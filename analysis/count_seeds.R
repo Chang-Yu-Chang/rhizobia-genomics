@@ -26,8 +26,11 @@ seeds <- tibble(
     mutate(Site = str_sub(PlantID, 1, 1), SiteID = str_sub(PlantID, 2, 2)) %>%
     select(Site, SiteID, PlantID, SeedCount)
 
-seeds
-
 seeds %>%
     group_by(Site, SiteID) %>%
     summarize(SeedCount = sum(SeedCount))
+
+seeds %>%
+    group_by(Site, SiteID) %>%
+    count()
+
