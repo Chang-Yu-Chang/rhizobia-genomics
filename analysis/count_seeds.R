@@ -34,3 +34,5 @@ seeds %>%
     group_by(Site, SiteID) %>%
     count()
 
+
+write_csv(seeds, here::here("data/raw/seeds/seeds.csv"))
