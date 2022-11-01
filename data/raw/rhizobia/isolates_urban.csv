@@ -1,0 +1,26 @@
+﻿StrainID,SiteName,Urban/Suburban
+src-1,swarthmore recycling center ,suburban
+src-2,swarthmore recycling center,suburban
+src-3,swarthmore recycling center,suburban
+fp 1-2,furness park,suburban
+fp 1-3,furness park,suburban
+fp 2-2,furness park,suburban
+crp 1-2,church road park,suburban
+crp 1-3,church road park,suburban
+crp 2-2,church road park,suburban
+gp 1-1,glenolden park,suburban
+gp 1-2,glenolden park,suburban
+gp 1-3,glenolden park,suburban
+,,
+bg-1,bartram's gardens,urban
+bg-2,bartram's gardens,urban
+bg-3,bartram's gardens,urban
+pms-1,penn medicine septa,urban
+pms-2,penn medicine septa,urban
+pms-3,penn medicine septa,urban
+ppf-1,penn park farm,urban
+ppf-2,penn park farm,urban
+ppf-3,penn park farm,urban
+40th-1,40th street septa station,urban
+40th-2,40st street septa station,urban
+40th-3,40nd street septa station,urban

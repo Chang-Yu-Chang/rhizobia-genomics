@@ -2,6 +2,8 @@
 
 library(tidyverse)
 
+# 1. Generate local-urban isolate ID  ----
+
 isolates <- tibble(
     IsolateID = c(
         # 20221017
@@ -43,11 +45,13 @@ isolates %>%
     count(name = "Count")
 
 
-isolates %>%
+isolates <- isolates %>%
     arrange(IsolateID) %>%
     mutate(` `= 1:n()) %>%
-    select(` `, everything()) %>%
-    write_csv(file = here::here("data/raw/isolates_ID.csv"))
+    select(` `, everything())
+
+
+write_csv(isolates, file = here::here("data/raw/isolates_ID.csv"))
 
 
 #
@@ -102,7 +106,19 @@ write_csv(isolate_cryo_H, here::here("data/raw/isolates_cryo_H.csv"))
 
 
 
+# 2. Combine ID for my isolates and Terrence's isolates ----
+isolates_urban <- read_csv(here::here("data/raw/rhizobia/isolates_urban.csv"), show_col_types = F) %>%
+    filter(!is.na(StrainID))
 
+isolates_for_seq <- tibble(ExpID = c(isolates$IsolateID, isolates_urban$StrainID)) %>%
+    mutate(`Sample Name` = sprintf("%03.0f", 1:n()),
+           `# of picks per container` = 1,
+           Note = paste0("bag ", c(rep(1:5, each = 16), rep(6, 11))))
+
+write_csv(isolates_for_seq, here::here("data/raw/rhizobia/isolates_for_seq.csv"))
+
+
+c("Sample Name", "# of picks per container", "Note")
 
 
 
