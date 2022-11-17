@@ -8,7 +8,7 @@ if (FALSE) {
 library(tidyverse)
 library(sangeranalyseR)
 folder_data <- here::here("data/")
-#source(here::here("analysis/00-metadata.R"))
+source(here::here("analysis/00-metadata.R"))
 
 
 # 1. Align the F and R reads ----
@@ -48,10 +48,8 @@ sangeranalyseR::writeFasta(
 
 
 #
-consensus1 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/1st Round/Sanger_all_trimmed_reads.fa"), seqtype = "DNA")
-consensus2 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/2nd Round/Sanger_all_trimmed_reads.fa"), seqtype = "DNA")
-#consensus1 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/1st Round/Sanger_contigs_alignment.fa"), seqtype = "DNA")
-#consensus2 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/2nd Round/Sanger_contigs_alignment.fa"), seqtype = "DNA")
+consensus1 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/1st Round/Sanger_contigs_alignment.fa"), seqtype = "DNA")
+consensus2 <- seqinr::read.fasta(paste0(folder_data, "raw/sanger/2nd Round/Sanger_contigs_alignment.fa"), seqtype = "DNA")
 clean_concensus <- function(x) {
     contig <- x %>% as.character()
     contig[contig=="a"] <- "A"
@@ -125,12 +123,12 @@ conf_score$ExpID <- rownames(pred)
 
 # Join the predicted taxonomy and isolates information
 isolates_RDP <- left_join(isolates_16S, pred, by = "ExpID") %>% left_join(conf_score, "ExpID")
-write_csv(isolates_RDP, paste0(folder_data, "temp/02-isolates_RDP.csv"))
+write_csv(isolates_RDP, paste0(folder_data, "temp/01-isolates_RDP.csv"))
 
 
 # 3. Plot ----
 library(cowplot)
-isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
+isolates_RDP <- read_csv(paste0(folder_data, "temp/01-isolates_RDP.csv"), show_col_types = F) %>%
     #arrange(Genus) %>%
     mutate(Genus = factor(Genus, levels = rev(unique(isolates_RDP$Genus)))) %>%
     mutate(Family = factor(Family, levels = rev(unique(isolates_RDP$Family)))) %>%
@@ -189,8 +187,16 @@ isolates_RDP %>%
     left_join(isolates_ID) %>%
     filter(Owner == "CYC", Genus == "Ensifer")
 
+isolates_RDP_inocula <- isolates_RDP %>%
+    left_join(isolates_ID, by = c("ExpID", "ID")) %>%
+    filter(Owner == "CYC", Genus == "Ensifer") %>%
+    filter(ExpID %in% c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")) %>%
+    select(Owner, Site, ExpID, ID, everything(), Sequence)
 
-# expid_used <- c("H1M2R3", "H3M1R1", "H4M1R1", "L1M3R2", "L2M2R1", "L3M1R1")
+write_csv(isolates_RDP_inocula, paste0(folder_data, "temp/01-isolates_RDP_inocula.csv"))
+
+
+# expid_used <- c("H1M2R3", "H3M1R1", "H4M1R1", "L1M3R2", "L2M2R1", "L3M1R1") # These are not all rhizboia
 # isolates_RDP %>%
 #     filter(ExpID %in% expid_used)
 
