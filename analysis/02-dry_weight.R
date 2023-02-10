@@ -12,6 +12,15 @@ source(here::here("analysis/00-metadata.R"))
 experiments <- read_csv(paste0(folder_data, "raw/rhizobia/04-phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     rename(DryWeight = `DryWeight (mg)`)
 
+experiments %>%
+    filter(PlantSite == "S") %>%
+    str()
+
+table(experiments$RhizobiaSite, experiments$Rhizobia, experiments$PlantSite)
+
+xtabs(~ RhizobiaSite + Rhizobia + PlantSite, data = experiments)
+xtabs(~ RhizobiaSite + PlantSite, data = experiments %>% filter(PlantSite %in% c("H", "L")))
+
 # Exploratory plots ----
 experiments %>%
     filter(!is.na(DryWeight)) %>%
@@ -21,20 +30,28 @@ experiments %>%
     geom_point(position = position_jitterdodge(dodge.width = 0.6, jitter.width = 0.1)) +
     theme_classic()
 
-names(experiments)
 
-# Compare H vs. L plant fitness using rhizobia strains as environment
+# Colors
+rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), unique(experiments$Rhizobia))
+rhizobia_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
+plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
+
+# Compare H vs. M vs. L vs.  plant fitness using rhizobia strains as environment
 p1 <- experiments %>%
     filter(!is.na(DryWeight)) %>%
-    filter(PlantSite %in% c("H", "L")) %>%
+    filter(Rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
+    mutate(PlantSite = factor(PlantSite, c("H", "S", "L"))) %>%
+    #filter(PlantSite %in% c("H", "L")) %>%
     #replace_na(list(DryWeight = 0)) %>%
-    ggplot(aes(x = Rhizobia, y = DryWeight, color = PlantSite)) +
-    geom_boxplot(position = position_dodge(width = 0.6), width = 0.5) +
-    geom_point(position = position_jitterdodge(dodge.width = 0.6, jitter.width = 0.1), shape = 21, stroke = 1) +
+    ggplot(aes(x = PlantSite, y = DryWeight, fill = RhizobiaSite, color = PlantSite)) +
+    geom_boxplot(position = position_dodge(width = 0.6), width = 0.5, lwd = 1, outlier.size = 2, alpha = .7) +
+    geom_point(position = position_jitterdodge(dodge.width = 0.6, jitter.width = 0.1), shape = 21, stroke = 1, size = 2) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    scale_color_manual(values = plant_site_colors) +
     theme_classic() +
-    ggtitle("High vs. Low plants")
-
-ggsave(here::here("plots/02-H_L_plants.png"), p1, width = 4, height = 3)
+    ggtitle("High vs Mid vs Low plants")
+p1
+ggsave(here::here("plots/02-H_L_plants.png"), p1, width = 5, height = 4)
 
 ##
 experiments %>%
@@ -50,10 +67,13 @@ str(experiments)
 p2 <- experiments %>%
     filter(!is.na(DryWeight)) %>%
     filter(PlantSite == "S") %>%
-    ggplot(aes(x = Rhizobia, y = DryWeight, color = Rhizobia)) +
-    geom_boxplot() +
-    geom_point(position = position_jitter(width = 0.2), shape = 21, stroke = 1) +
+    ggplot(aes(x = Rhizobia, y = DryWeight, fill = RhizobiaSite, alpha = Rhizobia)) +
+    geom_boxplot(lwd = 1, outlier.size = 2) +
+    geom_point(position = position_jitter(width = 0.2), shape = 21, stroke = 1, size = 2) +
+    scale_alpha_manual(values = rhizobia_alphas) +
+    scale_fill_manual(values = rhizobia_site_colors) +
     theme_classic() +
+    guides(alpha = "none") +
     ggtitle("Mid plants")
 p2
 ggsave(here::here("plots/02-M_plants.png"), p2, width = 6, height = 4)
@@ -61,15 +81,19 @@ ggsave(here::here("plots/02-M_plants.png"), p2, width = 6, height = 4)
 p3 <- experiments %>%
     filter(!is.na(DryWeight)) %>%
     filter(PlantSite == "S") %>%
-    ggplot(aes(x = Rhizobia, y = DryWeight, color = Rhizobia)) +
-    geom_boxplot() +
-    geom_point(position = position_jitter(width = 0.2), shape = 21, stroke = 1) +
+    ggplot(aes(x = Rhizobia, y = DryWeight, fill = RhizobiaSite, alpha = Rhizobia)) +
+    geom_boxplot(lwd = 1, outlier.size = 2) +
+    geom_point(position = position_jitter(width = 0.2), shape = 21, stroke = 1, size = 2) +
+    scale_alpha_manual(values = rhizobia_alphas) +
+    scale_fill_manual(values = rhizobia_site_colors) +
     facet_wrap(Plant ~.) +
     theme_classic() +
     theme(panel.border = element_rect(color = 1, fill = NA),
+          panel.grid.major.x = element_line(color = grey(0.5, 0.4), linetype = 2),
           axis.text.x = element_text(angle = 30, hjust = 1)) +
+    guides(alpha = "none") +
     ggtitle("Mid plants")
-
+p3
 ggsave(here::here("plots/02-M_plants_facet.png"), p3, width = 10, height = 6)
 
 ## Summary statistics
@@ -96,29 +120,27 @@ pairwise.t.test(temp$DryWeight, temp$Rhizobia, p.adjust.method = "bonferroni")
 
 # Check assumptions ----
 
-
 # Analysis ----
 
-# The effect of rhizobia strain and source of origin on plant biomass
-mod <- experiments %>%
-    filter(PlantSite == "S") %>%
-    lmer(DryWeight ~ RhizobiaSite + Rhizobia + (1|Waterblock), data = .)
-Anova(mod)
-summary(mod)
-vif.lme(mod)
-
-
-
 # The effect of crossing H/L rhizobia and H/L plants on plant biomass
-mod <- experiments %>%
-    filter(PlantSite %in% c("L", "H")) %>%
-    filter(!is.na(DryWeight)) %>%
-    lmer(DryWeight ~ RhizobiaSite + PlantSite + (1 + Rhizobia| Waterblock), data = .)
-RhizobiaSite * (1|Rhizobia)
-Anova(mod)
-summary(mod)
-vif.lme(mod)
+experiments %>%
+    filter(Rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
+    lmer(DryWeight ~ RhizobiaSite * PlantSite + (1|PlantSite:Plant) + (1|Waterblock), data = .,
+         control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))) %>%
+    Anova(type = 3)
 
+
+# The effect of rhizobia strains and origins or thermal environments on plant biomass
+experiments %>%
+    filter(PlantSite == "S") %>%
+    lmer(DryWeight ~ RhizobiaSite + Rhizobia + (1|Waterblock), data = .) %>%
+    Anova()
+
+# The effect of rhizobia strains and origins or thermal environments on plant biomass
+experiments %>%
+    filter(PlantSite == "S") %>%
+    lmer(DryWeight ~ RhizobiaSite * Rhizobia + (1|RhizobiaSite:Rhizobia) + (1|Waterblock), data = .) %>%
+    Anova(type = 3)
 
 
 
