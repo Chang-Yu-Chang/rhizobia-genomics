@@ -8,7 +8,7 @@ if (FALSE) {
 library(tidyverse)
 library(sangeranalyseR)
 folder_data <- here::here("data/")
-source(here::here("analysis/00-metadata.R"))
+source(here::here("processing_scripts/00-metadata.R"))
 
 
 # 1. Align the F and R reads ----
@@ -97,8 +97,7 @@ library(tidyverse)
 library(rRDPData)
 library(rRDP)
 library(Biostrings)
-#source(here::here("analysis/00-metadata.R"))
-isolates_ID <- read_csv(paste0(folder_data, "raw/rhizobia/isolates_for_seq.csv"), col_types = cols()) %>%
+isolates_ID <- read_csv(paste0(folder_data, "raw/rhizobia/02-sequencing/isolates_for_seq.csv"), col_types = cols()) %>%
     mutate(ID = as.numeric(`Sample Name`)) %>%
     select(ExpID, ID) %>%
     mutate(ExpID = str_replace(ExpID, " ", ""))

@@ -89,12 +89,12 @@ treatments <- temp %>%
     mutate(Label = paste0("ID", ID, "-", Rhizobia, "-WB", Waterblock, "-", Plant)) %>%
     select(ID, everything())
 
-# Uncomment this line to genearte the csv table
-#write_csv(treatments, paste0(folder_data, "raw/rhizobia/treatments.csv"))
+# Uncomment this line to generate the csv table
+#write_csv(treatments, paste0(folder_data, "raw/rhizobia/03-label/treatments.csv"))
+
 #' To use the printing labels in MS Words, save the csv file into a xlsx file
 #' For how to print the labels, refer to the Google Docs from Corlett
 #' "Create and print pot labels with Excel and Mail Merge in Word"
-
 
 # 3. Manually assign the rest of the plants that are not included in the treatments.csv ----
 #' There were a few plants manually assigned during the day of inoculation
@@ -114,7 +114,8 @@ treatments_unassigned <- tibble(
 treatments_assigned <- treatments %>%
     rows_update(treatments_unassigned, by = "ID")
 
-write_csv(treatments_assigned, paste0(folder_data, "raw/rhizobia/treatments_assigned.csv"))
+# Uncomment this line to generate the csv table
+#write_csv(treatments_assigned, paste0(folder_data, "raw/rhizobia/03-label/treatments_assigned.csv"))
 
 
 
@@ -124,21 +125,3 @@ treatments_assigned %>%
     count()
 
 
-
-
-
-if (FALSE) {
-    waterblocks <- treatments %>%
-        distinct(RhizobiaSite, Rhizobia, TreatmentID, Waterblock) %>%
-        # Remove the unassigned
-        filter(!is.na(TreatmentID)) %>%
-        # No rhizobia control
-        bind_rows(tibble(TreatmentID = rep(0, 2), Waterblock = 31:32)) %>%
-        # Three extra plants for H and L
-        bind_rows(tibble(
-            RhizobiaSite = c("H", "H", "L"),
-            Rhizobia = c("H3M1R1", "H3M1R1", "L2M2R1"),
-            TreatmentID = c(3, 2, 6),
-            Waterblock = c(6, 6, 9))) %>%
-        arrange(Waterblock)
-}

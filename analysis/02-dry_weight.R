@@ -1,4 +1,4 @@
-# This script reads the dry weight data
+#' This script reads the dry weight data
 
 library(tidyverse)
 library(broom)
@@ -7,19 +7,26 @@ library(car) # Companion to Applied Regression
 # library(lattice)
 # library(lsmeans)
 # library(glmmADMB)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("processing_scripts/00-metadata.R"))
 
-experiments <- read_csv(paste0(folder_data, "raw/rhizobia/04-phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
+#
+experiments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     rename(DryWeight = `DryWeight (mg)`)
 
+dim(experiments) # 167 plants
+
+
 experiments %>%
-    filter(PlantSite == "S") %>%
-    str()
+    filter(PlantSite == "S", !is.na(Rhizobia)) %>%
+    group_by(Rhizobia) %>%
+    slice(1)
+table(experiments$Rhizobia, experiments$PlantSite)
 
 table(experiments$RhizobiaSite, experiments$Rhizobia, experiments$PlantSite)
 
 xtabs(~ RhizobiaSite + Rhizobia + PlantSite, data = experiments)
 xtabs(~ RhizobiaSite + PlantSite, data = experiments %>% filter(PlantSite %in% c("H", "L")))
+
 
 # Exploratory plots ----
 experiments %>%
@@ -178,43 +185,3 @@ vif.lme(mod)
 # Excluding plants that received too many nematode eggs does not qualitatively change the answer
 mod = lmer(FruitMass.g ~ Nodules + Galls + RootMass.g + scale(NumEggs) + Researcher + (1|Block),
            subset(experiment1, Number.of.Nematode.Eggs <=400))
-
-
-
-
-
-if (FALSE) {
-#
-
-PlantGrowth %>%
-    as_tibble() %>%
-    ggplot(aes(x = group, y = weight)) +
-    geom_boxplot() +
-    geom_jitter() +
-    theme_classic()
-
-fit_plant <- aov(weight ~ group, data = PlantGrowth)
-summary(fit_plant)
-dummy.coef(fit_plant)
-coef(fit_plant)
-
-plot(fit_plant, which = 2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
