@@ -10,21 +10,21 @@ library(car) # Companion to Applied Regression
 # library(glmmADMB)
 source(here::here("analysis/00-metadata.R"))
 
-experiments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
+treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     rename(dry_weight = `dry_weight (mg)`) %>%
     clean_names()
-nrow(experiments) # 167 plants
-experiments %>% tabyl(rhizobia_site, plant_site, show_missing_levels = T)
-experiments %>% tabyl(rhizobia, plant_site, show_missing_levels = T)
+nrow(treatments) # 167 plants
+treatments %>% tabyl(rhizobia_site, plant_site, show_missing_levels = T)
+treatments %>% tabyl(rhizobia, plant_site, show_missing_levels = T)
 
 
 #
-rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), unique(experiments$rhizobia))
+rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), unique(treatments$rhizobia))
 rhizobia_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
 plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
 
 # 1. Compare H vs. M vs. L vs.  plant fitness using rhizobia strains as environment ----
-p <- experiments %>%
+p <- treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
     mutate(plant_site = factor(plant_site, c("H", "S", "L"))) %>%
@@ -39,7 +39,7 @@ p <- experiments %>%
 ggsave(here::here("plots/02-01-biomass_match.png"), p, width = 5, height = 4)
 
 ##
-experiments %>%
+treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site %in% c("H", "L")) %>%
     #filter(rhizobia_site == "H") %>%
@@ -48,7 +48,7 @@ experiments %>%
 
 
 # 2. Compare M plant fitness using rhizobia statins as environment ----
-p <- experiments %>%
+p <- treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site == "S") %>%
     ggplot(aes(x = rhizobia, y = dry_weight, fill = rhizobia_site, alpha = rhizobia)) +
@@ -60,7 +60,7 @@ p <- experiments %>%
     guides(alpha = "none")
 ggsave(here::here("plots/02-02-biomass_rhizobia.png"), p, width = 6, height = 4)
 
-p <- experiments %>%
+p <- treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site == "S") %>%
     ggplot(aes(x = rhizobia, y = dry_weight, fill = rhizobia_site, alpha = rhizobia)) +
@@ -77,20 +77,20 @@ p <- experiments %>%
 ggsave(here::here("plots/02-03-bimass_rhizobia_facet.png"), p, width = 10, height = 6)
 
 ## Summary statistics
-experiments %>%
+treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site == "S") %>%
     group_by(rhizobia) %>%
     summarize(dry_weightMean = mean(dry_weight), dry_weightMedian = median(dry_weight))
 
 ##
-experiments %>%
+treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site == "S") %>%
     aov(dry_weight ~ rhizobia, data = .) %>%
     tidy()
 
-temp <- experiments %>%
+temp <- treatments %>%
     filter(!is.na(dry_weight)) %>%
     filter(plant_site == "S") %>%
     filter(!is.na(rhizobia))
@@ -99,7 +99,7 @@ pairwise.t.test(temp$dry_weight, temp$rhizobia, p.adjust.method = "bonferroni")
 
 
 # 4. nodule number ----
-p <- experiments %>%
+p <- treatments %>%
     #filter(!is.na(nodule_number)) %>%
     #filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
     mutate(plant_site = factor(plant_site, c("H", "S", "L"))) %>%
@@ -112,7 +112,7 @@ p <- experiments %>%
 ggsave(here::here("plots/02-04-nodule_interaction.png"), p, width = 5, height = 4)
 
 # 5. nodule number and biomass ----
-p <- experiments %>%
+p <- treatments %>%
     ggplot() +
     geom_point(aes(x = nodule_number, y = dry_weight), shape = 21, size = 2, stroke = 1) +
     #scale_color_manual(values = rhizobia_site_colors) +
@@ -122,11 +122,11 @@ p <- experiments %>%
     labs()
 ggsave(here::here("plots/02-05-biomass_nodule.png"), p, width = 4, height = 4)
 
-cor.test(experiments$dry_weight, experiments$nodule_number) %>% tidy()
+cor.test(treatments$dry_weight, treatments$nodule_number) %>% tidy()
 
 
 # 6. nodule number and biomass ----
-p <- experiments %>%
+p <- treatments %>%
     drop_na(rhizobia) %>%
     ggplot() +
     geom_smooth(aes(x = nodule_number, y = dry_weight), method = "lm") +
@@ -139,7 +139,7 @@ p <- experiments %>%
     labs()
 ggsave(here::here("plots/02-06-biomass_nodule.png"), p, width = 5, height = 4)
 
-experiments %>%
+treatments %>%
     drop_na(rhizobia) %>%
     nest(.by = rhizobia) %>%
     mutate(result = map(data, ~cor.test(.x$nodule_number, .x$dry_weight)),
@@ -147,7 +147,7 @@ experiments %>%
     unnest(tided)
 
 # 7. biomass / nodule number ----
-p <- experiments %>%
+p <- treatments %>%
     #filter(!is.na(nodule_number)) %>%
     #filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
     mutate(plant_site = factor(plant_site, c("H", "S", "L"))) %>%
@@ -161,7 +161,7 @@ ggsave(here::here("plots/02-07-biomass_nodule_interaction.png"), p, width = 5, h
 
 
 # 8. biomass / nodule number ----
-p <- experiments %>%
+p <- treatments %>%
     drop_na(dry_weight) %>%
     filter(nodule_number != 0) %>%
     ggplot(aes(x = rhizobia, y = dry_weight/nodule_number, fill = rhizobia_site, alpha = rhizobia)) +
@@ -175,7 +175,7 @@ p <- experiments %>%
 ggsave(here::here("plots/02-08-biomass_nodule_boxplot.png"), p, width = 6, height = 4)
 
 
-experiments %>%
+treatments %>%
     mutate(temp = dry_weight/nodule_number) %>%
     pull(temp) %>% range(na.rm = T)
 
@@ -186,7 +186,7 @@ experiments %>%
 # Analysis ----
 
 # The effect of crossing H/L rhizobia and H/L plants on plant biomass
-experiments %>%
+treatments %>%
     filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
     lmer(dry_weight ~ rhizobia_site * plant_site + (1|plant_site:Plant) + (1|Waterblock), data = .,
          control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))) %>%
@@ -194,13 +194,13 @@ experiments %>%
 
 
 # The effect of rhizobia strains and origins or thermal environments on plant biomass
-experiments %>%
+treatments %>%
     filter(plant_site == "S") %>%
     lmer(dry_weight ~ rhizobia_site + rhizobia + (1|Waterblock), data = .) %>%
     Anova()
 
 # The effect of rhizobia strains and origins or thermal environments on plant biomass
-experiments %>%
+treatments %>%
     filter(plant_site == "S") %>%
     lmer(dry_weight ~ rhizobia_site * rhizobia + (1|rhizobia_site:rhizobia) + (1|Waterblock), data = .) %>%
     Anova(type = 3)
