@@ -11,7 +11,7 @@ library(car) # Companion to Applied Regression
 source(here::here("analysis/00-metadata.R"))
 
 treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
-    rename(dry_weight = `dry_weight (mg)`) %>%
+    rename(dry_weight = `DryWeight (mg)`) %>%
     clean_names()
 nrow(treatments) # 167 plants
 treatments %>% tabyl(rhizobia_site, plant_site, show_missing_levels = T)
@@ -36,7 +36,7 @@ p <- treatments %>%
     scale_fill_manual(values = rhizobia_site_colors) +
     scale_color_manual(values = plant_site_colors) +
     theme_classic()
-ggsave(here::here("plots/02-01-biomass_match.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "temp/02-01-biomass_match.png"), p, width = 5, height = 4)
 
 ##
 treatments %>%
@@ -58,7 +58,7 @@ p <- treatments %>%
     scale_fill_manual(values = rhizobia_site_colors) +
     theme_classic() +
     guides(alpha = "none")
-ggsave(here::here("plots/02-02-biomass_rhizobia.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "temp/02-02-biomass_rhizobia.png"), p, width = 6, height = 4)
 
 p <- treatments %>%
     filter(!is.na(dry_weight)) %>%
@@ -74,7 +74,7 @@ p <- treatments %>%
           panel.grid.major.x = element_line(color = grey(0.5, 0.4), linetype = 2),
           axis.text.x = element_text(angle = 30, hjust = 1)) +
     guides(alpha = "none")
-ggsave(here::here("plots/02-03-bimass_rhizobia_facet.png"), p, width = 10, height = 6)
+ggsave(paste0(folder_data, "temp/02-03-bimass_rhizobia_facet.png"), p, width = 10, height = 6)
 
 ## Summary statistics
 treatments %>%
@@ -109,7 +109,7 @@ p <- treatments %>%
     scale_fill_manual(values = rhizobia_site_colors) +
     scale_color_manual(values = plant_site_colors) +
     theme_classic()
-ggsave(here::here("plots/02-04-nodule_interaction.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "temp/02-04-nodule_interaction.png"), p, width = 5, height = 4)
 
 # 5. nodule number and biomass ----
 p <- treatments %>%
@@ -120,7 +120,7 @@ p <- treatments %>%
     theme() +
     guides() +
     labs()
-ggsave(here::here("plots/02-05-biomass_nodule.png"), p, width = 4, height = 4)
+ggsave(paste0(folder_data, "temp/02-05-biomass_nodule.png"), p, width = 4, height = 4)
 
 cor.test(treatments$dry_weight, treatments$nodule_number) %>% tidy()
 
@@ -137,7 +137,7 @@ p <- treatments %>%
     theme() +
     guides() +
     labs()
-ggsave(here::here("plots/02-06-biomass_nodule.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "temp/02-06-biomass_nodule.png"), p, width = 5, height = 4)
 
 treatments %>%
     drop_na(rhizobia) %>%
@@ -157,7 +157,7 @@ p <- treatments %>%
     scale_fill_manual(values = rhizobia_site_colors) +
     scale_color_manual(values = plant_site_colors) +
     theme_classic()
-ggsave(here::here("plots/02-07-biomass_nodule_interaction.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "temp/02-07-biomass_nodule_interaction.png"), p, width = 5, height = 4)
 
 
 # 8. biomass / nodule number ----
@@ -172,7 +172,7 @@ p <- treatments %>%
     scale_y_continuous(expand = c(0.1,0)) +
     theme_classic () +
     guides(alpha = "none")
-ggsave(here::here("plots/02-08-biomass_nodule_boxplot.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "temp/02-08-biomass_nodule_boxplot.png"), p, width = 6, height = 4)
 
 
 treatments %>%
