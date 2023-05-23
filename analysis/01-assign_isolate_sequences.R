@@ -8,7 +8,7 @@ if (FALSE) {
 library(tidyverse)
 library(sangeranalyseR)
 folder_data <- here::here("data/")
-source(here::here("processing_scripts/00-metadata.R"))
+source(here::here("analysis/00-metadata.R"))
 
 
 # 1. Align the F and R reads ----
@@ -129,10 +129,24 @@ write_csv(isolates_RDP, paste0(folder_data, "temp/01-isolates_RDP.csv"))
 library(cowplot)
 isolates_RDP <- read_csv(paste0(folder_data, "temp/01-isolates_RDP.csv"), show_col_types = F) %>%
     #arrange(Genus) %>%
-    mutate(Genus = factor(Genus, levels = rev(unique(isolates_RDP$Genus)))) %>%
-    mutate(Family = factor(Family, levels = rev(unique(isolates_RDP$Family)))) %>%
+    # mutate(Genus = factor(Genus, levels = rev(unique(isolates_RDP$Genus)))) %>%
+    # mutate(Family = factor(Family, levels = rev(unique(isolates_RDP$Family)))) %>%
     filter(!is.na(Family))
 
+#
+isolates_rhizo <- isolates_RDP %>%
+    #filter(Genus == "Ensifer") %>%
+    filter(Family == "Rhizobiaceae") %>%
+    mutate(Site = str_sub(ExpID, 1, 1)) %>%
+    filter(Site %in% c("H", "L"))
+
+isolates_rhizo %>%
+    tabyl(Site) # 8 H and 11 L
+
+write_csv(isolates_rhizo, paste0(folder_data, "temp/01-isolates_rhizo.csv"))
+
+
+#
 p1 <- isolates_RDP %>%
     ggplot() +
     geom_bar(aes(y = Family, fill = Family), color = 1) +
@@ -181,7 +195,6 @@ p <- isolates_RDP %>%
 ggsave(here::here("plots/01-family_count.png"), plot = p, width = 6, height = 3)
 
 # Check the used rhizobia ----
-
 isolates_RDP %>%
     left_join(isolates_ID) %>%
     filter(Owner == "CYC", Genus == "Ensifer")

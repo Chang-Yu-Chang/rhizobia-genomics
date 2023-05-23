@@ -29,7 +29,7 @@ p <- treatments %>%
     filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
     mutate(plant_site = factor(plant_site, c("H", "S", "L"))) %>%
     #filter(plant_site %in% c("H", "L")) %>%
-    #replace_na(list(dry_weight = 0)) %>%
+    #replace_na(list(dry_weight = 0)) %>%=8
     ggplot(aes(x = plant_site, y = dry_weight, fill = rhizobia_site, color = plant_site)) +
     geom_boxplot(position = position_dodge(width = 0.6), width = 0.5, lwd = 1, outlier.size = 2, alpha = .7) +
     geom_point(position = position_jitterdodge(dodge.width = 0.6, jitter.width = 0.1), shape = 21, stroke = .5, size = 2) +

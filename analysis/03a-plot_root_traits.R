@@ -439,7 +439,7 @@ p <- pca_coord$df.u %>%
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
 ggsave(paste0(folder_data, "temp/03a-04b-pca_nodulating_strains.png"), p, width = 8, height = 7)
-p <- fviz_pca_ind(pcobj, habillage = drop_na(filter(treatments, rhizobia %in% nodulating_strains), all_of(traits))$rhizobia, addEllipses = T)
+p <- fviz_pca_ind(pcobj, habillage = drop_na(filter(treatments, rhizobia %in% nodulating_strains), all_of(traits))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
 ggsave(paste0(folder_data, "temp/03a-04b-pca_nodulating_strains_ec.png"), p, width = 8, height = 7)
 
 # 4b. six strains omitting nodule number
@@ -465,7 +465,7 @@ p <- pca_coord$df.u %>%
 
 ggsave(paste0(folder_data, "temp/03a-04c-pca_strains.png"), p, width = 8, height = 7)
 
-p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia, addEllipses = T)
+p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
 ggsave(paste0(folder_data, "temp/03a-04c-pca_strains_ec.png"), p, width = 8, height = 7)
 #
 
