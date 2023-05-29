@@ -9,6 +9,7 @@ library(DHARMa) # for checking assumptuons of lm4
 library(broom.mixed) # for tidy up lme4
 library(ggplotify) # for convert base plot into ggplot
 library(factoextra) # for plotting pca eclipse
+library(GGally) # for pairwise correlation plot between variables
 source(here::here("analysis/00-metadata.R"))
 
 treatments <- read_csv(paste0(folder_data, "temp/03-treatments.csv"), show_col_types = F)
@@ -21,7 +22,7 @@ rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2"
 rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), unique(treatments$rhizobia))
 rhizobia_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
 plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
-traits <- c("dry_weight", "nodule_number", "number_of_root_tips", "number_of_branch_points",
+traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "number_of_root_tips", "number_of_branch_points",
             "total_root_length_px", "branching_frequency_per_px", "network_area_px2",
             "average_diameter_px", "median_diameter_px", "maximum_diameter_px",
             "perimeter_px", "volume_px3", "surface_area_px2")
@@ -92,7 +93,7 @@ ggsave(paste0(folder_data, "temp/03a-01c-trait_value_scaled.png"), p, width = 15
 
 # 1d. check the LMM result ----
 ## Sanity check: does the biomass differ between plants with rhizobia from the two sites?
-mod <- lmer(dry_weight ~ rhizobia_site + (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments_scaled2)
+mod <- lmer(dry_weight_mg ~ rhizobia_site + (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments_scaled2)
 Anova(mod, type = 3)
 contrasts(as.factor(treatments_scaled2$rhizobia_site))
 
@@ -117,11 +118,11 @@ for (i in 1:13) p_list[[i]] <- as.ggplot(~plot(traits_mod$sr[[i]])) + theme(plot
 p <- plot_grid(plotlist = p_list, nrow = 4, scale = .9, labels = traits, label_x = 0, hjust = 0) + theme(plot.background = element_rect(fill = "white"))
 ggsave(paste0(folder_data, "temp/03a-01e-check_assumptions.png"), p, width = 30, height = 20)
 # 1f. biomass as a function of rhizobia site in only M elevation plants ----
-mod <- lmer(dry_weight ~ rhizobia_site + (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments_scaled2 %>% filter(plant_site == "S"))
+mod <- lmer(dry_weight_mg ~ rhizobia_site + (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments_scaled2 %>% filter(plant_site == "S"))
 Anova(mod, type = 3)
 
 tb <- treatments %>%
-    drop_na(dry_weight) %>%
+    drop_na(dry_weight_mg) %>%
     filter(plant_site == "S")
 
 tb_n <- tb %>%
@@ -131,7 +132,7 @@ tb_n <- tb %>%
 p <- tb %>%
     #group_by(rhizobia) %>% count
     #mutate(trait = factor(trait, traits)) %>%
-    ggplot(aes(x = rhizobia_site, y = dry_weight, color = rhizobia_site)) +
+    ggplot(aes(x = rhizobia_site, y = dry_weight_mg, color = rhizobia_site)) +
     geom_boxplot(outlier.size = -1) +
     geom_jitter(width = .1, shape = 21) +
     geom_text(data = tb_n, aes(x = rhizobia_site, label = paste0("n=", n)), y = Inf, vjust = 1) +
@@ -148,10 +149,10 @@ ggsave(paste0(folder_data, "temp/03a-01f-trait_site.png"), p, width = 4, height 
 
 
 # 2. trait correlation ----
-# 2a. dry_weight ~ nodule number, colored by trait site ----
+# 2a. dry_weight_mg ~ nodule number, colored by trait site ----
 p <- treatments %>%
     drop_na(rhizobia_site) %>%
-    ggplot(aes(x = nodule_number, y = dry_weight, color = rhizobia_site)) +
+    ggplot(aes(x = nodule_number, y = dry_weight_mg, color = rhizobia_site)) +
     geom_point(shape = 21, size = 2, stroke = 1) +
     geom_smooth(method = "lm") +
     scale_color_manual(values = rhizobia_site_colors) +
@@ -162,16 +163,15 @@ p <- treatments %>%
 ggsave(paste0(folder_data, "temp/03a-02a-trait_site.png"), p, width = 4, height = 3)
 
 ## Does the rhizoibia site and nodule together have effect on biomass?
-mod <- lmer(dry_weight ~ rhizobia_site + nodule_number + rhizobia_site:nodule_number +
+mod <- lmer(dry_weight_mg ~ rhizobia_site + nodule_number + rhizobia_site:nodule_number +
                 (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments)
 Anova(mod, type = 3) # nodule_number does, but not with rhizobia site
 
-lmer(dry_weight ~ nodule_number + (1|rhizobia), data = treatments) %>%
+lmer(dry_weight_mg ~ nodule_number + (1|rhizobia), data = treatments) %>%
     Anova(type = 3)
 
 
-# 2b. correlation between all traits ----
-library(GGally)
+# 2b. correlation between all traits, colored by trait site ----
 p <- treatments %>%
     drop_na(rhizobia_site) %>%
     #select(all_of(traits)) %>%
@@ -184,9 +184,9 @@ p <- treatments %>%
         diag = list(continuous = wrap("densityDiag", alpha = 0.5))
     )
 
-ggsave(paste0(folder_data, "temp/03a-02b-trait_correlation.png"), p, width = 15, height = 15)
+ggsave(paste0(folder_data, "temp/03a-02b-trait_correlation.png"), p, width = 20, height = 20)
 
-# 2c. correlation between all traits ----
+# 2c. correlation between all traits, colored by trait site ----
 p <- treatments_scaled %>%
     drop_na(rhizobia_site) %>%
     #select(all_of(traits)) %>%
@@ -199,14 +199,14 @@ p <- treatments_scaled %>%
         diag = list(continuous = wrap("densityDiag", alpha = 0.5))
     )
 
-ggsave(paste0(folder_data, "temp/03a-02c-trait_correlation_scaled.png"), p, width = 15, height = 15)
+ggsave(paste0(folder_data, "temp/03a-02c-trait_correlation_scaled.png"), p, width = 20, height = 20)
 
 ##
-lmer(dry_weight ~ rhizobia_site + network_area_px2 + rhizobia_site:network_area_px2 +
+lmer(dry_weight_mg ~ rhizobia_site + network_area_px2 + rhizobia_site:network_area_px2 +
          (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments) %>%
     Anova(type = 3)
 
-# 2d. Correlation matrix with significant level ----
+# 2d. correlation matrix with significant level ----
 library(Hmisc) # for pairwise correlation test
 calculate_cor <- function (treatments) {
     temp <- treatments %>%
@@ -264,6 +264,25 @@ p <- plot_grid(plotlist = p_list, nrow = 2, labels = paste0(names(a), " (n=", a,
 ggsave(paste0(folder_data, "temp/03a-02e-trait_correlation_matrix_strain.png"), p, width = 30, height = 16)
 
 
+# 2f. correlation between all traits
+lowerFn <- function(data, mapping, method = "lm", ...) {
+    p <- ggplot(data = data, mapping = mapping) +
+        geom_point(shape = 21) +
+        geom_smooth(method = method, color = "blue", ...)
+    p
+}
+p <- treatments %>%
+#    drop_na(rhizobia_site) %>%
+    #select(all_of(traits)) %>%
+    ggpairs(
+        columns = which(names(treatments) %in% traits),
+        aes(),
+        upper = list(continuous = "cor", combo = "box_no_facet", discrete = "facetbar", na = "na"),
+        lower = list(continuous = wrap(lowerFn, method = "lm")),
+        diag = list(continuous = wrap("densityDiag", alpha = 0.5))
+    )
+
+ggsave(paste0(folder_data, "temp/03a-02f-trait_correlation.png"), p, width = 20, height = 20)
 # 3. Traits by strain ----
 # 3a. histogram of traits by strains
 p <- treatments_scaled_long %>%
@@ -285,7 +304,7 @@ ggsave(paste0(folder_data, "temp/03a-03a-trait_strain.png"), p, width = 10, heig
 
 # 3b. LMM result ----
 ## Sanity check: does the biomass differ between plants with rhizobia from the two sites?
-mod <- lmer(dry_weight ~ rhizobia + (1|waterblock) + (1|plant), data = treatments_scaled)
+mod <- lmer(dry_weight_mg ~ rhizobia + (1|waterblock) + (1|plant), data = treatments_scaled)
 Anova(mod, type = 3)
 
 ## LMM
@@ -314,7 +333,7 @@ options(contrasts = c("contr.treatment", "contr.treatment"))
 
 # 3c. LM of traits ----
 ## Sanity check
-lm(dry_weight ~ rhizobia, data = treatments_scaled) %>%
+lm(dry_weight_mg ~ rhizobia, data = treatments_scaled) %>%
     summary()
 
 lm(nodule_number ~ rhizobia, data = treatments_scaled) %>%
@@ -343,6 +362,21 @@ traits_mod %>%
     group_by(trait) %>%
     pivot_wider(names_from = term, values_from = significance)
 
+# 03d root weight vs. root network area ----
+p <- treatments %>%
+    drop_na(c(root_weight_mg, network_area_px2)) %>%
+    ggplot() +
+    geom_point(aes(x = root_weight_mg, y = network_area_px2), size = 2, shape = 21) +
+    geom_smooth(aes(x = root_weight_mg, y = network_area_px2), method = "lm") +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/03a-03d-root_weight_vs_area.png"), p, width = 4, height = 4)
+
+cor.test(treatments$root_weight_mg, treatments$network_area_px2, method = "pearson")
+model <- lm(network_area_px2 ~ root_weight_mg, data = treatments)
+summary(model)
 
 # 4. PCA ----
 # 4a. pca ----
@@ -387,7 +421,7 @@ compute_pca_coord <- function (pcobj) {
 }
 pcobj <- treatments %>%
     select(id, all_of(traits)) %>%
-    #select(id, all_of(c("dry_weight", "nodule_number"))) %>%
+    #select(id, all_of(c("dry_weight_mg", "nodule_number"))) %>%
     drop_na() %>%
     select(-id) %>%
     prcomp(center = TRUE, scale. = TRUE)
@@ -419,7 +453,7 @@ nodulating_strains <- c("H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1")
 pcobj <- treatments %>%
     filter(rhizobia %in% nodulating_strains) %>%
     select(id, all_of(traits)) %>%
-    #select(id, all_of(c("dry_weight", "nodule_number"))) %>%
+    #select(id, all_of(c("dry_weight_mg", "nodule_number"))) %>%
     drop_na() %>%
     select(-id) %>%
     prcomp(center = TRUE, scale. = TRUE)
@@ -468,23 +502,21 @@ ggsave(paste0(folder_data, "temp/03a-04c-pca_strains.png"), p, width = 8, height
 p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
 ggsave(paste0(folder_data, "temp/03a-04c-pca_strains_ec.png"), p, width = 8, height = 7)
 #
-
-
+# #
+# install.packages("factoextra")
+# library(factoextra)
+# iris.pca <- prcomp(iris[, -5],
+#                    scale = TRUE)
 #
-install.packages("factoextra")
-library(factoextra)
-iris.pca <- prcomp(iris[, -5],
-                   scale = TRUE)
-
-summary(iris.pca)
-
-fviz_pca_ind(iris.pca,
-             habillage=iris$Species,
-             addEllipses=TRUE)
-
-
-
-
+# summary(iris.pca)
+#
+# fviz_pca_ind(iris.pca,
+#              habillage=iris$Species,
+#              addEllipses=TRUE)
+#
+#
+#
+#
 
 
 
