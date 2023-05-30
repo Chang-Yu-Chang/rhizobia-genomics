@@ -66,11 +66,35 @@ p <- gc_summ %>%
 
 ggsave(paste0(folder_data, "temp/04a-03-gc_mean.png"), p, width = 10, height = 6)
 
-# 4.
+# 4. plot the growth curve fit
+gc.prm.stat <- read_csv(file=paste0(folder_data, 'temp/04c-gc_prm_summ.csv'))
+gc.prm <- read_csv(file=paste0(folder_data, 'temp/04c-gc_prm.csv'))
+
+gc.prm.stat %>%
+    filter(strain %in% c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1", "blank")) %>%
+    ggplot() +
+    geom_point(aes(x = strain, y = r)) +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
 
 
+p <- gc.prm %>%
+    filter(strain %in% c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1", "blank")) %>%
+    mutate(strain = factor(strain, rev(c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1", "blank")))) %>%
+    pivot_longer(cols = c(r, t.r, lag, maxOD.fit), names_to = "gc_trait") %>%
+    ggplot() +
+    geom_boxplot(aes(x = strain, y = value), outlier.size = 0) +
+    geom_point(aes(x = strain, y = value), shape = 21) +
+    facet_wrap(gc_trait ~., scales = "free", ncol = 1, strip.position = "right") +
+    coord_flip() +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
 
-
+ggsave(paste0(folder_data, "temp/04a-04-gc_trait.png"), p, width = 6, height = 10)
 
 
 
