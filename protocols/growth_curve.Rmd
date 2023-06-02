@@ -128,24 +128,27 @@ wide_to_long <- function (x) {
 
 ```{r message=F}
 #"READ THE ACTUAL DATA HERE AS mi"
-mi <- read_csv(paste0(folder_data, "raw/growth_curve/inocula_before_standardization.csv"), show_col_types = F)
+mi <- read_csv(paste0(folder_data, "raw/growth_curve/inocula_before_standardization2.csv"), show_col_types = F)
 # Match well to inocula
 mi_before <- mi %>%
+    select(-...14) %>%
     wide_to_long() %>%
     left_join(gc_plate, by = join_by("row", "column")) %>%
     filter(column %in% c(1, 5, 9))
 
-# 
+od600_blank <- mean(mi_before$od600[mi_before$strain == "blank"])
 
 mi_before %>%
     # For this batch use the following strains
-    filter(strain %in% c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1")) %>%
+    #filter(strain %in% c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1")) %>%
+    filter(strain != "blank") %>% 
+    mutate(od600 = od600 - od600_blank) %>% 
     arrange(column, row) %>% 
     mutate(od_dissolved = od600) %>%
     mutate(od_target = 0.1, volume_target = 100) %>% 
     mutate(volume_dissolved = round(volume_target * od_target / od_dissolved, 2)) %>%
     mutate(volume_pbs = round(volume_target - volume_dissolved, 2)) %>%
-    select(strain, well, od_dissolved, od_target, volume_target, volume_dissolved, volume_pbs) %>%
+    select(strain, well, od_dissolved, od_target, volume_target, volume_dissolved, volume_pbs) %>% 
     kable()
 
 ```

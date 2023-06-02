@@ -133,6 +133,9 @@ isolates_RDP <- read_csv(paste0(folder_data, "temp/01-isolates_RDP.csv"), show_c
     # mutate(Family = factor(Family, levels = rev(unique(isolates_RDP$Family)))) %>%
     filter(!is.na(Family))
 
+isolates_RDP %>%
+    filter(ExpID %in% c("H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1", "L4M2R2", "L4M3R3", "L4M4R1")) %>%
+    view
 #
 isolates_rhizo <- isolates_RDP %>%
     #filter(Genus == "Ensifer") %>%
