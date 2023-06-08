@@ -132,7 +132,7 @@ compute.gam <- function(x)
 }
 
 
-gc <- read_csv(paste0(folder_data, "raw/growth_curve/rhizobia_growth_curve.csv"))
+gc <- read_csv(paste0(folder_data, "raw/growth_curve/rhizobia_growth_curve2.csv"))
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve/gc_plate.csv"))
 clean_well_names <- function (x) {
     y <- paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
