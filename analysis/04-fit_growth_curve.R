@@ -1,15 +1,18 @@
-#' This script fit the to
+#' This script fit GAM to growth curve
 
 require(tidyverse)
 library(janitor)
-require(viridis)
 require(data.table)
 require(mgcv)
-require(egg)
 source(here::here("analysis/00-metadata.R"))
 
-compute.gam <- function(x)
-{
+gc <- read_csv(paste0(folder_data, "raw/growth_curve/rhizobia_growth_curve2.csv"))
+gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve/gc_plate.csv"))
+clean_well_names <- function (x) {
+    y <- paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
+    return(y)
+}
+compute.gam <- function(x) {
     # Remove "blank"
     x <- x[order(t)]
     x[, abs := abs-0.034]
@@ -111,7 +114,7 @@ compute.gam <- function(x)
                       r = maxgr$deriv.fit[1],
                       t.r = t.maxGr,
                       lag = t_lag,
-                      maxOD.fit = max(pred0$fit),
+                      maxOD = max(pred0$fit),
                       startOD = blk )
         return(list('data' = pred,
                     'params' = prm))
@@ -124,19 +127,11 @@ compute.gam <- function(x)
                       r = 0,
                       t.r = NA,
                       lag = NA,
-                      maxOD.fit = NA,
+                      maxOD = NA,
                       startOD = blk)
         return(list('data' = NA,
                     'params' = prm))
     }
-}
-
-
-gc <- read_csv(paste0(folder_data, "raw/growth_curve/rhizobia_growth_curve2.csv"))
-gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve/gc_plate.csv"))
-clean_well_names <- function (x) {
-    y <- paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
-    return(y)
 }
 
 # Tidy up
@@ -148,9 +143,26 @@ gc <- gc %>%
     pivot_longer(cols = -t, names_to = "well", values_to = "od600") %>%
     mutate(well = clean_well_names(well)) %>%
     left_join(gc_plate) %>%
-    filter(strain != "blank") %>%
     rename(abs = od600)
 
+gc_blank <- gc %>%
+    filter(strain == "blank") %>%
+    group_by(t) %>%
+    summarize(abs_blank = mean(abs))
+
+gc <- gc %>%
+    left_join(gc_blank) %>%
+    mutate(abs = abs - abs_blank) %>%
+    mutate(abs = ifelse(abs < 0, 0, abs)) %>%
+    filter(strain != "blank")
+
+gc_summ <- gc %>%
+    group_by(t, strain) %>%
+    summarize(mean_abs = mean(abs), sd_abs = sd(abs))
+write_csv(gc, paste0(folder_data, 'temp/04-gc.csv')) # subtract blank
+write_csv(gc_summ, paste0(folder_data, 'temp/04-gc_summ.csv')) # subtract blank
+
+# Smooth and fit GAM to growth curves
 gc <- as.data.table(gc)
 gc <- split(gc, by = c('well', 'strain'))
 gc.fits <- lapply(gc, compute.gam)
@@ -158,30 +170,17 @@ gc.prm <- do.call(rbind, lapply(gc.fits, function(x) x[[2]]))
 gc <- do.call(rbind, lapply(gc.fits, function(x) x[[1]]))
 
 ## get statistics over replicates
+gc.prm <- gc.prm %>% mutate(site = str_sub(strain, 1, 1))
 gc.prm.stat <- gc.prm %>%
     group_by(strain) %>%
     summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
               t.r.sem = sd(t.r)/sqrt(n()), t.r = mean(t.r),
               lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
-              maxOD.sem = sd(maxOD.fit)/sqrt(n()), maxOD = mean(maxOD.fit))
+              maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD)) %>%
+    mutate(site = str_sub(strain, 1, 1))
 
-setDT(gc.prm)
-setDT(gc.prm.stat)
-fwrite(gc.prm, file=paste0(folder_data, 'temp/04c-gc_prm.csv'))
-fwrite(gc.prm.stat, file=paste0(folder_data, 'temp/04c-gc_prm_summ.csv'))
+write_csv(gc.prm, file = paste0(folder_data, 'temp/04-gc_prm.csv'))
+write_csv(gc.prm.stat, file = paste0(folder_data, 'temp/04-gc_prm_summ.csv'))
 
-#d <- fread(paste0(folder_data, 'raw/growth_curve/test_fit/raw_gcurves_all.csv'))
-#d <- split(d, by = c(well', 'strain', 'seq'))
-#d.fits <- lapply(d, compute.gam)
-# d.prm <- do.call(rbind, lapply(d.fits, function(x) x[[2]]))
-# d <- do.call(rbind, lapply(d.fits, function(x) x[[1]]))
 
-## get statistics over replicates
-# d.prm.stat <- d.prm %>%
-#     group_by(seq, csource) %>%
-#     summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
-#               t.r.sem = sd(t.r)/sqrt(n()), t.r = mean(t.r),
-#               lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
-#               maxOD.sem = sd(maxOD.fit)/sqrt(n()), maxOD = mean(maxOD.fit))
-#
-# setDT(d.prm.stat)
+

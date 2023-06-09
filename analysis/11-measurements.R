@@ -1,33 +1,37 @@
-#' This script matches the plant phenotypes into one tabular csv
+#' This script analyses the hand measured phenotypes: dry weight, nodule count, root weight, nodule weight
 
 library(tidyverse)
+library(broom)
 library(janitor)
+# library(lattice)
+# library(lsmeans)
+# library(glmmADMB)
 source(here::here("analysis/00-metadata.R"))
 
-# 1. Merge the files
+# Manual measurements
+treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
+    rename(dry_weight = `DryWeight (mg)`) %>%
+    clean_names()
+nrow(treatments) # 167 plants
 treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     clean_names()
 
+# Computer vision measurements
 features <- read_csv(paste0(folder_data, "raw/rhizobia/05-root_architecture/features.csv"), show_col_types = F) %>%
     clean_names() %>%
     mutate(id = str_replace(file_name, ".png", "") %>% as.numeric())
 treatments <- treatments %>% left_join(features)
-
-traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "number_of_root_tips", "number_of_branch_points",
-            "total_root_length_px", "branching_frequency_per_px", "network_area_px2",
-            "average_diameter_px", "median_diameter_px", "maximum_diameter_px",
-            "perimeter_px", "volume_px3", "surface_area_px2")
 
 treatments_long <- treatments %>%
     select(-contains("range_")) %>%
     pivot_longer(cols = all_of(traits), names_to = "trait", values_to = "value")
 
 
-write_csv(treatments_long, paste0(folder_data, "temp/03-treatments_long.csv"))
-write_csv(treatments, paste0(folder_data, "temp/03-treatments.csv"))
+write_csv(treatments, paste0(folder_data, "temp/11-treatments.csv"))
+write_csv(treatments_long, paste0(folder_data, "temp/11-treatments_long.csv"))
 
 
-# 2. Check assumptions
+# Check assumptions ----
 treatments_scaled <- treatments %>%
     # # Excluding the strains that do not nodulate
     # filter(!rhizobia %in% c("H2M3R1", "L4M2R2")) %>%
@@ -38,10 +42,7 @@ treatments_scaled_long <- treatments_scaled %>%
     select(-contains("range_")) %>%
     pivot_longer(cols = all_of(traits), names_to = "trait", values_to = "value")
 
-write_csv(treatments_scaled, paste0(folder_data, "temp/03-treatments_scaled.csv"))
-write_csv(treatments_scaled_long, paste0(folder_data, "temp/03-treatments_scaled_long.csv"))
-
-
-
+write_csv(treatments_scaled, paste0(folder_data, "temp/11-treatments_scaled.csv"))
+write_csv(treatments_scaled_long, paste0(folder_data, "temp/11-treatments_scaled_long.csv"))
 
 

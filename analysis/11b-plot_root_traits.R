@@ -12,29 +12,14 @@ library(factoextra) # for plotting pca eclipse
 library(GGally) # for pairwise correlation plot between variables
 source(here::here("analysis/00-metadata.R"))
 
-treatments <- read_csv(paste0(folder_data, "temp/03-treatments.csv"), show_col_types = F)
-treatments_long <- read_csv(paste0(folder_data, "temp/03-treatments_long.csv"), show_col_types = F)
-treatments_scaled <- read_csv(paste0(folder_data, "temp/03-treatments_scaled.csv"), show_col_types = F)
-treatments_scaled_long <- read_csv(paste0(folder_data, "temp/03-treatments_scaled_long.csv"), show_col_types = F)
-
-#
-rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
-rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), unique(treatments$rhizobia))
-rhizobia_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
-plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
-traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "number_of_root_tips", "number_of_branch_points",
-            "total_root_length_px", "branching_frequency_per_px", "network_area_px2",
-            "average_diameter_px", "median_diameter_px", "maximum_diameter_px",
-            "perimeter_px", "volume_px3", "surface_area_px2")
-
-traits2 <- c(traits,
-             paste0(rep(c("root_length_diameter_range_", "projected_area_diameter_range_", "surface_area_diameter_range_", "volume_diameter_range_"), each = 6),
-                   rep(1:6, 4), rep(c("_px", "_px2", "_px2", "_px3"), each = 6)))
+treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
+treatments_long <- read_csv(paste0(folder_data, "temp/11-treatments_long.csv"), show_col_types = F)
+treatments_scaled <- read_csv(paste0(folder_data, "temp/11-treatments_scaled.csv"), show_col_types = F)
+treatments_scaled_long <- read_csv(paste0(folder_data, "temp/11-treatments_scaled_long.csv"), show_col_types = F)
 
 # Set contrasts (sum-to-zero rather than R's default treatment contrasts)
 # http://rstudio-pubs-static.s3.amazonaws.com/65059_586f394d8eb84f84b1baaf56ffb6b47f.html
 options(contrasts=c("contr.sum", "contr.poly"))
-
 
 # 1. Traits by rhizobia location ----
 # 1a. boxplot of traits by sites ----
@@ -51,7 +36,7 @@ p <- treatments_long %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/03a-01a-trait_site.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "temp/11b-01a-trait_site.png"), p, width = 10, height = 8)
 
 ##
 treatments_scaled2 <- treatments_scaled %>%
@@ -74,7 +59,7 @@ p <- treatments_long %>%
     theme() +
     guides() +
     labs()
-ggsave(paste0(folder_data, "temp/03a-01b-trait_value.png"), p, width = 15, height = 10)
+ggsave(paste0(folder_data, "temp/11b-01b-trait_value.png"), p, width = 15, height = 10)
 
 # 1c. histogram of scaled traits values ----
 p <- treatments_scaled_long2 %>%
@@ -89,7 +74,7 @@ p <- treatments_scaled_long2 %>%
     theme() +
     guides() +
     labs()
-ggsave(paste0(folder_data, "temp/03a-01c-trait_value_scaled.png"), p, width = 15, height = 10)
+ggsave(paste0(folder_data, "temp/11b-01c-trait_value_scaled.png"), p, width = 15, height = 10)
 
 # 1d. check the LMM result ----
 ## Sanity check: does the biomass differ between plants with rhizobia from the two sites?
@@ -116,7 +101,7 @@ traits_mod
 p_list <- rep(list(NA), 13)
 for (i in 1:13) p_list[[i]] <- as.ggplot(~plot(traits_mod$sr[[i]])) + theme(plot.background = element_rect(color = "black"))
 p <- plot_grid(plotlist = p_list, nrow = 4, scale = .9, labels = traits, label_x = 0, hjust = 0) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/03a-01e-check_assumptions.png"), p, width = 30, height = 20)
+ggsave(paste0(folder_data, "temp/11b-01e-check_assumptions.png"), p, width = 30, height = 20)
 # 1f. biomass as a function of rhizobia site in only M elevation plants ----
 mod <- lmer(dry_weight_mg ~ rhizobia_site + (1|rhizobia) + (1|waterblock) + (1|plant), data = treatments_scaled2 %>% filter(plant_site == "S"))
 Anova(mod, type = 3)
@@ -143,7 +128,7 @@ p <- tb %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/03a-01f-trait_site.png"), p, width = 4, height = 3)
+ggsave(paste0(folder_data, "temp/11b-01f-trait_site.png"), p, width = 4, height = 3)
 
 
 
@@ -160,7 +145,7 @@ p <- treatments %>%
     theme() +
     guides() +
     labs()
-ggsave(paste0(folder_data, "temp/03a-02a-trait_site.png"), p, width = 4, height = 3)
+ggsave(paste0(folder_data, "temp/11b-02a-trait_site.png"), p, width = 4, height = 3)
 
 ## Does the rhizoibia site and nodule together have effect on biomass?
 mod <- lmer(dry_weight_mg ~ rhizobia_site + nodule_number + rhizobia_site:nodule_number +
@@ -184,7 +169,7 @@ p <- treatments %>%
         diag = list(continuous = wrap("densityDiag", alpha = 0.5))
     )
 
-ggsave(paste0(folder_data, "temp/03a-02b-trait_correlation.png"), p, width = 20, height = 20)
+ggsave(paste0(folder_data, "temp/11b-02b-trait_correlation.png"), p, width = 20, height = 20)
 
 # 2c. correlation between all traits, colored by trait site ----
 p <- treatments_scaled %>%
@@ -199,7 +184,7 @@ p <- treatments_scaled %>%
         diag = list(continuous = wrap("densityDiag", alpha = 0.5))
     )
 
-ggsave(paste0(folder_data, "temp/03a-02c-trait_correlation_scaled.png"), p, width = 20, height = 20)
+ggsave(paste0(folder_data, "temp/11b-02c-trait_correlation_scaled.png"), p, width = 20, height = 20)
 
 ##
 lmer(dry_weight_mg ~ rhizobia_site + network_area_px2 + rhizobia_site:network_area_px2 +
@@ -249,7 +234,7 @@ p <- treatments %>%
     calculate_cor() %>%
     plot_cor_matrix()
 
-ggsave(paste0(folder_data, "temp/03a-02d-trait_correlation_matrix.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "temp/11b-02d-trait_correlation_matrix.png"), p, width = 10, height = 8)
 # 2e. correlation matrix by strain ----
 p_list <- rep(list(NA), 6)
 for (i in 1:6) {
@@ -261,7 +246,7 @@ for (i in 1:6) {
 
 a <- table(treatments$rhizobia)
 p <- plot_grid(plotlist = p_list, nrow = 2, labels = paste0(names(a), " (n=", a, ")"), hjust = 0)
-ggsave(paste0(folder_data, "temp/03a-02e-trait_correlation_matrix_strain.png"), p, width = 30, height = 16)
+ggsave(paste0(folder_data, "temp/11b-02e-trait_correlation_matrix_strain.png"), p, width = 30, height = 16)
 
 
 # 2f. correlation between all traits
@@ -282,7 +267,7 @@ p <- treatments %>%
         diag = list(continuous = wrap("densityDiag", alpha = 0.5))
     )
 
-ggsave(paste0(folder_data, "temp/03a-02f-trait_correlation.png"), p, width = 20, height = 20)
+ggsave(paste0(folder_data, "temp/11b-02f-trait_correlation.png"), p, width = 20, height = 20)
 # 3. Traits by strain ----
 # 3a. histogram of traits by strains
 p <- treatments_scaled_long %>%
@@ -300,7 +285,7 @@ p <- treatments_scaled_long %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/03a-03a-trait_strain.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "temp/11b-03a-trait_strain.png"), p, width = 10, height = 8)
 
 # 3b. LMM result ----
 ## Sanity check: does the biomass differ between plants with rhizobia from the two sites?
@@ -326,7 +311,7 @@ traits_mod %>%
 p_list <- rep(list(NA), 13)
 for (i in 1:13) p_list[[i]] <- as.ggplot(~plot(traits_mod$sr[[i]])) + theme(plot.background = element_rect(color = "black"))
 p <- plot_grid(plotlist = p_list, nrow = 4, scale = .9, labels = traits, label_x = 0, hjust = 0) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/03a-03b-check_assumptions.png"), p, width = 30, height = 20)
+ggsave(paste0(folder_data, "temp/11b-03b-check_assumptions.png"), p, width = 30, height = 20)
 
 #
 options(contrasts = c("contr.treatment", "contr.treatment"))
@@ -372,7 +357,7 @@ p <- treatments %>%
     theme() +
     guides() +
     labs()
-ggsave(paste0(folder_data, "temp/03a-03d-root_weight_vs_area.png"), p, width = 4, height = 4)
+ggsave(paste0(folder_data, "temp/11b-03d-root_weight_vs_area.png"), p, width = 4, height = 4)
 
 cor.test(treatments$root_weight_mg, treatments$network_area_px2, method = "pearson")
 model <- lm(network_area_px2 ~ root_weight_mg, data = treatments)
@@ -446,7 +431,7 @@ p <- pca_coord$df.u %>%
     theme_classic() +
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
-ggsave(paste0(folder_data, "temp/03a-04a-pca.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04a-pca.png"), p, width = 8, height = 7)
 
 # 4b. four strains that nodulate
 nodulating_strains <- c("H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1")
@@ -472,9 +457,9 @@ p <- pca_coord$df.u %>%
     theme_classic() +
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
-ggsave(paste0(folder_data, "temp/03a-04b-pca_nodulating_strains.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04b-pca_nodulating_strains.png"), p, width = 8, height = 7)
 p <- fviz_pca_ind(pcobj, habillage = drop_na(filter(treatments, rhizobia %in% nodulating_strains), all_of(traits))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/03a-04b-pca_nodulating_strains_ec.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04b-pca_nodulating_strains_ec.png"), p, width = 8, height = 7)
 
 # 4b. six strains omitting nodule number
 pcobj <- treatments %>%
@@ -497,26 +482,10 @@ p <- pca_coord$df.u %>%
     theme_classic() +
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
-ggsave(paste0(folder_data, "temp/03a-04c-pca_strains.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04c-pca_strains.png"), p, width = 8, height = 7)
 
 p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/03a-04c-pca_strains_ec.png"), p, width = 8, height = 7)
-#
-# #
-# install.packages("factoextra")
-# library(factoextra)
-# iris.pca <- prcomp(iris[, -5],
-#                    scale = TRUE)
-#
-# summary(iris.pca)
-#
-# fviz_pca_ind(iris.pca,
-#              habillage=iris$Species,
-#              addEllipses=TRUE)
-#
-#
-#
-#
+ggsave(paste0(folder_data, "temp/11b-04c-pca_strains_ec.png"), p, width = 8, height = 7)
 
 
 
