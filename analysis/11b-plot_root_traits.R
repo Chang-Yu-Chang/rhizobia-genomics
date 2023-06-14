@@ -249,7 +249,7 @@ p <- plot_grid(plotlist = p_list, nrow = 2, labels = paste0(names(a), " (n=", a,
 ggsave(paste0(folder_data, "temp/11b-02e-trait_correlation_matrix_strain.png"), p, width = 30, height = 16)
 
 
-# 2f. correlation between all traits
+# 2f. correlation between all traits ----
 lowerFn <- function(data, mapping, method = "lm", ...) {
     p <- ggplot(data = data, mapping = mapping) +
         geom_point(shape = 21) +
@@ -268,6 +268,24 @@ p <- treatments %>%
     )
 
 ggsave(paste0(folder_data, "temp/11b-02f-trait_correlation.png"), p, width = 20, height = 20)
+
+# 2g. trait correlation by site ----
+p1 <- treatments %>%
+    filter(rhizobia_site == "H") %>%
+    calculate_cor() %>%
+    plot_cor_matrix() +
+    ggtitle("High sites")
+
+p2 <- treatments %>%
+    filter(rhizobia_site == "L") %>%
+    calculate_cor() %>%
+    plot_cor_matrix() +
+    ggtitle("Low sites")
+
+p <- plot_grid(p1, p2, nrow = 1)
+ggsave(paste0(folder_data, "temp/11b-02g-trait_correlation_matrix_strain.png"), p, width = 14, height = 5)
+
+
 # 3. Traits by strain ----
 # 3a. histogram of traits by strains
 p <- treatments_scaled_long %>%
@@ -348,18 +366,20 @@ traits_mod %>%
     pivot_wider(names_from = term, values_from = significance)
 
 # 03d root weight vs. root network area ----
-p <- treatments %>%
-    drop_na(c(root_weight_mg, network_area_px2)) %>%
+tt <- treatments %>%
+    drop_na(c(root_weight_mg, network_area_px2))
+p <- tt %>%
     ggplot() +
     geom_point(aes(x = root_weight_mg, y = network_area_px2), size = 2, shape = 21) +
     geom_smooth(aes(x = root_weight_mg, y = network_area_px2), method = "lm") +
+    annotate("text", label = paste0("n=", nrow(tt)), x = -Inf, y = Inf, hjust = -1, vjust = 2) +
     theme_classic() +
     theme() +
     guides() +
-    labs()
+    labs(x = "root weight (mg)", y = "# of forground pixels")
 ggsave(paste0(folder_data, "temp/11b-03d-root_weight_vs_area.png"), p, width = 4, height = 4)
 
-cor.test(treatments$root_weight_mg, treatments$network_area_px2, method = "pearson")
+cor.test(treatments$root_weight_mg, treatments$network_area_px2, method = "pearson") # cor = 0.901, p < 0.001
 model <- lm(network_area_px2 ~ root_weight_mg, data = treatments)
 summary(model)
 
@@ -424,6 +444,7 @@ p <- pca_coord$df.u %>%
                size = 2, stroke = .8) +
     # Label the variable axes
     geom_text(data = pca_coord$df.v, aes(label = varname, x = xvar, y = yvar, angle = angle, hjust = hjust), color = 'blue', size = 3) +
+    scale_color_manual(values = rhizobia_site_colors) +
     # scale_color_manual(values = color_names, name = "", label = names(color_names)) +
     # scale_fill_manual(values = fill_names, name = "", label = names(color_names)) +
     # scale_shape_manual(values = shape_names, name = "", label = names(color_names)) +
@@ -458,10 +479,12 @@ p <- pca_coord$df.u %>%
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
 ggsave(paste0(folder_data, "temp/11b-04b-pca_nodulating_strains.png"), p, width = 8, height = 7)
-p <- fviz_pca_ind(pcobj, habillage = drop_na(filter(treatments, rhizobia %in% nodulating_strains), all_of(traits))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/11b-04b-pca_nodulating_strains_ec.png"), p, width = 8, height = 7)
 
-# 4b. six strains omitting nodule number
+# 4c. eclipse ----
+p <- fviz_pca_ind(pcobj, habillage = drop_na(filter(treatments, rhizobia %in% nodulating_strains), all_of(traits))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
+ggsave(paste0(folder_data, "temp/11b-04c-pca_nodulating_strains_ec.png"), p, width = 8, height = 7)
+
+# 4d. six strains omitting nodule number ----
 pcobj <- treatments %>%
     select(id, all_of(traits[-2])) %>%
     drop_na() %>%
@@ -479,15 +502,62 @@ p <- pca_coord$df.u %>%
                size = 2, stroke = .8) +
     # Label the variable axes
     geom_text(data = pca_coord$df.v, aes(label = varname, x = xvar, y = yvar, angle = angle, hjust = hjust), color = 'blue', size = 3) +
+    scale_color_manual(values = rhizobia_site_colors) +
     theme_classic() +
     labs(x = pca_coord$u.axis.labs[1], y = pca_coord$u.axis.labs[2])
 
-ggsave(paste0(folder_data, "temp/11b-04c-pca_strains.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04d-pca_strains.png"), p, width = 8, height = 7)
 
+# 4e. eclipse ----
 p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia, addEllipses = T) + theme(plot.background = element_rect(fill = "white"))
-ggsave(paste0(folder_data, "temp/11b-04c-pca_strains_ec.png"), p, width = 8, height = 7)
+ggsave(paste0(folder_data, "temp/11b-04e-pca_strains_ec.png"), p, width = 8, height = 7)
 
+# 4f. pca by site ----
+p <- fviz_pca_ind(pcobj, habillage = drop_na(treatments, all_of(traits[-2]))$rhizobia_site, addEllipses = T) + theme(plot.background = element_rect(fill = "white")) +
+    scale_color_manual(values = rhizobia_site_colors) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    guides(shape = "none")
+ggsave(paste0(folder_data, "temp/11b-04f-pca_strains_ec.png"), p, width = 8, height = 7)
 
+# 5. show all traits colored by sites -----
+p <- treatments_long %>%
+    #filter(trait %in% c())
+    drop_na(value, rhizobia) %>%
+    mutate(trait = factor(trait, traits)) %>%
+    ggplot(aes(x = rhizobia_site, y = value, fill = rhizobia_site)) +
+    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
+    geom_jitter(shape = 21, width = 0.1, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    facet_wrap(~trait, scales = "free_y") +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA)
+    ) +
+    guides() +
+    labs()
+
+ggsave(paste0(folder_data, "temp/11b-5-trait_site.png"), p, width = 10, height = 8)
+
+# 5a. show only a few strains color by site ----
+p <- treatments_long %>%
+    drop_na(value, rhizobia) %>%
+    filter(trait %in% c("total_root_length_px", "network_area_px2", "average_diameter_px", "branching_frequency_per_px")) %>%
+    mutate(trait = factor(trait, traits)) %>%
+    ggplot(aes(x = rhizobia_site, y = value, fill = rhizobia_site)) +
+    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
+    geom_jitter(shape = 21, width = 0.1, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    facet_wrap(~trait, scales = "free_y", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA)
+    ) +
+    guides() +
+    labs()
+
+ggsave(paste0(folder_data, "temp/11b-5a-some_trait_site.png"), p, width = 8, height = 4)
 
 
 

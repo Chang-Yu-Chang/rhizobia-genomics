@@ -1,8 +1,10 @@
 #' This scripts plots the factorial design of the plant experiment, and the plot the manually measured phenotypes
 
 library(tidyverse)
+library(cowplot)
 library(broom)
 library(janitor)
+library(ggsci)
 library(waffle) #remotes::install_github("hrbrmstr/waffle")
 library(lme4) # for linear mixed-effect models
 library(car) # Companion to Applied Regression
@@ -10,52 +12,32 @@ source(here::here("analysis/00-metadata.R"))
 
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
 
-# 0. factorial design ----
-treatments %>% tabyl(rhizobia_site, plant_site, show_missing_levels = T)
-treatments %>% tabyl(rhizobia, plant_site, show_missing_levels = T)
-
-p <- treatments %>%
-    mutate(rhizobia_site = ifelse(is.na(rhizobia_site), "control", rhizobia_site),
-           rhizobia = ifelse(is.na(rhizobia), "control", rhizobia)) %>%
-    #filter(rhizobia != "control") %>%
-    mutate(rhizobia_site = factor(rhizobia_site)) %>%
-    group_by(rhizobia_site, rhizobia, plant_site) %>%
-    count(.drop = F) %>%
-    arrange(rhizobia_site, plant_site) %>%
-    ggplot() +
-    geom_waffle(aes(fill = plant_site, values = n),
-                n_rows = 10, color = "white", radius = unit(2, "pt"), size = 0.33,
-                na.rm = TRUE, flip = TRUE) +
-    #scale_fill_manual(values = RColorBrewer::brewer.pal(6, "Set1")) +
-    #scale_y_continuous(labels = function(x) x * 10, expand = c(0,0)) +
-    scale_alpha_manual(values = rhizobia_alphas) +
-    facet_grid(~rhizobia_site) +
-    coord_equal() +
-    theme_void() +
-    theme(
-        legend.position = "bottom",
-        strip.text.x = element_text(hjust = 0.5),
-        plot.background = element_rect(fill = "white", color = NA)
-    ) +
-    guides() +
-    labs()
-ggsave(paste0(folder_data, "temp/11a-00-factorial_design.png"), p, width = 5, height = 2)
-
-
-# 2. Compare H vs. M vs. L vs.  plant fitness using rhizobia strains as environment ----
+# 1. Compare H vs. M vs. L vs.  plant fitness using rhizobia strains as environment ----
 p <- treatments %>%
     filter(!is.na(dry_weight_mg)) %>%
     filter(rhizobia %in% c("H3M1R1", "L2M2R1")) %>%
-    mutate(plant_site = factor(plant_site, c("H", "S", "L"))) %>%
-    #filter(plant_site %in% c("H", "L")) %>%
-    #replace_na(list(dry_weight_mg = 0)) %>%=8
-    ggplot(aes(x = plant_site, y = dry_weight_mg, fill = rhizobia_site, color = plant_site)) +
-    geom_boxplot(position = position_dodge(width = 0.6), width = 0.5, lwd = 1, outlier.size = 2, alpha = .7) +
+    filter(plant_site != "S") %>%
+    # mutate(plant_site = case_when(
+    #     plant_site == "H" ~ "High",
+    #     plant_site == "S" ~ "Mid",
+    #     plant_site == "L" ~ "Low",
+    # )) %>%
+    ggplot(aes(x = plant_site, y = dry_weight_mg, fill = rhizobia_site)) +
+    geom_rect(aes(fill = plant_site), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.03) +
+    geom_boxplot(position = position_dodge(width = 0.6), width = 0.5, outlier.size = 0, alpha = .7) +
     geom_point(position = position_jitterdodge(dodge.width = 0.6, jitter.width = 0.1), shape = 21, stroke = .5, size = 2) +
-    scale_fill_manual(values = rhizobia_site_colors) +
-    scale_color_manual(values = plant_site_colors) +
-    theme_classic()
-ggsave(paste0(folder_data, "temp/11a-01-biomass_match.png"), p, width = 5, height = 4)
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
+    facet_grid(~plant_site, scales = "free_x") +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        legend.position = "top"
+    ) +
+    guides(fill = guide_legend(title = "rhizobia site")) +
+    labs(x = "plant site", y = "above-ground weight (mg)")
+ggsave(paste0(folder_data, "temp/11a-01-biomass_match.png"), p, width = 4, height = 4)
 
 ##
 treatments %>%
@@ -198,16 +180,80 @@ treatments %>%
     mutate(temp = dry_weight_mg/nodule_number) %>%
     pull(temp) %>% range(na.rm = T)
 
-# 9. root mass ----
+# 9. four traits ----
+p <- treatments %>%
+    drop_na(rhizobia) %>%
+    select(id, site = rhizobia_site, dry_weight_mg, nodule_number, root_weight_mg, nodule_weight_mg) %>%
+    pivot_longer(cols = c(dry_weight_mg, nodule_number, root_weight_mg, nodule_weight_mg), names_to = "trait") %>%
+    ggplot(aes(x = site, y = value, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    facet_wrap(~trait, scales = "free_y", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA)
+    ) +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/11a-09-measurements_site.png"), p, width = 8, height = 4)
 
-names(treatments)
 
+# 10. for trait in different y scale ----
+tt <- treatments %>%
+    drop_na(rhizobia) %>%
+    select(id, site = rhizobia_site, dry_weight_mg, nodule_number, root_weight_mg, nodule_weight_mg)
 
+p1 <- tt %>%
+    drop_na(dry_weight_mg) %>%
+    ggplot(aes(x = site, y = dry_weight_mg, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.y.left = element_blank(),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = "above-ground dry weight (mg)")
 
+p2 <- tt %>%
+    ggplot(aes(x = site, y = root_weight_mg, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.x = element_blank(),
+        legend.position = "top"
+    ) +
+    guides() +
+    labs(x = "", y = "root dry weight (mg)")
 
+p3 <- tt %>%
+    ggplot(aes(x = site, y = nodule_number, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.x = element_blank(),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = "# of nodules")
 
+p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
 
-
+ggsave(paste0(folder_data, "temp/11a-10-measurements_site_trait.png"), p, width = 8, height = 6)
 
 
 

@@ -3,14 +3,10 @@
 library(tidyverse)
 library(broom)
 library(janitor)
-# library(lattice)
-# library(lsmeans)
-# library(glmmADMB)
 source(here::here("analysis/00-metadata.R"))
 
 # Manual measurements
 treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
-    rename(dry_weight = `DryWeight (mg)`) %>%
     clean_names()
 nrow(treatments) # 167 plants
 treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
@@ -36,7 +32,7 @@ treatments_scaled <- treatments %>%
     # # Excluding the strains that do not nodulate
     # filter(!rhizobia %in% c("H2M3R1", "L4M2R2")) %>%
     # scale the traits
-    mutate_at(c(9:11, 14:49), ~ c(scale(.)))
+    mutate_at(c(9:12, 15:50), ~ c(scale(.)))
 
 treatments_scaled_long <- treatments_scaled %>%
     select(-contains("range_")) %>%
