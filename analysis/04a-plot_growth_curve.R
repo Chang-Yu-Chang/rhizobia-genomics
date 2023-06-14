@@ -89,12 +89,12 @@ ggsave(paste0(folder_data, "temp/04a-04-gc_mean_overlay.png"), p, width = 4, hei
 # 5. example of one strain ----
 p <- gc_summ %>%
     mutate(strain = factor(strain, list_strains)) %>%
-    filter(strain == "H1M1R1") %>%
+    filter(strain == "H2M3R1") %>%
     ggplot() +
-    geom_line(aes(x = t, y = mean_abs), color = "maroon") +
-    geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs), alpha = 0.2, fill = "maroon") +
+    geom_line(aes(x = t, y = mean_abs), color = "#0C6291") +
+    geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs), alpha = 0.2, fill = "#0C6291") +
     scale_x_continuous(limits = c(0, 48), breaks = seq(0, 48, 12), expand = c(0,0)) +
-    scale_y_continuous(limits = c(-0.04, 0.6), expand = c(0,0)) +
+    scale_y_continuous(limits = c(-0.01, 0.5), breaks = seq(0, 0.5, 0.1), expand = c(0,0)) +
     theme_classic() +
     theme() +
     guides() +
@@ -124,12 +124,10 @@ p1 <- gc.prm.stat %>%
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
-    coord_flip() +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank(),
-        axis.text.y.left = element_blank()
+        axis.text.x = element_blank()
     ) +
     guides(fill = "none") +
     labs(x = "", y = "lag time (hr)")
@@ -139,13 +137,11 @@ p2 <- gc.prm.stat %>%
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
-    coord_flip() +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
         axis.text.x = element_blank(),
-        axis.text.y.left = element_blank(),
-        legend.position = "right"
+        legend.position = "top"
     ) +
     guides() +
     labs(x = "", y = expression(growth~rate(h^-1)))
@@ -155,18 +151,16 @@ p3 <- gc.prm.stat %>%
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
-    coord_flip() +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank(),
-        axis.text.y.left = element_blank()
+        axis.text.x = element_blank()
     ) +
     guides(fill = "none") +
     labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
 
-p <- plot_grid(p1, p2, p3, ncol = 1, axis = "tbrl", align = "hv")
-ggsave(paste0(folder_data, "temp/04a-07-gc_trait_site.png"), p, width = 6, height = 5)
+p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
+ggsave(paste0(folder_data, "temp/04a-07-gc_trait_site.png"), p, width = 6, height = 4)
 
 ##
 gc_h <- gc.prm.stat %>% filter(site == "H")
@@ -190,8 +184,7 @@ p1 <- gc.prm %>%
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank(),
-        axis.text.y.left = element_blank()
+        axis.text.x = element_blank()
     ) +
     guides(fill = "none") +
     labs(x = "", y = "lag time (hr)")
@@ -206,7 +199,6 @@ p2 <- gc.prm %>%
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
         axis.text.x = element_blank(),
-        axis.text.y.left = element_blank(),
         legend.position = "right"
     ) +
     guides() +
@@ -221,8 +213,7 @@ p3 <- gc.prm %>%
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank(),
-        axis.text.y.left = element_blank()
+        axis.text.x = element_blank()
     ) +
     guides(fill = "none") +
     labs(x = "", y = expression(paste("max", "[", OD[600], "]")))

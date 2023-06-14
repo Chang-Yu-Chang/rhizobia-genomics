@@ -559,6 +559,77 @@ p <- treatments_long %>%
 
 ggsave(paste0(folder_data, "temp/11b-5a-some_trait_site.png"), p, width = 8, height = 4)
 
+# 5b. show panels one by one ----
+tt <- treatments %>%
+    drop_na(rhizobia) %>%
+    select(id, site = rhizobia_site, c("total_root_length_px", "network_area_px2", "average_diameter_px", "branching_frequency_per_px"))
+
+p1 <- tt %>%
+    ggplot(aes(x = site, y = network_area_px2, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.x = element_blank(),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = expression(area~size~(px^2)))
+
+p2 <- tt %>%
+    drop_na(total_root_length_px) %>%
+    ggplot(aes(x = site, y = total_root_length_px, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.y.left = element_blank(),
+        legend.position = "top"
+    ) +
+    guides() +
+    labs(x = "", y = "total length (px)")
+
+
+p3 <- tt %>%
+    ggplot(aes(x = site, y = average_diameter_px, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.x = element_blank(),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = "average diameter (px)")
+
+p4 <- tt %>%
+    ggplot(aes(x = site, y = branching_frequency_per_px, fill = site)) +
+    geom_boxplot(alpha = .6, outlier.shape = NA, color = "black") +
+    geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
+    scale_fill_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        axis.text.x = element_blank(),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = expression(branching~frequency~(px^-1)))
+
+p <- plot_grid(p1, p2, p3, p4, nrow = 1, axis = "tbrl", align = "hv")
+
+ggsave(paste0(folder_data, "temp/11b-5b-some_trait_site.png"), p, width = 10, height = 6)
+
 
 
 
