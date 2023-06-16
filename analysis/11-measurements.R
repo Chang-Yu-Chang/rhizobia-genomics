@@ -12,16 +12,21 @@ nrow(treatments) # 167 plants
 treatments <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     clean_names()
 
+# Clean up the treatment IDs
+treatments <- treatments %>%
+    rename(strain = rhizobia, strain_site_group = rhizobia_site, plant_site_group = plant_site) %>%
+    mutate(strain_site = str_sub(strain, 1, 2), plant_site = str_sub(plant, 1, 2)) %>%
+    select(label, id, treatment_id, starts_with("strain"), starts_with("plant"), everything())
+
 # Computer vision measurements
 features <- read_csv(paste0(folder_data, "raw/rhizobia/05-root_architecture/features.csv"), show_col_types = F) %>%
     clean_names() %>%
     mutate(id = str_replace(file_name, ".png", "") %>% as.numeric())
-treatments <- treatments %>% left_join(features)
+treatments <- treatments %>% left_join(features, by = join_by(id))
 
 treatments_long <- treatments %>%
     select(-contains("range_")) %>%
     pivot_longer(cols = all_of(traits), names_to = "trait", values_to = "value")
-
 
 write_csv(treatments, paste0(folder_data, "temp/11-treatments.csv"))
 write_csv(treatments_long, paste0(folder_data, "temp/11-treatments_long.csv"))
@@ -32,7 +37,7 @@ treatments_scaled <- treatments %>%
     # # Excluding the strains that do not nodulate
     # filter(!rhizobia %in% c("H2M3R1", "L4M2R2")) %>%
     # scale the traits
-    mutate_at(c(9:12, 15:50), ~ c(scale(.)))
+    mutate_at(c(11:14,17:52), ~ c(scale(.)))
 
 treatments_scaled_long <- treatments_scaled %>%
     select(-contains("range_")) %>%

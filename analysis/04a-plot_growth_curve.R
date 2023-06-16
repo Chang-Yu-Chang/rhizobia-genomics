@@ -118,9 +118,9 @@ p <- gc.prm %>%
 
 ggsave(paste0(folder_data, "temp/04a-06-gc_trait.png"), p, width = 6, height = 10)
 
-# 7. plot all trait mean by site ----
+# 7. plot all trait mean by strain_site_group ----
 p1 <- gc.prm.stat %>%
-    ggplot(aes(x = site, y = lag, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = lag, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
@@ -133,7 +133,7 @@ p1 <- gc.prm.stat %>%
     labs(x = "", y = "lag time (hr)")
 
 p2 <- gc.prm.stat %>%
-    ggplot(aes(x = site, y = r, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = r, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
@@ -147,7 +147,7 @@ p2 <- gc.prm.stat %>%
     labs(x = "", y = expression(growth~rate(h^-1)))
 
 p3 <- gc.prm.stat %>%
-    ggplot(aes(x = site, y = maxOD, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = maxOD, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
@@ -163,8 +163,8 @@ p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
 ggsave(paste0(folder_data, "temp/04a-07-gc_trait_site.png"), p, width = 6, height = 4)
 
 ##
-gc_h <- gc.prm.stat %>% filter(site == "H")
-gc_l <- gc.prm.stat %>% filter(site == "L")
+gc_h <- gc.prm.stat %>% filter(strain_site_group == "H")
+gc_l <- gc.prm.stat %>% filter(strain_site_group == "L")
 
 # lag
 wilcox.test(gc_h$lag, gc_l$lag) # p=0.599
@@ -174,9 +174,9 @@ wilcox.test(gc_h$r, gc_l$r) # p=0.4136
 wilcox.test(gc_h$maxOD, gc_l$maxOD) # p=0.8518
 
 
-# 8. plot all trait raw by site ----
+# 8. plot all trait raw by strain_site_group ----
 p1 <- gc.prm %>%
-    ggplot(aes(x = site, y = lag, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = lag, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
@@ -190,7 +190,7 @@ p1 <- gc.prm %>%
     labs(x = "", y = "lag time (hr)")
 
 p2 <- gc.prm %>%
-    ggplot(aes(x = site, y = r, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = r, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +
@@ -205,7 +205,7 @@ p2 <- gc.prm %>%
     labs(x = "", y = expression(growth~rate(h^-1)))
 
 p3 <- gc.prm %>%
-    ggplot(aes(x = site, y = maxOD, fill = site)) +
+    ggplot(aes(x = strain_site_group, y = maxOD, fill = strain_site_group)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
     scale_fill_manual(values = rhizobia_site_colors, labels = c("High", "Low"), breaks = c("H", "L")) +

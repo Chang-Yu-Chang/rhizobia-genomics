@@ -170,14 +170,15 @@ gc.prm <- do.call(rbind, lapply(gc.fits, function(x) x[[2]]))
 gc <- do.call(rbind, lapply(gc.fits, function(x) x[[1]]))
 
 ## get statistics over replicates
-gc.prm <- gc.prm %>% mutate(site = str_sub(strain, 1, 1))
+gc.prm <- gc.prm %>%
+    mutate(strain_site_group = str_sub(strain, 1, 1)) %>%
+    mutate(strain_site = str_sub(strain, 1, 2))
 gc.prm.stat <- gc.prm %>%
-    group_by(strain) %>%
+    group_by(strain_site_group, strain_site, strain) %>%
     summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
               t.r.sem = sd(t.r)/sqrt(n()), t.r = mean(t.r),
               lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
-              maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD)) %>%
-    mutate(site = str_sub(strain, 1, 1))
+              maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD))
 
 write_csv(gc.prm, file = paste0(folder_data, 'temp/04-gc_prm.csv'))
 write_csv(gc.prm.stat, file = paste0(folder_data, 'temp/04-gc_prm_summ.csv'))
