@@ -64,16 +64,23 @@ trait_long_stat <- bind_rows(mutate(gc_long_stat, trait_type = "growth"), mutate
 plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
     tb %>%
         ggplot() +
-        geom_boxplot(aes(x = strain_site_group, y = {{ytrait}}, fill = strain_site_group), alpha = .6, outlier.size = -1, color = "black") +
+        geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+        geom_boxplot(aes(x = strain_site_group, y = {{ytrait}}), fill = "white", outlier.size = -1, color = "black") +
         geom_point(aes(x = strain_site_group, y = {{ytrait}}, group = strain, color = strain), shape = 21, size = 2, stroke = 1, fill = NA,
                    position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
         scale_color_manual(values = rep("black", 100)) +
         scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
-        scale_x_discrete(label = c("high", "low")) +
+        #scale_x_discrete(label = c("high elevation", "low elevation")) +
+        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high\nelevation", L="low\nelevation"))) +
         theme_classic() +
         theme(
-            panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+            panel.spacing.x = unit(0, "mm"),
+            #panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+            strip.background = element_rect(color = NA, fill = NA),
+            strip.text = element_text(size = 10, color = "black"),
             axis.text = element_text(size = 10, color = "black"),
+            axis.text.x = element_blank(),
+            #axis.text.x = element_text(size = 10, color = "black", angle = 45, hjust = 1),
             legend.position = "none"
         ) +
         guides(color = "none") +
@@ -103,6 +110,68 @@ Anova(mod, type = 3) # Site group has effect on r
 mod <- lmer(maxOD ~ strain + (1|strain_site_group) + (1|strain_site), data = gc.prm)
 Anova(mod, type = 3) # Site group has effect on maxOD
 
+# 1a. plot traits by strains, faceted by sites ----
+gc_labels <- gc.prm.stat %>%
+    mutate(strain_label = factor(1:n())) %>%
+    select(strain, strain_label)
+p <- gc.prm %>%
+    left_join(gc_labels) %>%
+    ggplot() +
+    geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+    #geom_boxplot(aes(x = strain, y = lag, fill = strain_site_group), alpha = .6, outlier.size = -1, color = "black") +
+    geom_point(aes(x = strain_label, y = lag, group = strain_label, color = strain_label), shape = 21, size = 2, stroke = 1, fill = NA,
+               position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
+    scale_color_manual(values = rep("black", 100)) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+    #scale_x_discrete(label = c("high", "low")) +
+    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
+    theme_classic() +
+    theme(
+        panel.grid.major.x = element_line(color = "grey80"),
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        strip.background = element_rect(color = NA, fill = NA),
+        strip.text = element_text(size = 10, color = "black"),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.text.x = element_text(size = 10, color = "black"),
+        legend.position = "none"
+    ) +
+    guides(color = "none") +
+    labs(x = "rhizobia strain", y = "lag time (hr)")
+#p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
+ggsave(paste0(folder_data, "temp/22-01a-gc_by_strain.png"), p, width = 6, height = 4)
+
+
+# 1b. pca of the three growth traits ----
+tt <- gc.prm %>%
+    select(well, strain_site_group, all_of(c("r", "lag", "maxOD"))) %>%
+    drop_na()
+
+pcobj <- tt %>%
+    select(-well, -strain_site_group) %>%
+    prcomp(center = TRUE, scale. = TRUE)
+
+p <- fviz_pca_ind(
+    pcobj,
+    label = "none",
+    habillage = tt$strain_site_group,
+    addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
+) +
+    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
+    scale_shape_manual(values = c(H = 16, L = 17), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black"),
+        legend.position = c(0.2, 0.1),
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.title = element_blank(),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs()
+ggsave(paste0(folder_data, "temp/22-01b-pca.png"), p, width = 4, height = 4)
+
+
 
 # 2. one extended phenotype trait (root weight) by site group----
 p <- treatments %>%
@@ -113,17 +182,57 @@ p <- treatments %>%
     )
 ggsave(paste0(folder_data, "temp/22-02-weight_by_site.png"), p, width = 2, height = 4)
 
+# 2a. plot one trait by strain, faceted by sites ----
+gc_labels <- gc.prm.stat %>%
+    mutate(strain_label = factor(1:n())) %>%
+    select(strain, strain_label)
+p <- treatments_M %>%
+    left_join(gc_labels) %>%
+    drop_na(strain, dry_weight_mg) %>%
+    filter(strain != "control") %>%
+    ggplot() +
+    geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+    geom_boxplot(aes(x = strain_label, y = dry_weight_mg), fill = "white", outlier.size = -1, color = "black") +
+    geom_point(aes(x = strain_label, y = dry_weight_mg, group = strain_label, color = strain_label), shape = 21, size = 2, stroke = 1, fill = NA,
+               position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
+    scale_color_manual(values = rep("black", 100)) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high\nelevation", L="low\nelevation"))) +
+    theme_classic() +
+    theme(
+        panel.grid.major.x = element_line(color = "grey80"),
+        #panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_rect(color = NA, fill = NA),
+        strip.text = element_text(size = 10, color = "black"),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.text.x = element_text(size = 10, color = "black"),
+        legend.position = "none"
+    ) +
+    guides(color = "none") +
+    labs(x = "rhizobia strain", y = "above-ground dry weight (mg)")
+
+ggsave(paste0(folder_data, "temp/22-02a-weight_by_strain.png"), p, width = 3, height = 4)
+
+
+## Does rhizobia strain have effect on dry weight?
+mod <- lmer(dry_weight_mg ~ strain + (1|strain_site_group) + (1|plant) + (1|waterblock), data = treatments)
+Anova(mod, type = 3) # Site group does not have effect on dry weight
+
+
 ## Does rhizobia sites have effect on dry weight?
 mod <- lmer(dry_weight_mg ~ strain_site_group + (1|strain) + (1|plant) + (1|waterblock), data = treatments)
 Anova(mod, type = 3) # Site group does not have effect on dry weight
 
+
 # 3. pca of all extended phenotype traits ----
-tt <- treatments %>%
+tt <- treatments_M %>%
+    filter(strain != "control") %>%
     select(id, strain_site_group, all_of(traits), -nodule_weight_mg) %>%
     drop_na()
 
 pcobj <- tt %>%
-    select(-id, -strain) %>%
+    select(-id, -strain_site_group) %>%
     prcomp(center = TRUE, scale. = TRUE)
 
 p <- fviz_pca_ind(
@@ -132,13 +241,14 @@ p <- fviz_pca_ind(
     habillage = tt$strain_site_group,
     addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
 ) +
-    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("High", "Low"), breaks = c("H", "L"), name = "site") +
-    scale_shape_manual(values = c(H = 16, L = 17), labels = c("High", "Low"), breaks = c("H", "L"), name = "site") +
+    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
+    scale_shape_manual(values = c(H = 16, L = 17), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
     theme_classic() +
     theme(
         panel.border = element_rect(fill = NA, color = "black"),
-        legend.position = c(0.85, 0.85),
-        legend.background = element_rect(fill = "white", color = "black"),
+        legend.position = c(0.8, 0.9),
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.title = element_blank(),
         plot.background = element_rect(fill = "white", color = NA),
         plot.title = element_blank()
     ) +

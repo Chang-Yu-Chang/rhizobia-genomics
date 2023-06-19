@@ -128,21 +128,23 @@ ggsave(paste0(folder_data, "temp/21-02-site_elevation.png"), p, width = 3, heigh
 
 # 3. factorial design, plain ----
 # Clean up data
-treatments <- treatments %>%
-    mutate(strain_site = ifelse(is.na(strain_site), "control", strain_site),
+treatments_M <- treatments %>%
+    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
+           strain_site = ifelse(is.na(strain_site), "control", strain_site),
            strain = ifelse(is.na(strain), "control", strain)) %>%
-    mutate(strain_site = factor(strain_site, c("H", "L", "control")))
+    filter(plant_site_group == "S") %>%
+    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
 
-treatments %>% tabyl(strain_site, plant_site, show_missing_levels = T)
-treatments %>% tabyl(strain, plant_site, show_missing_levels = T)
+treatments_M %>% tabyl(strain_site_group, plant_site, show_missing_levels = T)
+treatments_M %>% tabyl(strain, plant_site, show_missing_levels = T)
 
 cc <- c(H = "#0C6291", L = "#BF4342", control = "#CBD4C2")
-p1 <- treatments %>%
-    group_by(strain_site, strain, plant_site) %>%
+p1 <- treatments_M %>%
+    group_by(strain_site_group, strain, plant_site) %>%
     count(.drop = F) %>%
-    arrange(strain_site, plant_site) %>%
+    arrange(strain_site_group, plant_site) %>%
     ggplot() +
-    geom_waffle(aes(values = n, fill = strain_site),
+    geom_waffle(aes(values = n, fill = strain_site_group),
                 n_rows = 10, color = "white", radius = unit(2, "pt"), size = 0.33,
                 na.rm = TRUE, flip = F) +
     scale_alpha_manual(values = rhizobia_alphas) +
@@ -162,10 +164,10 @@ p1 <- treatments %>%
     labs()
 
 # factorial design, by strain strains ----
-p2 <- treatments %>%
-    group_by(strain_site, strain) %>%
+p2 <- treatments_M %>%
+    group_by(strain_site_group, strain) %>%
     count(.drop = F) %>%
-    arrange(strain_site, strain) %>%
+    arrange(strain_site_group, strain) %>%
     mutate(strain = factor(strain)) %>%
     ggplot() +
     geom_waffle(aes(values = n, fill = strain),
