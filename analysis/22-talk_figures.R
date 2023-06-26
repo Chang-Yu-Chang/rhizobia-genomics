@@ -6,6 +6,8 @@ library(broom)
 library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
 library(factoextra) # for plotting pca eclipse
+library(flextable) # for making table
+library(Hmisc) # for pairwise correlation test
 source(here::here("analysis/00-metadata.R"))
 
 # growth curves
@@ -23,6 +25,14 @@ treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_t
 treatments_long <- read_csv(paste0(folder_data, "temp/11-treatments_long.csv"), show_col_types = F)
 treatments_scaled <- read_csv(paste0(folder_data, "temp/11-treatments_scaled.csv"), show_col_types = F)
 treatments_scaled_long <- read_csv(paste0(folder_data, "temp/11-treatments_scaled_long.csv"), show_col_types = F)
+# Clean up data
+treatments_M <- treatments %>%
+    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
+           strain_site = ifelse(is.na(strain_site), "control", strain_site),
+           strain = ifelse(is.na(strain), "control", strain)) %>%
+    filter(plant_site_group == "S") %>%
+    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
+
 
 # 0. combine the data from treatments and gc ----
 # Subset only Ensifer -----
@@ -92,7 +102,7 @@ p2 <- plot_boxplot_pair(gc.prm, r, expression(growth~rate(h^-1))) #+ theme(legen
 p3 <- plot_boxplot_pair(gc.prm, maxOD, expression(paste("max", "[", OD[600], "]")))
 
 p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
-ggsave(paste0(folder_data, "temp/22-01-gc_by_site.png"), p, width = 6, height = 5)
+ggsave(paste0(folder_data, "temp/22-01-gc_by_site.png"), p, width = 6, height = 4)
 
 ## Does the rhizobia sites have effect on any growth trait?
 mod <- lmer(lag ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
@@ -138,7 +148,7 @@ p <- gc.prm %>%
     guides(color = "none") +
     labs(x = "rhizobia strain", y = "lag time (hr)")
 #p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "hv")
-ggsave(paste0(folder_data, "temp/22-01a-gc_by_strain.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "temp/22-01a-gc_by_strain.png"), p, width = 4, height = 3)
 
 
 # 1b. pca of the three growth traits ----
@@ -260,6 +270,8 @@ ggsave(paste0(folder_data, "temp/22-03-pca.png"), p, width = 4, height = 4)
 p <- fviz_pca_var(
     pcobj, repel = T
 ) +
+    scale_x_continuous(limits = c(-1.5,1.5)) +
+    scale_y_continuous(limits = c(-1.5,1.5)) +
     theme_classic() +
     theme(
         panel.border = element_rect(fill = NA, color = "black"),
@@ -269,7 +281,7 @@ p <- fviz_pca_var(
         plot.title = element_blank()
     ) +
     labs()
-ggsave(paste0(folder_data, "temp/22-04-pca_var.png"), p, width = 4, height = 4)
+ggsave(paste0(folder_data, "temp/22-04-pca_var.png"), p, width = 6, height = 6)
 # p <- plot_grid(p1, p2, axis = "tblr", align = "h") +
 #     theme(plot.background = element_rect(fill = "white", color = NA))
 
@@ -387,14 +399,11 @@ ggsave(paste0(folder_data, "temp/22-07-pca_strain.png"), p, width = 4, height = 
 
 
 # 8. Table of all traits measured ----
-library(flextable)
-
-
 features <- tibble(
-    feature_tyep = c(rep("host yield", 4), rep("root architecture", 11)),
-    feature = traits
+    `Feature type` = c(rep("host yield", 2), rep("nodule", 2), rep("root architecture", 11)),
+    `Feature` = traits
 ) %>%
-    mutate(description = c(
+    mutate(`Description` = c(
         "above-ground dry weight (mg)",
         "number of nodule",
         "root dry weight (mg)",
@@ -410,24 +419,75 @@ features <- tibble(
         "estimated perimeter (px)",
         "estimated volume (px^3)",
         "estimated surface area (px^2)"
-    ))
+    )) %>%
     mutate(` ` = 1:n()) %>%
     select(` `, everything())
 
 ft <- features %>%
     flextable() %>%
-    merge_at(i = 1:4, j = 1, part = "body") %>%
-    merge_at(i = 5:15, j = 1, part = "body") %>%
-    width(j = 1, width = 2) %>%
+    merge_at(i = 1:2, j = 2, part = "body") %>%
+    merge_at(i = 3:4, j = 2, part = "body") %>%
+    merge_at(i = 5:15, j = 2, part = "body") %>%
     width(j = 2, width = 2) %>%
-    width(j = 3, width = 4) %>%
-    valign(j = 1, valign = "top", part = "all") %>%
+    width(j = 3, width = 2) %>%
+    width(j = 4, width = 4) %>%
+    valign(j = 2, valign = "top", part = "all") %>%
+    hline(i = 2, j = NULL, border = NULL, part = "body") %>%
+    hline(i = 4, j = NULL, border = NULL, part = "body") %>%
     hline(i = 15, j = NULL, border = NULL, part = "body")
 
-save_as_image(ft, paste0(folder_data, "temp/22-07-pca_strain.png"), webshot = "webshot2")
+save_as_image(ft, paste0(folder_data, "temp/22-08-trait_table.png"), webshot = "webshot2")
 
 
 
 
+
+
+
+# 9. correlation matrix ----
+
+calculate_cor <- function (treatments) {
+    temp <- treatments %>%
+        select(all_of(traits)) %>%
+        drop_na(all_of(traits)) %>%
+        as.matrix() %>%
+        rcorr(type = "spearman")
+
+    tb_cor <- temp$r %>%
+        as_tibble() %>%
+        mutate(row = colnames(.)) %>%
+        pivot_longer(-row, names_to = "col", values_to = "correlation")
+    tb_p <- temp$P %>%
+        as_tibble() %>%
+        mutate(row = colnames(.)) %>%
+        pivot_longer(-row, names_to = "col", values_to = "p_value")
+    tb <- tb_cor %>%
+        left_join(tb_p)
+    return(tb)
+}
+plot_cor_matrix <- function (tb) {
+    tb %>%
+        mutate(row = factor(row, traits), col = factor(col, rev(traits))) %>%
+        mutate(correlation = ifelse(p_value < 0.05, correlation, NA)) %>%
+        ggplot() +
+        geom_tile(aes(x = row, y = col, fill = correlation)) +
+        scale_fill_gradient2(low = "steelblue", mid = "white", high = "maroon") +
+        scale_x_discrete(position = "top", expand = c(0,0)) +
+        scale_y_discrete(expand = c(0,0)) +
+        theme_classic() +
+        theme(
+            axis.text.x = element_text(angle = 30, hjust = 0),
+            axis.title = element_blank()
+        ) +
+        guides() +
+        labs()
+
+}
+
+p <- treatments %>%
+    calculate_cor() %>%
+    plot_cor_matrix()
+
+ggsave(paste0(folder_data, "temp/22-09-trait_correlation_matrix.png"), p, width = 8, height = 6)
 
 
