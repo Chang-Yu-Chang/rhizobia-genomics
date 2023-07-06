@@ -25,3 +25,8 @@ rhizobia <- tibble(
     strain = list_strains[-20],
     rhizobia_site = str_sub(list_strains[-20], 1, 1)
 )
+
+
+paint_white_background <- function () {
+    theme(plot.background = element_rect(color = NA, fill = "white"))
+}
