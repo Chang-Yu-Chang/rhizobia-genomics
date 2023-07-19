@@ -234,6 +234,49 @@ Anova(mod, type = 3) # Site group does not have effect on dry weight
 mod <- lmer(dry_weight_mg ~ strain_site_group + (1|strain) + (1|plant) + (1|waterblock), data = treatments)
 Anova(mod, type = 3) # Site group does not have effect on dry weight
 
+# 2b. plot the nodule number by strain, faceted by sites ----
+gc_labels <- gc.prm.stat %>%
+    mutate(strain_label = factor(1:n())) %>%
+    select(strain, strain_label)
+p <- treatments_M %>%
+    left_join(gc_labels) %>%
+    drop_na(strain, nodule_number) %>%
+    filter(strain != "control") %>%
+    ggplot() +
+    geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+    geom_boxplot(aes(x = strain_label, y = nodule_number), fill = "white", outlier.size = -1, color = "black") +
+    geom_point(aes(x = strain_label, y = nodule_number, group = strain_label, color = strain_label), shape = 21, size = 2, stroke = 1, fill = NA,
+               position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
+    scale_color_manual(values = rep("black", 100)) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high\nelevation", L="low\nelevation"))) +
+    theme_classic() +
+    theme(
+        panel.grid.major.x = element_line(color = "grey80"),
+        #panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_rect(color = NA, fill = NA),
+        strip.text = element_text(size = 10, color = "black"),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.text.x = element_text(size = 10, color = "black"),
+        legend.position = "none"
+    ) +
+    guides(color = "none") +
+    labs(x = "rhizobia strain", y = "# of nodules")
+
+ggsave(paste0(folder_data, "temp/22-02b-nodule_by_strain.png"), p, width = 3, height = 4)
+
+
+## Does rhizobia strain have effect on dry weight?
+mod <- lmer(dry_weight_mg ~ strain + (1|strain_site_group) + (1|plant) + (1|waterblock), data = treatments)
+Anova(mod, type = 3) # Site group does not have effect on dry weight
+
+
+## Does rhizobia sites have effect on dry weight?
+mod <- lmer(dry_weight_mg ~ strain_site_group + (1|strain) + (1|plant) + (1|waterblock), data = treatments)
+Anova(mod, type = 3) # Site group does not have effect on dry weight
+
+
 
 # 3. pca of all extended phenotype traits ----
 tt <- treatments_M %>%
