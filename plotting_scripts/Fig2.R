@@ -6,7 +6,6 @@ library(cowplot)
 library(factoextra) # for plotting pca eclipse
 source(here::here("analysis/00-metadata.R"))
 
-#
 gc.prm <- read_csv(paste0(folder_data, 'temp/04-gc_prm.csv'), show_col_types = F)
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
 isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
@@ -31,8 +30,50 @@ subset_ensifer <- function(tb) {
 
 gc.prm <- gc.prm %>% subset_ensifer()
 
+# Panel A: growth rate at 30C ----
+gc <- read_csv(paste0(folder_data, 'temp/04-gc.csv'), show_col_types = F)
+gc_summ <- read_csv(paste0(folder_data, 'temp/04-gc_summ.csv'), show_col_types = F)
+gc.prm <- read_csv(paste0(folder_data, 'temp/04-gc_prm.csv'), show_col_types = F)
+gc.prm.stat <- read_csv(paste0(folder_data, 'temp/04-gc_prm_summ.csv'), show_col_types = F)
+isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
+    rename(strain = ExpID) %>%
+    filter(Genus == "Ensifer", str_sub(strain, 1,1) %in% c("H","L"))
 
-# Growth traits
+gc_labels <- gc.prm.stat %>%
+    mutate(strain_label = factor(1:n())) %>%
+    select(strain, strain_label)
+
+plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
+    tb %>%
+        ggplot() +
+        geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+        geom_boxplot(aes(x = strain_site_group, y = {{ytrait}}), fill = "white", outlier.size = -1, color = "black") +
+        geom_point(aes(x = strain_site_group, y = {{ytrait}}, group = strain, color = strain), shape = 21, size = 2, stroke = 1, fill = NA,
+                   position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
+        scale_color_manual(values = rep("black", 100)) +
+        scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+        #scale_x_discrete(label = c("high elevation", "low elevation")) +
+        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            #panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+            strip.background = element_rect(color = NA, fill = NA),
+            strip.text = element_text(size = 10, color = "black"),
+            axis.text = element_text(size = 10, color = "black"),
+            axis.text.x = element_blank(),
+            legend.position = "none",
+            plot.margin = unit(c(0,5,0,0), "mm")
+        ) +
+        guides(color = "none") +
+        labs(x = "", y = ylab)
+
+}
+
+p1 <- plot_boxplot_pair(gc.prm, r, expression(growth~rate(h^-1))) + theme(axis.title.x = element_blank())
+
+
+# Panel B: PCA for growth traits ----
 tt <- gc.prm %>%
     select(well, strain_site_group, all_of(c("r", "lag", "maxOD"))) %>%
     drop_na()
@@ -41,7 +82,7 @@ pcobj <- tt %>%
     select(-well, -strain_site_group) %>%
     prcomp(center = TRUE, scale. = TRUE)
 
-p1 <- fviz_pca_ind(
+p2 <- fviz_pca_ind(
     pcobj,
     label = "none",
     habillage = tt$strain_site_group,
@@ -62,7 +103,57 @@ p1 <- fviz_pca_ind(
     labs()
 
 
-# Extended phenotypes
+# Panel C: plant biomass ----
+treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
+tt <- treatments %>% drop_na(strain)
+trait_axis_names <- c(
+    "dry_weight_mg" = "shoot biomass (mg)",
+    "nodule_number" = "number of nodules",
+    "root_weight_mg" = "root biomass (mg)",
+    "nodule_weight_mg" = "nodule biomass (mg)",
+    "number_of_root_tips" = "number of root tips",
+    "number_of_branch_points" = "number of branch points",
+    "total_root_length_px" = "root length (px)",
+    "branching_frequency_per_px" = "branching frequencing (1/px)",
+    "network_area_px2" = "root area (px^2)",
+    "average_diameter_px" = "average diameter (px)",
+    "median_diameter_px" = "median diameter (px)",
+    "maximum_diameter_px" = "maximum diameter (px)",
+    "perimeter_px" = "perimeter (px)",
+    "volume_px3" = "volume (px^3)",
+    "surface_area_px2" = "surface area (px^2)"
+)
+
+
+plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
+    tb %>%
+        ggplot() +
+        geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+        geom_boxplot(aes_string(x = "strain_site_group", y = ytrait), fill = "white", outlier.size = -1, color = "black") +
+        geom_point(aes_string(x = "strain_site_group", y = ytrait, group = "strain", color = "strain"), shape = 21, size = 2, stroke = 1, fill = NA,
+                   position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
+        scale_color_manual(values = rep("black", 100)) +
+        scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_rect(color = NA, fill = NA),
+            strip.text = element_text(size = 10, color = "black"),
+            #strip.text = element_blank(),
+            axis.text = element_text(size = 10, color = "black"),
+            axis.text.x = element_blank(),
+            legend.position = "none"
+        ) +
+        guides(color = "none") +
+        labs(x = "", y = ylab)
+}
+
+p3 <- plot_boxplot_pair(tt, names(trait_axis_names)[1], trait_axis_names[[1]])
+
+
+
+# Panel D: PCA for extended phenotypes ----
 tt <- treatments_M %>%
     filter(strain != "control") %>%
     select(id, strain_site_group, all_of(traits), -nodule_weight_mg) %>%
@@ -72,7 +163,7 @@ pcobj <- tt %>%
     select(-id, -strain_site_group) %>%
     prcomp(center = TRUE, scale. = TRUE)
 
-p2 <- fviz_pca_ind(
+p4 <- fviz_pca_ind(
     pcobj,
     label = "none",
     habillage = tt$strain_site_group,
@@ -92,8 +183,9 @@ p2 <- fviz_pca_ind(
     guides(fill = "none") +
     labs()
 
-p <- plot_grid(p1, p2, nrow = 1, axis = "tblr", align = "hv", labels = c("A", "B"), scale = 0.9) + paint_white_background()
-ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 4)
+p <- plot_grid(p1, p2, p3, p4, nrow = 2, axis = "tblr", align = "hv", labels = LETTERS[1:4], scale = 0.9) + paint_white_background()
+
+ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 8)
 
 
 
