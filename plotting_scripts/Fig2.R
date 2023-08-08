@@ -183,9 +183,9 @@ p4 <- fviz_pca_ind(
     guides(fill = "none") +
     labs()
 
-p <- plot_grid(p1, p2, p3, p4, nrow = 2, axis = "tblr", align = "hv", labels = LETTERS[1:4], scale = 0.9) + paint_white_background()
+p <- plot_grid(p1, p2, p3, p4, nrow = 1, axis = "tblr", align = "hv", labels = LETTERS[1:4], scale = 0.9) + paint_white_background()
 
-ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 8)
+ggsave(here::here("plots/Fig2.png"), p, width = 15, height = 4)
 
 
 
