@@ -1,22 +1,9 @@
-#' This script makes the table for media used in the current study
-
-#
+#' This script make the table for growth traits measured growth curve
 
 library(tidyverse)
 library(flextable)
 
-
-# Rich TY medium
-features <- tibble(
-    `Feature type` = c(rep("host yield", 2), rep("nodule", 2), rep("root architecture", 11)),
-    `Feature` = traits
-) %>%
-
-
-
-# Fahreaus medium ----
-
-#
+traits <- c("lag time", "growth rate", "yield")
 
 features <- tibble(
     `Feature type` = c(rep("host yield", 2), rep("nodule", 2), rep("root architecture", 11)),
@@ -56,5 +43,3 @@ ft <- features %>%
     hline(i = 15, j = NULL, border = NULL, part = "body")
 
 save_as_image(ft, here::here("plots/TableS1.png"), webshot = "webshot2")
-
-

@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(flextable) # for making table
+source(here::here("analysis/00-metadata.R"))
 
 features <- tibble(
     `Feature type` = c(rep("host yield", 2), rep("nodule", 2), rep("root architecture", 11)),
@@ -35,10 +36,11 @@ ft <- features %>%
     width(j = 2, width = 2) %>%
     width(j = 3, width = 2) %>%
     width(j = 4, width = 4) %>%
-    valign(j = 2, valign = "top", part = "all") %>%
+    #valign(j = 2, valign = "top", part = "all") %>%
     hline(i = 2, j = NULL, border = NULL, part = "body") %>%
     hline(i = 4, j = NULL, border = NULL, part = "body") %>%
-    hline(i = 15, j = NULL, border = NULL, part = "body")
+    hline(i = 15, j = NULL, border = NULL, part = "body") %>%
+    fix_border_issues()
 
 save_as_image(ft, here::here("plots/TableS1.png"), webshot = "webshot2")
 
