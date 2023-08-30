@@ -6,35 +6,7 @@ library(cowplot)
 library(factoextra) # for plotting pca eclipse
 source(here::here("analysis/00-metadata.R"))
 
-gc.prm <- read_csv(paste0(folder_data, 'temp/04-gc_prm.csv'), show_col_types = F)
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
-isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
-    rename(strain = ExpID) %>%
-    filter(Genus == "Ensifer", str_sub(strain, 1,1) %in% c("H","L")) %>%
-    mutate(strain_site = str_sub(strain, 1, 2), strain_site_group = str_sub(strain, 1, 1))
-
-
-# Clean up data
-treatments_M <- treatments %>%
-    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
-           strain_site = ifelse(is.na(strain_site), "control", strain_site),
-           strain = ifelse(is.na(strain), "control", strain)) %>%
-    filter(plant_site_group == "S") %>%
-    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
-
-subset_ensifer <- function(tb) {
-    tb %>%
-        left_join(select(isolates_RDP, strain, Genus)) %>%
-        drop_na()
-}
-
-gc.prm <- gc.prm %>% subset_ensifer()
-
-
-
-# Panel A: plant biomass ----
-treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
-tt <- treatments %>% drop_na(strain)
 trait_axis_names <- c(
     "dry_weight_mg" = "shoot biomass (mg)",
     "nodule_number" = "number of nodules",
@@ -53,13 +25,34 @@ trait_axis_names <- c(
     "surface_area_px2" = "surface area (px^2)"
 )
 
+# Clean up data
+treatments_M <- treatments %>%
+    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
+           strain_site = ifelse(is.na(strain_site), "control", strain_site),
+           strain = ifelse(is.na(strain), "control", strain)) %>%
+    filter(plant_site_group == "S") %>%
+    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
 
+
+treatments_HL <- treatments %>%
+    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
+           strain_site = ifelse(is.na(strain_site), "control", strain_site),
+           strain = ifelse(is.na(strain), "control", strain)) %>%
+    filter(plant_site_group != "S") %>%
+    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
+
+
+# Panel A: cartoon for methods ----
+p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png")) + draw_text("placeholder for\ncartoon")
+
+
+# Panel B: plant biomass ----
 plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
     tb %>%
         ggplot() +
         geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_boxplot(aes_string(x = "strain_site_group", y = ytrait), fill = "white", outlier.size = -1, color = "black") +
-        geom_point(aes_string(x = "strain_site_group", y = ytrait, group = "strain", color = "strain"), shape = 21, size = 2, stroke = 1, fill = NA,
+        geom_boxplot(aes(x = strain_site_group, y = !!sym(ytrait)), fill = "white", outlier.size = -1, color = "black") +
+        geom_point(aes(x = strain_site_group, y = !!sym(ytrait), group = strain, color = strain), shape = 21, size = 2, stroke = 1, fill = NA,
                    position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
         scale_color_manual(values = rep("black", 100)) +
         scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
@@ -69,7 +62,6 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
             panel.spacing.x = unit(0, "mm"),
             strip.background = element_rect(color = NA, fill = NA),
             strip.text = element_text(size = 10, color = "black"),
-            #strip.text = element_blank(),
             axis.text = element_text(size = 10, color = "black"),
             axis.text.x = element_blank(),
             legend.position = "none"
@@ -77,25 +69,30 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
         guides(color = "none") +
         labs(x = "", y = ylab)
 }
+p2 <- treatments_M %>%
+    filter(strain != "control") %>%
+    drop_na(names(trait_axis_names)[1]) %>%
+    plot_boxplot_pair(ytrait = names(trait_axis_names)[1], trait_axis_names[[1]])
 
-p1 <- plot_boxplot_pair(tt, names(trait_axis_names)[1], trait_axis_names[[1]])
 
+# # Panel C: nodule number ----
+# p3 <- plot_boxplot_pair(tt, names(trait_axis_names)[2], trait_axis_names[[2]])
 
 
 # Panel C: PCA for extended phenotypes ----
-tt <- treatments_M %>%
+tt_M <- treatments_M %>%
     filter(strain != "control") %>%
     select(id, strain_site_group, all_of(traits), -nodule_weight_mg) %>%
     drop_na()
 
-pcobj <- tt %>%
+pcobj <- tt_M %>%
     select(-id, -strain_site_group) %>%
     prcomp(center = TRUE, scale. = TRUE)
 
-p2 <- fviz_pca_ind(
+p3 <- fviz_pca_ind(
     pcobj,
     label = "none",
-    habillage = tt$strain_site_group,
+    habillage = tt_M$strain_site_group,
     addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
 ) +
     scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
@@ -113,9 +110,44 @@ p2 <- fviz_pca_ind(
     labs()
 
 
-p <- plot_grid(p1, p2, nrow = 1, axis = "tblr", align = "hv", labels = LETTERS[1:2], scale = 0.95) + paint_white_background()
+# Panel D the experiment for plant local adaptation ----
+p4 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png")) + draw_text("placeholder for\ncartoon")
 
-ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 4)
+# Panel E the result of local adaptation ----
+set.seed(1)
+p5 <- treatments_HL %>%
+    filter(strain != "control") %>%
+    drop_na(dry_weight_mg) %>%
+    ggplot() +
+    geom_rect(data = tibble(strain_site_group = "H"), fill = "#0C6291", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+    geom_rect(data = tibble(strain_site_group = "L"), fill = "#BF4342", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+    geom_boxplot(aes(x = strain_site_group, y = dry_weight_mg, fill = plant_site_group), alpha = 1, outlier.size = -1, color = "black") +
+    geom_point(aes(x = strain_site_group, y = dry_weight_mg, group = plant_site_group, color = plant_site_group), shape = 21, size = 2, stroke = 1, fill = NA,
+               position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.75)) +
+    scale_color_manual(values = rep("black", 100)) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
+    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation rhizobia", L="low elevation rhizobia"))) +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_rect(color = NA, fill = NA),
+        strip.text = element_text(size = 10, color = "black"),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = c(0.2, 0.85),
+        legend.background = element_rect(fill = NA)
+    ) +
+    guides(color = "none", fill = guide_legend(title = "plant origin")) +
+    labs(x = "", y = trait_axis_names[[1]])
+
+## Stat
+
+
+
+p <- plot_grid(p1, p2, p3, p4, p5, NULL, nrow = 2, axis = "tblr", align = "h", labels = LETTERS[1:6], scale = 0.95, rel_widths = c(1,1.5,1.5)) + paint_white_background()
+
+ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 8)
 
 
 
