@@ -3,6 +3,9 @@
 library(tidyverse)
 library(cowplot)
 library(janitor)
+library(broom)
+library(lme4) # for linear mixed-effect models
+library(car) # companion to Applied Regression
 source(here::here("analysis/00-metadata.R"))
 
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
@@ -48,3 +51,72 @@ for (i in 1:length(trait_axis_names)) {
 p <- plot_grid(plotlist = p_list, align = "hv", axis = "tblr", ncol = 3, labels = LETTERS[1:15])
 
 ggsave(here::here("plots/FigS10.png"), p, width = 10, height = 12)
+
+
+## Stats
+## Does the rhizobia strain have effect on a plant trait?
+list_res <- rep(list(NA), length(trait_axis_names))
+for (i in 1:length(trait_axis_names)) {
+    f <- formula(paste0(names(trait_axis_names)[i], "~ strain + (1|strain_site_group) + (1|plant) + (1|waterblock)"))
+    mod <- lmer(f, data = treatments_M)
+    res <- tidy(Anova(mod, type = 3))
+    list_res[[i]] <- res %>%
+        filter(term == "strain") %>%
+        mutate(dependent = names(trait_axis_names)[i]) %>%
+        select(dependent, term, p.value)
+
+}
+res_strain <- bind_rows(list_res)
+
+## Does the rhizobia sites have effect on a plant trait?
+list_res <- rep(list(NA), length(trait_axis_names))
+for (i in 1:length(trait_axis_names)) {
+    f <- formula(paste0(names(trait_axis_names)[i], "~ strain_site_group + (1|plant) + (1|waterblock)"))
+    mod <- lmer(f, data = treatments_M)
+    res <- tidy(Anova(mod, type = 3))
+    list_res[[i]] <- res %>%
+        filter(term == "strain_site_group") %>%
+        mutate(dependent = names(trait_axis_names)[i]) %>%
+        select(dependent, term, p.value)
+
+}
+res_site <- bind_rows(list_res)
+
+bind_rows(res_strain, res_site) %>%
+    pivot_wider(names_from = term, values_from = p.value) %>%
+    filter(strain < 0.05) %>%
+    pull(dependent) %>%
+    paste(collapse = ", ")
+
+
+# dependent                     strain strain_site_group
+# <chr>                          <dbl>             <dbl>
+# 1 dry_weight_mg              0.0314                0.656
+# 2 nodule_number              0.0000218             0.462
+# 3 branching_frequency_per_px 0.00171               0.394
+# 4 maximum_diameter_px        0.00808               0.566
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
