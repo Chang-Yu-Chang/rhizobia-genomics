@@ -32,8 +32,8 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
     tb %>%
         ggplot() +
         geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_boxplot(aes_string(x = "strain_site_group", y = ytrait), fill = "white", outlier.size = -1, color = "black") +
-        geom_point(aes_string(x = "strain_site_group", y = ytrait, group = "strain", color = "strain"), shape = 21, size = 2, stroke = 1, fill = NA,
+        geom_boxplot(aes(x = strain_site_group, y = !!sym(ytrait)), fill = "white", outlier.size = -1, color = "black") +
+        geom_point(aes(x = strain_site_group, y = !!sym(ytrait), group = strain, color = strain), shape = 21, size = 2, stroke = 1, fill = NA,
                    position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
         scale_color_manual(values = rep("black", 100)) +
         scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
@@ -58,5 +58,41 @@ for (i in 1:length(traits)) p_list[[i]] <- plot_boxplot_pair(tt, names(trait_axi
 
 p <- plot_grid(plotlist = p_list, ncol = 5, align = "hv", axis = "tblr")
 ggsave(here::here("plots/FigS6.png"), p, width = 15, height = 9)
+
+# STAT ----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

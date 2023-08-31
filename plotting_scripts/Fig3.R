@@ -3,27 +3,14 @@
 library(tidyverse)
 library(janitor)
 library(cowplot)
+library(broom)
+library(lme4) # for linear mixed-effect models
+library(car) # companion to Applied Regression
 library(factoextra) # for plotting pca eclipse
 source(here::here("analysis/00-metadata.R"))
 
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
-trait_axis_names <- c(
-    "dry_weight_mg" = "shoot biomass (mg)",
-    "nodule_number" = "number of nodules",
-    "root_weight_mg" = "root biomass (mg)",
-    "nodule_weight_mg" = "nodule biomass (mg)",
-    "number_of_root_tips" = "number of root tips",
-    "number_of_branch_points" = "number of branch points",
-    "total_root_length_px" = "root length (px)",
-    "branching_frequency_per_px" = "branching frequencing (1/px)",
-    "network_area_px2" = "root area (px^2)",
-    "average_diameter_px" = "average diameter (px)",
-    "median_diameter_px" = "median diameter (px)",
-    "maximum_diameter_px" = "maximum diameter (px)",
-    "perimeter_px" = "perimeter (px)",
-    "volume_px3" = "volume (px^3)",
-    "surface_area_px2" = "surface area (px^2)"
-)
+
 
 # Clean up data
 treatments_M <- treatments %>%
@@ -69,14 +56,28 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
         guides(color = "none") +
         labs(x = "", y = ylab)
 }
+
 p2 <- treatments_M %>%
     filter(strain != "control") %>%
     drop_na(names(trait_axis_names)[1]) %>%
     plot_boxplot_pair(ytrait = names(trait_axis_names)[1], trait_axis_names[[1]])
 
+## Stat
+## Does the rhizobia strain have effect on shoot biomass?
+mod <- lmer(dry_weight_mg ~ strain + (1|strain_site_group) + (1|plant) + (1|waterblock), data = treatments_M)
+Anova(mod, type = 3) # rhizobia strain has effect on shoot biomass
+# Response: dry_weight_mg
+# Chisq Df Pr(>Chisq)
+# (Intercept)  3.1672  1    0.07513 .
+# strain      13.8485  6    0.03138 *
 
-# # Panel C: nodule number ----
-# p3 <- plot_boxplot_pair(tt, names(trait_axis_names)[2], trait_axis_names[[2]])
+## Does the rhizobia sites have effect on shoot biomass?
+mod <- lmer(dry_weight_mg ~ strain_site_group + (1|plant) + (1|waterblock), data = treatments_M)
+Anova(mod, type = 3) # Site group does not have effect on lag time
+# Response: dry_weight_mg
+# Chisq Df Pr(>Chisq)
+# (Intercept)       40.9288  1  1.579e-10 ***
+# strain_site_group  0.8439  2     0.6558
 
 
 # Panel C: PCA for extended phenotypes ----
@@ -108,6 +109,27 @@ p3 <- fviz_pca_ind(
     ) +
     guides(fill = "none") +
     labs()
+
+
+## Stats
+# MANOVA test plus random effect
+mod <- manova(cbind(dry_weight_mg) ~ strain_site_group, data = filter(treatments_M, strain != "control"))
+tidy(mod)
+
+mod <- ano(dry_weight_mg ~ strain_site_group, data = filter(treatments_M, strain != "control"))
+tidy(mod)
+
+
+mod <- lmer(dry_weight_mg ~ strain_site_group + (1|waterblock), data = filter(treatments_M, strain != "control"))
+Anova(mod, type = 3) # rhizobia strain has effect on shoot biomass
+
+
+# mod <- lmer(dry_weight_mg ~ strain_site_group + (1|plant) + (1|waterblock), data = treatments_M)
+# sepl <- iris$Sepal.Length
+# petl <- iris$Petal.Length
+manova(cbind(Sepal.Length, Petal.Length) ~ strain_site_group + (1|plant) + (1|waterblock), data = iris)
+summary(res.man)
+
 
 
 # Panel D the experiment for plant local adaptation ----

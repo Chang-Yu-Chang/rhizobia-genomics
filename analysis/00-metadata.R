@@ -30,3 +30,21 @@ rhizobia <- tibble(
 paint_white_background <- function () {
     theme(plot.background = element_rect(color = NA, fill = "white"))
 }
+
+trait_axis_names <- c(
+    "dry_weight_mg" = "shoot biomass (mg)",
+    "nodule_number" = "number of nodules",
+    "root_weight_mg" = "root biomass (mg)",
+    "nodule_weight_mg" = "nodule biomass (mg)",
+    "number_of_root_tips" = "number of root tips",
+    "number_of_branch_points" = "number of branch points",
+    "total_root_length_px" = "root length (px)",
+    "branching_frequency_per_px" = "branching frequencing (1/px)",
+    "network_area_px2" = "root area (px^2)",
+    "average_diameter_px" = "average diameter (px)",
+    "median_diameter_px" = "median diameter (px)",
+    "maximum_diameter_px" = "maximum diameter (px)",
+    "perimeter_px" = "perimeter (px)",
+    "volume_px3" = "volume (px^3)",
+    "surface_area_px2" = "surface area (px^2)"
+)
