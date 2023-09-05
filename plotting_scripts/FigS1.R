@@ -1,4 +1,4 @@
-#'
+#' This script plots the map and elevation for our field sites
 
 library(tidyverse)
 library(janitor)
@@ -23,14 +23,21 @@ site_cd <- readxl::read_excel(paste0(folder_data, "raw/High and low elevation si
 
 # strain source
 isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
-    rename(strain = ExpID) %>%
+    rename(strain = ExpID)
     filter(Genus == "Ensifer", str_sub(strain, 1,1) %in% c("H","L"))
+
+isolates_RDP %>%
+    filter(Family == "Rhizobiaceae") %>%
+    filter(str_sub(strain, 1,1) %in% c("H","L")) %>%
+    mutate(temp = str_sub(strain, 1, 4)) %>%
+    pull(temp) %>%
+    table()
 
 str_sub(isolates_RDP$strain, 1, 2) %>%
     table()
 
 
-# 1. map for sampling site ----
+# Panel A: map for sampling site ----
 # Clean up the site coordinates
 site_cd <- site_cd %>%
     clean_names() %>%
@@ -97,15 +104,18 @@ p1 <- ggdraw(p1_1) +
     draw_plot(p1_2, x = 0.15, y = 0.65, width = 0.4, height = 0.4)
 
 
+# Panel B: site elevations ----
 p2 <- site_cd %>%
     ggplot() +
     geom_col(aes(x = site, y = elevation_m, color = site_group), fill = "grey", linewidth = 1, width = .8) +
-    #geom_col(aes(x = site, y = elevation_m), color = "black", fill = "black") +
     scale_color_manual(values = c(H = "#0C6291", L = "#BF4342", MLBS = "gold"), labels = c("high", "low", "MLBS"), name = "site") +
-    # scale_fill_manual(values = c(H = "#0C6291", L = "#BF4342", MLBS = "gold"), labels = c("high", "low", "MLBS"), name = "site") +
     scale_y_continuous(expand = c(0, 0), limits = c(0, 1200), breaks = seq(0, 1200, 200)) +
     theme_classic() +
-    theme() +
+    theme(
+        panel.grid.major.y = element_line(color = 1, linetype = 2),
+        panel.grid.minor.y = element_line(color = grey(0.8), linetype = 2),
+        panel.border = element_rect(color = 1, fill = NA)
+    ) +
     guides(color = "none") +
     labs(x = "site", y = "elevation (m)")
 

@@ -6,7 +6,7 @@ library(cowplot)
 library(broom)
 library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
-library(factoextra) # for plotting pca eclipse
+#library(factoextra) # for plotting pca ellipses
 library(vegan) # for permanova
 source(here::here("analysis/00-metadata.R"))
 
@@ -44,7 +44,7 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
                    position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
         scale_color_manual(values = rep("black", 100)) +
         scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
-        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
+        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="H rhizobia", L="L rhizobia"))) +
         theme_classic() +
         theme(
             panel.spacing.x = unit(0, "mm"),
@@ -99,14 +99,15 @@ p3 <- df %>%
     geom_polygon(stat = "ellipse", aes(x = PC1, y = PC2, color = strain_site_group), fill = NA, alpha = 0.3) +
     geom_vline(xintercept = 0, linetype = 2) +
     geom_hline(yintercept = 0, linetype = 2) +
-    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
-    scale_shape_manual(values = c(H = 16, L = 17), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
+    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("H rhizobia", "L rhizobia"), breaks = c("H", "L"), name = "elevation") +
+    scale_shape_manual(values = c(H = 16, L = 17), labels = c("H rhizobia", "L rhizobia"), breaks = c("H", "L"), name = "elevation") +
     theme_classic() +
     theme(
-        panel.border = element_rect(fill = NA, color = "black"),
-        legend.position = c(0.8, 0.9),
+        panel.border = element_rect(fill = NA, color = 1),
+        legend.position = "right",
         legend.background = element_rect(fill = NA, color = NA),
         legend.title = element_blank(),
+        legend.margin = margin(0,0,0,0),
         plot.background = element_rect(fill = "white", color = NA),
         plot.title = element_blank()
     ) +
@@ -114,27 +115,6 @@ p3 <- df %>%
     labs(x = paste0("PC1 (", round(summary(pcobj)$importance[2,1]* 100, 1), "%)"),
          y = paste0("PC2 (", round(summary(pcobj)$importance[2,2]* 100, 1), "%)"))
 
-
-
-# p3 <- fviz_pca_ind(
-#     pcobj,
-#     label = "none",
-#     habillage = tt_M$strain_site_group,
-#     addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
-# ) +
-#     scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
-#     scale_shape_manual(values = c(H = 16, L = 17), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
-#     theme_classic() +
-#     theme(
-#         panel.border = element_rect(fill = NA, color = "black"),
-#         legend.position = c(0.8, 0.9),
-#         legend.background = element_rect(fill = NA, color = NA),
-#         legend.title = element_blank(),
-#         plot.background = element_rect(fill = "white", color = NA),
-#         plot.title = element_blank()
-#     ) +
-#     guides(fill = "none") +
-#     labs()
 
 
 ## Stats
@@ -165,29 +145,10 @@ adonis2(Y ~ strain_site_group, data = tt_M, strata = tt_M$plant, permutations = 
 # Total             103   7.7584 1.00000
 
 
-# mod <- manova(cbind(dry_weight_mg) ~ strain_site_group, data = filter(treatments_M, strain != "control"))
-# tidy(mod)
-#
-# mod <- anova(dry_weight_mg ~ strain_site_group, data = filter(treatments_M, strain != "control"))
-# tidy(mod)
-#
-#
-# mod <- lmer(dry_weight_mg ~ strain_site_group + (1|waterblock), data = filter(treatments_M, strain != "control"))
-# Anova(mod, type = 3) # rhizobia strain has effect on shoot biomass
-#
-#
-# # mod <- lmer(dry_weight_mg ~ strain_site_group + (1|plant) + (1|waterblock), data = treatments_M)
-# # sepl <- iris$Sepal.Length
-# # petl <- iris$Petal.Length
-# manova(cbind(Sepal.Length, Petal.Length) ~ strain_site_group + (1|plant) + (1|waterblock), data = iris)
-# summary(res.man)
-
-
-
-# Panel D the experiment for plant local adaptation ----
+# Panel D: the experiment for plant local adaptation ----
 p4 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png")) + draw_text("placeholder for\ncartoon")
 
-# Panel E the result of local adaptation ----
+# Panel E: the result of local adaptation ----
 set.seed(1)
 p5 <- treatments_HL %>%
     filter(strain != "control") %>%
@@ -199,8 +160,8 @@ p5 <- treatments_HL %>%
     geom_point(aes(x = strain_site_group, y = dry_weight_mg, group = plant_site_group, color = plant_site_group), shape = 21, size = 2, stroke = 1, fill = NA,
                position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.75)) +
     scale_color_manual(values = rep("black", 100)) +
-    scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
-    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation rhizobia", L="low elevation rhizobia"))) +
+    scale_fill_manual(values = rhizobia_site_colors, labels = c("H plant", "L plant"), breaks = c("H", "L")) +
+    facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="H rhizobia", L="L rhizobia"))) +
     theme_classic() +
     theme(
         panel.spacing.x = unit(0, "mm"),
@@ -209,17 +170,119 @@ p5 <- treatments_HL %>%
         axis.text = element_text(size = 10, color = "black"),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        legend.position = c(0.2, 0.85),
-        legend.background = element_rect(fill = NA)
+        legend.position = c(0.2, 0.9),
+        legend.background = element_rect(fill = NA),
+        legend.title = element_blank()
     ) +
-    guides(color = "none", fill = guide_legend(title = "plant origin")) +
+    guides(color = "none") +
     labs(x = "", y = trait_axis_names[[1]])
 
+# df_boxplot <- ggplot_build(p5)$data[[3]] # Extract the x axis
+# p5 + annotate("segment", x = df_boxplot$x[1], xend = df_boxplot$x[2], y = 30, yend = 30) +
+#     geom_text("", label = "*", x = mean(df_boxplot$x[1:2]), y = 35)
+
 ## Stat
+## Does H rhizobia perform better with H plants than with L plants?
+mod <- treatments_HL %>%
+    filter(strain_site_group == "H") %>%
+    lmer(dry_weight_mg ~ plant_site_group + (1|plant) + (1|waterblock), data = .)
+Anova(mod, type = 3) # H rhizobia performs better when with the L plants
+# Response: dry_weight_mg
+#                   Chisq  Df   Pr(>Chisq)
+# (Intercept)      18.9198  1  1.363e-05 ***
+# plant_site_group  5.5531  1    0.01845 *
+
+
+## Does L rhizobia perform better with L plants than with H plants?
+mod <- treatments_HL %>%
+    filter(strain_site_group == "L") %>%
+    lmer(dry_weight_mg ~ plant_site_group + (1|plant) + (1|waterblock), data = .)
+Anova(mod, type = 3) # No difference
+# Response: dry_weight_mg
+# Chisq Df Pr(>Chisq)
+# (Intercept)      14.0587  1  0.0001772 ***
+# plant_site_group  0.7809  1  0.3768756
+
+## Do H plants perform better with H rhizobium than with L rhizobium?
+mod <- treatments_HL %>%
+    filter(plant_site_group == "H") %>%
+    lmer(dry_weight_mg ~ strain_site_group + (1|strain) + (1|waterblock), data = .)
+Anova(mod, type = 3)
+# Response: dry_weight_mg
+# Chisq Df Pr(>Chisq)
+# (Intercept)       40.9996  1  1.523e-10 ***
+# strain_site_group  0.1325  1     0.7159
+
+## Do L plants perform better with L rhizobium than with H rhizobium?
+mod <- treatments_HL %>%
+    filter(plant_site_group == "L") %>%
+    lmer(dry_weight_mg ~ strain_site_group + (1|strain) + (1|waterblock), data = .)
+Anova(mod, type = 3)
+# Response: dry_weight_mg
+# Chisq Df Pr(>Chisq)
+# (Intercept)       28.6186  1  8.813e-08 ***
+# strain_site_group  0.8306  1     0.3621
+
+
+# Panel F: PCA for extended phenottypes for local adpataion ----
+tt_HL <- treatments_HL %>%
+    filter(strain != "control") %>%
+    select(id, plant, plant_site_group, strain, strain_site_group, all_of(traits), -nodule_weight_mg) %>%
+    drop_na()
+
+pcobj <- tt_HL %>%
+    select(-id, -plant, -plant_site_group, -strain, -strain_site_group) %>%
+    prcomp(center = TRUE, scale. = TRUE)
+df <- as_tibble(predict(pcobj)[,1:2])
+p6 <- df %>%
+    bind_cols(select(tt_HL, id, plant, plant_site_group, strain, strain_site_group)) %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = strain_site_group, shape = plant_site_group), size = 2, stroke = 1) +
+    geom_vline(xintercept = 0, linetype = 2) +
+    geom_hline(yintercept = 0, linetype = 2) +
+    scale_color_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("H rhizobia", "L rhizobia"), breaks = c("H", "L"), name = "elevation") +
+    scale_shape_manual(values = c(H = 21, L = 22), labels = c("H plant", "L plant"), breaks = c("H", "L"), name = "elevation") +
+    #scale_fill_manual(values = c(H = "#0C6291", L = "#BF4342"), labels = c("high elevation", "low elevation"), breaks = c("H", "L"), name = "elevation") +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = 1),
+        legend.position = "right",
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.title = element_blank(),
+        legend.margin = margin(0,0,0,0),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_blank()
+    ) +
+    guides() +
+    labs(x = paste0("PC1 (", round(summary(pcobj)$importance[2,1]* 100, 1), "%)"),
+         y = paste0("PC2 (", round(summary(pcobj)$importance[2,2]* 100, 1), "%)"))
+
+
+## Stats
+## Explanation of PC1 + PC2
+summ <- summary(pcobj)
+sum(summ$importance[2,1:2]) # 0.8053
+
+# PERMANOVA test
+tt_HL <- treatments_HL %>%
+    filter(strain != "control") %>%
+    select(id, plant, plant_site_group, strain, strain_site_group, all_of(traits), -nodule_weight_mg) %>%
+    drop_na()
+Y <- tt_HL %>%
+    select(names(trait_axis_names)[-4])
+
+set.seed(1)
+adonis2(Y ~  plant_site_group + strain_site_group , data = tt_HL, strata = tt_HL$plant, permutations = 999)
+# adonis2(formula = Y ~ plant_site_group + strain_site_group, data = tt_HL, permutations = 999, strata = tt_HL$plant)
+# Df SumOfSqs      R2      F Pr(>F)
+# plant_site_group   1   0.4299 0.11487 5.4770  0.81
+# strain_site_group  1   0.0158 0.00421 0.2008  0.81
+# Residual          42   3.2965 0.88091
+# Total             44   3.7421 1.00000
 
 
 
-p <- plot_grid(p1, p2, p3, p4, p5, NULL, nrow = 2, axis = "tblr", align = "h", labels = LETTERS[1:6], scale = 0.95, rel_widths = c(1,1.5,1.5)) + paint_white_background()
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, axis = "tblr", align = "h", labels = LETTERS[1:6], scale = 0.95, rel_widths = c(1,1.5,2)) + paint_white_background()
 
 ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 8)
 

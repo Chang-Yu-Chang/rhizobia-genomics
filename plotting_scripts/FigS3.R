@@ -1,115 +1,30 @@
-#' Growth traits for all strains
+#' Correlation between the foreground pixel number and root weight
 
 library(tidyverse)
-library(cowplot)
-library(janitor)
-library(lme4) # for linear mixed-effect models
-library(car) # companion to Applied Regression
+library(factoextra) # for plotting pca eclipse
 source(here::here("analysis/00-metadata.R"))
 
-gc <- read_csv(paste0(folder_data, 'temp/04-gc.csv'), show_col_types = F)
-gc_summ <- read_csv(paste0(folder_data, 'temp/04-gc_summ.csv'), show_col_types = F)
-gc.prm <- read_csv(paste0(folder_data, 'temp/04-gc_prm.csv'), show_col_types = F)
-gc.prm.stat <- read_csv(paste0(folder_data, 'temp/04-gc_prm_summ.csv'), show_col_types = F)
-isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
-    rename(strain = ExpID) %>%
-    filter(Genus == "Ensifer", str_sub(strain, 1,1) %in% c("H","L"))
 
-gc_labels <- gc.prm.stat %>%
-    mutate(strain_label = factor(1:n())) %>%
-    select(strain, strain_label)
+treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
+tt <- treatments %>%
+    drop_na(c(root_weight_mg, network_area_px2))
 
-# By strain
-plot_strains_trait <- function (gc.prm, ytrait, ylab = "") {
-    gc.prm %>%
-        left_join(gc_labels) %>%
-        #select(-t.r, - startOD) %>%
-        #pivot_longer(cols = c(r, lag, maxOD), names_to = "trait") %>%
-        ggplot() +
-        geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_point(aes(x = strain_label, y = {{ytrait}}, group = strain_label, color = strain_label), shape = 21, size = 2, stroke = 1, fill = NA,
-                   position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
-        scale_color_manual(values = rep("black", 100)) +
-        scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
-        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
-        theme_classic() +
-        theme(
-            panel.grid.major.x = element_line(color = "grey80"),
-            panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-            strip.background = element_rect(color = NA, fill = NA),
-            strip.text = element_text(size = 10, color = "black"),
-            strip.placement = "outside",
-            axis.text = element_text(size = 10, color = "black"),
-            axis.text.x = element_text(size = 10, color = "black"),
-            legend.position = "none",
-            plot.margin = unit(c(0,5,0,0), "mm")
-        ) +
-        guides(color = "none") +
-        labs(x = "rhizobia strain", y = ylab)
-}
-p1_1 <- plot_strains_trait(gc.prm, lag, "lag time (hr)") + theme(axis.title.x = element_blank())
-p1_2 <- plot_strains_trait(gc.prm, r, expression(growth~rate(h^-1))) + theme(strip.text = element_blank(), axis.title.x = element_blank())
-p1_3 <- plot_strains_trait(gc.prm, maxOD, expression(paste("max", "[", OD[600], "]"))) + theme(strip.text = element_blank())
-
-# By site
-plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
-    tb %>%
-        ggplot() +
-        geom_rect(data = tibble(strain_site_group = c("H", "L")), aes(fill = strain_site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_boxplot(aes(x = strain_site_group, y = {{ytrait}}), fill = "white", outlier.size = -1, color = "black") +
-        geom_point(aes(x = strain_site_group, y = {{ytrait}}, group = strain, color = strain), shape = 21, size = 2, stroke = 1, fill = NA,
-                   position = position_jitterdodge(jitter.width = 0, dodge.width = 0.5)) +
-        scale_color_manual(values = rep("black", 100)) +
-        scale_fill_manual(values = rhizobia_site_colors, labels = c("high", "low"), breaks = c("H", "L")) +
-        #scale_x_discrete(label = c("high elevation", "low elevation")) +
-        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="high elevation", L="low elevation"))) +
-        theme_classic() +
-        theme(
-            panel.spacing.x = unit(0, "mm"),
-            panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-            strip.background = element_rect(color = NA, fill = NA),
-            strip.text = element_text(size = 10, color = "black"),
-            axis.text = element_text(size = 10, color = "black"),
-            axis.text.x = element_blank(),
-            legend.position = "none",
-            plot.margin = unit(c(0,5,0,0), "mm")
-        ) +
-        guides(color = "none") +
-        labs(x = "", y = ylab)
-
-}
-p2_1 <- plot_boxplot_pair(gc.prm, lag, "lag time (hr)") + theme(axis.title.x = element_blank())
-p2_2 <- plot_boxplot_pair(gc.prm, r, expression(growth~rate(h^-1))) + theme(strip.text = element_blank(), axis.title.x = element_blank())
-p2_3 <- plot_boxplot_pair(gc.prm, maxOD, expression(paste("max", "[", OD[600], "]"))) + theme(strip.text = element_blank(), axis.title.x = element_blank())
-
-p1 <- plot_grid(p1_1, p2_1, ncol = 2, axis = "tbrl", align = "hv", rel_widths = c(2,1), labels = c("A", "B"), scale = .95)
-p2 <- plot_grid(p1_2, p2_2, ncol = 2, axis = "tbrl", align = "hv", rel_widths = c(2,1), scale = .95)
-p3 <- plot_grid(p1_3, p2_3, ncol = 2, axis = "tbrl", align = "hv", rel_widths = c(2,1), scale = .95)
-p <- plot_grid(p1, p2, p3, ncol = 1, axis = "tbrl", align = "hv") + paint_white_background()
+# root biomass
+p <- tt %>%
+    mutate(network_area_px2 = network_area_px2/1e5) %>%
+    ggplot() +
+    geom_point(aes(x = root_weight_mg, y = network_area_px2), size = 2, shape = 21) +
+    geom_smooth(aes(x = root_weight_mg, y = network_area_px2), method = "lm") +
+    annotate("text", label = paste0("n=", nrow(tt)), x = -Inf, y = Inf, hjust = -1, vjust = 2) +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs(x = "root biomass (mg)", y = expression(paste("# of foreground pixels ", (10^5))))
 
 
-ggsave(here::here("plots/FigS3.png"), p, width = 10, height = 8)
+ggsave(here::here("plots/FigS3.png"), p, width = 3, height = 3)
 
-
-## Does the rhizobia sites have effect on any growth trait?
-mod <- lmer(lag ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group does not have effect on lag time
-mod <- lmer(r ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group does not have effect on r
-mod <- lmer(maxOD ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group does not have effect on maxOD
-
-## Does the rhizobia strain have effect on any growth trait?
-mod <- lmer(lag ~ strain + (1|strain_site_group) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group has effect on lag time
-mod <- lmer(r ~ strain + (1|strain_site_group) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group has effect on r
-mod <- lmer(maxOD ~ strain + (1|strain_site_group) + (1|strain_site), data = gc.prm)
-Anova(mod, type = 3) # Site group has effect on maxOD
-
-
-
-
-
-
+cor.test(treatments$root_weight_mg, treatments$network_area_px2, method = "pearson") # cor = 0.901, p < 0.001
+model <- lm(network_area_px2 ~ root_weight_mg, data = treatments)
+summary(model)
 
