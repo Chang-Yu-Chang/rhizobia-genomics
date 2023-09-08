@@ -3,6 +3,8 @@
 library(tidyverse)
 library(janitor)
 library(cowplot)
+library(lme4) # for linear mixed-effect models
+library(car) # companion to Applied Regression
 library(vegan) # for permanova
 source(here::here("analysis/00-metadata.R"))
 
@@ -31,7 +33,7 @@ subset_ensifer <- function(tb) {
 gc.prm <- gc.prm %>% subset_ensifer()
 
 # Panel A: cartoon for methods ----
-p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig2A.png")) + draw_text("placeholder for\ncartoon")
+p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig2A.png"))
 
 
 # Panel B: growth rate at 30C ----
@@ -63,18 +65,42 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
             panel.spacing.x = unit(0, "mm"),
             #panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
             strip.background = element_rect(color = NA, fill = NA),
-            strip.text = element_text(size = 10, color = "black"),
+            # strip.text = element_text(size = 10, color = "black"),
+            strip.text = element_blank(),
             axis.text = element_text(size = 10, color = "black"),
             axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.title.x = element_blank(),
             legend.position = "none",
-            plot.margin = unit(c(0,5,0,0), "mm")
+            plot.margin = margin(0,0,15,0, "mm")
         ) +
         guides(color = "none") +
         labs(x = "", y = ylab)
 
 }
 
-p2 <- plot_boxplot_pair(gc.prm, r, expression(growth~rate(h^-1))) + theme(axis.title.x = element_blank())
+p2_1 <- plot_boxplot_pair(gc.prm, r, expression(growth~rate(h^-1)))
+
+## Add the treatment logo
+t1 <- magick::image_read(here::here("plots/cartoons/Fig2B_1.png"))
+t2 <- magick::image_read(here::here("plots/cartoons/Fig2B_2.png"))
+p2 <- ggdraw() +
+    draw_plot(p2_1) +
+    draw_image(t1, x = 0.16, y = -0.13, scale = 0.4, halign = 0, valign = 0) +
+    draw_image(t2, x = 0.6, y = -0.13, scale = 0.4, halign = 0, valign = 0)
+
+
+
+
+## Stats
+## Does rhizobia site make the difference in growth rate?
+mod <- lmer(r ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
+Anova(mod, type = 3) # Site group does not have effect on r
+# Response: r
+#           Chisq Df Pr(>Chisq)
+# (Intercept)       45.5158  1  1.514e-11 ***
+# strain_site_group  1.7946  1     0.1804
+
 
 
 # Panel C: PCA for growth traits ----
@@ -132,7 +158,7 @@ adonis2(Y ~ strain_site_group, data = gc.prm, permutations = 999)
 # Total             75  0.70848 1.00000
 
 
-p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tblr", align = "h", labels = LETTERS[1:3], scale = 0.95, rel_widths = c(1,1.5,1.5)) + paint_white_background()
+p <- plot_grid(p1, p2, p3, nrow = 1, axis = "t", align = "h", labels = LETTERS[1:3], scale = 0.95, rel_widths = c(1,1.5,1.5)) + paint_white_background()
 
 ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 4)
 

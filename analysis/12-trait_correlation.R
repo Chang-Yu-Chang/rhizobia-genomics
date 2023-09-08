@@ -19,7 +19,7 @@ isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_c
 # plant traits
 treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
 
-# Clean up data
+# Clean up data. Use only medium elevation plants
 treatments_M <- treatments %>%
     mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
            strain_site = ifelse(is.na(strain_site), "control", strain_site),
@@ -36,6 +36,8 @@ tm1 <- treatments_M %>% filter(strain != "control")
 n_bs <- 1000 # number of bootstraps
 n_spb <- 10 # number of resamples per strain per bootstrap
 list_cor <- tibble(r0 = rep(NA, n_bs), r1 = rep(NA, n_bs))
+n_bsp <- n_spb * length(rhizobia_strains) # number of sampled pairs in one bootstrap
+list_pair <- rep(list(tibble(gi0 = rep(NA, n_bsp), ei0 = rep(NA, n_bsp), gi1 = rep(NA, n_bsp), ei1 = rep(NA, n_bsp))), n_bs)
 
 for (i in 1:n_bs) {
     set.seed(i)
@@ -60,6 +62,11 @@ for (i in 1:n_bs) {
     ei1 <- unlist(ei1)
     list_cor$r1[i] <- cor(gi1, ei1)
 
+    # Save the bootstrapped samples
+    list_pair[[i]]$gi0 <- gi0
+    list_pair[[i]]$ei0 <- ei0
+    list_pair[[i]]$gi1 <- gi1
+    list_pair[[i]]$ei1 <- ei1
 
     cat(" ", i)
 
@@ -69,8 +76,11 @@ list_cor <- list_cor %>%
     mutate(bootstrap = 1:n()) %>%
     mutate(difference = ifelse(r1 > r0, "r1 is greater", "r1 is less"))
 
-table(list_cor$difference)
+boot_pair <- bind_rows(list_pair, .id = "bootstrap")
+write_csv(boot_pair, paste0(folder_data, "temp/12-01-raw_growth_rate_vs_biomass.csv"))
 
+
+table(list_cor$difference)
 mean(list_cor$r0) # 0.009594945
 mean(list_cor$r1) # 0.4390422
 # r0 is randomized_across_strains

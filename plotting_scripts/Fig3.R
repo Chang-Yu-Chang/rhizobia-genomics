@@ -31,7 +31,7 @@ treatments_HL <- treatments %>%
 
 
 # Panel A: cartoon for methods ----
-p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png")) + draw_text("placeholder for\ncartoon")
+p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png"))
 
 
 # Panel B: plant biomass ----
@@ -49,19 +49,33 @@ plot_boxplot_pair <- function (tb, ytrait, ylab = "") {
         theme(
             panel.spacing.x = unit(0, "mm"),
             strip.background = element_rect(color = NA, fill = NA),
-            strip.text = element_text(size = 10, color = "black"),
+            #strip.text = element_text(size = 10, color = "black"),
+            strip.text = element_blank(),
             axis.text = element_text(size = 10, color = "black"),
             axis.text.x = element_blank(),
-            legend.position = "none"
+            axis.ticks.x = element_blank(),
+            legend.position = "none",
+            plot.margin = margin(0,0,13,0, "mm")
         ) +
         guides(color = "none") +
         labs(x = "", y = ylab)
 }
 
-p2 <- treatments_M %>%
+p2_1 <- treatments_M %>%
     filter(strain != "control") %>%
     drop_na(names(trait_axis_names)[1]) %>%
     plot_boxplot_pair(ytrait = names(trait_axis_names)[1], trait_axis_names[[1]])
+
+## Add the treatment logo
+t1 <- magick::image_read(here::here("plots/cartoons/Fig3B_1.png"))
+t2 <- magick::image_read(here::here("plots/cartoons/Fig3B_2.png"))
+p2 <- ggdraw() +
+    draw_plot(p2_1) +
+    draw_image(t1, x = 0.18, y = -0.09, scale = 0.3, halign = 0, valign = 0) +
+    draw_image(t2, x = 0.64, y = -0.09, scale = 0.3, halign = 0, valign = 0)
+
+
+
 
 ## Stat
 ## Does the rhizobia strain have effect on shoot biomass?
@@ -104,10 +118,10 @@ p3 <- df %>%
     theme_classic() +
     theme(
         panel.border = element_rect(fill = NA, color = 1),
-        legend.position = "right",
-        legend.background = element_rect(fill = NA, color = NA),
+        legend.position = c(0.8, 0.8),
+        legend.background = element_rect(fill = "white", color = "black"),
         legend.title = element_blank(),
-        legend.margin = margin(0,0,0,0),
+        legend.margin = margin(1,1,1,1, "mm"),
         plot.background = element_rect(fill = "white", color = NA),
         plot.title = element_blank()
     ) +
@@ -146,17 +160,49 @@ adonis2(Y ~ strain_site_group, data = tt_M, strata = tt_M$plant, permutations = 
 
 
 # Panel D: the experiment for plant local adaptation ----
-p4 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3A.png")) + draw_text("placeholder for\ncartoon")
+p4 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig3D.png"))
 
 # Panel E: the result of local adaptation ----
 set.seed(1)
-p5 <- treatments_HL %>%
+if (F) {
+    p5 <- treatments_HL %>%
+        filter(strain != "control") %>%
+        drop_na(dry_weight_mg) %>%
+        ggplot() +
+        geom_rect(data = tibble(strain_site_group = "H"), fill = "#0C6291", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+        geom_rect(data = tibble(strain_site_group = "L"), fill = "#BF4342", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
+        geom_boxplot(aes(x = strain_site_group, y = dry_weight_mg, fill = plant_site_group), alpha = 1, outlier.size = -1, color = "black") +
+        geom_point(aes(x = strain_site_group, y = dry_weight_mg, group = plant_site_group, color = plant_site_group), shape = 21, size = 2, stroke = 1, fill = NA,
+                   position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.75)) +
+        scale_color_manual(values = rep("black", 100)) +
+        scale_fill_manual(values = rhizobia_site_colors, labels = c("H plant", "L plant"), breaks = c("H", "L")) +
+        facet_grid(~strain_site_group, scales = "free_x", space = "free_x", labeller = labeller(.cols = c(H="H rhizobia", L="L rhizobia"))) +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_rect(color = NA, fill = NA),
+            #strip.text = element_text(size = 10, color = "black"),
+            strip.text = element_blank(),
+            axis.text = element_text(size = 10, color = "black"),
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            legend.position = c(0.18, 0.88),
+            legend.background = element_rect(fill = "white", color = "black"),
+            legend.margin = margin(0,2,0,1,"mm"),
+            legend.text = element_text(size = 8),
+            legend.title = element_blank(),
+            plot.margin = margin(0,0,13,0, "mm")
+        ) +
+        guides(color = "none", fill = "none") +
+        labs(x = "", y = trait_axis_names[[1]])
+}
+p5_1 <- treatments_HL %>%
     filter(strain != "control") %>%
     drop_na(dry_weight_mg) %>%
     ggplot() +
     geom_rect(data = tibble(strain_site_group = "H"), fill = "#0C6291", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
     geom_rect(data = tibble(strain_site_group = "L"), fill = "#BF4342", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-    geom_boxplot(aes(x = strain_site_group, y = dry_weight_mg, fill = plant_site_group), alpha = 1, outlier.size = -1, color = "black") +
+    geom_boxplot(aes(x = strain_site_group, y = dry_weight_mg, group = plant_site_group), alpha = 1, outlier.size = -1, color = "black") +
     geom_point(aes(x = strain_site_group, y = dry_weight_mg, group = plant_site_group, color = plant_site_group), shape = 21, size = 2, stroke = 1, fill = NA,
                position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.75)) +
     scale_color_manual(values = rep("black", 100)) +
@@ -166,16 +212,33 @@ p5 <- treatments_HL %>%
     theme(
         panel.spacing.x = unit(0, "mm"),
         strip.background = element_rect(color = NA, fill = NA),
-        strip.text = element_text(size = 10, color = "black"),
+        #strip.text = element_text(size = 10, color = "black"),
+        strip.text = element_blank(),
         axis.text = element_text(size = 10, color = "black"),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        legend.position = c(0.2, 0.9),
-        legend.background = element_rect(fill = NA),
-        legend.title = element_blank()
+        legend.position = c(0.18, 0.88),
+        legend.background = element_rect(fill = "white", color = "black"),
+        legend.margin = margin(0,2,0,1,"mm"),
+        legend.text = element_text(size = 8),
+        legend.title = element_blank(),
+        plot.margin = margin(0,0,15,0, "mm")
     ) +
-    guides(color = "none") +
+    guides(color = "none", fill = "none") +
     labs(x = "", y = trait_axis_names[[1]])
+## Add the treatment logo
+t1 <- magick::image_read(here::here("plots/cartoons/Fig3E_1.png"))
+t2 <- magick::image_read(here::here("plots/cartoons/Fig3E_2.png"))
+t3 <- magick::image_read(here::here("plots/cartoons/Fig3E_3.png"))
+t4 <- magick::image_read(here::here("plots/cartoons/Fig3E_4.png"))
+p5 <- ggdraw() +
+    draw_plot(p5_1) +
+    draw_image(t1, x = 0.09, y = -0.08, scale = 0.3, halign = 0, valign = 0) +
+    draw_image(t2, x = 0.27, y = -0.08, scale = 0.3, halign = 0, valign = 0) +
+    draw_image(t3, x = 0.54, y = -0.08, scale = 0.3, halign = 0, valign = 0) +
+    draw_image(t4, x = 0.72, y = -0.08, scale = 0.3, halign = 0, valign = 0)
+
+
 
 # df_boxplot <- ggplot_build(p5)$data[[3]] # Extract the x axis
 # p5 + annotate("segment", x = df_boxplot$x[1], xend = df_boxplot$x[2], y = 30, yend = 30) +
@@ -246,10 +309,12 @@ p6 <- df %>%
     theme_classic() +
     theme(
         panel.border = element_rect(fill = NA, color = 1),
-        legend.position = "right",
-        legend.background = element_rect(fill = NA, color = NA),
+        legend.position = c(0.2, 0.2),
+        legend.background = element_rect(fill = "white", color = "black"),
         legend.title = element_blank(),
-        legend.margin = margin(0,0,0,0),
+        legend.margin = margin(0,1,0,1, "mm"),
+        legend.key.size = unit(5, "mm"),
+        #legend.box.spacing = unit(-2, "mm"),
         plot.background = element_rect(fill = "white", color = NA),
         plot.title = element_blank()
     ) +
@@ -282,9 +347,9 @@ adonis2(Y ~  plant_site_group + strain_site_group , data = tt_HL, strata = tt_HL
 
 
 
-p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, axis = "tblr", align = "h", labels = LETTERS[1:6], scale = 0.95, rel_widths = c(1,1.5,2)) + paint_white_background()
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, axis = "t", align = "h", labels = LETTERS[1:6], scale = 0.9, rel_widths = c(1,1.5,1.5)) + paint_white_background()
 
-ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 8)
+ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 8)
 
 
 
