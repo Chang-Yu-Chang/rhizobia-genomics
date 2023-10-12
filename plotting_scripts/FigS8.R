@@ -117,7 +117,7 @@ Anova(mod, type = 3) # Site group does not have effect on lag time
 # Response: lag
 #           Chisq Df Pr(>Chisq)
 # (Intercept)       292.6038  1     <2e-16 ***
-#     strain_site_group   0.4997  1     0.4796
+# strain_site_group   0.4997  1     0.4796
 mod <- lmer(r ~ strain_site_group + (1|strain) + (1|strain_site), data = gc.prm)
 Anova(mod, type = 3) # Site group does not have effect on r
 # Response: r
