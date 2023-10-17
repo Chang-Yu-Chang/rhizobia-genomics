@@ -6,7 +6,7 @@ source ~/.zshrc
 mamba activate bakta
 mamba env list
 
-bakta_database=~/bioinformatics/bakta/ # This database is mandatory and must be downloaded before annotation
+bakta_database=~/bioinformatics/bakta/db # This database is mandatory and must be downloaded before annotation
 medaka_consensus=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/03-flye_medaka/medaka/consensus.fasta
 bakta_folder=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/04-bakta/
 
