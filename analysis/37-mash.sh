@@ -6,7 +6,7 @@ source ~/.zshrc
 mamba activate mash
 mamba env list
 
-medaka_consensus=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/03-flye_medaka/medaka/consensus.fasta
+medaka_consensus=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/04-medaka/consensus.fasta
 refseq_db=~/bioinformatics/mash/refseq.genomes+plasmid.k21.s1000.msh
 mash_sketch=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/07-mash/consensus.fasta
 mash_distance=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/07-mash/distances.tab
