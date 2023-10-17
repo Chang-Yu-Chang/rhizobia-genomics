@@ -7,7 +7,7 @@ mamba activate checkm
 mamba env list
 
 checkm_results=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/06-checkm/checkm-results.tsv
-bin_input=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/04-medaka/
+bin_input=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/04-medaka
 checkm_dir=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/06-checkm
 
 checkm lineage_wf --tab_table --file "$checkm_results" --thread 12 --pplacer_threads 12 --extension fasta "$bin_input" "$checkm_dir"

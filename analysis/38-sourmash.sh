@@ -7,7 +7,7 @@ mamba activate sourmash
 mamba env list
 
 medaka_consensus=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/04-medaka/consensus.fasta
-sourmash_dir=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/08-sourmash/
+sourmash_dir=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/08-sourmash
 sourmash_sig=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/08-sourmash/consensus.fasta.sig
 genbank_db=~/bioinformatics/sourmash/genbank-k31.lca.json.gz
 
