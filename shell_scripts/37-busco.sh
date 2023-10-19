@@ -1,13 +1,26 @@
 cd
 source ~/.zshrc
 
-# check genome quality
+# Check genome quality
 mamba activate busco
 mamba env list
 
 
+medaka_consensus=$1
+busco_folder=$2
+
+busco -i $medaka_consensus --out_path $busco_folder -o "results" -m genome --auto-lineage-prok
+# `-i` input sequence file in FASTA format
+# `-out_path` output folder name
+# `-o` output project name
+# `-m genome` BUSCO analysis mode. We use genome mode
+# `--auto-lineage-prok` Automated lineage selection
 
 
+# busco -i ~/MGJW/problem_set3/out_S56/contigs.fa -l bacteria_odb10 -o busco_op -m genome
+# busco -i ~/MGJW/problem_set1/fasta/genome4.fasta -l bacteria_odb10 -o busco_op2 -m genome
+# busco -i ~/MGJW/problem_set1/fasta/genome4.fasta -l clostridiales_odb10 -o busco_op3 -m genome
+# busco -i ~/MGJW/problem_set3/out_S56/contigs.fa -l pseudomonadales_odb10 -o busco_op4 -m genome
 # Check genome completeness and contamination
 # mamba activate checkm
 # mamba env list

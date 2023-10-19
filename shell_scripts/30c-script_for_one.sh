@@ -3,12 +3,16 @@ source ~/.zshrc
 
 cd ~/Desktop/lab/local-adaptation/shell_scripts
 folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
-folder_raw_result="/Users/cychang/Dropbox/lab/local-adaptation/data/raw/Chang_Q5C_results"
-folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results"
+folder_raw_result="/Users/cychang/Dropbox/lab/local-adaptation/data/raw/$1"
+folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/$1"
 
 # Sample ID
-sample_id="Chang_Q5C_1"
+sample_id=$2
+mkdir -p "$folder_temp_result/$sample_id"
 mkdir -p "$folder_temp_result/$sample_id/logs"
+
+echo $folder_temp_result
+echo $sample_id
 
 # Make folders
 mkdir -p "$folder_temp_result/$sample_id/01-filtlong"
@@ -37,7 +41,7 @@ log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
 raw_reads="$folder_raw_result/$sample_id/reads/raw_reads.fastq.gz"
 filtered_reads="$folder_temp_result/$sample_id/01-filtlong/01-filtered_reads.fastq.gz"
 
-zsh 31-filter_reads.sh $raw_reads $filtered_reads | tee $log01
+zsh 31-filter_reads.sh $raw_reads $filtered_reads &> $log01
 
 # 2. Draft genome via miniasm
 downsample_reads="$folder_temp_result/$sample_id/02-miniasm/02-downsampled_reads.fastq"
@@ -45,7 +49,7 @@ assemble_paf="$folder_temp_result/$sample_id/02-miniasm/02-miniasm_pilot.paf.gz"
 assemble_gfa="$folder_temp_result/$sample_id/02-miniasm/02-miniasm_pilot.gfa"
 assemble_fq="$folder_temp_result/$sample_id//02-miniasm/02-miniasm_pilot.fasta"
 
-zsh 32-miniasm.sh $filtered_reads $downsample_reads $assemble_paf $assemble_gfa $assemble_fq | tee $log02
+zsh 32-miniasm.sh $filtered_reads $downsample_reads $assemble_paf $assemble_gfa $assemble_fq &> $log02
 
 # 3. Assemble genome via flye
 filtered_reads="$folder_temp_result/Chang_Q5C_1/01-filtlong/01-filtered_reads.fastq.gz"
@@ -72,13 +76,16 @@ bakta_folder="$folder_temp_result/$sample_id/05-bakta"
 zsh 35-bakta.sh $bakta_database $medaka_consensus $bakta_folder | tee $log05
 
 # 6. Check genome quality via quast
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+quast_folder="$folder_temp_result/$sample_id/06-quast"
 
-
+zsh 36-quast.sh $medaka_consensus $quast_folder | tee $log06
 
 # 7. Check genome quality via busco
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+busco_folder="$folder_temp_result/$sample_id/07-busco"
 
-
-
+zsh 37-busco.sh $medaka_consensus $busco_folder | tee $log07
 
 # 8. Identify taxonomy via mash
 medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
@@ -95,7 +102,6 @@ genbank_db="/Users/cychang/bioinformatics/sourmash/genbank-k31.lca.json.gz"
 sourmash_sig="$folder_temp_result/$sample_id/09-sourmash/consensus.fasta.sig"
 
 zsh 39-sourmash.sh $medaka_consensus $sourmash_dir $genbank_db $sourmash_sig | tee $log09
-
 
 
 # Remove all temporary files

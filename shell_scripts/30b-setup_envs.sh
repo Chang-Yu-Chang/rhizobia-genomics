@@ -64,7 +64,7 @@ quast-download-busco
 mamba create -n busco
 mamba activate busco
 mamba install --yes -c bioconda busco=5.4.7
-busco -h
+
 
 # Install CheckM v1.2.2
 # CheckM, an automated method for assessing the quality of a genome using a broader set of marker genes specific to the position of a genome within a reference genome tree and information about the collocation of these gene
