@@ -6,19 +6,24 @@ source ~/.zshrc
 mamba activate filtlong
 mamba env list
 
-filtered_reads=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/01-filtlong/01-filtered_reads.fastq.gz
-downsample_reads=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-downsampled_reads.fastq
+filtered_reads=$1
+downsample_reads=$2
+assemble_paf=$3
+assemble_gfa=$4
+assemble_fq=$5
+# filtered_reads=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/01-filtlong/01-filtered_reads.fastq.gz
+# downsample_reads=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-downsampled_reads.fastq
 
-filtlong --target_bases 250000000 "$filtered_reads" > "$downsample_reads"
+filtlong --target_bases 250000000 $filtered_reads > $downsample_reads
 # `--target_bases 250000000` remove the worst reads unitl only 250 Mbp remain
 
 # Assembly
 mamba activate miniasm
 mamba env list
 
-assemble_paf=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.paf.gz
-assemble_gfa=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.gfa
-assemble_fq=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.fasta
+# assemble_paf=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.paf.gz
+# assemble_gfa=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.gfa
+# assemble_fq=~/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/02-miniasm/02-miniasm_pilot.fasta
 
 ## Overlap raw reads using minimap
 minimap2 -x ava-ont -t8 "$downsample_reads" "$downsample_reads" | gzip -1 > "$assemble_paf"

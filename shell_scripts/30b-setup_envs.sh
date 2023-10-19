@@ -39,11 +39,32 @@ mkdir -p ~/bioinformatics/bakta
 bakta_db download --output ~/bioinformatics/bakta/
 # This database is on zenodo https://zenodo.org/records/7669534 and it's ~50 GB
 
-# Install Bandage v0.8.1
-# Bandage (a Bioinformatics Application for Navigating De novo Assembly Graphs Easily)
-mamba create -n bandage
-mamba activate bandage
-mamba install bandage=0.8.1
+# # Install Bandage v0.8.1
+# # Bandage (a Bioinformatics Application for Navigating De novo Assembly Graphs Easily)
+# mamba create -n bandage
+# mamba activate bandage
+# mamba install bandage=0.8.1
+
+# Install Quast v5.2.0
+# QUAST stands for QUality ASsessment Tool. It evaluates genome/metagenome assemblies by computing various metrics. The current QUAST toolkit includes the general QUAST tool for genome assemblies, MetaQUAST, the extension for metagenomic datasets, QUAST-LG, the extension for large genomes (e.g., mammalians), and Icarus, the interactive visualizer for these tools.
+mamba create -n quast
+mamba activate quast
+mamba install --yes -c bioconda quast=5.2.0
+# The default QUAST package does not include:
+# * GRIDSS (needed for structural variants detection)
+# * SILVA 16S rRNA database (needed for reference genome detection in metagenomic datasets)
+# * BUSCO tools and databases (needed for searching BUSCO genes) -- works in Linux only!
+# To be able to use those, please run
+quast-download-gridss
+quast-download-silva
+quast-download-busco
+
+# Install Busco v5.4.7
+# BUSCO provides measures for quantitative assessment of genome assembly, gene set, and transcriptome completeness based on evolutionarily informed expectations of gene content from near-universal single-copy orthologs selected from OrthoDB.
+mamba create -n busco
+mamba activate busco
+mamba install --yes -c bioconda busco=5.4.7
+busco -h
 
 # Install CheckM v1.2.2
 # CheckM, an automated method for assessing the quality of a genome using a broader set of marker genes specific to the position of a genome within a reference genome tree and information about the collocation of these gene
