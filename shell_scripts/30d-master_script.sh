@@ -30,3 +30,28 @@ zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_17"
 zsh 30c-script_for_one.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_19"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_10"
+
+
+# Extract the read size
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_1"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_2"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_3"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_4"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_5"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_6"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_7"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_8"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_9"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_10"
+zsh 31a-extract_reads.sh "Chang_Q5C_results_repeated" "Chang_Q5C_11"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_12"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_13"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_14"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_15"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_16"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_17"
+zsh 31a-extract_reads.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_19"
+zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_20"
+
+
