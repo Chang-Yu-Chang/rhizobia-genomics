@@ -17,6 +17,10 @@ busco -i $medaka_consensus --out_path $busco_folder -o "results" -m genome --aut
 # `--auto-lineage-prok` Automated lineage selection
 
 
+
+
+
+
 # busco -i ~/MGJW/problem_set3/out_S56/contigs.fa -l bacteria_odb10 -o busco_op -m genome
 # busco -i ~/MGJW/problem_set1/fasta/genome4.fasta -l bacteria_odb10 -o busco_op2 -m genome
 # busco -i ~/MGJW/problem_set1/fasta/genome4.fasta -l clostridiales_odb10 -o busco_op3 -m genome

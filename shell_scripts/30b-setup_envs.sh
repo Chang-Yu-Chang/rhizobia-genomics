@@ -87,7 +87,11 @@ wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O r
 mamba create -n sourmash
 mamba activate sourmash
 mamba install --yes -c bioconda sourmash=4.6.1
-# Download a Genbank LCA database for k=31
-mkdir -p ~/bioinformatics/sourmash
-cd ~/bioinformatics/sourmash/
-wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
+# Download a prefetch database for k=3.1
+# # Download a Genbank LCA database for k=31
+# mkdir -p ~/bioinformatics/sourmash
+# cd ~/bioinformatics/sourmash/
+# wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
+
+
+

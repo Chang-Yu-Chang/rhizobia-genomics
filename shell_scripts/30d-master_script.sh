@@ -30,4 +30,3 @@ zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_17"
 zsh 30c-script_for_one.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_19"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_10"
-

@@ -5,8 +5,7 @@ filtered_reads=$1
 assemble_fq=$2
 downsampled_reads2=$3
 genome_size=$4
-downsampled_reads2=$5
-assembly_folder=$6
+assembly_folder=$5
 
 
 # Using information acquired from the Miniasm assembly, re-downsample the reads to ~100x coverage (do nothing if there isn't at least 100x coverage) with heavy weight applied to removing low quality reads (helps small plasmids stick around)
