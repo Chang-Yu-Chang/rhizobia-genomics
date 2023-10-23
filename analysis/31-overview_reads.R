@@ -5,27 +5,34 @@ library(cowplot)
 source(here::here("analysis/00-metadata.R"))
 
 
-list_g <- paste0(rep("Chang_Q5C_results", 20), "/Chang_Q5C_", 1:20, "/")
+list_g <- paste0(rep("Chang_Q5C_results", 19), "/Chang_Q5C_", 1:19, "/")
 list_g[11] <- "Chang_Q5C_results_repeated/Chang_Q5C_11/"
 list_g[18] <- "Chang_Q5C_results_repeated/Chang_Q5C_18/"
+list_reads <- rep(list(NA), 19)
 
-
-for (i in 1:20) {
-    raw_phred <- read_table(paste0(folder_data, "temp/plasmidsaurus/", list_g[i], "01-filtlong/raw_phred.txt"), col_names = c("name", "phred", "length"))
-    p <- raw_phred %>%
-        mutate(phred = phred - 33) %>%
-        ggplot() +
-        geom_point(aes(x = length, y = phred), size = 0.2, alpha = 0.2) +
-        theme_classic() +
-        theme(
-            panel.grid.major = element_line(color = "grey90", linewidth = 0.1)
-        ) +
-        guides() +
-        labs()
-
-    ggsave(paste0(folder_data, "temp/31-01-raw_reads_g", sprintf("%02d", i),".png"), plot = p, width = 5, height = 5)
-
+for (i in 1:19) {
+    list_reads[[i]] <- read_table(paste0(folder_data, "temp/plasmidsaurus/", list_g[i], "01-filtlong/raw_phred.txt"), col_names = c("name", "phred", "length"))
 }
+
+raw_phred <- list_reads %>%
+    bind_rows(.id = "genome_id")
+
+
+
+p <- raw_phred %>%
+    #mutate(phred = phred - 33) %>%
+    ggplot() +
+    geom_point(aes(x = length, y = phred), size = 0.2, alpha = 0.2) +
+    scale_x_log10() +
+    facet_wrap(~genome_id, ncol = 5, nrow = 4) +
+    theme_classic() +
+    theme(
+        panel.grid.major = element_line(color = "grey90", linewidth = 0.1)
+    ) +
+    guides() +
+    labs()
+
+ggsave(paste0(folder_data, "temp/31-01-raw_reads.png"), plot = p, width = 16, height = 20)
 
 #filtered_phred <- read_table(paste0(folder_data, "temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/01-filtlong/01-filtered_phred.txt"), col_names = c("name", "phred", "length"))
 #downsampled2_phred <- read_table(paste0(folder_data, "temp/plasmidsaurus/Chang_Q5C_results/Chang_Q5C_1/03-flye/03-downsampled2_phred.txt"), col_names = c("name", "phred", "length"))
