@@ -2,6 +2,9 @@
 shell_scripts/busco_*.log
 shell_scripts/busco_downloads/*
 
+# snakemake logs
+.snakemake/log/*
+
 # DS
 .DS_Store
 

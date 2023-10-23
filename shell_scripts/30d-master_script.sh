@@ -29,7 +29,6 @@ zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_16"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_17"
 zsh 30c-script_for_one.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_19"
-zsh 30c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_10"
 
 
 # Extract the read size
@@ -52,6 +51,5 @@ zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_16"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_17"
 zsh 31a-extract_reads.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_19"
-zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_20"
 
 
