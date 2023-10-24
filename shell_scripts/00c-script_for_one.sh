@@ -4,7 +4,7 @@ source ~/.zshrc
 cd ~/Desktop/lab/local-adaptation/shell_scripts
 folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
 folder_raw_result="/Users/cychang/Dropbox/lab/local-adaptation/data/raw/$1"
-folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/"
+folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus"
 # folder_raw_result="/Users/cychang/Dropbox/lab/local-adaptation/data/raw/Chang_Q5C_results"
 # folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results"
 sample_id=$2
