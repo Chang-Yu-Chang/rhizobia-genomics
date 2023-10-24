@@ -20,4 +20,3 @@ medaka_consensus -i $raw_reads -d $draft_assembly -o $medaka_folder -t 10 -m r94
 # `-o "$medaka_folder"` output folder (default: medaka).
 # `-t 10` number of threads with which to create features (default: 1).
 # `-m r941_min_high_g303` medaka model, (default: r941_min_high_g360).
-

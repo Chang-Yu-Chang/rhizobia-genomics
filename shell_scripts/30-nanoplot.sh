@@ -8,7 +8,7 @@ mamba env list
 raw_reads=$1
 nanoplot_folder=$2
 
-NanoPlot -t 2 --verbose  --outdir $nanoplot_folder --fastq $raw_reads --maxlength 100000 --plots kde -c crimson  -cm RdBu --N50
+NanoPlot -t 2 --verbose  --outdir $nanoplot_folder --fastq $raw_reads --maxlength 100000 --plots kde #-c crimson  -cm RdBu --N50
 # `-t` thread
 # `--verbose` print  Write log messages also to terminal
 # `--outdir` output directory
