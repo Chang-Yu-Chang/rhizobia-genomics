@@ -8,7 +8,7 @@ folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmi
 # folder_raw_result="/Users/cychang/Dropbox/lab/local-adaptation/data/raw/Chang_Q5C_results"
 # folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_results"
 sample_id=$2
-#sample_id="Chang_Q5C_1"
+# sample_id="Chang_Q5C_1"
 
 echo $sample_id
 
@@ -111,6 +111,10 @@ gather_csv="$folder_temp_result/$sample_id/09-sourmash/gather.csv"
 
 zsh 39-sourmash.sh $medaka_consensus $sourmash_dir $genbank_db $sourmash_sig $gather_csv &> $log09
 
+# 10. multiqc
+mamba activate multiqc
+cd folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/$1/$2/"
+multiqc .
 
 # Remove all temporary files
 
