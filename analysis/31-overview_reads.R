@@ -16,8 +16,12 @@ raw_reads <- list_reads %>%
     mutate(genome_id = factor(genome_id, 1:20))
 
 # subtract by 33
-raw_reads$phred <- raw_reads$phred-33
+raw_reads$phred <- raw_reads$phred
 
+raw_reads %>%
+    filter(genome_id == 1) %>%
+    pull(phred) %>%
+    range()
 
 # 1. read length vs. phred
 p <- raw_reads %>%
@@ -34,7 +38,22 @@ p <- raw_reads %>%
 
 ggsave(paste0(folder_data, "temp/31-01-read_length_vs_phred.png"), plot = p, width = 16, height = 20)
 
-# 2. Summary stat for each file number histogram
+# 2.
+p <- raw_reads %>%
+    filter(genome_id == 1) %>%
+    ggplot() +
+    geom_point(aes(x = length, y = phred), size = 0.2, alpha = 0.2) +
+    #scale_x_log10() +
+    facet_wrap(~genome_id, ncol = 5, nrow = 4) +
+    theme_classic() +
+    theme(
+        panel.grid.major = element_line(color = "grey90", linewidth = 1)
+    ) +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/31-02-g1_read_length_vs_phred.png"), plot = p, width = 4, height = 4)
+
+# 2XX. Summary stat for each file number histogram
 raw_reads %>%
     group_by(genome_id) %>%
     summarize(n = n(),
