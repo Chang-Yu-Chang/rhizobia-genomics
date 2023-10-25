@@ -35,7 +35,7 @@ zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_17"
 zsh 00c-script_for_one.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_19"
 
-# Extract the read size
+# Extract the read length and ASC text
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_1"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_2"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_3"
