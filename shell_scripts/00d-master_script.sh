@@ -11,8 +11,8 @@ conda activate
 # zsh 00c-script_for_one.sh $batch_id $sample_id
 
 # Nanocompare all raw reads
-zsh 30a-naocomp.sh
-
+mamba activate nanocomp
+zsh 30a-nanocomp.sh
 
 # Run the master script
 zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_1"

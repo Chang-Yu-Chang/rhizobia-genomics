@@ -5,6 +5,7 @@ library(cowplot)
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read the raw read data
+if (FALSE) {
 list_g <- paste0("Chang_Q5C_", 1:19)
 list_reads <- rep(list(NA), 19)
 compute_q <- function (asc) {
@@ -26,6 +27,11 @@ raw_reads <- list_reads %>%
     bind_rows(.id = "genome_id") %>%
     mutate(genome_id = factor(genome_id, 1:19))
 
+write_csv(raw_reads, file = paste0(folder_data, "temp/31-raw_reads.csv"))
+
+}
+
+raw_reads <- read_csv(paste0(folder_data, "temp/31-raw_reads.csv"))
 
 # Summary stat for each file number histogram
 raw_reads %>%

@@ -2,6 +2,19 @@
 # In priniciple, one env per one tool
 
 cd
+
+# Install Nanocomp v1.23.1
+# Nanocomp compares multiple runs of long read sequencing data and alignments.
+mamba create -n nanocomp
+mamba activate nanocomp
+mamba install --yes -c bioconda nanocomp=1.23.1
+
+# Install Nanoplot v.1.41.6
+# Nanoplot is a plotting tool for long read sequencing data and alignments.
+mamba create -n nanoplot
+mamba activate nanoplot
+mamba install --yes -c bioconda nanoplot=1.41.6
+
 # Install Filtlong v0.2.1
 # Filtlong is a tool for filtering long reads by quality.
 mamba create -n filtlong
