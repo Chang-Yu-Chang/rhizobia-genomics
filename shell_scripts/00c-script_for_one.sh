@@ -101,22 +101,19 @@ log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
 #
 # zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
 #
-# 8. Identify taxonomy via mash
-echo "8-mash"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-mash_folder="$folder_temp_result/$sample_id/08-mash"
-
-zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
-
-# # 9. Identify taxonomy via sourmash
-# echo "9-sourmash"
+# # 8. Identify taxonomy via mash
+# echo "8-mash"
 # medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
-# genbank_db="/Users/cychang/bioinformatics/sourmash/genbank-k31.lca.json.gz"
-# sourmash_sig="$folder_temp_result/$sample_id/09-sourmash/consensus.fasta.sig"
-# gather_csv="$folder_temp_result/$sample_id/09-sourmash/gather.csv"
+# mash_folder="$folder_temp_result/$sample_id/08-mash"
 #
-# zsh 39-sourmash.sh $medaka_consensus $sourmash_folder $genbank_db $sourmash_sig $gather_csv &> $log09
+# zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
+#
+# 9. Identify taxonomy via sourmash
+echo "9-sourmash"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
+
+zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
 #
 # # 10. multiqc
 # mamba activate multiqc
