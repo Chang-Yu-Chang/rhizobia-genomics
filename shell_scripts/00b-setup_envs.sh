@@ -100,10 +100,23 @@ wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O r
 mamba create -n sourmash
 mamba activate sourmash
 mamba install --yes -c bioconda sourmash=4.6.1
-# Download a prefetch Genbank LCA database for k=31
+# Download a prefetch GTDB R8 genomic database for k=31
 mkdir -p ~/bioinformatics/sourmash
 cd ~/bioinformatics/sourmash/
+# Install zip that is used for sourmash gather
+wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
+
+
+
+
+
+# genomic representatives; this is 4.4GB with 85,205 species-level genomes. This took ~7min
 wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-reps.k31.sbt.zip -O gtdb-rs214-reps.k31.sbt.zip
+# genomic all genomes; this is 23GB with 402,709 genomes. This took 40min
+wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.sbt.zip -O gtdb-rs214-k31.sbt.zip
+# download species-level lineages
+wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214.lineages.csv.gz -O gtdb-rs214.lineages.csv.gz
+gunzip gtdb-rs214.lineages.csv.gz
 
 #wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/genbank-2022.03/genbank-2022.03-bacteria-k31.zip -O genbank-2022.03-bacteria-k31.zip
 # Create a Sequence Bloom Tree (SBT) database from the download database
