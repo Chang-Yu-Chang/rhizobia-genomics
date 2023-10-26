@@ -57,3 +57,7 @@ zsh 31a-extract_reads.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_19"
 
 
+# Make busco plot
+zsh 31a-plot_busco.sh
+
+
