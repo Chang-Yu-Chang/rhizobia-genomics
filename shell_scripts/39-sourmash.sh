@@ -11,7 +11,7 @@ sourmash_folder=$2
 # medaka_consensus="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_1/04-medaka/consensus.fasta"
 # sourmash_folder="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_1/09-sourmash"
 genbank_db="/Users/cychang/bioinformatics/sourmash/genbank-2022.03-bacteria-k31.zip"
-"THIS SHOULD BE A SBT FILE"
+#"THIS SHOULD BE A SBT FILE"
 sourmash_sig="$sourmash_folder/consensus.fasta.sig"
 gather_csv="$sourmash_folder/gather.csv"
 
@@ -25,11 +25,12 @@ sourmash sketch dna --param-string scaled=1000,k=31 $medaka_consensus --output-d
 # `--output-dir` output computed signatures to this directory
 
 # Selet the reference genomes to use for a metagenome analysis
-sourmash gather $sourmash_sig $genbank_db -o $gather_csv
+#sourmash gather $sourmash_sig $genbank_db
 # `gather` selects the best reference genomes to use for a metagenome analysis, by finding the smallest set of non-overlapping matches to the query in a database.  This is specifically meant for metagenome and genome bin analysis.
 # it takes two positional arguments `query` and `databases`
-# `-o` output CSV containg matches to this file
 
+# We recommend using the Zipfile databases for sourmash gather and the SBT databases for sourmash search.
+sourmash search $sourmash_sig $genbank_db --containment
 
 # Classify the signature with sourmash
 #sourmash tax --gather-csv HSMA33MX_gather_x_gtdbrs202_k31.csv --taxonomy gtdb-rs202.taxonomy.v2.csv
