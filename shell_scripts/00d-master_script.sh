@@ -57,7 +57,28 @@ zsh 31a-extract_reads.sh "Chang_Q5C_results_repeated" "Chang_Q5C_18"
 zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_19"
 
 
+# After all analysis above
+# Copy assembled genomes to one folder
+zsh 34a-move_consensus.sh
 # Make busco plot
-zsh 31a-plot_busco.sh
+zsh 37a-plot_busco.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

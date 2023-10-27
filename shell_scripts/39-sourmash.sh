@@ -8,9 +8,9 @@ mamba env list
 
 medaka_consensus=$1
 sourmash_folder=$2
+gtdb_db="/Users/cychang/bioinformatics/sourmash/gtdb-rs214-k31.zip"
 # medaka_consensus="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_1/04-medaka/consensus.fasta"
 # sourmash_folder="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/Chang_Q5C_1/09-sourmash"
-gtdb_db="/Users/cychang/bioinformatics/sourmash/gtdb-rs214-k31.zip"
 sourmash_sig="$sourmash_folder/consensus.sig"
 gathered_csv="$sourmash_folder/gathered.csv"
 
@@ -22,12 +22,16 @@ sourmash sketch dna --check-sequence -f -p scaled=1000,k=31 $medaka_consensus -o
 # `-o` output computed signatures to this directory
 
 # We recommend using the Zipfile databases for sourmash gather and the SBT databases for sourmash search.
-sourmash gather $sourmash_sig $gtdb_db -o $gathered_csv
+sourmash gather $sourmash_folder/consensus.sig $gtdb_db --save-matches $sourmash_folder/matches.zip
+#-o $gathered_csv
 
 # Classify the signature
-#sourmash tax --gather-csv HSMA33MX_gather_x_gtdbrs202_k31.csv --taxonomy gtdb-rs202.taxonomy.v2.csv
+#sourmash tax --gather-csv $gathered_csv --taxonomy "/Users/cychang/bioinformatics/sourmash/gtdb-rs214.lineages.csv"
 #sourmash tax genome --gather-csv $gather_csv --taxonomy "$sourmash_folder/taxonomy.csv"
-
+# sourmash tax metagenome --gather-csv $gathered_csv --taxonomy "/Users/cychang/bioinformatics/sourmash/gtdb-rs214.lineages.csv"
+# sourmash tax metagenome -F --gather-csv $gathered_csv --taxonomy "/Users/cychang/bioinformatics/sourmash/gtdb-rs214.lineages.csv" \
+#     --output-format krona --rank species
+# sourmash tax genome --gather-csv 47+63_x_gtdb-rs202.gather.csv --taxonomy gtdb-rs202.taxonomy.v2.csv
 
 
 # Select the best reference genomes to use

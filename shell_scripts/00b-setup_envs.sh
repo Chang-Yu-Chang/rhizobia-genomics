@@ -106,18 +106,14 @@ cd ~/bioinformatics/sourmash/
 # Install zip that is used for sourmash gather
 wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
 
-
-
-
-
-# genomic representatives; this is 4.4GB with 85,205 species-level genomes. This took ~7min
-wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-reps.k31.sbt.zip -O gtdb-rs214-reps.k31.sbt.zip
-# genomic all genomes; this is 23GB with 402,709 genomes. This took 40min
-wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.sbt.zip -O gtdb-rs214-k31.sbt.zip
-# download species-level lineages
-wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214.lineages.csv.gz -O gtdb-rs214.lineages.csv.gz
-gunzip gtdb-rs214.lineages.csv.gz
-
+# # genomic representatives; this is 4.4GB with 85,205 species-level genomes. This took ~7min
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-reps.k31.sbt.zip -O gtdb-rs214-reps.k31.sbt.zip
+# # genomic all genomes; this is 23GB with 402,709 genomes. This took 40min
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.sbt.zip -O gtdb-rs214-k31.sbt.zip
+# # download species-level lineages
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214.lineages.csv.gz -O gtdb-rs214.lineages.csv.gz
+# gunzip gtdb-rs214.lineages.csv.gz
+#
 #wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/genbank-2022.03/genbank-2022.03-bacteria-k31.zip -O genbank-2022.03-bacteria-k31.zip
 # Create a Sequence Bloom Tree (SBT) database from the download database
 #sourmash index -k 31 genbank-2022.03-bacteria-k31.sbt.zip genbank-2022.03-bacteria-k31.zip
@@ -126,5 +122,10 @@ gunzip gtdb-rs214.lineages.csv.gz
 #wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
 
 
+# Install FastANI v1.31
+# FastANI is developed for fast alignment-free computation of whole-genome Average Nucleotide Identity (ANI)
+mamba create -n fastani
+mamba activate fastani
+mamba install --yes -c bioconda fastani=1.31
 
 
