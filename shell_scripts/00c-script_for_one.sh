@@ -37,7 +37,7 @@ log06="$folder_temp_result/$sample_id/logs/06-quast.log"
 log07="$folder_temp_result/$sample_id/logs/07-busco.log"
 log08="$folder_temp_result/$sample_id/logs/08-mash.log"
 log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
-#
+
 # # 0. nanoplot
 # echo "0-nanoplot"
 # raw_reads="$folder_raw_result/$sample_id/reads/raw_reads.fastq.gz"
@@ -93,28 +93,28 @@ log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
 # quast_folder="$folder_temp_result/$sample_id/06-quast"
 #
 # zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
-#
-# # 7. Check genome quality via busco
-# echo "7-busco"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# busco_folder="$folder_temp_result/$sample_id/07-busco"
-#
-# zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
-#
-# # 8. Identify taxonomy via mash
-# echo "8-mash"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# mash_folder="$folder_temp_result/$sample_id/08-mash"
-#
-# zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
-#
-# 9. Identify taxonomy via sourmash
+
+# 7. Check genome quality via busco
+echo "7-busco"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+busco_folder="$folder_temp_result/$sample_id/07-busco"
+
+zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
+
+# 8. Identify taxonomy via mash
+echo "8-mash"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+mash_folder="$folder_temp_result/$sample_id/08-mash"
+
+zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
+
+9. Identify taxonomy via sourmash
 echo "9-sourmash"
 medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
 sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
 
 zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
-#
+
 # # 10. multiqc
 # mamba activate multiqc
 # cd folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/$1/$2/"
