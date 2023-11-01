@@ -25,6 +25,7 @@ mkdir -p "$folder_temp_result/$sample_id/06-quast"
 mkdir -p "$folder_temp_result/$sample_id/07-busco"
 mkdir -p "$folder_temp_result/$sample_id/08-mash"
 mkdir -p "$folder_temp_result/$sample_id/09-sourmash"
+mkdir -p "$folder_temp_result/$sample_id/10-prokka"
 
 # Specify log directory
 log00="$folder_temp_result/$sample_id/logs/00-nanoplot.log"
@@ -37,6 +38,7 @@ log06="$folder_temp_result/$sample_id/logs/06-quast.log"
 log07="$folder_temp_result/$sample_id/logs/07-busco.log"
 log08="$folder_temp_result/$sample_id/logs/08-mash.log"
 log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
+log10="$folder_temp_result/$sample_id/logs/10-prokka.log"
 
 # # 0. nanoplot
 # echo "0-nanoplot"
@@ -79,7 +81,7 @@ log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
 #
 # zsh 34-medaka.sh $raw_reads $draft_assembly $medaka_folder &> $log04
 #
-# # 5. Annotate genome via bakta
+# 5. Annotate genome via bakta
 # echo "5-bakta"
 # bakta_database="/Users/cychang/bioinformatics/bakta/db" # This database is mandatory and must be downloaded before annotation
 # medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
@@ -93,29 +95,36 @@ log09="$folder_temp_result/$sample_id/logs/09-sourmash.log"
 # quast_folder="$folder_temp_result/$sample_id/06-quast"
 #
 # zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
+#
+# # 7. Check genome quality via busco
+# echo "7-busco"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# busco_folder="$folder_temp_result/$sample_id/07-busco"
+#
+# zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
+#
+# # 8. Identify taxonomy via mash
+# echo "8-mash"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# mash_folder="$folder_temp_result/$sample_id/08-mash"
+#
+# zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
+#
+# 9. Identify taxonomy via sourmash
+# echo "9-sourmash"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
+#
+# zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
 
-# 7. Check genome quality via busco
-echo "7-busco"
+# 10. prokka
 medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-busco_folder="$folder_temp_result/$sample_id/07-busco"
+prokka_folder="$folder_temp_result/$sample_id/10-prokka"
 
-zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
+zsh 40-prokka.sh $medaka_consensus $prokka_folder &> $log10
 
-# 8. Identify taxonomy via mash
-echo "8-mash"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-mash_folder="$folder_temp_result/$sample_id/08-mash"
 
-zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
-
-9. Identify taxonomy via sourmash
-echo "9-sourmash"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
-
-zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
-
-# # 10. multiqc
+# # 1111. multiqc
 # mamba activate multiqc
 # cd folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/$1/$2/"
 # multiqc .

@@ -129,3 +129,22 @@ mamba activate fastani
 mamba install --yes -c bioconda fastani=1.31
 
 
+# Install Roary v3.13.0
+# Roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
+mamba create -n roary
+conda activate roary
+mamba install --yes -c bioconda roary=3.13.0
+roary -h
+# roary may plot using R and ggplot2
+mamba install --yes -c conda-forge r-base=4.2.0
+mamba install --yes -c conda-forge r-ggplot2=3.4.4
+
+
+# Install Scoary v1.6.16
+# Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
+mamba create -n scoary
+conda activate scoary
+mamba install --yes -c bioconda scoary=1.6.16
+scoary -h
+
+

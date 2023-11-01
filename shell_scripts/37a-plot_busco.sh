@@ -7,7 +7,7 @@ mamba activate busco
 mamba env list
 
 folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus"
-mkdir -p "$folder_temp_result/summary/07-busco"
+mkdir -p "$folder_temp_result/summary/37-busco"
 
 # Copy the generic busco
 for i in {1..19}
@@ -28,4 +28,4 @@ do
 done
 
 # plot
-generate_plot.py -wd "$folder_temp_result/summary/07-busco"
+generate_plot.py -wd "$folder_temp_result/summary/37-busco"

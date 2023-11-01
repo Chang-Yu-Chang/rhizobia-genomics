@@ -62,7 +62,9 @@ zsh 31a-extract_reads.sh "Chang_Q5C_results" "Chang_Q5C_19"
 zsh 34a-move_consensus.sh
 # Make busco plot
 zsh 37a-plot_busco.sh
-
+# Pangenome analysis
+zsh 41-roary.sh
+zsh 42-scoary.sh
 
 
 
