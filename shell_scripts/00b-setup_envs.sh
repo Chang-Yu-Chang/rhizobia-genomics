@@ -138,7 +138,14 @@ roary -h
 # roary may plot using R and ggplot2
 mamba install --yes -c conda-forge r-base=4.2.0
 mamba install --yes -c conda-forge r-ggplot2=3.4.4
-
+# for plotting tree
+mamnba install --yes -c bioconda fasttree=2.1.11
+# an additional plotting script using the gene presence and absence table
+wget https://raw.githubusercontent.com/sanger-pathogens/Roary/master/contrib/roary_plots/roary_plots.py -O roary_plots.py
+# this requires the following python packages in the env
+mamba install --yes -c conda-forge matplotlib=3.8.1
+mamba install --yes -c conda-forge seaborn=0.13.0
+mamba install --yes -c conda-forge biopython=1.81
 
 # Install Scoary v1.6.16
 # Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.

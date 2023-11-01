@@ -89,41 +89,41 @@ log10="$folder_temp_result/$sample_id/logs/10-prokka.log"
 #
 # zsh 35-bakta.sh $bakta_database $medaka_consensus $bakta_folder &> $log05
 #
-# # 6. Check genome quality via quast
-# echo "6-quast"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# quast_folder="$folder_temp_result/$sample_id/06-quast"
-#
-# zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
-#
-# # 7. Check genome quality via busco
-# echo "7-busco"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# busco_folder="$folder_temp_result/$sample_id/07-busco"
-#
-# zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
-#
-# # 8. Identify taxonomy via mash
-# echo "8-mash"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# mash_folder="$folder_temp_result/$sample_id/08-mash"
-#
-# zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
-#
-# 9. Identify taxonomy via sourmash
-# echo "9-sourmash"
-# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-# sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
-#
-# zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
-
-# 10. prokka
+# 6. Check genome quality via quast
+echo "6-quast"
 medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-prokka_folder="$folder_temp_result/$sample_id/10-prokka"
+quast_folder="$folder_temp_result/$sample_id/06-quast"
 
-zsh 40-prokka.sh $medaka_consensus $prokka_folder &> $log10
+zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
 
+# 7. Check genome quality via busco
+echo "7-busco"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+busco_folder="$folder_temp_result/$sample_id/07-busco"
 
+zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
+
+# 8. Identify taxonomy via mash
+echo "8-mash"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+mash_folder="$folder_temp_result/$sample_id/08-mash"
+
+zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
+
+# 9. Identify taxonomy via sourmash
+echo "9-sourmash"
+medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
+
+zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
+#
+# # 10. prokka
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# prokka_folder="$folder_temp_result/$sample_id/10-prokka"
+#
+# zsh 40-prokka.sh $medaka_consensus $prokka_folder &> $log10
+#
+#
 # # 1111. multiqc
 # mamba activate multiqc
 # cd folder_temp_result="/Users/cychang/Dropbox/lab/local-adaptation/data/temp/plasmidsaurus/$1/$2/"
