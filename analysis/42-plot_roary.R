@@ -4,13 +4,16 @@ library(tidyverse)
 library(cowplot)
 library(janitor)
 library(ggsci)
+library(vegan) # for dissimilarity matrix
+library(ggtree) # for tree
+library(ape) # for tree
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read data
 # gpa_meta <- read_csv("~/mgjw/problem_set7/roary/gene_presence_absence.csv", show_col_types = F)
 # gpa <- read_table("~/mgjw/problem_set7/roary/gene_presence_absence.Rtab", show_col_types = F) %>% select(-`NC_017512.1:`)
 
-folder_roary <- paste0(folder_data, "temp/plasmidsaurus/summary/42-roary/roary2/")
+folder_roary <- paste0(folder_data, "temp/plasmidsaurus/summary/42-roary/roary5/")
 gpa_meta <- read_csv(paste0(folder_roary, "gene_presence_absence.csv"), show_col_types = F) %>% clean_names()
 gpa <- read_table(paste0(folder_roary, "gene_presence_absence.Rtab"), show_col_types = F)
 gnew <- read_table(paste0(folder_roary, "number_of_new_genes.Rtab"), col_names = F, show_col_types = F)
@@ -18,10 +21,14 @@ gconserved <- read_table(paste0(folder_roary, "number_of_conserved_genes.Rtab"),
 gunique <- read_table(paste0(folder_roary, "number_of_unique_genes.Rtab"), col_names = F, show_col_types = F)
 gpan <- read_table(paste0(folder_roary, "number_of_genes_in_pan_genome.Rtab"), col_names = F, show_col_types = F)
 
+isolates_rhizo <- read_csv(paste0(folder_data, "temp/01-isolates_rhizo.csv"), show_col_types = F) %>%
+    clean_names() %>%
+    filter(id != 44) %>%
+    mutate(genome_id = paste0("g", 1:19))
+
 # Remove rhizobium and keep only Ensifer
 # gpa <- gpa %>%
 #     select(-c(annotated_g1, annotated_g7, annotated_g12, annotated_g4, annotated_g18))
-
 
 # pivot longer
 gpa[gpa == 0] <- NA
@@ -41,16 +48,17 @@ gpa_glist <- gpa_long %>%
 gpa_gfs <- gpa_glist %>%
     group_by(n_isolates) %>%
     count(name = "n_genes")
-gpa_gfs$n_genes[gpa_gfs$n_isolates==19] # 1331 core genes when -i=75 and -cd=99
+n_isolates <- nrow(gpa_gfs)
+gpa_gfs$n_genes[gpa_gfs$n_isolates==n_isolates] # 2646 core genes when -i=75 and -cd=99 for 14 strains
 
 # Pan Genome Size
-length(unique(gpa_glist$gene)) # 30408
+length(unique(gpa_glist$gene)) # 17818
 
 # Size of the Accessory Genome
 gpa_gfs$n_genes
 
 #  number of singleton
-gpa_gfs$n_genes[1] # 16913
+gpa_gfs$n_genes[1] # 7397
 
 
 # 1. Number of gene shared in these isolates
@@ -61,20 +69,16 @@ p <- gpa_gfs %>%
     ggplot() +
     geom_col(aes(x = n_isolates, y = n_genes), color = "black", fill = "white") +
     #scale_x_continuous(breaks = 1:8) +
-    scale_y_continuous(expand = c(0,0), limits = c(0, 18), minor_breaks = 1:18) +
+    scale_y_continuous(expand = c(0,0), limits = c(0, max(gpa_gfs$n_genes)/10^3*1.1), minor_breaks = 1:round(max(gpa_gfs$n_genes)/10^3,0)) +
     theme_bw() +
-    theme(
-    ) +
+    theme() +
     guides() +
     labs(x = "gene shared by # of genomes", y = expression("#" ~ of ~ genes ~ (10^3)))
 
 ggsave(paste0(folder_data, "temp/42-01-histogram.png"), plot = p, width = 5, height = 5)
 
 # 2. heatmap for genes
-gpa_glist_core <- gpa_glist %>% filter(n_isolates == 14)
-
 p <- gpa_long %>%
-    #filter(str_detect(gene, "b")) %>%
     mutate(value = factor(value)) %>%
     ggplot() +
     geom_tile(aes(x = genome_id, y = gene, fill = value)) +
@@ -100,7 +104,7 @@ p <- glist %>%
     ggplot() +
     geom_line(aes(x = genome, y = n_genes, color = key, group = replicate), linewidth = .5) +
     scale_color_simpsons() +
-    scale_x_continuous(minor_breaks = 1:20, limits = c(1,20)) +
+    scale_x_continuous(minor_breaks = 1:n_isolates, limits = c(1,n_isolates)) +
     #scale_y_continuous(minor_breaks = 10, limits = c(1,20)) +
     theme_bw() +
     theme(
@@ -111,7 +115,7 @@ p <- glist %>%
 ggsave(paste0(folder_data, "temp/42-03-conserved_vs_total_genes.png"), plot = p, width = 5, height = 3)
 
 # numbers
-range(glist$n_genes) # 1331 and 30408
+range(glist$n_genes) # 2647 and 17818
 
 # 4. new genes vs. unique genes
 glist <- bind_rows(
@@ -125,7 +129,7 @@ p <- glist %>%
     ggplot() +
     geom_line(aes(x = genome, y = n_genes, color = key, group = replicate), linewidth = .5) +
     scale_color_simpsons() +
-    scale_x_continuous(minor_breaks = 1:20, limits = c(1,20)) +
+    scale_x_continuous(minor_breaks = 1:n_isolates, limits = c(1,n_isolates)) +
     #scale_y_continuous(minor_breaks = 10, limits = c(1,20)) +
     theme_bw() +
     theme(
@@ -136,7 +140,7 @@ p <- glist %>%
 ggsave(paste0(folder_data, "temp/42-04-unique_vs_new_genes.png"), plot = p, width = 5, height = 3)
 
 # Number
-range(glist$n_genes) # 17 and 17166
+range(glist$n_genes) # 17 and 8418
 
 # 5. all possible genes
 glist <- bind_rows(
@@ -152,7 +156,7 @@ p <- glist %>%
     ggplot() +
     geom_line(aes(x = genome, y = n_genes, color = key, group = replicate), linewidth = .5) +
     scale_color_simpsons() +
-    scale_x_continuous(minor_breaks = 1:20, limits = c(1,20)) +
+    scale_x_continuous(minor_breaks = 1:n_isolates, limits = c(1,n_isolates)) +
     theme_bw() +
     theme(
     ) +
@@ -162,7 +166,6 @@ p <- glist %>%
 ggsave(paste0(folder_data, "temp/42-05-all_genes.png"), plot = p, width = 5, height = 3)
 
 # 6. build a tree using the gene presence and absence data
-library(vegan)
 gpa_bin <- gpa
 gpa_bin[is.na(gpa_bin)] <- 0
 t_gpa <- gpa_bin %>%
@@ -170,21 +173,270 @@ t_gpa <- gpa_bin %>%
     select(-gene) %>%
     as.matrix() %>%
     t()
-dim(t_gpa) # 19x30408
-
+dim(t_gpa) # 14x17818
 # Calculate Bray-Curtis dissimilarity
 bin_dis <- vegdist(t_gpa, method = "bray")
 clus <- hclust(bin_dis)
-#dendrogram <- as.dendrogram(clus)
-#plot(dendrogram)
 
-library(ggtree)
-library(ape)
 tree <- as.phylo(clus)
 p <- tree %>%
     ggtree() +
     geom_tiplab()
 ggsave(paste0(folder_data, "temp/42-06-tree_all_genes.png"), plot = p, width = 6, height = 3)
+
+# 7. plot the key rhizobia genes
+gpa_rhi <- gpa_long %>%
+    filter(str_detect(gene, "nod|nif|fix|exo")) %>%
+    mutate(gene = str_sub(gene, 1, 4)) %>%
+    distinct(gene, genome_id, value) %>%
+    mutate(value = factor(value)) %>%
+    mutate(genome_id = factor(genome_id, paste0("g", 20:1))) %>%
+    mutate(gene_group = str_sub(gene, 1, 3))
+
+p1 <- gpa_rhi %>%
+    # add a pseudo block for plotting absence data
+    bind_rows(tibble(gene = "fixX", genome_id = "g2", value = "0", gene_group = "fix")) %>%
+    mutate(genome_id = factor(genome_id, paste0("g", 20:1))) %>%
+    mutate(value = factor(value, c("1", "0"))) %>%
+    ggplot() +
+    geom_tile(aes(x = gene, y = genome_id, fill = value)) +
+    geom_vline(xintercept = c(1:10)-0.5, color = "black") +
+    geom_hline(yintercept = c(1:20)-0.5, color = "black") +
+    facet_grid(~gene_group, scales = "free_x", space = "free") +
+    scale_fill_manual(values = c(`1` = "maroon", `0` = "white"), labels = c(`1` = "presence", `0` = "absence")) +
+    scale_x_discrete(position = "top", expand = c(0,0)) +
+    scale_y_discrete(position = "left", expand = c(0,0)) +
+    theme_classic() +
+    theme(
+        axis.text.x = element_text(size = 10),
+        strip.text = element_blank(),
+        legend.position = "bottom"
+    ) +
+    guides(fill = guide_legend(title = NULL, override.aes = list(color = "black", linewidth = .5))) +
+    labs(x = "gene", y = "genome")
+
+# check the growth curve trait, scaled
+if (T) {
+    # Call the isolates data. THIS IS A DIRTY CODE FOR CONVIENIENCE
+    gc <- read_csv(paste0(folder_data, 'temp/04-gc.csv'), show_col_types = F)
+    gc_summ <- read_csv(paste0(folder_data, 'temp/04-gc_summ.csv'), show_col_types = F)
+    gc.prm <- read_csv(paste0(folder_data, 'temp/04-gc_prm.csv'), show_col_types = F)
+    gc.prm.stat <- read_csv(paste0(folder_data, 'temp/04-gc_prm_summ.csv'), show_col_types = F)
+    isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
+        rename(strain = ExpID) %>%
+        filter(Genus == "Ensifer", str_sub(strain, 1,1) %in% c("H","L"))
+
+    # Subset only Ensifer
+    subset_ensifer <- function(tb) {
+        tb %>%
+            left_join(select(isolates_RDP, strain, Genus)) %>%
+            drop_na()
+    }
+
+    gc <- gc %>% subset_ensifer()
+    gc_summ <- gc_summ %>% subset_ensifer()
+    gc.prm <- gc.prm %>% subset_ensifer()
+    gc.prm.stat <- gc.prm.stat %>% subset_ensifer()
+
+    isolates <- isolates_rhizo %>%
+        select(strain = exp_id, genus, genome_id) %>%
+        left_join(gc.prm.stat) %>%
+        mutate(genome_id = factor(genome_id, paste0("g", 1:19))) %>%
+        filter(genus == "Ensifer")
+
+    write_csv(isolates, paste0(folder_data, "temp/42-isolates.csv"))
+    "CLEAN THIS ISOLATES TRAIT DATA IN A BETTER FORM"
+
+}
+isolates_long <- isolates %>%
+    select(genome_id, r, lag, maxOD) %>%
+    # scale
+    mutate_at(c("r", "lag", "maxOD"), ~(scale(.) %>% as.vector)) %>%
+    pivot_longer(cols = -genome_id, names_to = "trait")
+
+p2 <- isolates_long %>%
+    mutate(genome_id = factor(genome_id, paste0("g", 20:1))) %>%
+    mutate(trait = factor(trait, c("r", "lag", "maxOD"))) %>%
+    ggplot() +
+    geom_tile(aes(x = trait, y = genome_id, fill = value)) +
+    geom_vline(xintercept = c(1:10)-0.5, color = "black") +
+    geom_hline(yintercept = c(1:20)-0.5, color = "black") +
+    #facet_grid(~., scales = "free_x", space = "free") +
+    scale_fill_gradient(low = "white", high = "maroon", breaks = c(1, -1)) +
+    scale_x_discrete(position = "top", expand = c(0,0)) +
+    scale_y_discrete(position = "left", expand = c(0,0)) +
+    theme_classic() +
+    theme(
+        axis.title.y = element_blank(),
+        legend.position = "bottom"
+    ) +
+    guides(fill = guide_legend(title = NULL, override.aes = list(color = "black", linewidth = .5))) +
+    labs(x = "trait (scaled)")
+
+# Plot the plant phenotypes
+# gc_labels <- gc.prm.stat %>%
+#     mutate(strain_label = factor(1:n())) %>%
+#     select(strain, strain_label)
+treatments <- read_csv(paste0(folder_data, "temp/11-treatments.csv"), show_col_types = F)
+treatments_M <- treatments %>%
+    mutate(strain_site_group = ifelse(is.na(strain_site_group), "control", strain_site_group),
+           strain_site = ifelse(is.na(strain_site), "control", strain_site),
+           strain = ifelse(is.na(strain), "control", strain)) %>%
+    filter(plant_site_group == "S") %>%
+    mutate(strain_site_group = factor(strain_site_group, c("H", "L", "control")))
+
+isolates_plant <- treatments_M %>%
+    group_by(strain) %>%
+    summarize(mean_nodule_number = mean(nodule_number, na.rm = T),
+              mean_dry_weight_mg = mean(dry_weight_mg, na.rm = T),
+              mean_root_weight_mg = mean(root_weight_mg, na.rm = T)) %>%
+    left_join(isolates) %>%
+    select(genome_id, starts_with("mean")) %>%
+    filter(!is.na(genome_id))
+
+isolates_long3 <- isolates_plant %>%
+    # scale
+    mutate_at(c("mean_nodule_number", "mean_dry_weight_mg", "mean_root_weight_mg"), ~(scale(.) %>% as.vector)) %>%
+    pivot_longer(cols = -genome_id, names_to = "trait")
+
+p3 <- isolates_long3 %>%
+    bind_rows(tibble(genome_id = "g19", trait = "mean_dry_weight_mg", value = NA)) %>%
+    mutate(genome_id = factor(genome_id, paste0("g", c(19,17:15, 13, 11:8, 6:2)))) %>%
+    # shorten trait names
+    mutate(trait = str_remove(trait, "mean_") %>% str_remove("_weight_mg")) %>%
+    mutate(trait = str_replace(trait, "nodule_number", "#nodule") %>% str_replace("dry", "shoot")) %>%
+    ggplot() +
+    geom_tile(aes(x = trait, y = genome_id, fill = value)) +
+    geom_vline(xintercept = c(1:10)-0.5, color = "black") +
+    geom_hline(yintercept = c(1:21)-0.5, color = "black") +
+    #facet_grid(~., scales = "free_x", space = "free") +
+    scale_fill_gradient(low = "white", high = "seagreen", na.value = "grey70", breaks = c(1, -1)) +
+    scale_x_discrete(position = "top", expand = c(0,0)) +
+    scale_y_discrete(position = "left", expand = c(0,0), drop = F) +
+    theme_classic() +
+    theme(
+        axis.title.y = element_blank(),
+        panel.background = element_rect(fill = "grey70", color = NA),
+        legend.position = "bottom"
+    ) +
+    guides(fill = guide_legend(title = NULL, override.aes = list(color = "black", linewidth = .5))) +
+    labs(x = "trait (scaled)")
+
+p <- plot_grid(p1, p2, p3, nrow = 1, align = "h", axis = "tb", rel_widths = c(1, 0.2, 0.2))
+
+ggsave(paste0(folder_data, "temp/42-07-rhizobia_genes.png"), plot = p, width = 10, height = 6)
+
+
+#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+plot_trait_heat <- function (tb, tra = "r") {
+    tb %>%
+        mutate(genome_id = factor(genome_id, paste0("g", 20:1))) %>%
+        filter(trait == tra) %>%
+        ggplot() +
+        geom_tile(aes(x = trait, y = genome_id, fill = value)) +
+        # geom_vline(xintercept = c(1:10)-0.5, color = "black") +
+        geom_hline(yintercept = c(1:20)-0.5, color = "black") +
+        #facet_grid(~gene_group, scales = "free_x", space = "free") +
+        scale_fill_gradient(low = "white", high = "maroon") +
+        scale_x_discrete(position = "top", expand = c(0,0)) +
+        scale_y_discrete(position = "left", expand = c(0,0)) +
+        theme_classic() +
+        theme() +
+        guides() +
+        labs()
+
+}
+
+p1 <- plot_trait_heat(isolates_long, "r")
+p2 <- plot_trait_heat(isolates_long, "lag")
+p3 <- plot_trait_heat(isolates_long, "maxOD")
+
+plot_grid(p1, p2, p3, nrow = 1, align = "h", axis = "tb")
+
+ggsave(paste0(folder_data, "temp/42-08-rhizobia_growth.png"), plot = p, width = 5, height = 5)
+
+
+# 8. plot the heatmap for if the strain has either one of the key symbiosis gene
+
+gpa_long %>%
+    filter(str_detect(gene, "exo"))
+
+#' Nodulation (nod)
+#' Nitrogenase (nif and fix)
+#' Symbiotic Plasmid: Many rhizobia carry a symbiotic plasmid that contains the nod and nif genes, as well as other genes required for nodulation and nitrogen fixation. The presence of this plasmid is a key feature of rhizobia.
+#' Exopolysaccharide Genes (exo genes): Exopolysaccharides are produced by rhizobia and play a role in infection thread formation and nodule development. The exo genes are responsible for synthesizing these important molecules.
+#' Type III Secretion System (T3SS): Some rhizobia have a T3SS, which is responsible for delivering effector proteins into the plant cells. These effectors manipulate plant cell physiology and are crucial for establishing a successful symbiosis.
+
+
+
+# Sample data frame
+df <- data.frame(
+    x = rep(1:5, each = 20),
+    y = rnorm(100),
+    facet_var = rep(letters[1:5], each = 20)
+)
+
+# Create the ggplot
+ggplot(df, aes(x = x, y = y)) +
+    geom_point() +
+    facet_grid(rows = vars(facet_var), scales = "free_x")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

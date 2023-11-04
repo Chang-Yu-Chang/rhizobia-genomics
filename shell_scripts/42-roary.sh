@@ -41,6 +41,10 @@ roary -f roary3 -e -n -i 50 -cd 99 -s gff/*.gff
 cd $folder_temp_result/summary/42-roary
 roary -f roary4 -e -n -i 95 -cd 90 -s gff/*.gff
 
+# Run roary with only the ensifer specis
+cd $folder_temp_result/summary/42-roary
+roary -f roary5 -e -n -i 75 -cd 99 -s gff_ensifer/*.gff
+
 
 # Run a fast tree
 FastTree -nt -gtr core_gene_alignment.aln > my_tree.newick
@@ -58,10 +62,10 @@ python3 roary_plots.py my_tree.newick gene_presence_absence.csv
 
 
 
-cd roary1
-# Union of genes found in isolates. The output is a table
-query_pan_genome -a union ../gff/*.gff
-# Intersection of genes found in isolates (core genes)
-query_pan_genome -a intersection ../gff/*.gff
-# Complement of genes found in isolates (accessory genes)
-query_pan_genome -a complement ../gff/*.gff
+# cd roary1
+# # Union of genes found in isolates. The output is a table
+# query_pan_genome -a union ../gff/*.gff
+# # Intersection of genes found in isolates (core genes)
+# query_pan_genome -a intersection ../gff/*.gff
+# # Complement of genes found in isolates (accessory genes)
+# query_pan_genome -a complement ../gff/*.gff

@@ -132,7 +132,7 @@ mamba install --yes -c bioconda fastani=1.31
 # Install Roary v3.13.0
 # Roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
 mamba create -n roary
-conda activate roary
+mamba activate roary
 mamba install --yes -c bioconda roary=3.13.0
 roary -h
 # roary may plot using R and ggplot2
@@ -150,8 +150,18 @@ mamba install --yes -c conda-forge biopython=1.81
 # Install Scoary v1.6.16
 # Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
 mamba create -n scoary
-conda activate scoary
+mamba activate scoary
 mamba install --yes -c bioconda scoary=1.6.16
 scoary -h
+
+# Install Artemis  v18.2.0
+# Artemis is a free genome browser and annotation tool that allows visualisation of sequence features, next generation data and the results of analyses within the context of the sequence, and also its six-frame translation.
+mamba create -n artemis
+mamba activate artemis
+#mamba search -c bioconda artemis
+mamba install --yes -c bioconda artemis=18.2.0
+
+
+
 
 
