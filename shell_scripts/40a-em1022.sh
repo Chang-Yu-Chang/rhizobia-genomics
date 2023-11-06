@@ -43,16 +43,24 @@ cp "$folder_data/raw/ensifer_ncbi/data/GCF_013315775.1/GCF_013315775.1_ASM133157
 cp "$folder_data/raw/ensifer_ncbi/data/GCF_000017145.1/GCF_000017145.1_ASM1714v1_genomic.fna" \
 "$folder_data/temp/ncbi/wsm419/genome.fasta"
 
+
+# Reformate ncbi genomes to contigs compatible to anvio
+mamba activate anvio-8
+anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1021/genome.fasta" -o "$folder_data/temp/ncbi/em1021/contigs.fasta" --simplify-names
+anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1022/genome.fasta" -o "$folder_data/temp/ncbi/em1022/contigs.fasta" --simplify-names
+anvi-script-reformat-fasta "$folder_data/temp/ncbi/wsm419/genome.fasta" -o "$folder_data/temp/ncbi/wsm419/contigs.fasta" --simplify-names
+
+
 # Annotate these genomes using prokka
 mamba activate prokka
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/em1021/prokka" "$folder_data/temp/ncbi/em1021/genome.fasta"
+--outdir "$folder_data/temp/ncbi/em1021/prokka" "$folder_data/temp/ncbi/em1021/contigs.fasta"
 
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/em1022/prokka" "$folder_data/temp/ncbi/em1022/genome.fasta"
+--outdir "$folder_data/temp/ncbi/em1022/prokka" "$folder_data/temp/ncbi/em1022/contigs.fasta"
 
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/wsm419/prokka" "$folder_data/temp/ncbi/wsm419/genome.fasta"
+--outdir "$folder_data/temp/ncbi/wsm419/prokka" "$folder_data/temp/ncbi/wsm419/contigs.fasta"
 
 
 

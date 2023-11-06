@@ -9,11 +9,6 @@ cd "$folder_data/temp/anvio"
 mamba activate anvio-8
 anvi-self-test --suite pangenomics # You might have to install any dependency according to the error message if any
 
-# Reformate ncbi genomes to contigs compatible to anvio
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1021/genome.fasta" -o "$folder_data/temp/ncbi/em1021/contigs.fasta" --simplify-names
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1022/genome.fasta" -o "$folder_data/temp/ncbi/em1022/contigs.fasta" --simplify-names
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/wsm419/genome.fasta" -o "$folder_data/temp/ncbi/wsm419/contigs.fasta" --simplify-names
-
 # Importing prokka annotations into anvio. Prokka should have taken place
 for i in {1..19}
 do
@@ -55,8 +50,8 @@ do
     anvi-gen-contigs-database --force-overwrite \
         -f "$folder_data/temp/ncbi/$i/contigs.fasta" \
         -o "$folder_data/temp/anvio/genomes/$i.db" \
-        --external-gene-calls "$folder_data/temp/anvio/$i/anvio/gene_calls.txt" \
-        --name "$i" \
+        --external-gene-calls "$folder_data/temp/ncbi/$i/anvio/gene_calls.txt" \
+        --project-name "$i" \
         --ignore-internal-stop-codons
     # Import the functional annotations
     anvi-import-functions \
