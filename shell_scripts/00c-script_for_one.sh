@@ -47,12 +47,12 @@ log10="$folder_temp_result/$sample_id/logs/10-prokka.log"
 #
 # zsh 30-nanoplot.sh $raw_reads $nanoplot_folder &> $log00
 #
-# # 1. Filter worst reads via filtlong
-# echo "1-filtlong"
-# raw_reads="$folder_raw_result/$sample_id/reads/raw_reads.fastq.gz"
-# filtered_reads="$folder_temp_result/$sample_id/01-filtlong/01-filtered_reads.fastq.gz"
-#
-# zsh 31-filter_reads.sh $raw_reads $filtered_reads &> $log01
+# 1. Filter worst reads via filtlong
+echo "1-filtlong"
+raw_reads="$folder_raw_result/$sample_id/reads/raw_reads.fastq.gz"
+filtered_reads="$folder_temp_result/$sample_id/01-filtlong/01-filtered_reads.fastq.gz"
+
+zsh 31-filter_reads.sh $raw_reads $filtered_reads &> $log01
 #
 # # 2. Draft genome via miniasm
 # echo "2-miniasm"
@@ -90,32 +90,32 @@ log10="$folder_temp_result/$sample_id/logs/10-prokka.log"
 # zsh 35-bakta.sh $bakta_database $medaka_consensus $bakta_folder &> $log05
 #
 # 6. Check genome quality via quast
-echo "6-quast"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-quast_folder="$folder_temp_result/$sample_id/06-quast"
-
-zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
-
-# 7. Check genome quality via busco
-echo "7-busco"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-busco_folder="$folder_temp_result/$sample_id/07-busco"
-
-zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
-
-# 8. Identify taxonomy via mash
-echo "8-mash"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-mash_folder="$folder_temp_result/$sample_id/08-mash"
-
-zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
-
-# 9. Identify taxonomy via sourmash
-echo "9-sourmash"
-medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
-sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
-
-zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
+# echo "6-quast"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# quast_folder="$folder_temp_result/$sample_id/06-quast"
+#
+# zsh 36-quast.sh $medaka_consensus $quast_folder &> $log06
+#
+# # 7. Check genome quality via busco
+# echo "7-busco"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# busco_folder="$folder_temp_result/$sample_id/07-busco"
+#
+# zsh 37-busco.sh $medaka_consensus $busco_folder &> $log07
+#
+# # 8. Identify taxonomy via mash
+# echo "8-mash"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# mash_folder="$folder_temp_result/$sample_id/08-mash"
+#
+# zsh 38-mash.sh $medaka_consensus $mash_folder &> $log08
+#
+# # 9. Identify taxonomy via sourmash
+# echo "9-sourmash"
+# medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"
+# sourmash_folder="$folder_temp_result/$sample_id/09-sourmash"
+#
+# zsh 39-sourmash.sh $medaka_consensus $sourmash_folder &> $log09
 #
 # # 10. prokka
 # medaka_consensus="$folder_temp_result/$sample_id/04-medaka/consensus.fasta"

@@ -1,6 +1,7 @@
 #' This scripts assigns taxonomy to aligned 16S of rhizobia strains
 
 library(tidyverse)
+library(janitor)
 library(rRDPData)
 library(rRDP)
 library(Biostrings)
@@ -44,7 +45,16 @@ isolates_rhizo <- isolates_RDP %>%
 isolates_rhizo %>%
     tabyl(Site) # 8 H and 11 L
 
+# Add the genome id
+isolates_rhizo <- isolates_rhizo %>%
+    clean_names() %>%
+    filter(id != 44) %>%
+    mutate(genome_id = paste0("g", 1:19)) %>%
+    select(exp_id, id, genome_id, everything())
+
 write_csv(isolates_rhizo, paste0(folder_data, "temp/02-isolates_rhizo.csv"))
+
+
 
 # Check the used rhizobia ----
 isolates_RDP %>%
@@ -58,3 +68,6 @@ isolates_RDP_inocula <- isolates_RDP %>%
     select(Owner, Site, ExpID, ID, everything(), Sequence)
 
 write_csv(isolates_RDP_inocula, paste0(folder_data, "temp/02-isolates_RDP_inocula.csv"))
+
+
+

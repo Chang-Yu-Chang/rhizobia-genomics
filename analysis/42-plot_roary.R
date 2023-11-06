@@ -10,21 +10,16 @@ library(ape) # for tree
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read data
-# gpa_meta <- read_csv("~/mgjw/problem_set7/roary/gene_presence_absence.csv", show_col_types = F)
-# gpa <- read_table("~/mgjw/problem_set7/roary/gene_presence_absence.Rtab", show_col_types = F) %>% select(-`NC_017512.1:`)
-
 folder_roary <- paste0(folder_data, "temp/plasmidsaurus/summary/42-roary/roary5/")
+# Read roary pangenome tables
 gpa_meta <- read_csv(paste0(folder_roary, "gene_presence_absence.csv"), show_col_types = F) %>% clean_names()
 gpa <- read_table(paste0(folder_roary, "gene_presence_absence.Rtab"), show_col_types = F)
 gnew <- read_table(paste0(folder_roary, "number_of_new_genes.Rtab"), col_names = F, show_col_types = F)
 gconserved <- read_table(paste0(folder_roary, "number_of_conserved_genes.Rtab"), col_names = F, show_col_types = F)
 gunique <- read_table(paste0(folder_roary, "number_of_unique_genes.Rtab"), col_names = F, show_col_types = F)
 gpan <- read_table(paste0(folder_roary, "number_of_genes_in_pan_genome.Rtab"), col_names = F, show_col_types = F)
-
-isolates_rhizo <- read_csv(paste0(folder_data, "temp/01-isolates_rhizo.csv"), show_col_types = F) %>%
-    clean_names() %>%
-    filter(id != 44) %>%
-    mutate(genome_id = paste0("g", 1:19))
+# Read the mapping file
+isolates_rhizo <- read_csv(paste0(folder_data, "temp/02-isolates_rhizo.csv"), show_col_types = F)
 
 # Remove rhizobium and keep only Ensifer
 # gpa <- gpa %>%
