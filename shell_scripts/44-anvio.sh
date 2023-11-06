@@ -35,16 +35,13 @@ done
 mkdir -p "$folder_data/temp/anvio/genomes"
 for i in {1..19}
 do
-    # Create the contig database
+    # Create the contig database attached with external gene call
     anvi-gen-contigs-database --force-overwrite \
-        -f "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/04-medaka/consensus.fasta" \
-        -o "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db"
-    # Attach with external gene call
-    anvi-gen-contigs-database \
         -f "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/04-medaka/consensus.fasta" \
         -o "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" \
         --external-gene-calls "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio/gene_calls.txt" \
-        --name "Chang_Q5C_$i"
+        --project-name "Chang_Q5C_$i" \
+        --ignore-internal-stop-codons
     # Import the functional annotations
     anvi-import-functions \
         -c "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" \
@@ -54,16 +51,13 @@ done
 
 for i in em1021 em1022 wsm419
 do
-    # Create the contig database
+    # Create the contig database attached with external gene call
     anvi-gen-contigs-database --force-overwrite \
-        -f "$folder_data/temp/ncbi/$i/contigs.fasta" \
-        -o "$folder_data/temp/anvio/genomes/$i.db"
-    # Attach with external gene call
-    anvi-gen-contigs-database \
         -f "$folder_data/temp/ncbi/$i/contigs.fasta" \
         -o "$folder_data/temp/anvio/genomes/$i.db" \
         --external-gene-calls "$folder_data/temp/anvio/$i/anvio/gene_calls.txt" \
-        --name "Chang_Q5C_$i"
+        --name "$i" \
+        --ignore-internal-stop-codons
     # Import the functional annotations
     anvi-import-functions \
         -c "$folder_data/temp/anvio/genomes/$i.db" \
@@ -75,7 +69,7 @@ done
 cd "$folder_data/temp/anvio"
 echo -e "name\tcontigs_db_path" > external_genomes.txt
 for i in {1..19}; do; echo -e "Chang_Q5C_$i\t$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" >> external_genomes.txt; done
-for i in em1021 em1022 wsm419; do; echo -e "em1021\t$folder_data/temp/anvio/genomes/$i.db" >> external_genomes.txt; done
+for i in em1021 em1022 wsm419; do; echo -e "$i\t$folder_data/temp/anvio/genomes/$i.db" >> external_genomes.txt; done
 cat external_genomes.txt
 
 # Generate an anvi’o genomes storage
