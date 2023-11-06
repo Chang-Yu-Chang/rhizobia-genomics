@@ -162,6 +162,48 @@ mamba activate artemis
 mamba install --yes -c bioconda artemis=18.2.0
 
 
+# Install anvi'o v8
+# Anvi'o is an open-source, community-driven analysis and visualization platform for microbial 'omics.
+# Set up environment
+mamba create -y -n anvio-8 python=3.10
+mamba activate anvio-8
+mamba install -y -c conda-forge -c bioconda python=3.10 \
+        sqlite prodigal idba mcl muscle=3.8.1551 famsa hmmer diamond \
+        blast megahit spades bowtie2 bwa graphviz "samtools>=1.9" \
+        trimal iqtree trnascan-se fasttree vmatch r-base r-tidyverse \
+        r-optparse r-stringi r-magrittr bioconductor-qvalue meme ghostscript
+#mamba install -y -c bioconda fastani
+# Download the python source code package
+mkdir -p ~/bioinformatics/anvio
+curl -L https://github.com/merenlab/anvio/releases/download/v8/anvio-8.tar.gz --output ~/bioinformatics/anvio/anvio-8.tar.gz
+# For macOS that requires more up to date c-compiler
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+# pip install
+cd ~/bioinformatics/anvio
+pip3 install anvio-8.tar.gz # make sure the pip3 is under the anvio environment
+# Check installation. If everything goes smoothly, your browser should pop-up and show you an anvi’o interactive interface
+anvi-self-test --suite mini
+# Setup key resources
+anvi-setup-scg-taxonomy # to setup SCG taxonomy data using GTDB genomes.
+anvi-setup-ncbi-cogs, # to setup NCBI’s COG database for quick annotation of genes with functions,
+anvi-setup-kegg-data, # so anvi-estimate-metabolism and anvi-reaction-network find the database of KEGG orthologs ready when you need it.
+anvi-self-test --suite pangenomics # to see if everything is order, especially if you plan to use anvi’o for pangenomics.
+# Install package that converts prokka annotation to anvio compatible format
+cd ~/bioinformatics/anvio
+wget https://raw.githubusercontent.com/karkman/gff_parser/master/gff_parser.py -O gff_parser.py
+pip3 install gffutils
+
+
+
+
+
+
+
+
+
+
+
 
 
 

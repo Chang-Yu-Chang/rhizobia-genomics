@@ -7,7 +7,7 @@ source(here::here("analysis/00-metadata.R"))
 
 
 # 0. read data
-isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv")) %>%
+isolates_RDP <- read_csv(paste0(folder_data, "temp/02-isolates_RDP.csv"), show_col_types = F) %>%
     mutate(genome_id = paste0("g", ID))
 
 tb_abi <- read_table(paste0(folder_data, "temp/plasmidsaurus/summary/04-medaka/test.out"),
