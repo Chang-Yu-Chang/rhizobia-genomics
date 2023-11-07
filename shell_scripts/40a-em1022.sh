@@ -42,14 +42,14 @@ cp "$folder_data/raw/ensifer_ncbi/data/GCF_013315775.1/GCF_013315775.1_ASM133157
 "$folder_data/temp/ncbi/em1022/genome.fasta"
 cp "$folder_data/raw/ensifer_ncbi/data/GCF_000017145.1/GCF_000017145.1_ASM1714v1_genomic.fna" \
 "$folder_data/temp/ncbi/wsm419/genome.fasta"
-
+# Also move ncbi strains data to a medaka folder for calculating ani
+for i in em1021 em1022 wsm419; do; cp "$folder_data/temp/ncbi/$i/contigs.fasta" "$folder_data/temp/plasmidsaurus/summary/34-medaka/$i.fasta"; done
 
 # Reformate ncbi genomes to contigs compatible to anvio
 mamba activate anvio-8
 anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1021/genome.fasta" -o "$folder_data/temp/ncbi/em1021/contigs.fasta" --simplify-names
 anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1022/genome.fasta" -o "$folder_data/temp/ncbi/em1022/contigs.fasta" --simplify-names
 anvi-script-reformat-fasta "$folder_data/temp/ncbi/wsm419/genome.fasta" -o "$folder_data/temp/ncbi/wsm419/contigs.fasta" --simplify-names
-
 
 # Annotate these genomes using prokka
 mamba activate prokka
@@ -64,20 +64,16 @@ prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 # Pan genome analysis thes twoe using roary -> in the next script
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
