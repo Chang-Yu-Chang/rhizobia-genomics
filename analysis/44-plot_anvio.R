@@ -21,6 +21,32 @@ isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types
            strain_site = ifelse(is.na(strain_site), "ncbi", strain_site),
            strain_site_group = ifelse(is.na(strain_site_group), "ncbi", strain_site_group))
 
+# Numbers
+# Total number of gene clusters
+egc %>%
+    distinct(gene_cluster_id) %>%
+    nrow() # 10752
+# mean of total number of gene cluster in a genome
+egc %>%
+    distinct(gene_cluster_id, genome_name) %>%
+    group_by(genome_name) %>%
+    count() %>%
+    ungroup() %>%
+    summarize(mean(n)) # 6074
+# total number of core genes
+egc %>%
+    distinct(gene_cluster_id, bin_name) %>%
+    replace_na(list(bin_name = "rest")) %>%
+    group_by(bin_name) %>%
+    count()
+# bin_name                 n
+# <chr>                <int>
+# 1 better_core            654
+# 2 core                  1658
+# 3 duplicated_gene_pair  1721
+# 4 rest                  6719
+
+
 
 # Clean up
 egc <- egc %>%
@@ -37,7 +63,11 @@ egc_wide <- egc %>%
     mutate(across(starts_with("GC"), factor))
 
 # Numbers
-nrow(egc) # 116135
+egc %>%
+    distinct(gene_cluster_id, genome_name) %>%
+    filter()
+
+
 egc %>%
     mutate(bin_name = factor(bin_name, c("core", "better_core", "duplicated_gene_pair"))) %>%
     group_by(bin_name) %>%
