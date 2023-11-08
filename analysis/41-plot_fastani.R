@@ -3,6 +3,8 @@
 library(tidyverse)
 library(cowplot)
 library(janitor)
+library(ggtree) # for tree
+library(ape) # for tree
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read data
@@ -22,20 +24,18 @@ tb_ani <- read_table(paste0(folder_data, "temp/plasmidsaurus/summary/34-medaka/a
 
 
 # Clean up
-isolates_RDP %>%
-    select(genome_id, Genus)
+tb_ani <- tb_ani %>%
+    mutate(ani = ani/100) %>%
+    select(g_A, g_B, ani) %>%
+    arrange(g_A, g_B)
 
 # Write the ani for only the Ensifers, including the three ncbi strains
 tb_ani_ensifer <- tb_ani %>%
-    mutate(ani = ani/100) %>%
     filter(!g_A %in% paste0("Chang_Q5C_", c(1, 7, 12, 14, 18))) %>%
     filter(!g_B %in% paste0("Chang_Q5C_", c(1, 7, 12, 14, 18))) %>%
-    select(g_A, g_B, ani) %>%
-    arrange(g_A, g_B) %>%
     pivot_wider(names_from = g_A, values_from = ani) %>%
     rename(key = g_B)
 write_delim(tb_ani_ensifer, file = paste0(folder_data, "temp/plasmidsaurus/summary/34-medaka/ani_ensifer.txt"), delim = "\t")
-#read_table(paste0(folder_data, "temp/plasmidsaurus/summary/34-medaka/ani_ensifer.txt"))
 
 # 1. plot the pairwise ani estimate
 p <- tb_ani %>%
@@ -64,10 +64,16 @@ p <- tb_ani %>%
 
 ggsave(paste0(folder_data, "temp/41-02-ani_histogram.png"), p, width = 4, height = 4)
 
-# 2. plot the heatmap with labels
-
-
-
+# 3. plot a tree using fastani
+dim(tb_ani_ensifer[,-1]) # 17*17
+bin_dis <- as.matrix(tb_ani_ensifer[,-1])
+clus <- ape::nj(bin_dis)
+tree <- as.phylo(clus) %>%
+    ladderize(right = T)
+p <- tree %>%
+    ggtree() +
+    geom_tiplab()
+ggsave(paste0(folder_data, "temp/41-03-tree_ani.png"), plot = p, width = 6, height = 3)
 
 
 

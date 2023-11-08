@@ -110,8 +110,7 @@ anvi-pan-genome \
 # If you publish results from this workflow, please do not forget to cite DIAMOND (doi:10.1038/nmeth.3176), unless you use it with --use-ncbi-blast flag, and MCL (http://micans.org/mcl/ and doi:10.1007/978-1-61779-361-5_15)
 
 # 4.1 add the ANI metric among genomes
-anvi-import-misc-data  \
-    "$folder_data/temp/plasmidsaurus/summary/34-medaka/ani_ensifer.txt" \
+anvi-import-misc-data "$folder_data/temp/plasmidsaurus/summary/34-medaka/ani_ensifer.txt" \
     -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
     --target-data-table layers \
     --target-data-group ANI_percent_identity
@@ -136,13 +135,71 @@ anvi-display-pan \
 # `-p` anvio pan database. The output of anvi-pan-genome
 # `-g` anvio genomes storage file. The output of anvi-gen-genomes-storage
 
-# 5.1 options in the GUI
-# Samples Tab > Sample Order > ‘gene_cluster frequencies’ tree
+
+# 6. Explore pangenome
+# 6.1 Split the pangenome
+# Once you have bins labeled in the pan genome and saved into a "collection" called default
+# In this case I have three bins: core, better_core, and duplicated gene pairs
+anvi-split \
+    -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
+    -g "$folder_data/temp/anvio/ensifer-GENOMES.db" \
+    -C default \
+    -o "$folder_data/temp/anvio/split_pangenome"
+# `-C` collection that contains the bins
+# `-o` output folder
+anvi-display-pan \
+    -p "$folder_data/temp/anvio/split_pangenome/duplicated_gene_pair/PAN.db" \
+    -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
+
+
+
+#anvi-display-pan -p "$folder_data/temp/anvio/split_pangenome/core/PAN.db" -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
+
+# 6.2 Provide the trait data as a layer
+anvi-import-misc-data "$folder_data/temp/42-isolates_anvio.txt" \
+    -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
+    --target-data-table layers
+# The provide trait dataset is only the growth traits and it's from 44_plot_anvio.R
+# Rmove layer
+# anvi-delete-misc-data \
+#     -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
+#     --target-data-table layers \
+#     --keys-to-remove r_catogory
+
+
+# 6.3 compute function enrichment
+anvi-compute-functional-enrichment-in-pan \
+    -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
+    -g "$folder_data/temp/anvio/ensifer-GENOMES.db" \
+    --category r_category \
+    --annotation-source Prokka:Prodigal \
+    -o "$folder_data/temp/anvio/enriched_functions.txt"
+# This only works for categorical traits
+# This uses a Rscript to calculate the enrichment score. Need to make sure the R packages are included
+# It seems that my mamba environment has it, but the Rscript CLT uses the base Rscript instead of the mamba env bin/Rscript
+# Do this to install the required R packages in base for now
+# install.packages("tidyverse")
+# install.packages("optparse")
+# BiocManager::install("qvalue")
+
+
+# 7. Summarize the pangenomes
+anvi-summarize \
+    -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
+    -g "$folder_data/temp/anvio/ensifer-GENOMES.db" \
+    -C default \
+    -o "$folder_data/temp/anvio/summary"
+
+
+# unzip the txt file
+gunzip "$folder_data/temp/anvio/summary/ensifer_gene_clusters_summary.txt.gz"
 
 # convert svg to pdf
-#alias stp=
+folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
+cd "$folder_data/temp/anvio/figures"
 rsvg-convert -f pdf -o ensifer.pdf ensifer.svg
-
+rsvg-convert -f pdf -o ensifer_circle.pdf ensifer_circle.svg
+rsvg-convert -f pdf -o ensifer_duplicated.pdf ensifer_duplicated.svg
 
 
 
