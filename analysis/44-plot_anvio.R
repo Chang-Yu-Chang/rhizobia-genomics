@@ -146,7 +146,7 @@ ggsave(paste0(folder_data, "temp/44-03-gene_frequency_permuted.png"), plot = p, 
 
 
 # 4. permutation of genomes, scale to one
-pangenome_boots %>%
+p <- pangenome_boots %>%
     mutate(across(-c(n_genomes_sampled, -bootstrap), function(x){x/pangene})) %>%  # scaled by pangene
     pivot_longer(cols = c(-n_genomes_sampled, -bootstrap), names_to = "gene_type", values_to = "n_genes") %>%
     mutate(gene_type = factor(gene_type, c("pangene", "core", "singleton", "duplicate"))) %>%
