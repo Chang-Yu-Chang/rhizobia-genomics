@@ -2,6 +2,7 @@
 # In priniciple, one env per one tool
 
 cd
+mkdir -p ~/bioinformatics
 
 # Install Nanocomp v1.23.1
 # Nanocomp compares multiple runs of long read sequencing data and alignments.
@@ -139,9 +140,9 @@ roary -h
 mamba install --yes -c conda-forge r-base=4.2.0
 mamba install --yes -c conda-forge r-ggplot2=3.4.4
 # for plotting tree
-mamnba install --yes -c bioconda fasttree=2.1.11
+mamba install --yes -c bioconda fasttree=2.1.11
 # an additional plotting script using the gene presence and absence table
-wget https://raw.githubusercontent.com/sanger-pathogens/Roary/master/contrib/roary_plots/roary_plots.py -O roary_plots.py
+wget https://raw.githubusercontent.com/sanger-pathogens/Roary/master/contrib/roary_plots/roary_plots.py -O ~/bioinformatics/roary/roary_plots.py
 # this requires the following python packages in the env
 mamba install --yes -c conda-forge matplotlib=3.8.1
 mamba install --yes -c conda-forge seaborn=0.13.0
