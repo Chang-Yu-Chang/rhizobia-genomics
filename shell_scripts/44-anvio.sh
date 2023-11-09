@@ -12,73 +12,53 @@ anvi-self-test --suite pangenomics # You might have to install any dependency ac
 
 # 1. Importing prokka annotations into anvio. Prokka should have had happened
 cd ~/bioinformatics/anvio
-for i in {1..19}
+mkdir -p "$folder_data/temp/anvio/gene_calls"
+mkdir -p "$folder_data/temp/anvio/gene_annot"
+
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
 do
-    mkdir -p "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio"
-    python3 gff_parser.py "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/10-prokka/annotated.gff" \
-    --gene-calls "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio/gene_calls.txt" \
-    --annotation "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio/gene_annot.txt"
+    python3 gff_parser.py "$folder_data/temp/plasmidsaurus/$i/10-prokka/annotated.gff" \
+        --gene-calls "$folder_data/temp/anvio/gene_calls/$i.txt" \
+        --annotation "$folder_data/temp/anvio/gene_annot/$i.txt"
 done
 
-for i in em1021 em1022 wsm419
-do
-    mkdir -p "$folder_data/temp/ncbi/$i/anvio"
-    python3 gff_parser.py "$folder_data/temp/ncbi/$i/prokka/annotated.gff" \
-        --gene-calls "$folder_data/temp/ncbi/$i/anvio/gene_calls.txt" \
-        --annotation "$folder_data/temp/ncbi/$i/anvio/gene_annot.txt"
-done
 
 # 2. Create one contigs database per assembly FASTA file
+
+# 2.1 Create the contigs-db
 mkdir -p "$folder_data/temp/anvio/genomes"
-for i in {1..19}
+
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
 do
     # Create the contig database attached with external gene call
     anvi-gen-contigs-database --force-overwrite \
-        -f "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/04-medaka/consensus.fasta" \
-        -o "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" \
-        --external-gene-calls "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio/gene_calls.txt" \
-        --project-name "Chang_Q5C_$i" \
-        --ignore-internal-stop-codons
-    # Import the functional annotations
-    anvi-import-functions \
-        -c "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" \
-        -i "$folder_data/temp/plasmidsaurus/Chang_Q5C_$i/11-anvio/gene_annot.txt"
-
-done
-
-for i in em1021 em1022 wsm419
-do
-    # Create the contig database attached with external gene call
-    anvi-gen-contigs-database --force-overwrite \
-        -f "$folder_data/temp/ncbi/$i/contigs.fasta" \
+        -f "$folder_data/temp/plasmidsaurus/$i/04-medaka/consensus.fasta" \
         -o "$folder_data/temp/anvio/genomes/$i.db" \
-        --external-gene-calls "$folder_data/temp/ncbi/$i/anvio/gene_calls.txt" \
-        --project-name "$i" \
+        --external-gene-calls "$folder_data/temp/anvio/gene_calls/$i.txt" \
+        --project-name $i \
         --ignore-internal-stop-codons
     # Import the functional annotations
     anvi-import-functions \
         -c "$folder_data/temp/anvio/genomes/$i.db" \
-        -i "$folder_data/temp/ncbi/$i/anvio/gene_annot.txt"
+        -i "$folder_data/temp/anvio/gene_annot/$i.txt"
 done
 
-# 2.1 Examine a anvio database if needed
-# i=1
-# anvi-db-info "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db"
 
-# 2.2 Run hmms, which helps annotate the genes in your contigs-db. This add the HMM info to the database
-for i in {1..19}; do; anvi-run-hmms -c "$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db"; done
-for i in em1021 em1022 wsm419; do; anvi-run-hmms -c "$folder_data/temp/anvio/genomes/$i.db"; done
+# 2.2 Examine a anvio database if needed
+anvi-db-info "$folder_data/temp/anvio/genomes/Chang_Q5C_15.db"
+
+# 2.3 Run hmms, which helps annotate the genes in your contigs-db. This add the HMM info to the database
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; anvi-run-hmms -c "$folder_data/temp/anvio/genomes/$i.db"; done
 
 
 # 3. Generate an anvi’o genomes storage
 # 3.1 Create a input list of genomes
 cd "$folder_data/temp/anvio"
 echo -e "name\tcontigs_db_path" > external_genomes.txt
-for i in {1..19}; do; echo -e "Chang_Q5C_$i\t$folder_data/temp/anvio/genomes/Chang_Q5C_$i.db" >> external_genomes.txt; done
-for i in em1021 em1022 wsm419; do; echo -e "$i\t$folder_data/temp/anvio/genomes/$i.db" >> external_genomes.txt; done
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; echo -e "$i\t$folder_data/temp/anvio/genomes/$i.db" >> external_genomes.txt; done
 cat external_genomes.txt # this should have 19 + 3 = 22 genomes
 
-# 3.2 Generate one storage file for holding the 22 genomes
+# 3.2 Generate one storage database for holding the 22 genomes
 anvi-gen-genomes-storage \
     -e "$folder_data/temp/anvio/external_genomes.txt" \
     -o "$folder_data/temp/anvio/ensifer-GENOMES.db" \
@@ -87,22 +67,19 @@ anvi-gen-genomes-storage \
 # `--gene-caller` uses the external gene caller included in each genome's db
 # `-o` it must ends with -GENOMES.db
 
-
 # 4. Run a pangenome analysis
 pangenome_id="pangenome"
-
 mkdir -p "$folder_data/temp/anvio/$pangenome_id"
 anvi-pan-genome \
     --force-overwrite \
-    -g ensifer-GENOMES.db \
+    -g "ensifer-GENOMES.db" \
     -n "ensifer" \
-    --output-dir "$folder_data/temp/anvio/$pangenome_id/" \
+    --output-dir "$folder_data/temp/anvio/$pangenome_id" \
     --num-threads 20 \
     --minbit 0.5 \
     --mcl-inflation 10 \
     --genome-names Chang_Q5C_2,Chang_Q5C_3,Chang_Q5C_4,Chang_Q5C_5,Chang_Q5C_6,Chang_Q5C_8,Chang_Q5C_9,Chang_Q5C_10,Chang_Q5C_11,Chang_Q5C_13,Chang_Q5C_15,Chang_Q5C_16,Chang_Q5C_17,Chang_Q5C_19,em1021,em1022,wsm419 \
     --min-occurrence 1
-#    --use-ncbi-blast
 # `-g` anvio genomes storage file
 # `-n` project name
 # `--minbit` the minimum minibit value
@@ -116,17 +93,12 @@ anvi-import-misc-data "$folder_data/temp/plasmidsaurus/summary/34-medaka/ani_ens
     -p "$folder_data/temp/anvio/$pangenome_id/ensifer-PAN.db" \
     --target-data-table layers \
     --target-data-group ANI_percent_identity
-# anvi-compute-genome-similarity \
-#     -e "$folder_data/temp/anvio/external_genomes.txt" \
-#     -o "$folder_data/temp/anvio/ani" \
-#     -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
-#     --program pyANI
-# # `-e` A two-column TAB-delimited flat text file that lists anvi'o contigs databases. Same txt used to make the anvio database
-# # `-p` useful when a anivo pangenome is available. The ANI will be written into the pangenome database
-# # `--program` program for computing ANI
-# # Anvi'o will use 'PyANI' by Pritchard et al. (DOI: 10.1039/C5AY02550H) to compute ANI. If you publish your findings, please do not forget to properly credit their work.
+# `-e` A two-column TAB-delimited flat text file that lists anvi'o contigs databases. Same txt used to make the anvio database
+# `-p` useful when a anivo pangenome is available. The ANI will be written into the pangenome database
+# `--program` program for computing ANI
+# Anvi'o will use 'PyANI' by Pritchard et al. (DOI: 10.1039/C5AY02550H) to compute ANI. If you publish your findings, please do not forget to properly credit their work.
 
-# Check the pangenome database
+# 4.3 Check the pangenome database
 anvi-db-info "$folder_data/temp/anvio/$pangenome_id/ensifer-PAN.db"
 
 
@@ -136,6 +108,8 @@ anvi-display-pan \
     -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
 # `-p` anvio pan database. The output of anvi-pan-genome
 # `-g` anvio genomes storage file. The output of anvi-gen-genomes-storage
+
+# Then the bin collection has to be saved for anvi-summarize to work
 
 
 # 6. Explore pangenome
@@ -150,7 +124,7 @@ anvi-split \
 # `-C` collection that contains the bins. the collection of bins has to be specificed in the GUI
 # `-o` output folder
 
-#
+# 6.2 Desplay the split pangenome
 anvi-display-pan \
     -p "$folder_data/temp/anvio/split_$pangenome_id/duplicated_gene_pair/PAN.db" \
     -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
@@ -159,19 +133,21 @@ anvi-display-pan \
 
 #anvi-display-pan -p "$folder_data/temp/anvio/split_pangenome/core/PAN.db" -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
 
-# 6.2 Provide the trait data as a layer
+# 6.3 Provide the trait data as a layer
+# The provide trait dataset is only the growth traits and it's from 44_plot_anvio.R
 anvi-import-misc-data "$folder_data/temp/42-isolates_anvio.txt" \
     -p "$folder_data/temp/anvio/$pangenome_id/ensifer-PAN.db" \
     --target-data-table layers
-# The provide trait dataset is only the growth traits and it's from 44_plot_anvio.R
-# Rmove layer
+
+# 6.4 Remove a layer in case it's needed
 # anvi-delete-misc-data \
 #     -p "$folder_data/temp/anvio/pangenome/ensifer-PAN.db" \
 #     --target-data-table layers \
 #     --keys-to-remove r_catogory
 
 
-# 6.3 compute function enrichment
+# 6.5 compute function enrichment
+# This is not yet possible becasue the T
 # anvi-compute-functional-enrichment-in-pan \
 #     -p "$folder_data/temp/anvio/$pangenome_id/ensifer-PAN.db" \
 #     -g "$folder_data/temp/anvio/ensifer-GENOMES.db" \
@@ -193,7 +169,7 @@ anvi-summarize \
     -g "$folder_data/temp/anvio/ensifer-GENOMES.db" \
     -C default \
     -o "$folder_data/temp/anvio/summary_$pangenome_id"
-# `-C` the collection of bins has to be specificed in the GUI
+# `-C` the collection of bins has to be specificed in the GUI using anvi-display-pan
 
 # unzip the txt file
 gunzip "$folder_data/temp/anvio/summary_$pangenome_id/ensifer_gene_clusters_summary.txt.gz"

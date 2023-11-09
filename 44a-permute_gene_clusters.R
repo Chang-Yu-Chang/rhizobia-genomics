@@ -9,8 +9,6 @@ source(here::here("analysis/00-metadata.R"))
 egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
 
 # Extract only the unique gene id
-genomes <- tibble(genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419"),
-       genome_id = factor(paste0("g", 1:17)))
 egc_g <- egc %>%
     select(unique_id, gene_cluster_id, genome_name) %>%
     distinct(gene_cluster_id, genome_name, .keep_all = T) %>%

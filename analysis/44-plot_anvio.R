@@ -40,6 +40,13 @@ egc %>%
     count() %>%
     ungroup() %>%
     summarize(mean(n)) # 6372
+
+
+egc %>%
+    #distinct(gene_cluster_id, genome_name) %>%
+    filter(genome_name == "Chang_Q5C_15") %>%
+    filter()
+
 # total number of core genes
 egc %>%
     distinct(gene_cluster_id, bin_name) %>%
@@ -167,7 +174,6 @@ p <- pangenome_boots %>%
 
 ggsave(paste0(folder_data, "temp/44-04-gene_frequency_permuted_scaled.png"), plot = p, width = 6, height = 4)
 
-#
 
 
 

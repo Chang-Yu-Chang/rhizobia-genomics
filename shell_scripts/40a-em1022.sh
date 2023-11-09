@@ -22,45 +22,45 @@ grep 'WSM419'
 
 # Download the EM1021 and EM1022 genomes
 datasets download genome accession GCF_000006965.1 GCF_013315775.1 GCF_000017145.1 \
---include genome,cds,gff3,seq-report \
---filename  "$folder_data/raw/ensifer_ncbi.zip"
+    --include genome,cds,gff3,seq-report \
+    --filename  "$folder_data/raw/ensifer_ncbi.zip"
 cd "$folder_data/raw"
 rm README.md
 unzip ensifer_ncbi.zip
 mv ncbi_dataset ensifer_ncbi
 
 # Move the files
-mkdir -p "$folder_data/temp/ncbi"
-cd "$folder_data/temp/ncbi"
+mkdir -p "$folder_data/temp/plasmidsaurus"
+cd "$folder_data/temp/plasmidsaurus"
 mkdir -p "em1021/prokka"
 mkdir -p "em1022/prokka"
 mkdir -p "wsm419/prokka"
 
 cp "$folder_data/raw/ensifer_ncbi/data/GCF_000006965.1/GCF_000006965.1_ASM696v1_genomic.fna" \
-"$folder_data/temp/ncbi/em1021/genome.fasta"
+"$folder_data/temp/plasmidsaurus/em1021/genome.fasta"
 cp "$folder_data/raw/ensifer_ncbi/data/GCF_013315775.1/GCF_013315775.1_ASM1331577v1_genomic.fna" \
-"$folder_data/temp/ncbi/em1022/genome.fasta"
+"$folder_data/temp/plasmidsaurus/em1022/genome.fasta"
 cp "$folder_data/raw/ensifer_ncbi/data/GCF_000017145.1/GCF_000017145.1_ASM1714v1_genomic.fna" \
-"$folder_data/temp/ncbi/wsm419/genome.fasta"
+"$folder_data/temp/plasmidsaurus/wsm419/genome.fasta"
 # Also move ncbi strains data to a medaka folder for calculating ani
-for i in em1021 em1022 wsm419; do; cp "$folder_data/temp/ncbi/$i/contigs.fasta" "$folder_data/temp/plasmidsaurus/summary/34-medaka/$i.fasta"; done
+for i in em1021 em1022 wsm419; do; cp "$folder_data/temp/plasmidsaurus/$i/contigs.fasta" "$folder_data/temp/plasmidsaurus/summary/34-medaka/$i.fasta"; done
 
 # Reformate ncbi genomes to contigs compatible to anvio
 mamba activate anvio-8
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1021/genome.fasta" -o "$folder_data/temp/ncbi/em1021/contigs.fasta" --simplify-names
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/em1022/genome.fasta" -o "$folder_data/temp/ncbi/em1022/contigs.fasta" --simplify-names
-anvi-script-reformat-fasta "$folder_data/temp/ncbi/wsm419/genome.fasta" -o "$folder_data/temp/ncbi/wsm419/contigs.fasta" --simplify-names
+anvi-script-reformat-fasta "$folder_data/temp/plasmidsaurus/em1021/genome.fasta" -o "$folder_data/temp/plasmidsaurus/em1021/04-medaka/consensus.fasta" --simplify-names
+anvi-script-reformat-fasta "$folder_data/temp/plasmidsaurus/em1022/genome.fasta" -o "$folder_data/temp/plasmidsaurus/em1022/04-medaka/consensus.fasta" --simplify-names
+anvi-script-reformat-fasta "$folder_data/temp/plasmidsaurus/wsm419/genome.fasta" -o "$folder_data/temp/plasmidsaurus/wsm419/04-medaka/consensus.fasta" --simplify-names
 
 # Annotate these genomes using prokka
 mamba activate prokka
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/em1021/prokka" "$folder_data/temp/ncbi/em1021/contigs.fasta"
+--outdir "$folder_data/temp/plasmidsaurus/em1021/10-prokka" "$folder_data/temp/plasmidsaurus/em1021/04-medaka/consensus.fasta"
 
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/em1022/prokka" "$folder_data/temp/ncbi/em1022/contigs.fasta"
+--outdir "$folder_data/temp/plasmidsaurus/em1022/10-prokka" "$folder_data/temp/plasmidsaurus/em1022/04-medaka/consensus.fasta"
 
 prokka --force --kingdom Bacteria --prefix annotated --gcode 11 \
---outdir "$folder_data/temp/ncbi/wsm419/prokka" "$folder_data/temp/ncbi/wsm419/contigs.fasta"
+--outdir "$folder_data/temp/plasmidsaurus/wsm419/10-prokka" "$folder_data/temp/plasmidsaurus/wsm419/04-medaka/consensus.fasta"
 
 
 
