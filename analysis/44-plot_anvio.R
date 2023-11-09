@@ -9,7 +9,7 @@ source(here::here("analysis/00-metadata.R"))
 
 # 0. read data
 egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
-ef <- read_delim(paste0(folder_data, "/temp/anvio/enriched_functions.txt"), delim = "\t", show_col_types = F)
+#ef <- read_delim(paste0(folder_data, "/temp/anvio/enriched_functions.txt"), delim = "\t", show_col_types = F)
 isolates_anvio <- read_delim(paste0(folder_data, "temp/42-isolates_anvio.txt"), show_col_types = F) %>%
     select(sample, r_category)
 isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types = F) %>%
@@ -21,52 +21,58 @@ isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types
            strain_site = ifelse(is.na(strain_site), "ncbi", strain_site),
            strain_site_group = ifelse(is.na(strain_site_group), "ncbi", strain_site_group))
 
+# Clean up
+egc <- egc %>%
+    replace_na(list(bin_name = "rest")) %>%
+    filter(!is.na(bin_name)) %>%
+    mutate(genome_name = factor(genome_name, c(paste0("Chang_Q5C_", 1:20), "em1021", "em1022", "wsm419"))) %>%
+    arrange(genome_name)
+
 # Numbers
 # Total number of gene clusters
 egc %>%
     distinct(gene_cluster_id) %>%
-    nrow() # 10752
+    nrow() # 15824
 # mean of total number of gene cluster in a genome
 egc %>%
     distinct(gene_cluster_id, genome_name) %>%
     group_by(genome_name) %>%
     count() %>%
     ungroup() %>%
-    summarize(mean(n)) # 6074
+    summarize(mean(n)) # 6372
 # total number of core genes
 egc %>%
     distinct(gene_cluster_id, bin_name) %>%
-    replace_na(list(bin_name = "rest")) %>%
+    mutate(bin_name = factor(bin_name, c("core", "rest", "duplicate", "singleton"))) %>%
     group_by(bin_name) %>%
-    count()
-# bin_name                 n
-# <chr>                <int>
-# 1 better_core            654
-# 2 core                  1658
-# 3 duplicated_gene_pair  1721
-# 4 rest                  6719
+    count() %>%
+    ungroup() %>%
+    mutate(frac = n / sum(n))
+# bin_name      n  frac
+# 1 core       3048 0.193
+# 2 rest       5808 0.367
+# 3 duplicate  1896 0.120
+# 4 singleton  5072 0.321
 
 
 
-# Clean up
-egc <- egc %>%
-    filter(!is.na(bin_name)) %>%
-    mutate(genome_name = factor(genome_name, c(paste0("Chang_Q5C_", 1:20), "em1021", "em1022", "wsm419"))) %>%
-    arrange(genome_name)
-
-egc_wide <- egc %>%
-    # Remove the core genes because they are not helpful
-    filter(bin_name == "duplicated_gene_pair") %>%
-    select(gene_cluster_id, genome_name) %>%
-    mutate(value = 1) %>%
-    pivot_wider(names_from = gene_cluster_id, values_from = value, values_fill = 0, ) %>%
-    mutate(across(starts_with("GC"), factor))
 
 # 1. plot the Ensifer clusters using the duplicated gene pairs ----
 egc %>%
-    filter(bin_name == "duplicated_gene_pair") %>%
-    nrow()
-# 3442
+    distinct(bin_name, gene_cluster_id) %>%
+    filter(bin_name == "duplicate") %>%
+    nrow() # 1896
+
+# Reshape
+egc_wide <- egc %>%
+    # Remove the core genes because they are not helpful
+    filter(bin_name == "duplicate") %>%
+    distinct(gene_cluster_id, genome_name, .keep_all = T) %>%
+    select(gene_cluster_id, genome_name) %>%
+    mutate(value = 1) %>%
+    pivot_wider(names_from = gene_cluster_id, values_from = value, values_fill = 0) %>%
+    mutate(across(starts_with("GC"), factor))
+
 
 # MCA because it's a categorical dataset
 mca <- MCA(egc_wide[,-1], ncp = 5, graph = F)
@@ -95,6 +101,7 @@ p <- isolates_mca %>%
 
 ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4, height = 4)
 
+
 # 2. gene frequency spectrum ----
 p <- egc %>%
     group_by(num_genomes_gene_cluster_has_hits)  %>%
@@ -102,7 +109,7 @@ p <- egc %>%
     count() %>%
     ggplot() +
     geom_col(aes(x = num_genomes_gene_cluster_has_hits, y = n), color = "black", fill = "white") +
-    scale_x_continuous(breaks = 2:17) +
+    scale_x_continuous(breaks = 1:17) +
     theme_classic() +
     theme(
         panel.grid.major.y = element_line(linetype = 2)
@@ -111,6 +118,62 @@ p <- egc %>%
     labs(x = "# of genomes that gene cluster has hits", y = "# of genes")
 
 ggsave(paste0(folder_data, "temp/44-02-gene_frequency.png"), p, width = 4, height = 4)
+
+
+
+# 3. permutation of genome
+pangenome_boots <- read_csv(paste0(folder_data, "temp/44a-pangenome_boots.csv"), show_col_types = F)
+p <- pangenome_boots %>%
+    pivot_longer(cols = c(-n_genomes_sampled, -bootstrap), names_to = "gene_type", values_to = "n_genes") %>%
+    mutate(gene_type = factor(gene_type, c("pangene", "core", "singleton", "duplicate"))) %>%
+    mutate(n_genes = n_genes / 1000) %>%
+    group_by(n_genomes_sampled, gene_type) %>%
+    summarize(mean_n_genes = mean(n_genes), sd_n_genes = sd(n_genes)) %>%
+    ggplot() +
+    geom_line(aes(x = n_genomes_sampled, y = mean_n_genes, color = gene_type), linewidth = 1) +
+    geom_ribbon(aes(x = n_genomes_sampled, ymin = mean_n_genes - sd_n_genes, ymax = mean_n_genes + sd_n_genes, fill = gene_type), alpha = 0.2, color = NA) +
+    scale_x_continuous(breaks = 1:17) +
+    scale_y_continuous(breaks = c(0, 5, 10, 15), minor_breaks = 0:17) +
+    theme_classic() +
+    theme(
+        panel.grid.major.y = element_line(linetype = 1),
+        panel.grid.minor.y = element_line(linetype = 2, linewidth = 0.2)
+    ) +
+    guides() +
+    labs(x = "# of genomes included in a pangenome", y = "# of genes (k)")
+
+ggsave(paste0(folder_data, "temp/44-03-gene_frequency_permuted.png"), plot = p, width = 6, height = 4)
+
+
+# 4. permutation of genomes, scale to one
+pangenome_boots %>%
+    mutate(across(-c(n_genomes_sampled, -bootstrap), function(x){x/pangene})) %>%  # scaled by pangene
+    pivot_longer(cols = c(-n_genomes_sampled, -bootstrap), names_to = "gene_type", values_to = "n_genes") %>%
+    mutate(gene_type = factor(gene_type, c("pangene", "core", "singleton", "duplicate"))) %>%
+    group_by(n_genomes_sampled, gene_type) %>%
+    summarize(mean_n_genes = mean(n_genes), sd_n_genes = sd(n_genes)) %>%
+    ggplot() +
+    geom_line(aes(x = n_genomes_sampled, y = mean_n_genes, color = gene_type), linewidth = 1) +
+    geom_ribbon(aes(x = n_genomes_sampled, ymin = mean_n_genes - sd_n_genes, ymax = mean_n_genes + sd_n_genes, fill = gene_type), alpha = 0.2, color = NA) +
+    scale_x_continuous(breaks = 1:17) +
+    scale_y_continuous(breaks = seq(0, 1, 0.2), minor_breaks = seq(0,1,0.1)) +
+    theme_classic() +
+    theme(
+        panel.grid.major.y = element_line(linetype = 1),
+        panel.grid.minor.y = element_line(linetype = 2, linewidth = 0.2)
+    ) +
+    guides() +
+    labs(x = "# of genomes included in a pangenome", y = "# of genes (scaled)")
+
+ggsave(paste0(folder_data, "temp/44-04-gene_frequency_permuted_scaled.png"), plot = p, width = 6, height = 4)
+
+#
+
+
+
+
+
+
 
 
 
@@ -131,24 +194,4 @@ p <- gpa_long %>%
     ) +
     guides(fill = "none") +
     labs(x = "strain", y = "gene")
-ggsave(paste0(folder_data, "temp/42-02-heatmap.png"), plot = p, width = 10, height = 20)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#ggsave(paste0(folder_data, "temp/42-02-heatmap.png"), plot = p, width = 10, height = 20)

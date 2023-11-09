@@ -1,4 +1,4 @@
-#' This script analysis the anvio generated
+#' This script permute the genomes included in a pan genome analysis
 
 library(tidyverse)
 library(cowplot)
@@ -7,26 +7,61 @@ source(here::here("analysis/00-metadata.R"))
 
 # 0. read data
 egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
-isolates_anvio <- read_delim(paste0(folder_data, "temp/42-isolates_anvio.txt"), show_col_types = F) %>%
-    select(sample, r_category)
-isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types = F) %>%
-    mutate(sample = str_replace(genome_id, "g", "Chang_Q5C_")) %>%
-    select(sample, everything(), -r, -lag, -maxOD) %>%
-    bind_rows(tibble(sample = c("em1021", "em1022", "wsm419"))) %>%
-    left_join(isolates_anvio) %>%
-    mutate(strain = ifelse(is.na(strain), "ncbi", strain),
-           strain_site = ifelse(is.na(strain_site), "ncbi", strain_site),
-           strain_site_group = ifelse(is.na(strain_site_group), "ncbi", strain_site_group))
+
+# Extract only the unique gene id
+genomes <- tibble(genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419"),
+       genome_id = factor(paste0("g", 1:17)))
+egc_g <- egc %>%
+    select(unique_id, gene_cluster_id, genome_name) %>%
+    distinct(gene_cluster_id, genome_name, .keep_all = T) %>%
+    left_join(genomes) %>%
+    select(-genome_name)
+
+n_b = 100 # number of permutation
+n_g = 17 # total number of genomes in the pangenome
+
+list_pangenome <- rep(list(NA), n_g-1)
+
+for (j in 1:(n_g-1)) { # number of genomes sampled
+    list_boot <- rep(list(NA), n_b)
+    for (i in 1:n_b) {
+        set.seed(i)
+        g_sampled <- sample(genomes$genome_id, size = j, replace = F)
+
+        gfs <- egc_g %>% # gene frequency spectrum
+            filter(genome_id %in% g_sampled) %>%
+            group_by(gene_cluster_id) %>%
+            summarize(n_genomes = n()) %>%
+            group_by(n_genomes) %>%
+            summarize(n_genes = n())
+
+        g1 <- gfs$n_genes[gfs$n_genomes == 1] # singleton
+        g2 <- gfs$n_genes[gfs$n_genomes == 2] # duplicate
+        gc <- gfs$n_genes[gfs$n_genomes == j] # core gene clusters
+        gp <- sum(gfs$n_genes) # total number of gene clusters in the pangenome
+
+        list_boot[[i]] = tibble(bootstrap = i, singleton = g1, duplicate = g2, core = gc, pangene = gp)
+    }
+
+    list_pangenome[[j]]  <- bind_rows(list_boot) %>%
+        mutate(n_genomes_sampled = j) %>%
+        select(n_genomes_sampled, everything())
+
+    print(j)
+}
+
+pangenome_boots <- bind_rows(list_pangenome)
+
+write_csv(pangenome_boots, file = paste0(folder_data, "temp/44a-pangenome_boots.csv"))
 
 
-egc %>%
 
 
 
 
-#
-egc %>%
-    replace_na(list(bin_name = "rest")) %>%
-    group_by(gene_cluster_id, bin_name) %>%
-    summarize(count = n())
+
+
+
+
+
 
