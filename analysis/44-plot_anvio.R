@@ -62,18 +62,7 @@ egc_wide <- egc %>%
     pivot_wider(names_from = gene_cluster_id, values_from = value, values_fill = 0, ) %>%
     mutate(across(starts_with("GC"), factor))
 
-# Numbers
-egc %>%
-    distinct(gene_cluster_id, genome_name) %>%
-    filter()
-
-
-egc %>%
-    mutate(bin_name = factor(bin_name, c("core", "better_core", "duplicated_gene_pair"))) %>%
-    group_by(bin_name) %>%
-    summarize(count = n())
-
-# 1. plot the Ensifer clusters using the duplicated gene pairs
+# 1. plot the Ensifer clusters using the duplicated gene pairs ----
 egc %>%
     filter(bin_name == "duplicated_gene_pair") %>%
     nrow()
@@ -106,12 +95,60 @@ p <- isolates_mca %>%
 
 ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4, height = 4)
 
-# 2. Plot the enriched functions
-ef %>%
-    filter(unadjusted_p_value < 0.05) %>%
+# 2. gene frequency spectrum ----
+p <- egc %>%
+    group_by(num_genomes_gene_cluster_has_hits)  %>%
+    distinct(gene_cluster_id, .keep_all = T) %>%
+    count() %>%
     ggplot() +
-    geom_histogram(aes(x = enrichment_score)) +
+    geom_col(aes(x = num_genomes_gene_cluster_has_hits, y = n), color = "black", fill = "white") +
+    scale_x_continuous(breaks = 2:17) +
     theme_classic() +
-    theme() +
+    theme(
+        panel.grid.major.y = element_line(linetype = 2)
+    ) +
     guides() +
-    labs()
+    labs(x = "# of genomes that gene cluster has hits", y = "# of genes")
+
+ggsave(paste0(folder_data, "temp/44-02-gene_frequency.png"), p, width = 4, height = 4)
+
+
+
+
+
+
+
+
+# 2. heatmap for genes ----
+p <- gpa_long %>%
+    mutate(value = factor(value)) %>%
+    ggplot() +
+    geom_tile(aes(x = genome_id, y = gene, fill = value)) +
+    scale_fill_manual(values = c(`1` = "maroon")) +
+    theme_classic() +
+    theme(
+        axis.text.x = element_text(size = 10)
+    ) +
+    guides(fill = "none") +
+    labs(x = "strain", y = "gene")
+ggsave(paste0(folder_data, "temp/42-02-heatmap.png"), plot = p, width = 10, height = 20)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
