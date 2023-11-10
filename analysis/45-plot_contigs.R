@@ -48,6 +48,17 @@ egcc_count <- egcc %>%
     mutate(contig_ordered = factor(paste0("c", 1:n()))) %>%
     ungroup()
 
+# plot the
+p <- egcc_count %>%
+    arrange(n_genes) %>%
+    ggplot() +
+    geom_histogram(aes(x = n_genes), fill = "white", color = "black", binwidth = 100) +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/45-00-contig_genes_n.png"), p, width = 4, height = 4)
+
 # 0.7 label the contigs by new contig label
 egcc_ordered <- egcc %>%
     left_join(select(egcc_count, genome_name, contig, contig_ordered)) %>%
@@ -122,14 +133,15 @@ jdm <- proxy::dist(egcc_m, method = "Jaccard")
 # Plot the tree
 library(ggtree)
 te <- as.dendrogram(hclust(jdm)) # my tree!
-egcc_label <- egcc_ordered %>% select(contig_id, genome_id, contig_ordered) %>% distinct() %>%
+egcc_label <- egcc_ordered %>%
+    select(contig_id, genome_id, contig_ordered) %>% distinct() %>%
+    filter(contig_ordered %in% paste0("c", 1:3)) %>%
     mutate(contig_id = as.character(contig_id))
-
 
 p <- te %>%
     ggtree(layout = "rectangular") +
     geom_tiplab() +
-    geom_highlight(data = egcc_label, aes(node = contig_id, fill = contig_ordered)) +
+    #geom_highlight(data = egcc_label, aes(node = contig_id, fill = contig_ordered)) +
     scale_x_continuous(expand = c(0.1,0)) +
     scale_y_continuous(expand = c(0.1,0)) +
     theme_tree2() +
@@ -142,8 +154,37 @@ p <- te %>%
 ggsave(paste0(folder_data, "temp/45-03-contig_tree.png"), p, width = 10, height = 10)
 
 
+# 4. plot PCA ----
+library(FactoMineR) # for MCA
 
+# MCA because it's a categorical dataset
+egcc_cm <- egcc_c %>% mutate(across(starts_with("GC"), factor))
+mca <- MCA(egcc_cm[,-1], ncp = 5, graph = F)
 
+contigs_mca <- as_tibble(mca$ind$coord) %>%
+    clean_names() %>%
+    bind_cols(egcc_label) %>%
+    select(contig_id, everything())
+
+mca_var <- as_tibble(mca$eig) %>%
+    clean_names() %>%
+    mutate(ev = eigenvalue / sum(eigenvalue))
+
+p <- contigs_mca %>%
+    ggplot() +
+    geom_point(aes(x = dim_1, y = dim_2)) +
+    #geom_point(aes(x = dim_1, y = dim_2, color = contig_ordered), position = position_jitter(), size = 4, stroke = 2, shape = 21, alpha = 0.8) +
+    scale_color_d3(labels = c(H = "high elevation", L = "low elevation", ncbi = "NCBI")) +
+    theme_classic() +
+    theme(
+        legend.position = c(0.8, 0.8),
+        legend.background = element_rect(color = "black", fill = "white")
+    ) +
+    guides(color = guide_legend(title = "original site")) +
+    labs(x = paste0("PC1 (", round(mca_var$ev[1]*100, 1), "%)"),
+         y = paste0("PC2 (", round(mca_var$ev[2]*100, 1), "%)"))
+
+ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4, height = 4)
 
 
 

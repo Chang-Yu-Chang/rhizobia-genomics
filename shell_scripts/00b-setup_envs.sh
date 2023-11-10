@@ -148,19 +148,18 @@ mamba install --yes -c conda-forge matplotlib=3.8.1
 mamba install --yes -c conda-forge seaborn=0.13.0
 mamba install --yes -c conda-forge biopython=1.81
 
-# Install Scoary v1.6.16
-# Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
-mamba create -n scoary
-mamba activate scoary
-mamba install --yes -c bioconda scoary=1.6.16
-scoary -h
-
-# Install Artemis  v18.2.0
-# Artemis is a free genome browser and annotation tool that allows visualisation of sequence features, next generation data and the results of analyses within the context of the sequence, and also its six-frame translation.
-mamba create -n artemis
-mamba activate artemis
-#mamba search -c bioconda artemis
-mamba install --yes -c bioconda artemis=18.2.0
+# # Install Scoary v1.6.16
+# # Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
+# mamba create -n scoary
+# mamba activate scoary
+# mamba install --yes -c bioconda scoary=1.6.16
+# scoary -h
+#
+# # Install Artemis  v18.2.0
+# # Artemis is a free genome browser and annotation tool that allows visualisation of sequence features, next generation data and the results of analyses within the context of the sequence, and also its six-frame translation.
+# mamba create -n artemis
+# mamba activate artemis
+# mamba install --yes -c bioconda artemis=18.2.0
 
 
 # Install anvi'o v8
@@ -199,12 +198,30 @@ pip3 install gffutils
 # Install PlasmidFinder
 mamba create -y -n plasmidfinder
 mamba activate plasmidfinder
+# Go to wanted location for plasmidfinder
+cd ~/bioinformatics
 mamba install --yes -c bioconda plasmidfinder=2.1.6
+# Build container
+docker build -t plasmidfinder .
+docker run --rm -it --entrypoint=/test/test.sh plasmidfinder
+# Install PlasmidFinder database with executable kma_index program
+git clone https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git
+cd plasmidfinder_db
+rm -rf .git # remove the git
+PLASMID_DB=$(pwd)
+python3 INSTALL.py kma_index
+
+
+
+
+
+
+# # Clone and enter the plasmidfinder directory
+# git clone https://bitbucket.org/genomicepidemiology/plasmidfinder.git
+# rm -rf plasmidfinder/.git # remove the git
+# mamba env update -f conda/meta.yaml
+
 #Please run download-db.sh to download the PlasmidFinder database to /Users/cychang/miniconda3/envs/intel_env/envs/plasmidfinder/share/plasmidfinder-2.1.6/database.
-download-db.sh
-
-
-
 
 # Install plaSquid
 # # plaSquid is a Nextflow pipeline for plasmid detection and classification in genomic and metagenomic data.
