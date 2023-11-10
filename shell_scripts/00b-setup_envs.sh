@@ -196,6 +196,81 @@ wget https://raw.githubusercontent.com/karkman/gff_parser/master/gff_parser.py -
 pip3 install gffutils
 
 
+# Install PlasmidFinder
+mamba create -y -n plasmidfinder
+mamba activate plasmidfinder
+mamba install --yes -c bioconda plasmidfinder=2.1.6
+#Please run download-db.sh to download the PlasmidFinder database to /Users/cychang/miniconda3/envs/intel_env/envs/plasmidfinder/share/plasmidfinder-2.1.6/database.
+download-db.sh
+
+
+
+
+# Install plaSquid
+# # plaSquid is a Nextflow pipeline for plasmid detection and classification in genomic and metagenomic data.
+# mkdir ~/bioinformatics/plasquid
+# cd ~/bioinformatics/plasquid
+# git clone --depth=1 https://github.com/mgimenez720/plaSquid/
+# rm -rf plaSquid/.git # remove the git
+# # Create mamba env
+# cd ~/bioinformatics/plasquid/plaSquid
+# mamba create -y -n plasquid
+# mamba activate plasquid
+# mamba env update -f environments/plaSquid.yml
+# mamba search -c conda-forge procpsng procps-ng
+#
+# # Install SDK
+# curl -s "https://get.sdkman.io" | bash
+# # Install java
+# sdk install java 17.0.6-amzn
+# # Install Nextflow
+# take ~/bioinformatics/nextflow
+# wget -qO- https://get.nextflow.io | bash
+# # Test
+# cd ~/bioinformatics/plasquid/plaSquid
+# chmod 755 ~/bioinformatics/nextflow/nextflow
+# ~/bioinformatics/nextflow/nextflow run main.nf --contigs testdata/test.fasta --outdir testdata
+
+
+
+
+# # Install PlasForest
+# # PlasForest is A random forest classifier of contigs to identify contigs of plasmid origin in contig and scaffold genomes.
+# # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04270-w
+# mamba create -y -n plasforest python=3.8 # scikit-learn==0.22.2 requires python <= 3.8
+# mamba activate plasforest
+# mamba install --yes -c bioconda biopython=1.79
+# mamba install --yes -c bioconda numpy=1.21
+# mamba install --yes -c bioconda pandas=2.0.1
+# mamba install --yes -c bioconda joblib=1.3.0
+# mamba install --yes -c bioconda scikit-learn=0.22.2.post1
+# mamba install --yes -c bioconda blast=2.10.1
+# # Download the code
+# mkdir ~/bioinformatics/plasforest
+# cd ~/bioinformatics/plasforest
+# git clone --depth=1 https://github.com/leaemiliepradier/PlasForest
+# rm -rf PlasForest/.git # remove the git
+# # Untar the random forest classifier:
+# cd PlasForest/
+# tar -zxvf plasforest.sav.tar.gz
+# # Download a database of plasmid sequences (2.5GB)
+# chmod 755 database_downloader.sh
+# ./database_downloader.sh
+# # Testing the installation. To test that PlasForest has been correctly installed, you can run the following script:
+# chmod 755 ./test_plasforest.sh
+# ./test_plasforest.sh
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -50,6 +50,27 @@ anvi-db-info "$folder_data/temp/anvio/genomes/Chang_Q5C_15.db"
 # 2.3 Run hmms, which helps annotate the genes in your contigs-db. This add the HMM info to the database
 for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; anvi-run-hmms -c "$folder_data/temp/anvio/genomes/$i.db"; done
 
+# 2.4 output the contig stat from each contigs-db
+mkdir -p "$folder_data/temp/anvio/contigs_stat"
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+do
+    anvi-display-contigs-stats \
+        "$folder_data/temp/anvio/genomes/$i.db" \
+        --report-as-text \
+        -o "$folder_data/temp/anvio/contigs_stat/$i.txt"
+done
+
+# 2.5 Export contigs
+mkdir -p "$folder_data/temp/anvio/contigs"
+for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+do
+    anvi-export-contigs \
+        -c "$folder_data/temp/anvio/genomes/$i.db" \
+        -o "$folder_data/temp/anvio/contigs/$i.fasta"
+done
+
+
+
 
 # 3. Generate an anvi’o genomes storage
 # 3.1 Create a input list of genomes
@@ -66,6 +87,8 @@ anvi-gen-genomes-storage \
 # `-e`
 # `--gene-caller` uses the external gene caller included in each genome's db
 # `-o` it must ends with -GENOMES.db
+
+
 
 # 4. Run a pangenome analysis
 pangenome_id="pangenome"
@@ -128,10 +151,6 @@ anvi-split \
 anvi-display-pan \
     -p "$folder_data/temp/anvio/split_$pangenome_id/duplicated_gene_pair/PAN.db" \
     -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
-
-
-
-#anvi-display-pan -p "$folder_data/temp/anvio/split_pangenome/core/PAN.db" -g "$folder_data/temp/anvio/ensifer-GENOMES.db"
 
 # 6.3 Provide the trait data as a layer
 # The provide trait dataset is only the growth traits and it's from 44_plot_anvio.R

@@ -6,7 +6,7 @@ library(janitor)
 library(ggsci)
 source(here::here("analysis/00-metadata.R"))
 
-# 0. read data
+# 0. read data ----
 # 0.1 ensifer gene presence and abense table
 egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
 
@@ -35,6 +35,10 @@ gene_calls <- bind_rows(list_calls) %>%
 egcc <- gene_calls %>%
     left_join(egc) %>%
     mutate(genome_name = factor(genome_name, genomes$genome_name), genome_id = factor(genome_id, genomes$genome_id))
+
+# 0.5 read the raw data
+
+
 
 # 1. plot the gene numbers on each contig
 p <- egcc %>%
