@@ -190,7 +190,15 @@ ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4
 # 5. plot the genecluster
 egc %>%
     group_by(gene_cluster_id, genome_name) %>%
-    count()
+    count() %>%
+    ggplot() +
+    geom_tile(aes(x = gene_cluster_id, y = genome_name, fill = n)) +
+    scale_fill_gradient(low = "white", high = "maroon") +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
+
 
 
 
