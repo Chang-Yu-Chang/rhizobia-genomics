@@ -187,6 +187,10 @@ p <- contigs_mca %>%
 ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4, height = 4)
 
 
+# 5. plot the genecluster
+egc %>%
+    group_by(gene_cluster_id, genome_name) %>%
+    count()
 
 
 
