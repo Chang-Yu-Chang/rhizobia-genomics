@@ -7,7 +7,7 @@ library(FactoMineR) # for MCA
 library(ggsci)
 source(here::here("analysis/00-metadata.R"))
 
-# 0. read data
+# 0. read data ----
 egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
 #ef <- read_delim(paste0(folder_data, "/temp/anvio/enriched_functions.txt"), delim = "\t", show_col_types = F)
 isolates_anvio <- read_delim(paste0(folder_data, "temp/42-isolates_anvio.txt"), show_col_types = F) %>%

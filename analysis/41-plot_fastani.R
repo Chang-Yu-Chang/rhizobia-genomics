@@ -30,12 +30,17 @@ tb_ani <- tb_ani %>%
     arrange(g_A, g_B)
 
 # Write the ani for only the Ensifers, including the three ncbi strains
-tb_ani_ensifer <- tb_ani %>%
+tb_ani <- tb_ani %>%
     filter(!g_A %in% paste0("Chang_Q5C_", c(1, 7, 12, 14, 18))) %>%
-    filter(!g_B %in% paste0("Chang_Q5C_", c(1, 7, 12, 14, 18))) %>%
+    filter(!g_B %in% paste0("Chang_Q5C_", c(1, 7, 12, 14, 18)))
+
+write_csv(tb_ani, file = paste0(folder_data, "temp/41-tb_ani.csv"))
+
+tb_ani_ensifer <- tb_ani %>%
     pivot_wider(names_from = g_A, values_from = ani) %>%
     rename(key = g_B)
 write_delim(tb_ani_ensifer, file = paste0(folder_data, "temp/plasmidsaurus/summary/34-medaka/ani_ensifer.txt"), delim = "\t")
+
 
 # 1. plot the pairwise ani estimate
 p <- tb_ani %>%

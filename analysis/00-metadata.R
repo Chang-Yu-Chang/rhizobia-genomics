@@ -8,7 +8,7 @@ folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of d
 
 # For genomics
 genomes <- tibble(genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419"),
-                  genome_id = factor(paste0("g", 1:17)))
+                  genome_id = factor(c(paste0("g", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419")))
 
 
 # FOr experiemnt

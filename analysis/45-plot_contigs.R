@@ -4,11 +4,15 @@ library(tidyverse)
 library(cowplot)
 library(janitor)
 library(ggsci)
+library(FactoMineR) # for MCA
+library(proxy) # for computing jaccard matrix
+library(ggtree)
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read data ----
 # 0.1 ensifer gene presence and abense table
-egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
+egc <- read_delim(paste0(folder_data, "/temp/anvio/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F) %>%
+    clean_names()
 
 # 0.2 gene annotation
 n_genomes <-  nrow(genomes)
@@ -39,7 +43,7 @@ egcc <- gene_calls %>%
 # 0.6 order the contigs by size
 egcc_count <- egcc %>%
     #distinct(gene_cluster_id, gene_callers_id, .keep_all = T) %>%
-    group_by(genome_name, contig) %>%
+    group_by(genome_id, genome_name, contig) %>%
     summarize(n_genes = n()) %>%
     # Remove very small contigs
     #filter(n_genes > 10) %>%
@@ -48,7 +52,7 @@ egcc_count <- egcc %>%
     mutate(contig_ordered = factor(paste0("c", 1:n()))) %>%
     ungroup()
 
-# plot the
+# plot the contig numbers
 p <- egcc_count %>%
     arrange(n_genes) %>%
     ggplot() +
@@ -62,15 +66,45 @@ ggsave(paste0(folder_data, "temp/45-00-contig_genes_n.png"), p, width = 4, heigh
 # 0.7 label the contigs by new contig label
 egcc_ordered <- egcc %>%
     left_join(select(egcc_count, genome_name, contig, contig_ordered)) %>%
-    #select(genome_name, genome_id, contig, contig_ordered) %>%
-    # Remove the genes on the small contigs
     filter(!is.na(contig_ordered)) %>%
     ungroup() %>%
     mutate(contig_id = paste0(genome_id, "_", contig_ordered)) %>%
-    mutate(contig_id = factor(contig_id, paste0("g", rep(1:20, each = 20), "_", "c", rep(1:20, 20))))
+    #pull(contig_id) %>% unique
+    mutate(contig_id = factor(contig_id, paste0(rep(genomes$genome_id, each = 10), "_", "c", rep(1:10, nrow(genomes)))))
 
+# 0.8 Filter for the largest three contigs
+egcc_c <- egcc_ordered %>%
+    filter(contig_ordered %in% paste0("c", 1:3)) %>%
+    select(contig_id, gene_cluster_id) %>%
+    distinct(contig_id, gene_cluster_id) %>%
+    mutate(value = 1) %>%
+    arrange(contig_id, gene_cluster_id) %>%
+    pivot_wider(id_cols = contig_id, names_from = gene_cluster_id, values_from = value, values_fill = 0)
 
+write_csv(egcc_c, paste0(folder_data, "temp/45-egcc_c.csv"))
 
+# 0.9 manually assign the plasmids and chromros
+egcc_count_t <- egcc_count %>%
+    filter(contig_ordered %in% paste0("c", 1:3)) %>%
+    mutate(contig_type = case_when(
+        contig_ordered == "c1" ~ "chromosome",
+        contig_ordered == "c2" ~ "psymb",
+        contig_ordered == "c3" ~ "psyma"
+    )) %>%
+    mutate(contig_type = case_when(
+        contig_ordered == "c2" & genome_id %in% paste0("g", c(10, 16, 17)) ~ "psyma",
+        contig_ordered == "c3" & genome_id %in% paste0("g", c(10, 16, 17)) ~ "psymb",
+        T ~ contig_type
+    ))
+
+write_csv(egcc_count_t, paste0(folder_data, "temp/45-egcc_count_t.csv"))
+
+# 0.10
+egcct <- egcc_ordered %>%
+    left_join(egcc_count_t) %>%
+    filter(contig_ordered %in% paste0("c", 1:3))
+
+write_csv(egcct, paste0(folder_data, "temp/45-egcct.csv"))
 
 # 1. plot the gene numbers on each contig ----
 p <- egcc_count %>%
@@ -90,7 +124,7 @@ p <- egcc_count %>%
 
 ggsave(paste0(folder_data, "temp/45-01-contig_genes_n.png"), p, width = 6, height = 4)
 
-# 2. plot the heatmap for gene presence absence
+# 2. plot the heatmap for gene presence absence ----
 p <- egcc_ordered %>%
     filter(contig_ordered %in% paste0("c", 1:3)) %>%
     ggplot() +
@@ -112,18 +146,7 @@ p <- egcc_ordered %>%
 
 ggsave(paste0(folder_data, "temp/45-02-contig_gene.png"), p, width = 10, height = 6)
 
-# 3. make a tree
-# Compute the jaccard matrix
-library(proxy)
-egcc_c <- egcc_ordered %>%
-    # Filter for the largest three contigs
-    filter(contig_ordered %in% paste0("c", 1:3)) %>%
-    select(contig_id, gene_cluster_id) %>%
-    distinct(contig_id, gene_cluster_id) %>%
-    mutate(value = 1) %>%
-    arrange(contig_id, gene_cluster_id) %>%
-    pivot_wider(id_cols = contig_id, names_from = gene_cluster_id, values_from = value, values_fill = 0)
-
+# 3. make a tree ----
 # Compute the Jaccard distance matrix
 egcc_m <- as.matrix(egcc_c[,-1])
 dim(egcc_m)
@@ -131,12 +154,12 @@ rownames(egcc_m) <- as.character(egcc_c$contig_id)
 jdm <- proxy::dist(egcc_m, method = "Jaccard")
 
 # Plot the tree
-library(ggtree)
 te <- as.dendrogram(hclust(jdm)) # my tree!
 egcc_label <- egcc_ordered %>%
     select(contig_id, genome_id, contig_ordered) %>% distinct() %>%
     filter(contig_ordered %in% paste0("c", 1:3)) %>%
-    mutate(contig_id = as.character(contig_id))
+    mutate(contig_id = as.character(contig_id)) %>%
+    arrange(genome_id, contig_ordered)
 
 p <- te %>%
     ggtree(layout = "rectangular") +
@@ -154,12 +177,10 @@ p <- te %>%
 ggsave(paste0(folder_data, "temp/45-03-contig_tree.png"), p, width = 10, height = 10)
 
 
-# 4. plot PCA ----
-library(FactoMineR) # for MCA
-
-# MCA because it's a categorical dataset
+# 4. make clusters ----
 egcc_cm <- egcc_c %>% mutate(across(starts_with("GC"), factor))
-mca <- MCA(egcc_cm[,-1], ncp = 5, graph = F)
+mca <- MCA(as.matrix(egcc_cm[,-1]), ncp = 5, graph = F)
+#mca <- MCA(egcc_cm[,2:100], ncp = 5, graph = F)
 
 contigs_mca <- as_tibble(mca$ind$coord) %>%
     clean_names() %>%
@@ -172,36 +193,101 @@ mca_var <- as_tibble(mca$eig) %>%
 
 p <- contigs_mca %>%
     ggplot() +
-    geom_point(aes(x = dim_1, y = dim_2)) +
-    #geom_point(aes(x = dim_1, y = dim_2, color = contig_ordered), position = position_jitter(), size = 4, stroke = 2, shape = 21, alpha = 0.8) +
-    scale_color_d3(labels = c(H = "high elevation", L = "low elevation", ncbi = "NCBI")) +
+    geom_point(aes(x = dim_1, y = dim_2, color = contig_ordered), size = 3, stroke = 1, shape = 21, alpha = 0.8) +
+    scale_color_aaas() +
     theme_classic() +
     theme(
-        legend.position = c(0.8, 0.8),
+        legend.position = c(0.8, 0.2),
         legend.background = element_rect(color = "black", fill = "white")
     ) +
-    guides(color = guide_legend(title = "original site")) +
+    guides(color = guide_legend(title = "contig")) +
     labs(x = paste0("PC1 (", round(mca_var$ev[1]*100, 1), "%)"),
          y = paste0("PC2 (", round(mca_var$ev[2]*100, 1), "%)"))
 
-ggsave(paste0(folder_data, "temp/44-01-duplicated_gene_pairs.png"), p, width = 4, height = 4)
+ggsave(paste0(folder_data, "temp/45-04-contig_clusters.png"), p, width = 4, height = 4)
 
-
-# 5. plot the genecluster
-egc %>%
-    group_by(gene_cluster_id, genome_name) %>%
+# 5. Plot the genecluster by paralog numbers ----
+p <- egc %>%
+    left_join(genomes) %>%
+    mutate(genome_id = factor(genome_id, genomes$genome_id)) %>%
+    group_by(gene_cluster_id, genome_id) %>%
     count() %>%
+    arrange(desc(n)) %>%
+    #filter(str_detect(gene_cluster_id, "000000")) %>%
     ggplot() +
-    geom_tile(aes(x = gene_cluster_id, y = genome_name, fill = n)) +
-    scale_fill_gradient(low = "white", high = "maroon") +
+    geom_tile(aes(x = gene_cluster_id, y = genome_id, fill = log(n))) +
+    scale_fill_gradient(low = "white", high = "black") +
     theme_classic() +
-    theme() +
+    theme(
+        #axis.text.x = element_text(angle = 90),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()
+    ) +
     guides() +
     labs()
 
+ggsave(paste0(folder_data, "temp/45-05-gene_clusters.png"), p, width = 15, height = 5)
+
+# 6. plot the key symbiosis gene on contigs ----
+p <- egcct %>%
+    filter(str_detect(prokka_prodigal_acc, "nif|nod|fix")) %>%
+    mutate(gene_group = str_sub(prokka_prodigal_acc, 1, 3)) %>%
+    mutate(gene = str_sub(prokka_prodigal_acc, 1, 4)) %>%
+    group_by(contig_ordered, gene_group, gene, genome_id, contig_type) %>%
+    count() %>%
+    arrange(desc(n)) %>%
+    ggplot() +
+    geom_tile(aes(x = gene, y = genome_id, fill = n), width = 0.8, height = 0.8) +
+    scale_fill_gradient(low = "grey80", high = "black") +
+    scale_y_discrete(position = "right") +
+    facet_grid(contig_type~gene_group, scales = "free_x", switch = "y") +
+    theme_classic() +
+    theme(
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.border = element_rect(color = "black", fill = NA),
+        strip.background = element_rect(color = NA, fill = NA)
+    ) +
+    guides() +
+    labs(x = "gene cluster", y = "genome")
+ggsave(paste0(folder_data, "temp/45-06-symbiosis_genes.png"), p, width = 10, height = 8)
 
 
+# 7. plot the number of core for chromosome, pSymA, and pSymB ----
+egcct <- read_csv(paste0(folder_data, "temp/45-egcct.csv"), show_col_types = F)
+egcct <- egcct %>%
+    select(genome_id, gene_cluster_id, unique_id, bin_name, contig_type) %>%
+    arrange(genome_id, gene_cluster_id, unique_id) %>%
+    mutate(genome_id = factor(genome_id, genomes$genome_id))
 
+p <- egcct %>%
+    distinct(genome_id, contig_type, gene_cluster_id) %>%
+    group_by(contig_type, gene_cluster_id) %>%
+    count(name = "n_genomes") %>%
+    group_by(contig_type, n_genomes) %>%
+    count(name = "n_genes") %>%
+    ggplot() +
+    #geom_histogram(aes(x = n, fill = contig_type), width = 1.5, binwidth = 1, color = "black", position = position_dodge2(width = 1), alpha = 0.4) +
+    geom_line(aes(x = n_genomes, y = n_genes, color = contig_type, group = contig_type), linewidth = 1) +
+    geom_point(aes(x = n_genomes, y = n_genes, color = contig_type), shape = 21, size = 2, stroke = 1) +
+    scale_x_continuous(breaks = 1:17) +
+    scale_y_continuous(breaks = seq(0, 3000, 1000), minor_breaks = seq(0, 3000, 500)) +
+    scale_color_aaas(labels = c(chromosome="chromosome", psyma = "pSymA", psymb = "pSymB")) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major.x = element_line(color = "grey90"),
+        panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.minor.y = element_line(color = "grey90")
+    ) +
+    guides(color = guide_legend(title = "")) +
+    labs(x = "# of genomes", y = "# of gene clusters")
 
+ggsave(paste0(folder_data, "temp/45-07-gene_freq_spec.png"), p, width = 6, height = 3)
 
+# Extract only the unique gene id
+egc_g <- egc %>%
+    select(unique_id, gene_cluster_id, genome_name) %>%
+    distinct(gene_cluster_id, genome_name, .keep_all = T) %>%
+    left_join(genomes) %>%
+    select(-genome_name)
 
