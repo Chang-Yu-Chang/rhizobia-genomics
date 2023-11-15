@@ -54,11 +54,10 @@ do
         --outdir "$folder_anvio/06-alignment/snippy/$i"
 done
 
-# 7.2 merge thee vcf
+# 7.2 merge these vcf
 mkdir -p "$folder_anvio/06-alignment/snippy/core"
 cd "$folder_anvio/06-alignment/snippy"
-snippy-core --ref Chang_Q5C_1/ref.fa --prefix core/core  Chang_Q5C_1 Chang_Q5C_10 Chang_Q5C_11 Chang_Q5C_12 Chang_Q5C_13 Chang_Q5C_14 Chang_Q5C_15
-#snippy-core --ref Chang_Q5C_1/ref.fa Chang_Q5C_1 Chang_Q5C_10 Chang_Q5C_11 Chang_Q5C_12 Chang_Q5C_13 Chang_Q5C_14 Chang_Q5C_15 Chang_Q5C_16 Chang_Q5C_17 Chang_Q5C_18 Chang_Q5C_19 Chang_Q5C_2 Chang_Q5C_3 Chang_Q5C_4 Chang_Q5C_5 Chang_Q5C_6 Chang_Q5C_7 Chang_Q5C_8 Chang_Q5C_9 em1021 em1022 wsm419
+snippy-core --ref Chang_Q5C_1/ref.fa Chang_Q5C_1 Chang_Q5C_10 Chang_Q5C_11 Chang_Q5C_12 Chang_Q5C_13 Chang_Q5C_14 Chang_Q5C_15 Chang_Q5C_16 Chang_Q5C_17 Chang_Q5C_18 Chang_Q5C_19 Chang_Q5C_2 Chang_Q5C_3 Chang_Q5C_4 Chang_Q5C_5 Chang_Q5C_6 Chang_Q5C_7 Chang_Q5C_8 Chang_Q5C_9 em1021 em1022 wsm419
 
 # 7.3 quick plot
 cd "$folder_anvio/06-alignment/snippy/core"
@@ -74,10 +73,17 @@ cp "$folder_anvio/06-alignment/snippy/core/core.vcf" "$folder_anvio/08-vcf/core.
 # 8.1 Filter variants
 mamba activate bcftools
 cd "$folder_anvio/08-vcf"
-# Apply filters based on variant quality (QUAL, DP, QD, etc.)
-bcftools filter -i 'QUAL > 30 && DP > 10 && QD > 2' core.vcf -o filtered.vcf
+#bcftools filter -i 'QUAL > 30 && DP > 10 && QD > 2' core.vcf -o filtered.vcf
 
+mamba activate vcftools
+# Calculate allele frequencies
+vcftools --vcf core.vcf --freq --out allele_freq
 
+# Calculate nucleotide diversity (pi)
+vcftools --vcf core.vcf --site-pi --out nucleotide_diversity
+
+# Calculate FST between populations
+vcftools --vcf core.vcf --weir-fst-pop population1.txt --weir-fst-pop population2.txt --out FST_results
 
 # 7.2 use snippy for all genomes at once -> the shell script is the same as the previous section
 # for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; echo "$i\t$folder_anvio/01-fasta/$i.fasta" >> "$folder_anvio/06-alignment/snippy/input.txt"; done
