@@ -230,6 +230,24 @@ mamba create -y -n samtools
 mamba activate samtools
 mamba install --yes -c bioconda samtools=1.18
 
+# Install Snippy v4.6.0
+# Snippy is Rapid haploid variant calling and core genome alignment
+mamba create -y -n snippy
+mamba activate snippy
+mamba install --yes -c bioconda snippy=4.6.0
+mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
+
+# Install bcftools 1.18
+# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
+mamba create -y -n bcftools
+mamba activate bcftools
+mamba install --yes -c bioconda bcftools=1.18
+
+# Install vcftools 0.1.16
+# vcftools is A set of tools written in Perl and C++ for working with VCF files.
+mamba create -y -n vcftools
+mamba activate vcftools
+mamba install --yes -c bioconda vcftools=0.1.16
 
 
 # # Clone and enter the plasmidfinder directory
