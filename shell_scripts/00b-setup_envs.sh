@@ -1,3 +1,4 @@
+#!/usr/bin/env zsh
 # This script creates the mamba envs for various bioconda tools.
 # In priniciple, one env per one tool
 
@@ -212,7 +213,22 @@ PLASMID_DB=$(pwd)
 python3 INSTALL.py kma_index
 
 
+# Install minimap2 v2.26
+mamba create -y -n minimap2
+mamba activate minimap2
+mamba install --yes -c bioconda minimap2=2.26
 
+# Install BWA v0.7.17
+# BWA is a software package for mapping low-divergent sequences against a large reference genome,
+mamba create -y -n bwa
+mamba activate bwa
+mamba install --yes -c bioconda bwa=0.7.17
+
+# Install Samtools v1.18
+# samtools are Tools for dealing with SAM, BAM and CRAM files
+mamba create -y -n samtools
+mamba activate samtools
+mamba install --yes -c bioconda samtools=1.18
 
 
 
