@@ -99,7 +99,7 @@ egcc_count_t <- egcc_count %>%
 
 write_csv(egcc_count_t, paste0(folder_data, "temp/45-egcc_count_t.csv"))
 
-# 0.10
+# 0.10 long egcc with genetic element types.
 egcct <- egcc_ordered %>%
     left_join(egcc_count_t) %>%
     filter(contig_ordered %in% paste0("c", 1:3))
