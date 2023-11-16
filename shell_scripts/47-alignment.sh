@@ -7,11 +7,11 @@ folder_anvio="$folder_data/temp/anvio"
 # 6.1 For long reads, tools like Minimap2 or NGMLR are often preferred
 mamba activate minimap2
 mkdir -p "$folder_anvio/06-alignment/sam"
-ref_genome="$folder_anvio/06-alignment/reference_genome.mmi"
+ref_genome="$folder_anvio/06-alignment/usda1106.mmi"
 minimap2 -d $ref_genome "$folder_anvio/01-fasta/usda1106.fasta"
 
 # 6.2 Align Each Assembled Genome to the Reference
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     minimap2 -ax map-ont $ref_genome "$folder_anvio/01-fasta/$i.fasta" > "$folder_anvio/06-alignment/sam/$i.sam"
 done
@@ -19,7 +19,7 @@ done
 # 6.3 Cover sam to bam
 mamba activate samtools
 mkdir -p "$folder_anvio/06-alignment/bam"
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     # Convert SAM to BAM: For each alignment use samtools to convert the SAM file to BAM and sort it.
     samtools view -bS "$folder_anvio/06-alignment/sam/$i.sam" | samtools sort -o "$folder_anvio/06-alignment/bam/$i.bam"
@@ -27,15 +27,12 @@ do
     samtools index "$folder_anvio/06-alignment/bam/$i.bam"
 done
 
-# i=Chang_Q5C_1
-# samtools mpileup "$folder_anvio/bam/$i.bam"
-
-# 6.4. move hdf file from medaka
-mkdir -p "$folder_anvio/06-alignment/hdf"
-for i in Chang_Q5C_{1..19}
-do
-    cp "$folder_data/temp/plasmidsaurus/$i/04-medaka/consensus_probs.hdf" "$folder_anvio/06-alignment/hdf/$i.hdf"
-done
+# # 6.4. move hdf file from medaka
+# mkdir -p "$folder_anvio/06-alignment/hdf"
+# for i in Chang_Q5C_{1..19}
+# do
+#     cp "$folder_data/temp/plasmidsaurus/$i/04-medaka/consensus_probs.hdf" "$folder_anvio/06-alignment/hdf/$i.hdf"
+# done
 
 
 # 7. call SNPs variation. Output is a VCF file
@@ -56,11 +53,7 @@ do
         --outdir "$folder_anvio/06-alignment/snippy/$i"
 done
 
-cd "$folder_anvio/06-alignment/snippy/Chang_Q5C_2/"
-snippy-vcf_report --html --cpus 16 --auto > snps.report.html
-
-
-# 7.2 merge these vcf. Only the 14 wild Ensifer genomes
+# merge these vcf. Only the 14 wild Ensifer genomes
 mkdir -p "$folder_anvio/06-alignment/snippy/core"
 cd "$folder_anvio/06-alignment/snippy"
 snippy-core --ref "$folder_anvio/06-alignment/usda1106.gbff" \
@@ -70,29 +63,28 @@ snippy-core --ref "$folder_anvio/06-alignment/usda1106.gbff" \
     --prefix core/core
 
 
-# 7.3 quick plot
-cd "$folder_anvio/06-alignment/snippy/core"
-snippy-clean_full_aln core.full.aln > clean.full.aln
-run_gubbins.py -p gubbins clean.full.aln
-snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln
-#FastTree -gtr -nt clean.core.aln > clean.core.tree
+# 7.2 use freebayes to call variants from BAM
+mamba activate freebayes
+mkdir -p "$folder_anvio/06-alignment/freebayes"
+cd "$folder_anvio/06-alignment/freebayes"
+rm list_bam.txt
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419; do; echo $folder_anvio/06-alignment/bam/$i.bam >> list_bam.txt; done
+freebayes -f "$folder_anvio/01-fasta/usda1106.fasta" --bam-list list_bam.txt > "$folder_anvio/06-alignment/freebayes/variants.vcf"
 
-# 8. Handle vcf files
-mkdir -p "$folder_anvio/08-vcf"
-cp "$folder_anvio/06-alignment/snippy/core/core.vcf" "$folder_anvio/08-vcf/core.vcf"
-cd "$folder_anvio/08-vcf"
-
-# 8.1 Filter for only the SNPs
-mamba activate vcftools
-vcftools --vcf "$folder_anvio/08-vcf/core.vcf" --remove-indels --recode --recode-INFO-all --out "$folder_anvio/08-vcf/snps_only"
-
-
-# 8.2 Filter variants
-# mamba activate bcftools
+#freebayes -f reference.fa aln1.bam aln2.bam -p 2 -F 0.01 --min-coverage 10 --min-alternate-fraction 0.2 > variants.vcf
 
 
 
 
+
+# # 8. Handle vcf files
+# mkdir -p "$folder_anvio/08-vcf"
+# cp "$folder_anvio/06-alignment/snippy/core/core.vcf" "$folder_anvio/08-vcf/core.vcf"
+# cd "$folder_anvio/08-vcf"
+#
+# # 8.1 Filter for only the SNPs
+# mamba activate vcftools
+# vcftools --vcf "$folder_anvio/08-vcf/core.vcf" --remove-indels --recode --recode-INFO-all --out "$folder_anvio/08-vcf/snps_only"
 
 #
 #

@@ -13,6 +13,8 @@ g2_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5
 g4_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_4/snps.vcf"))
 core_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/core/core.vcf"))
 
+fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/variants.vcf"))
+
 vcfR::getCHROM(core_vcf) %>%
     table()
 

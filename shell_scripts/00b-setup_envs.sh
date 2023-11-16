@@ -250,6 +250,12 @@ mamba activate vcftools
 mamba install --yes -c bioconda vcftools=0.1.16
 
 
+# Install Freebayes v1.3.6
+mamba create -y -n freebayes
+mamba activate freebayes
+mamba install --yes -c bioconda freebayes=1.3.6
+
+
 # # Clone and enter the plasmidfinder directory
 # git clone https://bitbucket.org/genomicepidemiology/plasmidfinder.git
 # rm -rf plasmidfinder/.git # remove the git
