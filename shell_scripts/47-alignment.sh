@@ -71,10 +71,10 @@ mkdir -p "$folder_anvio/08-vcf"
 cp "$folder_anvio/06-alignment/snippy/core/core.vcf" "$folder_anvio/08-vcf/core.vcf"
 
 # 8.1 Filter variants
-mamba activate bcftools
-cd "$folder_anvio/08-vcf"
+# mamba activate bcftools
 #bcftools filter -i 'QUAL > 30 && DP > 10 && QD > 2' core.vcf -o filtered.vcf
 
+cd "$folder_anvio/08-vcf"
 mamba activate vcftools
 # Calculate allele frequencies
 vcftools --vcf core.vcf --freq --out allele_freq
