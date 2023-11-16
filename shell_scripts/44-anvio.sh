@@ -13,8 +13,8 @@ mamba activate anvio-8
 
 # 1. Clean the assembled genome fasta to have simplified deflines
 mkdir -p "$folder_anvio/01-fasta"
-
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+# i=usda1106
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     # Clean the fasta
     anvi-script-reformat-fasta \
@@ -29,13 +29,12 @@ done
 # --report-file reports the changes to deflines
 # --min-len 500 minimum length of contigs to keep
 
-
 # 2. Prokka
 # 2.1 Run Prokka
 mamba activate prokka
 mkdir -p "$folder_anvio/02-prokka"
 
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     prokka \
         --force --kingdom Bacteria --prefix annotated --gcode 11 \
@@ -53,7 +52,7 @@ cd ~/bioinformatics/anvio # For using the gff_parser.py
 mkdir -p "$folder_anvio/02-prokka/gene_calls"
 mkdir -p "$folder_anvio/02-prokka/gene_annot"
 
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     python3 gff_parser.py \
         "$folder_anvio/02-prokka/$i/annotated.gff" \
@@ -66,7 +65,7 @@ mamba activate anvio-8
 # 3.1 Create the contigs-db
 mkdir -p "$folder_anvio/03-contigs_db"
 
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     # Create the contig database attached with external gene call
     anvi-gen-contigs-database \
@@ -90,11 +89,11 @@ done
 #anvi-db-info "$folder_anvio/03-contigs_db/Chang_Q5C_15.db"
 
 # 2.3 Run hmms, which helps annotate the genes in your contigs-db. This adds the HMM info to the database
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; anvi-run-hmms -c "$folder_anvio/03-contigs_db/$i.db"; done
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419; do; anvi-run-hmms -c "$folder_anvio/03-contigs_db/$i.db"; done
 
 # 2.4 output the contig stat from each contigs-db
 mkdir -p "$folder_anvio/03-contigs_db/contigs_stat"
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419
 do
     anvi-display-contigs-stats \
         "$folder_anvio/03-contigs_db/$i.db" \
@@ -119,8 +118,8 @@ done
 mkdir "$folder_anvio/04-genomes"
 cd "$folder_anvio/04-genomes"
 echo -e "name\tcontigs_db_path" > external_genomes.txt
-for i in Chang_Q5C_{1..19} em1021 em1022 wsm419; do; echo -e "$i\t$folder_anvio/03-contigs_db/$i.db" >> external_genomes.txt; done
-cat external_genomes.txt # this should have 19 + 3 = 22 genomes
+for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419; do; echo -e "$i\t$folder_anvio/03-contigs_db/$i.db" >> external_genomes.txt; done
+cat external_genomes.txt # this should have 19 + 4 = 23 genomes
 
 # 4.2 Generate one storage database for holding the 22 genomes
 anvi-gen-genomes-storage \
@@ -145,7 +144,7 @@ anvi-pan-genome \
     --num-threads 20 \
     --minbit 0.5 \
     --mcl-inflation 10 \
-    --genome-names Chang_Q5C_2,Chang_Q5C_3,Chang_Q5C_4,Chang_Q5C_5,Chang_Q5C_6,Chang_Q5C_8,Chang_Q5C_9,Chang_Q5C_10,Chang_Q5C_11,Chang_Q5C_13,Chang_Q5C_15,Chang_Q5C_16,Chang_Q5C_17,Chang_Q5C_19,em1021,em1022,wsm419 \
+    --genome-names Chang_Q5C_2,Chang_Q5C_3,Chang_Q5C_4,Chang_Q5C_5,Chang_Q5C_6,Chang_Q5C_8,Chang_Q5C_9,Chang_Q5C_10,Chang_Q5C_11,Chang_Q5C_13,Chang_Q5C_15,Chang_Q5C_16,Chang_Q5C_17,Chang_Q5C_19,usda1106,em1021,em1022,wsm419 \
     --min-occurrence 1
 # -g anvio genomes storage file
 # -n project name
