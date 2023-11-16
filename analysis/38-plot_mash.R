@@ -60,7 +60,7 @@ write_csv(mash_c, paste0(folder_data, "temp/38-mash_c.csv"))
 # 1. genome top hits
 mash_g_top <- mash_g %>%
     group_by(genome_id) %>%
-    slice(1)
+    slice(1:3)
 write_csv(mash_g_top, paste0(folder_data, "temp/38-mash_g_top.csv"))
 
 
