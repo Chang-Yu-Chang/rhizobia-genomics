@@ -40,10 +40,24 @@ isolates_egcc <- egcct %>%
     mutate(contig_type = paste0("ngenes_", contig_type)) %>%
     pivot_wider(id_cols = genome_name, names_from = contig_type, values_from = n_genes) %>%
     mutate(ngenes_genome = ngenes_chromosome + ngenes_psyma + ngenes_psymb)
-# 0.3 join the three datasets
+# 0.3 clean the gene number for symbiosis genes
+isolates_sym <- egcct %>%
+    filter(str_detect(genome_name, "Chang")) %>%
+    filter(str_detect(prokka_prodigal_acc, "nif|fix|nod")) %>%
+    mutate(genome_name = factor(genome_name, paste0("Chang_Q5C_", 1:20))) %>%
+    distinct(genome_name, contig_type, gene_cluster_id) %>%
+    group_by(genome_name, contig_type) %>%
+    count(name = "n_genes") %>%
+    ungroup() %>%
+    mutate(contig_type = paste0("nsymgenes_", contig_type)) %>%
+    pivot_wider(id_cols = genome_name, names_from = contig_type, values_from = n_genes, values_fill = 0) %>%
+    mutate(nsymgenes_genome = nsymgenes_chromosome + nsymgenes_psyma + nsymgenes_psymb)
+
+# 0.3 join the four datasets
 isolates <- isolates %>%
     left_join(isolates_egcc) %>%
-    left_join(isolates_clen)
+    left_join(isolates_clen) %>%
+    left_join(isolates_sym)
 
 
 # 1. contig length and number of genes ----
@@ -74,6 +88,7 @@ isolates_ngenes <- isolates %>%
 p <- isolates_ngenes %>%
     ggplot() +
     geom_point(aes(x = ngenes, y = value), stroke = 1, size = 3, shape = 21) +
+    geom_smooth(aes(x = ngenes, y = value), method = "lm") +
     facet_grid(growth_trait ~ contig_type, scales = "free") +
     #scale_color_aaas() +
     theme_bw() +
@@ -102,21 +117,77 @@ isolates_ngenes %>%
     select(contig_type, growth_trait, coefficient) %>%
     unnest(c(coefficient)) %>%
     filter(term == "ngenes") %>%
-    filter(p.value < 0.05)
+    filter(p.value < 0.05) %>%
+    select(contig_type, growth_trait, estimate, p.value)
 
-# Print the results
-
-glm(Response ~ Predictor1 + Predictor2, data = data, family = "binomial")
-
-
-
-
-# 3. Does the total number of genes in psymA predict its growth? ----
+# 3. Does the contig size predict its growth? ----
+fit_regression <- function(data) {
+    model <- lm(value ~ clen, data = data)
+    return(broom::tidy(model))
+}
 
 
+isolates_clen <- isolates %>%
+    select(genome_id, r, lag, maxOD, starts_with(c("clen_"))) %>%
+    pivot_longer(cols = starts_with("clen_"), names_prefix = "clen_", names_to = "contig_type", values_to = "clen") %>%
+    pivot_longer(cols = c(r, lag, maxOD), names_to = "growth_trait", values_to = "value")
+
+isolates_clen %>%
+    filter(contig_type == "chromosome", growth_trait == "r") %>%
+    select(genome_id, clen, value) %>%
+    fit_regression()
+
+isolates_clen %>%
+    nest(data = c(genome_id, clen, value)) %>%
+    mutate(coefficient = map(data, fit_regression)) %>%
+    select(contig_type, growth_trait, coefficient) %>%
+    unnest(c(coefficient)) %>%
+    filter(term == "clen") %>%
+    filter(p.value < 0.05) %>%
+    select(contig_type, growth_trait, estimate, p.value)
+
+
+# 4. Does the number of symbiosis gene predict its growth? ----
+isolates_nsymgenes <- isolates %>%
+    select(genome_id, r, lag, maxOD, starts_with(c("nsymgenes"))) %>%
+    pivot_longer(cols = starts_with("nsymgenes"), names_prefix = "nsymgenes_", names_to = "contig_type", values_to = "nsymgenes") %>%
+    pivot_longer(cols = c(r, lag, maxOD), names_to = "growth_trait", values_to = "value")
+p <- isolates_nsymgenes %>%
+    ggplot() +
+    geom_point(aes(x = nsymgenes, y = value), stroke = 1, size = 3, shape = 21) +
+    geom_smooth(aes(x = nsymgenes, y = value), method = "lm") +
+    facet_grid(growth_trait ~ contig_type, scales = "free") +
+    #scale_color_aaas() +
+    theme_bw() +
+    theme(
+        panel.background = element_rect(fill = NA, color = "black"),
+        strip.background = element_blank()
+    ) +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/48-04-nsymgenes_vs_r.png"), p, width = 12, height = 9)
 
 # Fit logistic regression model
-model <- glm(Response ~ Predictor1 + Predictor2, data = data, family = "binomial")
+fit_regression <- function(data) {
+    model <- lm(value ~ nsymgenes, data = data)
+    return(broom::tidy(model))
+}
+
+isolates_nsymgenes %>%
+    filter(contig_type == "chromosome", growth_trait == "r") %>%
+    select(genome_id, nsymgenes, value) %>%
+    fit_regression()
+
+isolates_nsymgenes %>%
+    nest(data = c(genome_id, nsymgenes, value)) %>%
+    mutate(coefficient = map(data, fit_regression)) %>%
+    select(contig_type, growth_trait, coefficient) %>%
+    unnest(c(coefficient)) %>%
+    filter(term == "nsymgenes") %>%
+    filter(p.value < 0.05) %>%
+    select(contig_type, growth_trait, estimate, p.value)
+
+
 
 
 
