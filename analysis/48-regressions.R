@@ -3,6 +3,7 @@
 library(tidyverse)
 library(cowplot)
 library(janitor)
+library(ggsci)
 source(here::here("analysis/00-metadata.R"))
 
 
@@ -26,6 +27,7 @@ isolates_clen <- g_contigs %>%
     select(genome_name, contig_type, contig_length) %>%
     mutate(contig_type = paste0("clen_", contig_type)) %>%
     pivot_wider(id_cols = genome_name, names_from = contig_type, values_from = contig_length) %>%
+    mutate(clen_genome = clen_chromosome + clen_psyma + clen_psymb) %>%
     arrange(genome_name)
 # 0.2 Clean the gene number
 isolates_egcc <- egcct %>%
@@ -36,18 +38,20 @@ isolates_egcc <- egcct %>%
     count(name = "n_genes") %>%
     ungroup() %>%
     mutate(contig_type = paste0("ngenes_", contig_type)) %>%
-    pivot_wider(id_cols = genome_name, names_from = contig_type, values_from = n_genes)
+    pivot_wider(id_cols = genome_name, names_from = contig_type, values_from = n_genes) %>%
+    mutate(ngenes_genome = ngenes_chromosome + ngenes_psyma + ngenes_psymb)
 # 0.3 join the three datasets
 isolates <- isolates %>%
     left_join(isolates_egcc) %>%
     left_join(isolates_clen)
 
 
-# 1.
+# 1. contig length and number of genes ----
 p <- isolates %>%
     select(genome_name, strain_site_group, starts_with(c("ngenes", "clen"))) %>%
     pivot_longer(cols = -c(genome_name, strain_site_group), names_pattern = "(.*)_(.*)", names_to = c("name", "contig_type")) %>%
     pivot_wider(id_cols = c(genome_name, strain_site_group, contig_type)) %>%
+    mutate(contig_type = factor(contig_type, c("genome", "chromosome", "psyma", "psymb"))) %>%
     ggplot() +
     geom_point(aes(x = clen/10^6, y = ngenes/1000, color = contig_type), stroke = 1, size = 3, shape = 21) +
     scale_color_aaas() +
@@ -56,10 +60,77 @@ p <- isolates %>%
         legend.position = c(0.2, 0.8),
         legend.background = element_rect(color = "black", fill = "white")
     ) +
-    guides() +
+    guides(color = guide_legend(title = NULL)) +
     labs(x = "contig length (Mbp)", y = "# of genes (x1000)")
 
 ggsave(paste0(folder_data, "temp/48-01-contig_size.png"), p, width = 4, height = 4)
+
+# 2. number of total genes vs growth trait ----
+# Does the total number of genes in a genome predict its growth traits?
+isolates_ngenes <- isolates %>%
+    select(genome_id, r, lag, maxOD, starts_with(c("ngenes"))) %>%
+    pivot_longer(cols = starts_with("ngenes"), names_prefix = "ngenes_", names_to = "contig_type", values_to = "ngenes") %>%
+    pivot_longer(cols = c(r, lag, maxOD), names_to = "growth_trait", values_to = "value")
+p <- isolates_ngenes %>%
+    ggplot() +
+    geom_point(aes(x = ngenes, y = value), stroke = 1, size = 3, shape = 21) +
+    facet_grid(growth_trait ~ contig_type, scales = "free") +
+    #scale_color_aaas() +
+    theme_bw() +
+    theme(
+        panel.background = element_rect(fill = NA, color = "black"),
+        strip.background = element_blank()
+    ) +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "temp/48-02-ngenes_vs_r.png"), p, width = 12, height = 9)
+
+# Use purrr to fit regression models for each group
+fit_regression <- function(data) {
+    model <- lm(value ~ ngenes, data = data)
+    return(broom::tidy(model))
+}
+
+isolates_ngenes %>%
+    filter(contig_type == "chromosome", growth_trait == "r") %>%
+    select(genome_id, ngenes, value) %>%
+    fit_regression()
+
+isolates_ngenes %>%
+    nest(data = c(genome_id, ngenes, value)) %>%
+    mutate(coefficient = map(data, fit_regression)) %>%
+    select(contig_type, growth_trait, coefficient) %>%
+    unnest(c(coefficient)) %>%
+    filter(term == "ngenes") %>%
+    filter(p.value < 0.05)
+
+# Print the results
+
+glm(Response ~ Predictor1 + Predictor2, data = data, family = "binomial")
+
+
+
+
+# 3. Does the total number of genes in psymA predict its growth? ----
+
+
+
+# Fit logistic regression model
+model <- glm(Response ~ Predictor1 + Predictor2, data = data, family = "binomial")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

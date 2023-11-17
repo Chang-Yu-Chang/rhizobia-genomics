@@ -13,7 +13,11 @@ g2_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5
 g4_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_4/snps.vcf"))
 core_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/core/core.vcf"))
 
-fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/variants.vcf"))
+fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/test.vcf"))
+fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/var.vcf"))
+
+
+snf_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/sniffles/sv.vcf")) # structure variants
 
 vcfR::getCHROM(core_vcf) %>%
     table()
@@ -36,9 +40,20 @@ vcfR::getCHROM(core_vcf) %>%
 # 13	Chang_Q5C_19	snp=244143	del=1681	ins=1709	het=3760	unaligned=2554793
 
 # Check the taxanomy
+isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types = F) %>%
+    mutate(genome_name = str_replace(genome_id, "g", "Chang_Q5C_") %>% factor(paste0("Chang_Q5C_", 1:20)))
+
 mash_g_top <- read_csv(paste0(folder_data, "temp/38-mash_g_top.csv"))
 mash_g_top %>%
-    select(genome_id, identity, query_comment)
+    select(genome_id, identity, query_comment) %>%
+    #filter(str_detect(query_comment, "Ensifer|Sinorhizobium")) %>%
+    select(-identity) %>%
+    group_by(genome_id) %>%
+    mutate(mash_hits = paste0("mash", 1:n())) %>%
+    ungroup() %>%
+    pivot_wider(id_cols = genome_id, names_from = mash_hits, values_from = query_comment) %>%
+    left_join(select(isolates, genome_id, strain_site_group)) %>%
+    select(site = strain_site_group, genome_id, everything())
 # g2, 3, 10, 15 are meliloti
 #  the rest should be medicae
 

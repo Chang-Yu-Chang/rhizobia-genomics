@@ -255,6 +255,11 @@ mamba create -y -n freebayes
 mamba activate freebayes
 mamba install --yes -c bioconda freebayes=1.3.6
 
+# Install sniffles2 v2.2
+# A fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
+mamba create -y -n sniffles
+mamba activate sniffles
+mamba install --yes -c bioconda sniffles=2.2
 
 # # Clone and enter the plasmidfinder directory
 # git clone https://bitbucket.org/genomicepidemiology/plasmidfinder.git

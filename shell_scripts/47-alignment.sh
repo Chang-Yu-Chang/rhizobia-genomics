@@ -69,9 +69,39 @@ mkdir -p "$folder_anvio/06-alignment/freebayes"
 cd "$folder_anvio/06-alignment/freebayes"
 rm list_bam.txt
 for i in Chang_Q5C_{1..19} usda1106 em1021 em1022 wsm419; do; echo $folder_anvio/06-alignment/bam/$i.bam >> list_bam.txt; done
-freebayes -f "$folder_anvio/01-fasta/usda1106.fasta" --bam-list list_bam.txt > "$folder_anvio/06-alignment/freebayes/variants.vcf"
+freebayes -f "$folder_anvio/01-fasta/usda1106.fasta" \
+    --bam-list list_bam.txt \
+    -p 1 > "$folder_anvio/06-alignment/freebayes/var.vcf"
 
-#freebayes -f reference.fa aln1.bam aln2.bam -p 2 -F 0.01 --min-coverage 10 --min-alternate-fraction 0.2 > variants.vcf
+# I NEED TO USE PARAPLEEL OTHERWISE THE MEMORY IS USED
+
+# freebayes -f "$folder_anvio/01-fasta/usda1106.fasta" \
+#     $folder_anvio/06-alignment/bam/Chang_Q5C_2.bam $folder_anvio/06-alignment/bam/Chang_Q5C_3.bam \
+#     -p 1 > test.vcf
+#
+# freebayes -f reference.fa aln1.bam aln2.bam -p 1 -F 0.01 --min-coverage 10 --min-alternate-fraction 0.2 > variants.vcf
+
+
+# 7.3 use sniffle to call structural variants from BAM
+mamba activate sniffles
+mkdir -p "$folder_anvio/06-alignment/sniffles"
+# Call SV candidates and create an associated .snf file for each sample
+mkdir -p "$folder_anvio/06-alignment/snf"
+for i in Chang_Q5C_{1..19}; do; sniffles --input $folder_anvio/06-alignment/bam/$i.bam --snf $folder_anvio/06-alignment/snf/$i.snf ; done
+# Call structure variants
+cd "$folder_anvio/06-alignment/sniffles"
+for i in Chang_Q5C_{1..19}; do; echo $folder_anvio/06-alignment/snf/$i.snf >> list_snf.tsv; done
+sniffles --input list_snf.tsv --vcf sv.vcf
+
+# 7.4 use medaka to call variants from filtered raw reads fastaq
+mamba activate medaka
+for i in Chang_Q5C_{1..19}
+do
+    medaka_haploid_variant \
+        -i "$folder_data/temp/plasmidsaurus/$i/01-filtlong/01-filtered_reads.fastq.gz" \
+        -r "$folder_anvio/01-fasta/usda1106.fasta" \
+        -o "$folder_anvio/06-alignment/medaka/$i"
+done
 
 
 
