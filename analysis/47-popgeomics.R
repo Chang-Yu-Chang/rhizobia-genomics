@@ -8,19 +8,16 @@ library(poppr) # for pop gen analysis
 source(here::here("analysis/00-metadata.R"))
 
 # 0. read data ----
-g2_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_2/snps.vcf"))
+#g2_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_2/snps.vcf"))
 #g3_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_3/snps.vcf"))
-g4_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_4/snps.vcf"))
+#g4_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/Chang_Q5C_4/snps.vcf"))
+# fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/test.vcf"))
+# fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/var.vcf"))
+#snf_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/sniffles/sv.vcf")) # structure variants
 core_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy/core/core.vcf"))
+medicae_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/snippy_medicae/core/core.vcf"))
 
-fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/test.vcf"))
-fb_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/freebayes/var.vcf"))
-
-
-snf_vcf <- read.vcfR(paste0(folder_data, "temp/anvio/06-alignment/sniffles/sv.vcf")) # structure variants
-
-vcfR::getCHROM(core_vcf) %>%
-    table()
+vcfR::getCHROM(medicae_vcf) %>% table() %>% sum()
 
 # Loaded 3 sequences totalling 6716226 bp.
 # Will mask 0 regions totalling 0 bp ~ 0.00%
@@ -39,7 +36,7 @@ vcfR::getCHROM(core_vcf) %>%
 # 12	Chang_Q5C_17	snp=242988	del=1554	ins=1674	het=4756	unaligned=2634310
 # 13	Chang_Q5C_19	snp=244143	del=1681	ins=1709	het=3760	unaligned=2554793
 
-# Check the taxanomy
+# Check the taxonomy
 isolates <- read_csv(paste0(folder_data, "temp/42-isolates.csv"), show_col_types = F) %>%
     mutate(genome_name = str_replace(genome_id, "g", "Chang_Q5C_") %>% factor(paste0("Chang_Q5C_", 1:20)))
 
@@ -58,14 +55,16 @@ mash_g_top %>%
 #  the rest should be medicae
 
 # Convert the vcf to a genclone object
-core_genind <- vcfR2genind(core_vcf)
+#core_genind <- vcfR2genind(core_vcf)
+core_genind <- vcfR2genind(medicae_vcf)
 # core_genind <- as.genclone(core_genind)
 isolates_ensifer <- read_csv(paste0(folder_data, "temp/02-isolates_rhizo.csv"), show_col_types = F) %>%
     filter(genus == "Ensifer") %>%
     mutate(genome_name = str_replace(genome_id, "g", "Chang_Q5C_")) %>%
     select(genome_name, everything()) %>%
     mutate(genome_name = factor(genome_name, rownames(core_genind$tab))) %>%
-    arrange(genome_name)
+    arrange(genome_name) %>%
+    drop_na()
 other(core_genind)$taxa <- isolates_ensifer
 
 # Assign populations
@@ -112,6 +111,7 @@ poppr(core_genind)
 # 2     H  6   6    6  0 1.79  6  0.833   1 0.0691 17789 0.671 core_genind
 # 3 Total 14  14   10  0 2.64 14  0.929   1 0.0857 15509 0.465 core_genind
 
+# 1. PCA using the 14 Ensifer strains ----
 # PCA
 core_genlight_cut <- dartR::gi2gl(core_genind_cut)
 core_pca <- glPca(core_genlight_cut, nf = 2, center = T, scale = T)
@@ -165,6 +165,59 @@ p <- plot_grid(p1, p2, nrow = 1, align = "h", scale = 0.95, axis = "tb", labels 
 
 ggsave(paste0(folder_data, "temp/47-01-snippy_core.png"), width = 8, height = 4.5)
 
+# 2. PCA using the 10 Ensifer strains ----
+# PCA
+core_genlight_cut <- dartR::gi2gl(core_genind_cut)
+core_pca <- glPca(core_genlight_cut, nf = 2, center = T, scale = T)
+eig <- sort(core_pca$eig/sum(core_pca$eig), decreasing = T)
+
+# Merge the tb
+isolates_pca <- core_pca$scores %>%
+    as_tibble() %>%
+    mutate(PC1 = PC1/100, PC2 = PC2/100) %>%
+    mutate(genome_name = core_genlight_cut$ind.names) %>%
+    left_join(isolates_ensifer)
+
+set.seed(1)
+p1 <- isolates_pca %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = site), shape = 21, size = 3, stroke = 1.5, position = position_jitter(width = 0.02, height = 0.02)) +
+    scale_color_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        #legend.background = element_rect(fill = "white", color = "black"),
+        legend.position = "top",
+        panel.grid.major = element_line(color = "grey90", linewidth = 0.5),
+        panel.grid.minor = element_line(color = "grey90", linewidth = 0.2, linetype = 2),
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 (", round(eig[1]*100,1), "%)"),
+         y = paste0("PC2 (", round(eig[2]*100,1), "%)"))
+
+# include the mash result
+p2 <- isolates_pca %>%
+    # THIS IS HARD CODED BY CHECKING THE MASH OUTCOME. COME UP WITH A BETTER WAY
+    left_join(tibble(genome_name = paste0("Chang_Q5C_", c(2,3,10,15,4:6, 8,9,11,13,16,17,19)),
+                     species_mash = c(rep("meliloti", 4), rep("medicae", 10)))) %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = species_mash), shape = 21, size = 3, stroke = 1.5, position = position_jitter(width = 0.02, height = 0.02)) +
+    scale_color_npg() +
+    theme_classic() +
+    theme(
+        #legend.background = element_rect(fill = "white", color = "black"),
+        legend.position = "top",
+        panel.grid.major = element_line(color = "grey90", linewidth = 0.5),
+        panel.grid.minor = element_line(color = "grey90", linewidth = 0.2, linetype = 2),
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 (", round(eig[1]*100,1), "%)"),
+         y = paste0("PC2 (", round(eig[2]*100,1), "%)"))
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", scale = 0.95, axis = "tb", labels = c("A", "B")) + paint_white_background()
+
+ggsave(paste0(folder_data, "temp/47-02-snippy_medicae.png"), width = 8, height = 4.5)
 
 
 

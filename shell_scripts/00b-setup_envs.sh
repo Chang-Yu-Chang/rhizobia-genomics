@@ -261,6 +261,15 @@ mamba create -y -n sniffles
 mamba activate sniffles
 mamba install --yes -c bioconda sniffles=2.2
 
+# Install ggcaller v1.3.2
+# ggCaller traverses Bifrost graphs constructed from bacterial genomes to identify putative gene sequences, known as open reading frames (ORFs).
+# ggCaller incorporates Balrog to filter ORFs to improve specificity of calls and Panaroo for pangenome analysis and quality control.
+mamba create -y -n ggcaller
+mamba activate ggcaller
+mamba install --yes -c bioconda ggcaller=1.3.2
+
+
+
 # # Clone and enter the plasmidfinder directory
 # git clone https://bitbucket.org/genomicepidemiology/plasmidfinder.git
 # rm -rf plasmidfinder/.git # remove the git

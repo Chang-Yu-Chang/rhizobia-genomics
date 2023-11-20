@@ -39,6 +39,7 @@ done
 folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
 
 # 7.1 use snippy for each genome
+# 7.1a use meliloti as reference
 # For snippy, I dont need to index my fasta. I can use the fasta file directly
 mamba activate snippy
 mkdir -p "$folder_anvio/06-alignment/snippy"
@@ -53,7 +54,9 @@ do
         --outdir "$folder_anvio/06-alignment/snippy/$i"
 done
 
-# merge these vcf. Only the 14 wild Ensifer genomes
+
+
+# Merge these vcf. Only the 14 wild Ensifer genomes
 mkdir -p "$folder_anvio/06-alignment/snippy/core"
 cd "$folder_anvio/06-alignment/snippy"
 snippy-core --ref "$folder_anvio/06-alignment/usda1106.gbff" \
@@ -61,6 +64,29 @@ snippy-core --ref "$folder_anvio/06-alignment/usda1106.gbff" \
     Chang_Q5C_8 Chang_Q5C_9 Chang_Q5C_10 Chang_Q5C_11 Chang_Q5C_13 \
     Chang_Q5C_15 Chang_Q5C_16 Chang_Q5C_17 Chang_Q5C_19 \
     --prefix core/core
+
+# 7.1b use medicae as reference
+cp "$folder_data/temp/plasmidsaurus/wsm419/genome.gbff" "$folder_anvio/06-alignment/wsm419.gbff"
+mkdir -p "$folder_anvio/06-alignment/snippy_medicae/core"
+cd "$folder_anvio/06-alignment/snippy_medicae"
+
+for i in Chang_Q5C_4 Chang_Q5C_5 Chang_Q5C_6 Chang_Q5C_8 Chang_Q5C_9 Chang_Q5C_11 Chang_Q5C_13 Chang_Q5C_16 Chang_Q5C_17 Chang_Q5C_19 wsm419
+do
+    snippy \
+        --ref "$folder_anvio/06-alignment/wsm419.gbff" \
+        --ctgs "$folder_anvio/01-fasta/$i.fasta" \
+        --outdir "$folder_anvio/06-alignment/snippy_medicae/$i"
+done
+
+
+# Merge the set of 10 Ensifer medicae
+mkdir -p "$folder_anvio/06-alignment/snippy_medicae/core"
+cd "$folder_anvio/06-alignment/snippy_medicae"
+snippy-core --ref "$folder_anvio/06-alignment/wsm419.gbff" \
+    Chang_Q5C_4 Chang_Q5C_5 Chang_Q5C_6 Chang_Q5C_8 Chang_Q5C_9 \
+    Chang_Q5C_11 Chang_Q5C_13 Chang_Q5C_16 Chang_Q5C_17 Chang_Q5C_19 \
+    --prefix core/core
+
 
 
 # 7.2 use freebayes to call variants from BAM
