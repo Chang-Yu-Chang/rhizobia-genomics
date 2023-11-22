@@ -1,21 +1,10 @@
 #!/usr/bin/env zsh
-# This script creates the mamba envs for various bioconda tools.
-# In priniciple, one env per one tool
+
+# This script creates the mamba envs for various bioconda tools
+# In priniciple, one env per tool
 
 cd
 mkdir -p ~/bioinformatics
-
-# Install Nanocomp v1.23.1
-# Nanocomp compares multiple runs of long read sequencing data and alignments.
-mamba create -n nanocomp
-mamba activate nanocomp
-mamba install --yes -c bioconda nanocomp=1.23.1
-
-# Install Nanoplot v.1.41.6
-# Nanoplot is a plotting tool for long read sequencing data and alignments.
-mamba create -n nanoplot
-mamba activate nanoplot
-mamba install --yes -c bioconda nanoplot=1.41.6
 
 # Install Filtlong v0.2.1
 # Filtlong is a tool for filtering long reads by quality.
@@ -54,12 +43,6 @@ mkdir -p ~/bioinformatics/bakta
 bakta_db download --output ~/bioinformatics/bakta/
 # This database is on zenodo https://zenodo.org/records/7669534 and it's ~50 GB
 
-# # Install Bandage v0.8.1
-# # Bandage (a Bioinformatics Application for Navigating De novo Assembly Graphs Easily)
-# mamba create -n bandage
-# mamba activate bandage
-# mamba install bandage=0.8.1
-
 # Install Quast v5.2.0
 # QUAST stands for QUality ASsessment Tool. It evaluates genome/metagenome assemblies by computing various metrics. The current QUAST toolkit includes the general QUAST tool for genome assemblies, MetaQUAST, the extension for metagenomic datasets, QUAST-LG, the extension for large genomes (e.g., mammalians), and Icarus, the interactive visualizer for these tools.
 mamba create -n quast
@@ -79,13 +62,6 @@ quast-download-busco
 mamba create -n busco
 mamba activate busco
 mamba install --yes -c bioconda busco=5.4.7
-
-
-# Install CheckM v1.2.2
-# CheckM, an automated method for assessing the quality of a genome using a broader set of marker genes specific to the position of a genome within a reference genome tree and information about the collocation of these gene
-mamba create -n checkm
-mamba activate checkm
-mamba install --yes -c bioconda checkm-genome=1.2.2
 
 # Install Mash v2.3
 # Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
@@ -130,7 +106,6 @@ mamba create -n fastani
 mamba activate fastani
 mamba install --yes -c bioconda fastani=1.31
 
-
 # Install Roary v3.13.0
 # Roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
 mamba create -n roary
@@ -148,20 +123,6 @@ wget https://raw.githubusercontent.com/sanger-pathogens/Roary/master/contrib/roa
 mamba install --yes -c conda-forge matplotlib=3.8.1
 mamba install --yes -c conda-forge seaborn=0.13.0
 mamba install --yes -c conda-forge biopython=1.81
-
-# # Install Scoary v1.6.16
-# # Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
-# mamba create -n scoary
-# mamba activate scoary
-# mamba install --yes -c bioconda scoary=1.6.16
-# scoary -h
-#
-# # Install Artemis  v18.2.0
-# # Artemis is a free genome browser and annotation tool that allows visualisation of sequence features, next generation data and the results of analyses within the context of the sequence, and also its six-frame translation.
-# mamba create -n artemis
-# mamba activate artemis
-# mamba install --yes -c bioconda artemis=18.2.0
-
 
 # Install anvi'o v8
 # Anvi'o is an open-source, community-driven analysis and visualization platform for microbial 'omics.
@@ -195,7 +156,6 @@ cd ~/bioinformatics/anvio
 wget https://raw.githubusercontent.com/karkman/gff_parser/master/gff_parser.py -O gff_parser.py
 pip3 install gffutils
 
-
 # Install PlasmidFinder
 mamba create -y -n plasmidfinder
 mamba activate plasmidfinder
@@ -211,7 +171,6 @@ cd plasmidfinder_db
 rm -rf .git # remove the git
 PLASMID_DB=$(pwd)
 python3 INSTALL.py kma_index
-
 
 # Install minimap2 v2.26
 mamba create -y -n minimap2
@@ -249,7 +208,6 @@ mamba create -y -n vcftools
 mamba activate vcftools
 mamba install --yes -c bioconda vcftools=0.1.16
 
-
 # Install Freebayes v1.3.6
 mamba create -y -n freebayes
 mamba activate freebayes
@@ -268,6 +226,50 @@ mamba create -y -n ggcaller
 mamba activate ggcaller
 mamba install --yes -c bioconda ggcaller=1.3.2
 
+
+
+
+
+
+
+
+# # Install Nanocomp v1.23.1
+# # Nanocomp compares multiple runs of long read sequencing data and alignments.
+# mamba create -n nanocomp
+# mamba activate nanocomp
+# mamba install --yes -c bioconda nanocomp=1.23.1
+
+# # Install Nanoplot v.1.41.6
+# # Nanoplot is a plotting tool for long read sequencing data and alignments.
+# mamba create -n nanoplot
+# mamba activate nanoplot
+# mamba install --yes -c bioconda nanoplot=1.41.6
+
+# # Install Bandage v0.8.1
+# # Bandage (a Bioinformatics Application for Navigating De novo Assembly Graphs Easily)
+# mamba create -n bandage
+# mamba activate bandage
+# mamba install bandage=0.8.1
+
+# # Install CheckM v1.2.2
+# # CheckM, an automated method for assessing the quality of a genome using a broader set of marker genes specific to the position of a genome within a reference genome tree and information about the collocation of these gene
+# mamba create -n checkm
+# mamba activate checkm
+# mamba install --yes -c bioconda checkm-genome=1.2.2
+
+
+# # Install Scoary v1.6.16
+# # Scoary is a tool that uses Roary's gene_presence_absence.csv file and a user-created traits file to calculate associations between accessory genome genes and traits. It generates a list of genes ranked by the strength of association for each trait.
+# mamba create -n scoary
+# mamba activate scoary
+# mamba install --yes -c bioconda scoary=1.6.16
+# scoary -h
+#
+# # Install Artemis  v18.2.0
+# # Artemis is a free genome browser and annotation tool that allows visualisation of sequence features, next generation data and the results of analyses within the context of the sequence, and also its six-frame translation.
+# mamba create -n artemis
+# mamba activate artemis
+# mamba install --yes -c bioconda artemis=18.2.0
 
 
 # # Clone and enter the plasmidfinder directory
@@ -302,9 +304,6 @@ mamba install --yes -c bioconda ggcaller=1.3.2
 # chmod 755 ~/bioinformatics/nextflow/nextflow
 # ~/bioinformatics/nextflow/nextflow run main.nf --contigs testdata/test.fasta --outdir testdata
 
-
-
-
 # # Install PlasForest
 # # PlasForest is A random forest classifier of contigs to identify contigs of plasmid origin in contig and scaffold genomes.
 # # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04270-w
@@ -330,13 +329,6 @@ mamba install --yes -c bioconda ggcaller=1.3.2
 # # Testing the installation. To test that PlasForest has been correctly installed, you can run the following script:
 # chmod 755 ./test_plasforest.sh
 # ./test_plasforest.sh
-
-
-
-
-
-
-
 
 
 
