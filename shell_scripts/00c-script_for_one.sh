@@ -11,14 +11,14 @@ echo $sample_id
 echo $folder_genomes
 
 # Make folders and specify log
-for wf in 01-reads_qc 02-guided_assembly 03-denovo_assembly 04-taxonomy_assignment 05-gene_annotation
+for wf in 01-reads_qc 02-guided_assembly 03-denovo_assembly 04-taxonomy_assignment 05-gene_annotation 06-pangenome_prep
 do
 mkdir -p "$folder_genomes/$sample_id/$wf"
 done
 
 # 1. Quality control raw reads
+echo "01-reads_qc"
 # Filter the worst 5% reads via filtlong
-echo "01-filtlong"
 zsh 01-filter_reads.sh \
     "$folder_raw/$batch_name/$sample_id/reads/raw_reads.fastq.gz" \
     "$folder_genomes/$sample_id/01-reads_qc/filtered_reads.fastq.gz"
@@ -34,7 +34,17 @@ Rscript 01b-plot_reads.R \
     "$folder_genomes/$sample_id/01-reads_qc/filtered_reads_qc.png"
 
 
-# 2.
+# 2. Reference-guided assembly
+echo "02-guided_assembly"
+
+zsh 02a-align_genomes.sh  \
+    "$folder_genomics/reference/usda1106.mmi" \
+    $sample_id
+
+
+
+
+
 
 # # 0. nanoplot
 # echo "0-nanoplot"
