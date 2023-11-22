@@ -12,6 +12,11 @@ mamba create -n filtlong
 mamba activate filtlong
 mamba install --yes -c bioconda filtlong=0.2.1
 
+# Install bioawk v1.0
+mamba create -n bioawk
+mamba activate bioawk
+mamba install --yes -c bioconda bioawk=1.0
+
 # Install miniasm v0.3
 # Miniasm is a very fast OLC-based de novo assembler for noisy long reads
 mamba create -n miniasm

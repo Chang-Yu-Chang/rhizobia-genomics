@@ -11,10 +11,24 @@ conda activate
 # zsh 00c-script_for_one.sh $batch_id $sample_id
 
 # Nanocompare all raw reads
-mamba activate nanocomp
-zsh 30a-nanocomp.sh
+# mamba activate nanocomp
+# zsh 30a-nanocomp.sh
 
 # Run the master script
+for i in Chang_Q5C_{1..10} Chang_Q5C_{11..17} Chang_Q5C_19
+do
+    zsh 00c-script_for_one.sh "Chang_Q5C_results" $i
+done
+
+for i in Chang_Q5C_11 Chang_Q5C_18
+do
+    zsh 00c-script_for_one.sh "Chang_Q5C_results_repeated" $i
+done
+
+
+
+
+
 zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_1"
 zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_2"
 zsh 00c-script_for_one.sh "Chang_Q5C_results" "Chang_Q5C_3"
