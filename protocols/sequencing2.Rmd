@@ -42,12 +42,14 @@ isolate_seq2 <- isolates_RDP %>%
 ```{r}
 # Prepare the Plasmidsaurus sequencing submission 
 isolate_seq2 %>%
-    select(exp_id, id, genome_id) %>%
+    select(genome_id, exp_id, id) %>%
     kable()
 ```
 
 ```{r}
-write_csv(isolate_seq2, here::here("protocols/20231122_plasmidsaurus.csv"), col_names = F)
+isolate_seq2 %>%
+    select(genome_id, exp_id, id) %>% 
+    write_csv(here::here("protocols/20231122_plasmidsaurus.csv"), col_names = F)
 ```
 
 
