@@ -157,8 +157,6 @@ mi_before %>%
 
 
 
-\newpage
-
 
 
 
