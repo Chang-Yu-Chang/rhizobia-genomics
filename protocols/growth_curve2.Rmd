@@ -63,8 +63,8 @@ cbind(tb[1:8,], tb[9:16,], tb[17:24,], tb[25:32,]) %>%
     - prepare a DW96 filled with 300uL of PBS
     - pick colonies from the petri plate and dissolve the colonies in the PBS. Use wells in column 1, 5, and 9
     - dispense 100 uL of the dissolved colony to a NUNC96 and measure od at 600 nm
-    - standardize the OD600 to 0.1. For target od = 0.1 `od_target` and target inoculum volume = 100 uL `volume_target`, and given the measured od of dissolved colonies  `od_dissolved`, use the code below to calculate the needed volume of the dissolved colonies `volume_dissolved` and the TY medium volume `volume_ty`
-    - prepare another NUNC96, follow the table to add required volume of dissolved colonies and TY medium to make 100 uL of standardized inoculum
+    - standardize the OD600 to 0.1. For target od = 0.1 `od_target` and target inoculum volume = 100 uL `volume_target`, and given the measured od of dissolved colonies  `od_dissolved`, use the code below to calculate the needed volume of the dissolved colonies `volume_dissolved` and the pbs volume `volume_pbs`
+    - prepare another NUNC96, follow the table to add required volume of dissolved colonies and pbs to make 100 uL of standardized inoculum
     - measure the od of the standardized inoculum as `od_inoculum`
 
 - prepare 100 uL of TY medium in NUNC96
@@ -144,9 +144,9 @@ wide_to_long <- function (x) {
 
 \newpage 
 
-```{r message=F, eval = F}
+```{r message=F}
 #"READ THE ACTUAL DATA HERE AS mi"
-mi <- read_csv(paste0(folder_data, "raw/growth_curve/inocula_before_standardization2.csv"), show_col_types = F)
+mi <- read_csv(paste0(folder_data, "raw/growth_curve2/inocula_before_standardization.csv"), show_col_types = F)
 # Match well to inocula
 mi_before <- mi %>%
     select(-...14) %>%
@@ -164,8 +164,8 @@ mi_before %>%
     mutate(od_dissolved = od600) %>%
     mutate(od_target = 0.1, volume_target = 100) %>% 
     mutate(volume_dissolved = round(volume_target * od_target / od_dissolved, 2)) %>%
-    mutate(volume_ty = round(volume_target - volume_dissolved, 2)) %>%
-    select(genome_id, well, od_dissolved, od_target, volume_target, volume_dissolved, volume_ty) %>% 
+    mutate(volume_pbs = round(volume_target - volume_dissolved, 2)) %>%
+    select(genome_id, well, od_dissolved, od_target, volume_target, volume_dissolved, volume_pbs) %>% 
     kable()
 
 ```
