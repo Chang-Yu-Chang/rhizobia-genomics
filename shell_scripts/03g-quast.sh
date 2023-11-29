@@ -2,7 +2,7 @@
 source ~/.zshrc
 
 # This checks genome quality
-# $1: medaka consensus
+# $1: genome in fasta
 # $2: quast folder
 
 conda activate

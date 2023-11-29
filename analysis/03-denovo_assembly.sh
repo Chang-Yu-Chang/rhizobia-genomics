@@ -7,7 +7,7 @@ source 00-env_vars.sh
 cd $folder_shell
 echo "03-denovo_assembly"
 
-for i in {2..19}
+for i in {1..19}
 do
     echo "$folder_raw/$batch_ids[$i]/$sample_ids[$i]"
     raw_reads="$folder_raw/$batch_ids[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
@@ -50,17 +50,24 @@ do
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/flye/assembly.fasta" \
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/medaka"
 
+    # Clean up consensus name
+    zsh 03f-clean_names.sh \
+        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/medaka/consensus.fasta" \
+        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/genome.fasta" \
+        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/cleaned_names.txt"
+
     # Check assembly quality via quast
     mkdir -p "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/quast"
-    zsh 03f-quast.sh \
-        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/medaka/consensus.fasta"\
+    zsh 03g-quast.sh \
+        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/genome.fasta"\
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/quast"
 
     # Check assembly quality via busco
     mkdir -p "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/busco"
-    zsh 03g-busco.sh \
-        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/medaka/consensus.fasta"\
+    zsh 03h-busco.sh \
+        "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/genome.fasta"\
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/busco"
+
 
 done
 
