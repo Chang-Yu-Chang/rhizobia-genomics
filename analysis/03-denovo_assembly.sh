@@ -7,7 +7,7 @@ source 00-env_vars.sh
 cd $folder_shell
 echo "03-denovo_assembly"
 
-for i in {1..19}
+for i in {2..19}
 do
     echo "$folder_raw/$batch_ids[$i]/$sample_ids[$i]"
     raw_reads="$folder_raw/$batch_ids[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
@@ -61,7 +61,6 @@ do
     zsh 03g-busco.sh \
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/medaka/consensus.fasta"\
         "$folder_genomes/$sample_ids[$i]/03-denovo_assembly/busco"
-
 
 done
 
