@@ -6,12 +6,20 @@ library(tidyverse)
 folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
 folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of data
 
-# For genomics
+# Curate the mapping file below ----
+# Genomics
 genomes <- tibble(genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419"),
                   genome_id = factor(c(paste0("g", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419")))
 
+# Genomic workflow table
+genomes_mapping <- tibble(
+    batch_name = c(rep("Chang_Q5C_results", 10), "Chang_Q5C_results_repeated", rep("Chang_Q5C_results", 6), "Chang_Q5C_results_repeated", "Chang_Q5C_results"),
+    sample_id = paste0("Chang_Q5C_", 1:19)
+)
+write_csv(genomes_mapping, paste0(folder_data, "temp/00-genomes_mapping.csv"))
 
-# FOr experiemnt
+
+# Experiments
 list_strains <- c("H1M1R1", "H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H3M4R2", "H4M5R1", "L1M2R2", "L2M2R1", "L2M4R1", "L3M4R1", "L3M5R1", "L3M6R2", "L4M2R2", "L4M3R3", "L4M4R1", "L4M4R3", "L4M7R1", "blank")
 rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
 rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2", NA))
@@ -32,11 +40,6 @@ rhizobia <- tibble(
     rhizobia_site = str_sub(list_strains[-20], 1, 1)
 )
 
-
-paint_white_background <- function () {
-    theme(plot.background = element_rect(color = NA, fill = "white"))
-}
-
 trait_axis_names <- c(
     "dry_weight_mg" = "shoot biomass (mg)",
     "nodule_number" = "number of nodules",
@@ -54,3 +57,10 @@ trait_axis_names <- c(
     "volume_px3" = "volume (px^3)",
     "surface_area_px2" = "surface area (px^2)"
 )
+
+
+#
+paint_white_background <- function () {
+    theme(plot.background = element_rect(color = NA, fill = "white"))
+}
+
