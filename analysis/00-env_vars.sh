@@ -18,7 +18,7 @@ sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
 # Make folders for temporary genomic files
 for i in {1..19}
 do
-    for wf in 01-reads_qc 02-guided_assembly 03-denovo_assembly 04-taxonomy_assignment 05-gene_annotation 06-pangenome_prep
+    for wf in 01-reads_qc 02-guided_assembly 03-denovo_assembly 04-taxonomy 05-gene_annotation 06-pangenome_prep
     do
         mkdir -p "$folder_genomes/$sample_ids[i]/$wf"
     done

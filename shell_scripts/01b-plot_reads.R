@@ -1,10 +1,14 @@
-#' This script is to have a overview on the raw read statistics
+#' This script show the raw read statistics
+#' arg1: filtered reads in txt
+#' arg2: qc png file name
 
 renv::load()
-library(tidyverse)
-library(janitor)
-library(cowplot)
-source(here::here("analysis/00-metadata.R"))
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(janitor)
+    library(cowplot)
+    source(here::here("analysis/00-metadata.R"))
+})
 
 compute_q <- function (asc) {
     #' Compute the mean phred (Quality score) of a raw read
