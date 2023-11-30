@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 source ~/.zshrc
 
 # This prepares the anvio database for pangenome analysis
@@ -9,19 +9,17 @@ source ~/.zshrc
 
 conda activate
 mamba activate anvio-8
-
-folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
-mkdir -p "$folder_data/temp/anvio"
-folder_anvio="$folder_data/temp/anvio"
-cd $folder_anvio
-
-
 # Check setup
-anvi-self-test --suite pangenomics # You might have to install any dependency according to the error message if any
+#anvi-self-test --suite pangenomics # You might have to install any dependency according to the error message if any
 
+# folder_data="/Users/cychang/Dropbox/lab/local-adaptation/data"
+# mkdir -p "$folder_data/temp/anvio"
+# folder_anvio="$folder_data/temp/anvio"
+#cd $folder_anvio
 
-for i in {1..19}
+for i in {1..23}
 do
+
 
 done
 

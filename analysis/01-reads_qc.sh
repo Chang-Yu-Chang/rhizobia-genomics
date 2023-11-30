@@ -8,8 +8,8 @@ cd $folder_shell
 
 for i in {1..19}
 do
-    echo "$folder_raw/$batch_ids[$i]/$sample_ids[$i]"
-    raw_reads="$folder_raw/$batch_ids[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
+    echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
+    raw_reads="$folder_raw/$batch_names[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
     filtered_reads="$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.fastq.gz"
 
     # Filter the worst 5% reads via filtlong

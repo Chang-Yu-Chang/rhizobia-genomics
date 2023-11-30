@@ -1,4 +1,4 @@
-cd
+#!/usr/bin/env zsh
 source ~/.zshrc
 
 # This extract the filtered reads into a txt file

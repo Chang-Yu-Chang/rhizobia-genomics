@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 source ~/.zshrc
 
 # This script saves the environment varaibles shared by all shell scripts
@@ -12,13 +12,14 @@ folder_genomes="$folder_data/genomics/genomes"
 
 # Mapping files for genomics data
 table_file="$folder_data/temp/00-genomes_mapping.csv"
-batch_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 1)}")
+batch_names=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 1)}")
 sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
+accessions=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
 # Make folders for temporary genomic files
-for i in {1..19}
+for i in {1..23}
 do
-    for wf in 01-reads_qc 02-guided_assembly 03-denovo_assembly 04-taxonomy 05-gene_annotation 06-pangenome_prep
+    for wf in 01-reads_qc 02-denovo_assembly 03-variant_calling 04-taxonomy 05-gene_annotation 06-pangenome_prep
     do
         mkdir -p "$folder_genomes/$sample_ids[i]/$wf"
     done

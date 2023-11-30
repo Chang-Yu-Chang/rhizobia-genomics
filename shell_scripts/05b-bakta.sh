@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 source ~/.zshrc
 
 # This annotates de novo assembled genomes via bakta

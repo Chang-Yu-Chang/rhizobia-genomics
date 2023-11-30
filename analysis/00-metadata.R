@@ -8,13 +8,18 @@ folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of d
 
 # Curate the mapping file below ----
 # Genomics
-genomes <- tibble(genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419"),
-                  genome_id = factor(c(paste0("g", c(2:6, 8:11, 13, 15:17, 19)), "em1021", "em1022", "wsm419")))
+# genomes <- tibble(
+#     genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "usda1105", "em1021", "em1022", "wsm419"),
+#     genome_id = factor(c(paste0("g", c(2:6, 8:11, 13, 15:17, 19)), "usda1105", "em1021", "em1022", "wsm419")),
+#     accession = c(rep(NA, 14), c("GCF_002197065.1", "GCF_000006965", "GCF_013315775", "GCF_000017145"))
+# )
 
-# Genomic workflow table
+# Table for genomic workflow
 genomes_mapping <- tibble(
-    batch_name = c(rep("Chang_Q5C_results", 10), "Chang_Q5C_results_repeated", rep("Chang_Q5C_results", 6), "Chang_Q5C_results_repeated", "Chang_Q5C_results"),
-    sample_id = paste0("Chang_Q5C_", 1:19)
+    batch_name = c(rep("Chang_Q5C_results", 10), "Chang_Q5C_results_repeated", rep("Chang_Q5C_results", 6), "Chang_Q5C_results_repeated", "Chang_Q5C_results", rep("ncbi", 4)),
+    sample_id = c(paste0("Chang_Q5C_", 1:19), "usda1106", "em1021", "em1022", "wsm419"),
+    accession = c(rep(NA, 19), c("GCF_002197065.1", "GCF_000006965.1", "GCF_013315775.1", "GCF_000017145.1")),
+    genome_id = factor(c(paste0("g", 1:19), "usda1106", "em1021", "em1022", "wsm419")),
 )
 write_csv(genomes_mapping, paste0(folder_data, "temp/00-genomes_mapping.csv"))
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 
 # This script will install conda/mamba to your root directory. Skip this step if you already have conda/mamba
 # This script installs the conda/mamba environments required for assembling bacterial genome from nanopore long-read sequences
