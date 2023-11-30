@@ -1,15 +1,14 @@
-cd
+#!/usr/bin/env zshs
 source ~/.zshrc
 
+# This checks genome quality
+# $1: genome in fasta
+# $2: prokka folder
 
-# Check
+conda activate
 mamba activate prokka
-mamba env list
 
-medaka_consensus=$1
-prokka_folder=$2
-
-prokka --force --outdir $prokka_folder --kingdom Bacteria --locustag $medaka_consensus --prefix annotated --gcode 11 $medaka_consensus
+prokka --force --outdir $2 --kingdom Bacteria --locustag $1 --prefix annotated --gcode 11 $1
 # `--force` force overwriting existing output folder
 # `--outdir` o utput folder
 # `--kingdom`

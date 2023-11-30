@@ -2,7 +2,7 @@
 source ~/.zshrc
 
 # This allows genome comparison
-# $1: medaka_consensus
+# $1: genome in fasta
 # $2: sourmash_folder
 # $3: gtdb_db
 
@@ -20,7 +20,6 @@ sourmash sketch dna --check-sequence -f -p scaled=1000,k=31 $1 -o "$2/consensus.
 
 # We recommend using the Zipfile databases for sourmash gather and the SBT databases for sourmash search.
 sourmash gather $2/consensus.sig $3 --save-matches $2/matches.zip
-# `-o` $gathered_csv
 
 
 

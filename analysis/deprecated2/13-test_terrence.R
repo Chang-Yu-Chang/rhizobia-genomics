@@ -7,7 +7,8 @@ library(ggsci)
 library(RColorBrewer)
 source(here::here("analysis/00-metadata.R"))
 
-treatments_ttb <- readxl::read_xlsx(paste0(folder_data, "raw/rhizobia/Terrence/wood Lab rotation -fall 22 .xlsx"))
+#treatments_ttb <- readxl::read_xlsx(paste0(folder_data, "raw/rhizobia/Terrence/wood Lab rotation -fall 22 .xlsx"))
+treatments_ttb <- read_csv(paste0(folder_data, "raw/rhizobia/Terrence/corrected.csv"))
 treatments_cyc <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv"), show_col_types = F) %>%
     clean_names()
 

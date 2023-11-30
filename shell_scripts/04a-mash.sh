@@ -1,8 +1,8 @@
 #!/usr/bin/env zshs
 source ~/.zshrc
 
-# This estimate the genome distance to refseq
-# $1: medaka_consensus
+# This estimates the genome distance to refseq
+# $1: genome in fasta
 # $2: mash_folder
 # $3: refseq_db
 
@@ -19,7 +19,7 @@ mash screen -p 10 -w $3 $1  > "$2/screen.tab"
 # `-w`  Winner-takes-all strategy for identity estimates. After counting hashes for each query, hashes that appear in multiple queries will be removed from all except the one with the best identity (ties broken by larger query), and other identities will be reduced. This removes output redundancy, providing a rough compositional outline.
 
 ## Repeat for contigs
-for ct in ./contig*.fasta
+for ct in $2/c_*.fasta
 do
     mash screen -p 10 -w $3 $ct > "${ct/.fasta/.tab}"
 done

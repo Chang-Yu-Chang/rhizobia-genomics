@@ -13,17 +13,17 @@ do
     filtered_reads="$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.fastq.gz"
 
     # Filter the worst 5% reads via filtlong
-    zsh 01-filter_reads.sh \
+    zsh 01a-filter_reads.sh \
         $raw_reads \
         $filtered_reads
 
     # Extract the filtered reads to a txt file
-    zsh 01a-extract_reads.sh \
+    zsh 01b-extract_reads.sh \
         $filtered_reads \
         "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.txt"
 
     # Plot the read data
-    Rscript 01b-plot_reads.R \
+    Rscript 01c-plot_reads.R \
         "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.txt" \
         "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads_qc.png"
 done

@@ -23,3 +23,7 @@ do
         mkdir -p "$folder_genomes/$sample_ids[i]/$wf"
     done
 done
+
+# Set up conda and environments. Uncomment this chunk if not set up
+# zsh $folder_shell/00a-setup_conda.sh
+# zsh $folder_shell/00b-setup_envs.sh
