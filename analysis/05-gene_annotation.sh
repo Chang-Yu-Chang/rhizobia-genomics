@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 source ~/.zshrc
 source 00-env_vars.sh
 
@@ -6,7 +6,7 @@ source 00-env_vars.sh
 
 cd $folder_shell
 echo "05-gene_annotation"
-bakta_db="/Users/cychang/bioinformatics/bakta/db"
+bakta_db="/Users/cychang/bioinformatics/bakta/db"  # This database is mandatory and must be downloaded before annotation
 
 for i in {6..23}
 do
@@ -24,6 +24,6 @@ do
     zsh 05b-bakta.sh \
         $genome_fa \
         "$folder_genomes/$sample_ids[$i]/05-gene_annotation/bakta" \
-        $bakta_db # This database is mandatory and must be downloaded before annotation
+        $bakta_db
 
 done

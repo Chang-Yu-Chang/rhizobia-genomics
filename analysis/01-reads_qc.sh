@@ -1,4 +1,4 @@
-#!/usr/bin/env zshs
+#!/usr/bin/env zsh
 source ~/.zshrc
 source 00-env_vars.sh
 

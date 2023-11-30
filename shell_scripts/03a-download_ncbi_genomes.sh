@@ -12,7 +12,6 @@ batch_names=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 1)}")
 sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
 accessions=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
-
 # Download the Ensifer genomes
 datasets download genome accession $accessions[20,23] \
     --include genome,gff3,gbff \
@@ -37,8 +36,8 @@ for i in {20..23}
 do
     # Move files
     mkdir -p "$2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi"
-    cp "$2/ncbi_genomes/$accessions[$i]/*_genomic.fna" "$2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi/genome.fasta"
-    cp "$2/ncbi_genomes/$accessions[$i]/genomic.gbff" "$2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi/genome.gbff"
+    cp $2/ncbi_genomes/$accessions[$i]/*_genomic.fna $2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi/genome.fasta
+    cp $2/ncbi_genomes/$accessions[$i]/genomic.gbff $2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi/genome.gbff
 
     # Reformate ncbi genomes to contigs compatible to anvio
     anvi-script-reformat-fasta \
@@ -56,8 +55,6 @@ done
 
 # Also move ncbi strains data to a medaka folder for calculating ani
 #for i in em1021 em1022 wsm419; do; cp "$folder_data/temp/plasmidsaurus/$i/contigs.fasta" "$folder_data/temp/plasmidsaurus/summary/34-medaka/$i.fasta"; done
-
-
 # # Search NCBI for, EM1021, EM1022, USDA1106, WSM419
 # # EM1021 was SM1021 or 1021; EM1022 was WSM1022
 # datasets summary genome taxon 'ensifer meliloti' --assembly-source refseq --as-json-lines | \
