@@ -8,7 +8,7 @@ cd $folder_shell
 echo "05-gene_annotation"
 bakta_db="/Users/cychang/bioinformatics/bakta/db"
 
-for i in {2..19}
+for i in {6..23}
 do
     #echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
     genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
