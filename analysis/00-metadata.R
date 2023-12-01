@@ -28,11 +28,13 @@ write_csv(genomes_mapping, paste0(folder_data, "temp/00-genomes_mapping.csv"))
 # Table for strains
 isolates_mapping <- tibble(
     exp_id = c("H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1",
-               "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-1",
+               "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-2 ",
                "fp1-2", "fp1-3", "fp2-2", "crp1-2", "crp1-3", "crp2-2", "gp1-1", "gp1-2",
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
-    rhizobia_site = c(rep("high-elevation", 6), rep("low-elevaton", 9),
-                      rep("suburban", 10), rep("urban", 7))
+    rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9),
+                      rep("suburban", 10), rep("urban", 7)),
+    sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), rep(NA, 18)),
+    genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19,20, 21:37))
 )
 "INCLUDE THE GENOME ID INTO ONE SINGLE TABLE"
 
@@ -41,7 +43,7 @@ write_csv(isolates_mapping, paste0(folder_data, "temp/00-isolates_mapping.csv"))
 # list_strains <- c("H1M1R1", "H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H3M4R2", "H4M5R1", "L1M2R2", "L2M2R1", "L2M4R1", "L3M4R1", "L3M5R1", "L3M6R2", "L4M2R2", "L4M3R3", "L4M4R1", "L4M4R3", "L4M7R1", "blank")
 # rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
 # rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2", NA))
-# rhizobia_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
+rhizobia_site_colors <- c(`high-elevation` = "#0C6291", `mid-elevation` = "#CBD4C2", `low-elevation` = "#BF4342", `urban` = "deeppink", `suburban` = "yellowgreen")
 # plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
 traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "nodule_weight_mg",
             "number_of_root_tips", "number_of_branch_points",
@@ -53,10 +55,10 @@ traits2 <- c(traits,
                     rep(1:6, 4), rep(c("_px", "_px2", "_px2", "_px3"), each = 6)))
 
 
-rhizobia <- tibble(
-    strain = list_strains[-20],
-    rhizobia_site = str_sub(list_strains[-20], 1, 1)
-)
+# rhizobia <- tibble(
+#     strain = list_strains[-20],
+#     rhizobia_site = str_sub(list_strains[-20], 1, 1)
+# )
 
 trait_axis_names <- c(
     "dry_weight_mg" = "shoot biomass (mg)",

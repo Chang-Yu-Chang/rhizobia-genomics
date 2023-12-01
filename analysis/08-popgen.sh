@@ -59,4 +59,3 @@ sniffles --input list_snf.tsv --vcf sv.vcf
 
 
 
-

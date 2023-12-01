@@ -2,7 +2,7 @@
 source ~/.zshrc
 
 # This prepares the anvio object `contigs_db` for each genome
-# $1 parser directory
+# $1: parser directory
 # $2: prokka annotation in gff
 # $3: prokka gene calls in txt
 # $4: prokka gene annot in txt
