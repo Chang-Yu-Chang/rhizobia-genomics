@@ -125,9 +125,9 @@ wide_to_long <- function (x) {
 
 \newpage 
 
-```{r message=F, include =F}
+```{r message=F}
 #"READ THE ACTUAL DATA HERE AS mi"
-mi <- read_csv(paste0(folder_data, "raw/growth_curve2/inocula_before_standardization.csv"), show_col_types = F)
+mi <- read_csv(paste0(folder_data, "raw/growth_curve3/inocula_before_standardization.csv"), show_col_types = F)
 # Match well to inocula
 mi_before <- mi %>%
     select(-...14) %>%

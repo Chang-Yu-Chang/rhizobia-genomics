@@ -1,8 +1,10 @@
 # This script stores the metadata shared by all scripts
 
-library(tidyverse)
-library(janitor)
-
+renv::load()
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(janitor)
+})
 
 # This main folder depends on your home directory and user name
 folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
@@ -21,6 +23,7 @@ genomes_mapping <- tibble(
     batch_name = c(rep("Chang_Q5C_results", 10), "Chang_Q5C_results_repeated", rep("Chang_Q5C_results", 6), "Chang_Q5C_results_repeated", "Chang_Q5C_results", rep("ncbi", 4)),
     sample_id = c(paste0("Chang_Q5C_", 1:19), "usda1106", "em1021", "em1022", "wsm419"),
     accession = c(rep(NA, 19), c("GCF_002197065.1", "GCF_000006965.1", "GCF_013315775.1", "GCF_000017145.1")),
+    genome_name = c(paste0("Chang_Q5C_", 1:19), "usda1106", "em1021", "em1022", "wsm419"),
     genome_id = factor(c(paste0("g", 1:19), "usda1106", "em1021", "em1022", "wsm419")),
 )
 write_csv(genomes_mapping, paste0(folder_data, "temp/00-genomes_mapping.csv"))
@@ -33,7 +36,8 @@ isolates_mapping <- tibble(
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
     rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9),
                       rep("suburban", 10), rep("urban", 7)),
-    sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), rep(NA, 18)),
+    sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_XXX_", c(20:37))),
+    genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_XXX_", c(20:37))),
     genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19,20, 21:37))
 )
 "INCLUDE THE GENOME ID INTO ONE SINGLE TABLE"

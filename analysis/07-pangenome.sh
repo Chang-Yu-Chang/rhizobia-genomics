@@ -91,8 +91,17 @@ zsh 07e-summarize_pan.sh \
     "ensifer"
 
 
+# Roary
+rm -rf $folder_pangenome/roary_gff
+mkdir -p $folder_pangenome/roary_gff/
+for i in {1..23}
+do
+    cp "$folder_genomes/$sample_ids[$i]/05-gene_annotation/prokka/annotated.gff" "$folder_pangenome/roary_gff/$sample_ids[$i].gff"
+done
 
-
+zsh 07f-roary.sh \
+    "$folder_pangenome/roary_rhizobia" \
+    "$folder_pangenome/roary_gff"
 
 
 

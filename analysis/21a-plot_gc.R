@@ -1,15 +1,18 @@
-#' This script fits the growth curve data
+#' This script plots the growth curve data
 
-library(tidyverse)
-library(cowplot)
-library(janitor)
-source(here::here("analysis/00-metadata.R"))
+renv::load()
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(cowplot)
+    library(janitor)
+    source(here::here("analysis/00-metadata.R"))
+})
 
 isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
-gc <- read_csv(paste0(folder_data, 'temp/11-gc.csv'), show_col_types = F)
-gc_summ <- read_csv(paste0(folder_data, 'temp/11-gc_summ.csv'), show_col_types = F)
-gc_prm <- read_csv(paste0(folder_data, 'temp/11-gc_prm.csv'), show_col_types = F)
-gc_prm_summ <- read_csv(paste0(folder_data, 'temp/11-gc_prm_summ.csv'), show_col_types = F)
+gc <- read_csv(paste0(folder_data, 'temp/21-gc.csv'), show_col_types = F)
+gc_summ <- read_csv(paste0(folder_data, 'temp/21-gc_summ.csv'), show_col_types = F)
+gc_prm <- read_csv(paste0(folder_data, 'temp/21-gc_prm.csv'), show_col_types = F)
+gc_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summ.csv'), show_col_types = F)
 
 # 0. clean up data ----
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
@@ -26,7 +29,7 @@ p <- gc %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/11a-01-gc_raw.png"), p, width = 8, height = 5)
+ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 8, height = 5)
 
 
 # 2. Growth curves by well ----
@@ -42,7 +45,7 @@ p <- gc %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/11a-02-gc_raw_grid.png"), p, width = 20, height = 15)
+ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height = 15)
 
 # 3. Average OD by exp_id ----
 p <- gc_summ %>%
@@ -59,7 +62,7 @@ p <- gc_summ %>%
     ) +
     #guides(color = "none", fill = "none") +
     labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/11a-03-gc_mean.png"), p, width = 8, height = 12)
+ggsave(paste0(folder_data, "temp/21a-03-gc_mean.png"), p, width = 8, height = 12)
 
 # 4. Average OD by exp_id, overlayed ----
 p <- gc_summ %>%
@@ -74,7 +77,7 @@ p <- gc_summ %>%
         legend.position = "right"
     ) +
     labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/11a-04-gc_mean_overlay.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 6, height = 4)
 
 
 # 5. plot all trait mean by strain_site_group ----
@@ -125,7 +128,7 @@ p3 <- gc_prm_summ %>%
     labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
 
 p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "h", rel_widths = c(1,1,1.6))
-ggsave(paste0(folder_data, "temp/11a-05-gc_trait_site.png"), p, width = 8, height = 4)
+ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 4)
 
 
 # 6. check the taxonomy ----
@@ -198,6 +201,6 @@ gc_prm_summ %>%
 #     labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
 #
 # p <- plot_grid(p1, p2, p3, ncol = 1, axis = "tbrl", align = "hv")
-# ggsave(paste0(folder_data, "temp/11a-08-gc_trait_site.png"), p, width = 6, height = 5)
+# ggsave(paste0(folder_data, "temp/21a-08-gc_trait_site.png"), p, width = 6, height = 5)
 
 

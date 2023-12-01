@@ -1,10 +1,13 @@
 #' This script fits the growth curve data
 
-require(tidyverse)
-library(janitor)
-require(data.table)
-require(mgcv)
-source(here::here("analysis/00-metadata.R"))
+renv::load()
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(janitor)
+    library(data.table)
+    library(mgcv)
+    source(here::here("analysis/00-metadata.R"))
+})
 
 gc <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F)
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
@@ -158,8 +161,8 @@ gc_summ <- gc %>%
     summarize(mean_abs = mean(abs), sd_abs = sd(abs))
 
 # Output the time series
-write_csv(gc, paste0(folder_data, 'temp/11-gc.csv')) # all replicates
-write_csv(gc_summ, paste0(folder_data, 'temp/11-gc_summ.csv')) # average over replicates
+write_csv(gc, paste0(folder_data, 'temp/21-gc.csv')) # all replicates
+write_csv(gc_summ, paste0(folder_data, 'temp/21-gc_summ.csv')) # average over replicates
 
 # Smooth and fit GAM to growth curves
 gc <- as.data.table(gc)
@@ -177,8 +180,8 @@ gc_prm_summ <- gc_prm %>%
               maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD))
 
 # Output the fit
-write_csv(gc_prm, file = paste0(folder_data, 'temp/11-gc_prm.csv')) # all replicate
-write_csv(gc_prm_summ, file = paste0(folder_data, 'temp/11-gc_prm_summ.csv')) # average over replicate
+write_csv(gc_prm, file = paste0(folder_data, 'temp/21-gc_prm.csv')) # all replicate
+write_csv(gc_prm_summ, file = paste0(folder_data, 'temp/21-gc_prm_summ.csv')) # average over replicate
 
 
 
