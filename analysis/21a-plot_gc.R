@@ -9,44 +9,21 @@ suppressPackageStartupMessages({
 })
 
 isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
-# gc <- read_csv(paste0(folder_data, 'temp/21-gc.csv'), show_col_types = F)
-# gc_summ <- read_csv(paste0(folder_data, 'temp/21-gc_summ.csv'), show_col_types = F)
-# gc_prm <- read_csv(paste0(folder_data, 'temp/21-gc_prm.csv'), show_col_types = F)
-# gc_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summ.csv'), show_col_types = F)
-gc_30c <- read_csv(paste0(folder_data, 'temp/21-gc_30c.csv'), show_col_types = F)
-gc_30c_summ <- read_csv(paste0(folder_data, 'temp/21-gc_30c_summ.csv'), show_col_types = F)
-gc_30c_prm <- read_csv(paste0(folder_data, 'temp/21-gc_30c_prm.csv'), show_col_types = F)
-gc_30c_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_30c_prm_summ.csv'), show_col_types = F)
-
-gc_35c <- read_csv(paste0(folder_data, 'temp/21-gc_35c.csv'), show_col_types = F)
-gc_35c_summ <- read_csv(paste0(folder_data, 'temp/21-gc_35c_summ.csv'), show_col_types = F)
-gc_35c_prm <- read_csv(paste0(folder_data, 'temp/21-gc_35c_prm.csv'), show_col_types = F)
-gc_35c_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_35c_prm_summ.csv'), show_col_types = F)
-
+gcs <- read_csv(paste0(folder_data, 'temp/21-gcs.csv'), show_col_types = F)
+gc_summs <- read_csv(paste0(folder_data, 'temp/21-gc_summs.csv'), show_col_types = F)
+gc_prms <- read_csv(paste0(folder_data, 'temp/21-gc_prms.csv'), show_col_types = F)
+gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_col_types = F)
 
 
 # 0. clean up data ----
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_30c_summ <- gc_30c_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_30c_prm <- gc_30c_prm %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_30c_prm_summ <- gc_30c_prm_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_summs <- gc_summs %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_prms <- gc_prms %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_summs <- gc_prm_summs %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
 
-gc_35c_summ <- gc_35c_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_35c_prm <- gc_35c_prm %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_35c_prm_summ <- gc_35c_prm_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-
-
-# 0.1 merge the data ----
-range(gc_30c$t)
-range(gc_35c$t)
-
-gc <- bind_rows(mutate(gc_30c, temperature = "30c"), mutate(gc_35c, temperature = "35c"))
-gc_summ <- bind_rows(mutate(gc_30c_summ, temperature = "30c"), mutate(gc_35c_summ, temperature = "35c"))
-gc_prm <- bind_rows(mutate(gc_30c_prm, temperature = "30c"), mutate(gc_35c_prm, temperature = "35c"))
-gc_prm_summ <- bind_rows(mutate(gc_30c_prm_summ, temperature = "30c"), mutate(gc_35c_prm_summ, temperature = "35c"))
 
 # 1. Raw data ----
-p <- gc %>%
+p <- gcs %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, group = well)) +
     facet_grid(.~temperature) +
@@ -59,7 +36,7 @@ ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 12, height = 5)
 
 
 # 2. Growth curves by well ----
-p <- gc %>%
+p <- gcs %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, linetype = temperature), linewidth = 1) +
     facet_grid(row ~ column) +
@@ -73,7 +50,7 @@ p <- gc %>%
 ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height = 15)
 
 # 3. Average OD by exp_id ----
-p <- gc_summ %>%
+p <- gc_summs %>%
     left_join(isolates_mapping) %>%
     ggplot() +
     geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, linetype = temperature)) +
@@ -90,7 +67,7 @@ p <- gc_summ %>%
 ggsave(paste0(folder_data, "temp/21a-03-gc_mean.png"), p, width = 8, height = 12)
 
 # 4. Average OD by exp_id, overlayed ----
-p <- gc_summ %>%
+p <- gc_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(group = exp_id)) +
     geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, group = exp_id)) +
@@ -107,7 +84,7 @@ ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 9, hei
 
 
 # 5. plot all trait mean by strain_site_group ----
-p1 <- gc_prm_summ %>%
+p1 <- gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(x = rhizobia_site, y = lag, fill = rhizobia_site)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
@@ -123,7 +100,7 @@ p1 <- gc_prm_summ %>%
     guides(fill = "none") +
     labs(x = "", y = "lag time (hr)")
 
-p2 <- gc_prm_summ %>%
+p2 <- gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(x = rhizobia_site, y = r, fill = rhizobia_site)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
@@ -139,7 +116,7 @@ p2 <- gc_prm_summ %>%
     guides(fill = "none") +
     labs(x = "", y = expression(growth~rate(h^-1)))
 
-p3 <- gc_prm_summ %>%
+p3 <- gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(x = rhizobia_site, y = maxOD, fill = rhizobia_site)) +
     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
@@ -161,7 +138,7 @@ ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, heigh
 
 
 # 6. check the taxonomy ----
-gc_prm_summ %>%
+gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     filter(rhizobia_site %in% c("high-elevation", "low-elevation")) %>%
     arrange(desc(maxOD)) %>%
@@ -174,8 +151,8 @@ gc_prm_summ %>%
 
 #
 # ##
-# gc_h <- gc_prm_summ %>% filter(strain_site_group == "H")
-# gc_l <- gc_prm_summ %>% filter(strain_site_group == "L")
+# gc_h <- gc_prm_summs %>% filter(strain_site_group == "H")
+# gc_l <- gc_prm_summs %>% filter(strain_site_group == "L")
 #
 # # lag
 # wilcox.test(gc_h$lag, gc_l$lag) # p=0.599
@@ -186,7 +163,7 @@ gc_prm_summ %>%
 #
 #
 # # 8. plot all trait raw by strain_site_group ----
-# p1 <- gc_prm %>%
+# p1 <- gc_prms %>%
 #     ggplot(aes(x = strain_site_group, y = lag, fill = strain_site_group)) +
 #     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
 #     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
@@ -200,7 +177,7 @@ gc_prm_summ %>%
 #     guides(fill = "none") +
 #     labs(x = "", y = "lag time (hr)")
 #
-# p2 <- gc_prm %>%
+# p2 <- gc_prms %>%
 #     ggplot(aes(x = strain_site_group, y = r, fill = strain_site_group)) +
 #     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
 #     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +
@@ -215,7 +192,7 @@ gc_prm_summ %>%
 #     guides() +
 #     labs(x = "", y = expression(growth~rate(h^-1)))
 #
-# p3 <- gc_prm %>%
+# p3 <- gc_prms %>%
 #     ggplot(aes(x = strain_site_group, y = maxOD, fill = strain_site_group)) +
 #     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
 #     geom_jitter(shape = 21, width = 0.2, size = 2, stroke = 1) +

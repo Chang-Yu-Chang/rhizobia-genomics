@@ -7,7 +7,7 @@ source 00-env_vars.sh
 cd $folder_shell
 bakta_db="/Users/cychang/bioinformatics/bakta/db"  # This database is mandatory and must be downloaded before annotation
 
-for i in {24..27}
+for i in {24..41}
 do
     #echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
     genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
