@@ -5,7 +5,6 @@ source 00-env_vars.sh
 # This script performs reference-guided genome assembly
 
 cd $folder_shell
-echo "03-variant calling"
 
 # # Download and prepared NCBI genomes
 # zsh 03a-download_ncbi_genomes.sh \
@@ -22,8 +21,9 @@ echo "03-variant calling"
 
 
 # Process each genome
-for i in {1..23}
+for i in {28..41}
 do
+    mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling"
     # Use reference E. meliloti usda1106
     ## Align the genome to the reference usda1106
     mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/snippy"

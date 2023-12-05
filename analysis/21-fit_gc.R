@@ -9,10 +9,69 @@ suppressPackageStartupMessages({
     source(here::here("analysis/00-metadata.R"))
 })
 
-gc <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F)
+# Tidy up time series
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
+gc_30c <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F)
+gc_35c <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv"), show_col_types = F)
 
 clean_well_names <- function (x) paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
+wide_to_long <- function (gc) {
+    #' This function clean up the variable names and pivot the wide form to long
+    gc %>%
+        # Calculate the time interval in minutes
+        mutate(t = as.numeric(difftime(Time, Time[1], units = "hours"))) %>%
+        select(-Time, -`T° 600`) %>%
+        pivot_longer(cols = -t, names_to = "well", values_to = "od600") %>%
+        mutate(well = clean_well_names(well)) %>%
+        left_join(gc_plate) %>%
+        rename(abs = od600)
+
+}
+extract_blank <- function (gc) {
+    #' This function takes the long format of gc to calculate the average abs of blank at each time point
+    gc %>%
+    filter(exp_id == "blank") %>%
+        group_by(t) %>%
+        summarize(abs_blank = mean(abs))
+}
+subtract_blank <- function (gc, gc_blank) {
+    #' This function takes the blank and subtract it
+    gc %>%
+        left_join(gc_blank) %>%
+        mutate(abs = abs - abs_blank) %>%
+        mutate(abs = ifelse(abs < 0, 0, abs)) %>%
+        filter(exp_id != "blank")
+
+}
+summarize_gc <- function (gc) {
+    #' This function takes the gc (after blank) and average across replicates
+    gc %>%
+    group_by(t, exp_id) %>%
+        summarize(mean_abs = mean(abs), sd_abs = sd(abs))
+}
+
+gc_30c <- wide_to_long(gc_30c)
+gc_blank <- extract_blank(gc_30c)
+gc_30c <- subtract_blank(gc_30c, gc_blank)
+gc_30c_summ <- summarize_gc(gc_30c)
+
+write_csv(gc_30c, paste0(folder_data, 'temp/21-gc_30c.csv')) # all replicates
+write_csv(gc_30c_summ, paste0(folder_data, 'temp/21-gc_30c_summ.csv')) # average over replicates
+
+#
+gc_35c <- wide_to_long(gc_35c)
+gc_blank <- extract_blank(gc_35c)
+gc_35c <- subtract_blank(gc_35c, gc_blank)
+gc_35c_summ <- summarize_gc(gc_35c)
+gc_35c <- gc_35c %>% filter(t <= 48)
+gc_35c_summ <- gc_35c_summ %>% filter(t <= 48)
+
+write_csv(gc_35c, paste0(folder_data, 'temp/21-gc_35c.csv')) # all replicates
+write_csv(gc_35c_summ, paste0(folder_data, 'temp/21-gc_35c_summ.csv')) # average over replicates
+
+
+
+# Smooth and fit GAM to growth curves
 compute.gam <- function(x) {
     # Remove "blank"
     x <- x[order(t)]
@@ -134,54 +193,39 @@ compute.gam <- function(x) {
                     'params' = prm))
     }
 }
+calculate_prm <- function (gc) {
+    #' This function takes the gc time series and calculate the gc parameters
+    gc <- as.data.table(gc)
+    gc <- split(gc, by = c('well', 'exp_id'))
+    gc_fits <- lapply(gc, compute.gam)
+    gc_prm <- do.call(rbind, lapply(gc_fits, function(x) x[[2]]))
+    return(gc_prm)
+}
+summarize_prm <- function (gc_prm) {
+    #' This function gets the statistics over replicates
+    gc_prm %>%
+        group_by(exp_id) %>%
+        summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
+                  t.r.sem = sd(t.r)/sqrt(n()), t.r = mean(t.r),
+                  lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
+                  maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD))
 
-# Tidy up
-gc <- gc %>%
-    # Calculate the time interval in minutes
-    mutate(t = as.numeric(difftime(Time, Time[1], units = "hours"))) %>%
-    select(-Time, -`T° 600`) %>%
-    pivot_longer(cols = -t, names_to = "well", values_to = "od600") %>%
-    mutate(well = clean_well_names(well)) %>%
-    left_join(gc_plate) %>%
-    rename(abs = od600)
+}
 
-gc_blank <- gc %>%
-    filter(exp_id == "blank") %>%
-    group_by(t) %>%
-    summarize(abs_blank = mean(abs))
+gc_30c_prm <- calculate_prm(gc_30c)
+gc_30c_prm_summ <- summarize_prm(gc_30c_prm)
 
-gc <- gc %>%
-    left_join(gc_blank) %>%
-    mutate(abs = abs - abs_blank) %>%
-    mutate(abs = ifelse(abs < 0, 0, abs)) %>%
-    filter(exp_id != "blank")
+write_csv(gc_30c_prm, file = paste0(folder_data, 'temp/21-gc_30c_prm.csv')) # all replicate
+write_csv(gc_30c_prm_summ, file = paste0(folder_data, 'temp/21-gc_30c_prm_summ.csv')) # average over replicate
 
-gc_summ <- gc %>%
-    group_by(t, exp_id) %>%
-    summarize(mean_abs = mean(abs), sd_abs = sd(abs))
+gc_35c_prm <- calculate_prm(gc_35c)
+gc_35c_prm_summ <- summarize_prm(gc_35c_prm)
 
-# Output the time series
-write_csv(gc, paste0(folder_data, 'temp/21-gc.csv')) # all replicates
-write_csv(gc_summ, paste0(folder_data, 'temp/21-gc_summ.csv')) # average over replicates
+write_csv(gc_35c_prm, file = paste0(folder_data, 'temp/21-gc_35c_prm.csv')) # all replicate
+write_csv(gc_35c_prm_summ, file = paste0(folder_data, 'temp/21-gc_35c_prm_summ.csv')) # average over replicate
 
-# Smooth and fit GAM to growth curves
-gc <- as.data.table(gc)
-gc <- split(gc, by = c('well', 'exp_id'))
-gc_fits <- lapply(gc, compute.gam)
-gc_prm <- do.call(rbind, lapply(gc_fits, function(x) x[[2]]))
-#gc <- do.call(rbind, lapply(gc.fits, function(x) x[[1]]))
 
-# get statistics over replicates
-gc_prm_summ <- gc_prm %>%
-    group_by(exp_id) %>%
-    summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
-              t.r.sem = sd(t.r)/sqrt(n()), t.r = mean(t.r),
-              lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
-              maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD))
 
-# Output the fit
-write_csv(gc_prm, file = paste0(folder_data, 'temp/21-gc_prm.csv')) # all replicate
-write_csv(gc_prm_summ, file = paste0(folder_data, 'temp/21-gc_prm_summ.csv')) # average over replicate
 
 
 

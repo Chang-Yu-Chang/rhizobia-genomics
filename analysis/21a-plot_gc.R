@@ -9,36 +9,61 @@ suppressPackageStartupMessages({
 })
 
 isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
-gc <- read_csv(paste0(folder_data, 'temp/21-gc.csv'), show_col_types = F)
-gc_summ <- read_csv(paste0(folder_data, 'temp/21-gc_summ.csv'), show_col_types = F)
-gc_prm <- read_csv(paste0(folder_data, 'temp/21-gc_prm.csv'), show_col_types = F)
-gc_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summ.csv'), show_col_types = F)
+# gc <- read_csv(paste0(folder_data, 'temp/21-gc.csv'), show_col_types = F)
+# gc_summ <- read_csv(paste0(folder_data, 'temp/21-gc_summ.csv'), show_col_types = F)
+# gc_prm <- read_csv(paste0(folder_data, 'temp/21-gc_prm.csv'), show_col_types = F)
+# gc_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summ.csv'), show_col_types = F)
+gc_30c <- read_csv(paste0(folder_data, 'temp/21-gc_30c.csv'), show_col_types = F)
+gc_30c_summ <- read_csv(paste0(folder_data, 'temp/21-gc_30c_summ.csv'), show_col_types = F)
+gc_30c_prm <- read_csv(paste0(folder_data, 'temp/21-gc_30c_prm.csv'), show_col_types = F)
+gc_30c_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_30c_prm_summ.csv'), show_col_types = F)
+
+gc_35c <- read_csv(paste0(folder_data, 'temp/21-gc_35c.csv'), show_col_types = F)
+gc_35c_summ <- read_csv(paste0(folder_data, 'temp/21-gc_35c_summ.csv'), show_col_types = F)
+gc_35c_prm <- read_csv(paste0(folder_data, 'temp/21-gc_35c_prm.csv'), show_col_types = F)
+gc_35c_prm_summ <- read_csv(paste0(folder_data, 'temp/21-gc_35c_prm_summ.csv'), show_col_types = F)
+
+
 
 # 0. clean up data ----
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_summ <- gc_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_prm <- gc_prm %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_prm_summ <- gc_prm_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_30c_summ <- gc_30c_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_30c_prm <- gc_30c_prm %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_30c_prm_summ <- gc_30c_prm_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+
+gc_35c_summ <- gc_35c_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_35c_prm <- gc_35c_prm %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_35c_prm_summ <- gc_35c_prm_summ %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+
+
+# 0.1 merge the data ----
+range(gc_30c$t)
+range(gc_35c$t)
+
+gc <- bind_rows(mutate(gc_30c, temperature = "30c"), mutate(gc_35c, temperature = "35c"))
+gc_summ <- bind_rows(mutate(gc_30c_summ, temperature = "30c"), mutate(gc_35c_summ, temperature = "35c"))
+gc_prm <- bind_rows(mutate(gc_30c_prm, temperature = "30c"), mutate(gc_35c_prm, temperature = "35c"))
+gc_prm_summ <- bind_rows(mutate(gc_30c_prm_summ, temperature = "30c"), mutate(gc_35c_prm_summ, temperature = "35c"))
 
 # 1. Raw data ----
 p <- gc %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, group = well)) +
+    facet_grid(.~temperature) +
     theme_classic() +
     theme() +
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 8, height = 5)
+ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 12, height = 5)
 
 
 # 2. Growth curves by well ----
 p <- gc %>%
     ggplot() +
-    geom_line(aes(x = t, y = abs, color = exp_id), linewidth = 1) +
-    theme_light() +
+    geom_line(aes(x = t, y = abs, color = exp_id, linetype = temperature), linewidth = 1) +
     facet_grid(row ~ column) +
-    theme_classic() +
+    theme_light() +
     theme(
         panel.border = element_rect(color = "black", fill = NA)
     ) +
@@ -51,8 +76,8 @@ ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height
 p <- gc_summ %>%
     left_join(isolates_mapping) %>%
     ggplot() +
-    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site)) +
-    geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs, fill = rhizobia_site), alpha = 0.2) +
+    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, linetype = temperature)) +
+    #geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs, fill = rhizobia_site), alpha = 0.2) +
     facet_wrap(~exp_id, ncol = 4) +
     scale_color_manual(values = rhizobia_site_colors) +
     scale_fill_manual(values = rhizobia_site_colors) +
@@ -68,16 +93,17 @@ ggsave(paste0(folder_data, "temp/21a-03-gc_mean.png"), p, width = 8, height = 12
 p <- gc_summ %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(group = exp_id)) +
-    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site)) +
+    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, group = exp_id)) +
     scale_color_manual(values = rhizobia_site_colors) +
-    scale_fill_manual(values = rhizobia_site_colors) +
+    facet_grid(.~temperature) +
+    #scale_fill_manual(values = rhizobia_site_colors) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA),
         legend.position = "right"
     ) +
     labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 9, height = 4)
 
 
 # 5. plot all trait mean by strain_site_group ----
@@ -88,6 +114,7 @@ p1 <- gc_prm_summ %>%
     geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
     scale_color_manual(values = rhizobia_site_colors) +
     scale_fill_manual(values = rhizobia_site_colors) +
+    facet_grid(.~temperature) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
@@ -103,6 +130,7 @@ p2 <- gc_prm_summ %>%
     geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
     scale_color_manual(values = rhizobia_site_colors) +
     scale_fill_manual(values = rhizobia_site_colors) +
+    facet_grid(.~temperature) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
@@ -118,6 +146,7 @@ p3 <- gc_prm_summ %>%
     geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
     scale_color_manual(values = rhizobia_site_colors) +
     scale_fill_manual(values = rhizobia_site_colors) +
+    facet_grid(.~temperature) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
@@ -127,8 +156,8 @@ p3 <- gc_prm_summ %>%
     guides() +
     labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
 
-p <- plot_grid(p1, p2, p3, nrow = 1, axis = "tbrl", align = "h", rel_widths = c(1,1,1.6))
-ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 4)
+p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
+ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 12)
 
 
 # 6. check the taxonomy ----

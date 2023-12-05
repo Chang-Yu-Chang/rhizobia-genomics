@@ -5,9 +5,8 @@ source 00-env_vars.sh
 # This script performs de novo genome assembly
 
 cd $folder_shell
-echo "02-denovo_assembly"
 
-for i in {1..19}
+for i in {32..41}
 do
     echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
     raw_reads="$folder_raw/$batch_names[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
@@ -18,6 +17,7 @@ do
     downsampled_reads2="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/downsampled_reads2.fastq"
 
     # Downsample reads
+    mkdir -p "$folder_genomes/$sample_ids[$i]/02-denovo_assembly"
     zsh 02a-downsample_reads.sh \
         $filtered_reads \
         $downsampled_reads
@@ -56,17 +56,17 @@ do
         "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
         "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/cleaned_names.txt"
 
-    # Check assembly quality via quast
-    mkdir -p "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/quast"
-    zsh 02g-quast.sh \
-        "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"\
-        "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/quast"
-
-    # Check assembly quality via busco
-    mkdir -p "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/busco"
-    zsh 02h-busco.sh \
-        "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"\
-        "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/busco"
+    # # Check assembly quality via quast
+    # mkdir -p "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/quast"
+    # zsh 02g-quast.sh \
+    #     "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"\
+    #     "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/quast"
+    #
+    # # Check assembly quality via busco
+    # mkdir -p "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/busco"
+    # zsh 02h-busco.sh \
+    #     "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"\
+    #     "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/busco"
 
 
 done

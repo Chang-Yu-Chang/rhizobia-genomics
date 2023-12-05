@@ -6,13 +6,14 @@ source 00-env_vars.sh
 
 cd $folder_shell
 
-for i in {1..19}
+for i in {24..41}
 do
     echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
     raw_reads="$folder_raw/$batch_names[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
     filtered_reads="$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.fastq.gz"
 
     # Filter the worst 5% reads via filtlong
+    mkdir -p "$folder_genomes/$sample_ids[$i]/01-reads_qc"
     zsh 01a-filter_reads.sh \
         $raw_reads \
         $filtered_reads
