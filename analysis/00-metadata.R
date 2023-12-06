@@ -50,7 +50,10 @@ write_csv(isolates_mapping, paste0(folder_data, "temp/00-isolates_mapping.csv"))
 # list_strains <- c("H1M1R1", "H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H3M4R2", "H4M5R1", "L1M2R2", "L2M2R1", "L2M4R1", "L3M4R1", "L3M5R1", "L3M6R2", "L4M2R2", "L4M3R3", "L4M4R1", "L4M4R3", "L4M7R1", "blank")
 # rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
 # rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2", NA))
-rhizobia_site_colors <- c(`high-elevation` = "#0C6291", `mid-elevation` = "#CBD4C2", `low-elevation` = "#BF4342", `urban` = "deeppink", `suburban` = "yellowgreen")
+# rhizobia_site_colors <- c(`high-elevation` = "#0C6291", `mid-elevation` = "#CBD4C2", `low-elevation` = "#BF4342", `urban` = "deeppink", `suburban` = "yellowgreen")
+# rhizobia_site_colors <- c(`high-elevation` = "#1f78b4", `low-elevation` = "#ff7f00", `urban` = "#33a02c", `suburban` = "#6a3d9a")
+rhizobia_site_colors <- brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)] %>% setNames(c("high-elevation", "low-elevation", "suburban", "urban"))
+
 # plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
 traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "nodule_weight_mg",
             "number_of_root_tips", "number_of_branch_points",
@@ -86,8 +89,21 @@ trait_axis_names <- c(
 )
 
 
-#
+# Plotting functions
 paint_white_background <- function () {
     theme(plot.background = element_rect(color = NA, fill = "white"))
 }
+
+theme_facets <- theme(
+    panel.grid.major = element_line(color = "grey95"),
+    strip.background = element_rect(fill = "grey95", color = NA),
+    panel.border = element_rect(fill = NA, color = "black")
+)
+
+
+
+
+
+
+
 
