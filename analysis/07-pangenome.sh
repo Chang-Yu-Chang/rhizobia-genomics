@@ -9,92 +9,92 @@ echo "07-pangenome"
 mkdir -p $folder_genomics/pangenome
 folder_pangenome="$folder_genomics/pangenome"
 
-# Generate an anvi’o genomes storage
-# Create a input list of external genomes
-echo -e "name\tcontigs_db_path" > "$folder_pangenome/list_genomes_for_anvio.txt"
-for i in {1..23}
-do
-    echo "$sample_ids[$i]\t$folder_genomes/$sample_ids[$i]/06-pangenome_prep/genome.db" >> "$folder_pangenome/list_genomes_for_anvio.txt"
-done
-
-# Generate one storage database for holding the 23 genomes
-zsh 07b-create_anvio_pan.sh \
-    "$folder_pangenome/list_genomes_for_anvio.txt" \
-    "$folder_pangenome/rhizobia-GENOMES.db"
-
-
-# Run a pangenome analysis
-# For all rhizobia genomes
-for i in {1..23}
-do
-    echo $sample_ids[$i]
-done >| "$folder_pangenome/list_genomes_rhizobia.txt"
-
-zsh 07c-run_anvio_pan.sh \
-    "$folder_pangenome/rhizobia-GENOMES.db" \
-    "rhizobia" \
-    "$folder_pangenome/rhizobia" \
-    "$folder_pangenome/list_genomes_rhizobia.txt"
-
-# For only ensifer spp
-for i in {2..6} {8..11} 13 {15..17} {19..23}
-do
-    echo $sample_ids[$i]
-done >| "$folder_pangenome/list_genomes_ensifer.txt"
-
-zsh 07c-run_anvio_pan.sh \
-    "$folder_pangenome/rhizobia-GENOMES.db" \
-    "ensifer" \
-    "$folder_pangenome/ensifer" \
-    "$folder_pangenome/list_genomes_ensifer.txt"
-
-
-# Calculate ANI
-for i in {1..23}
-do
-    echo -e "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
-done >| "$folder_pangenome/list_genomes_for_ani_rhizobia.txt"
-
-zsh 07a-fastani.sh \
-    "$folder_pangenome/list_genomes_for_ani_rhizobia.txt" \
-    "$folder_pangenome/fastani_rhizobia.txt"
-
-for i in {2..6} {8..11} 13 {15..17} {19..23}
-do
-    echo -e "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
-done >| "$folder_pangenome/list_genomes_for_ani_ensifer.txt"
-
-zsh 07a-fastani.sh \
-    "$folder_pangenome/list_genomes_for_ani_ensifer.txt" \
-    "$folder_pangenome/fastani_ensifer.txt"
-
-# Add the ANI metric among genomes
-zsh 07d-import_ani.sh \
-    "$folder_pangenome/fastani_rhizobia.out" \
-    "$folder_pangenome/rhizobia/rhizobia-PAN.db"
-
-zsh 07d-import_ani.sh \
-    "$folder_pangenome/fastani_ensifer.out" \
-    "$folder_pangenome/ensifer/ensifer-PAN.db"
-
-# Summarize the pangenomes
-zsh 07e-summarize_pan.sh \
-    "$folder_pangenome/rhizobia/rhizobia-PAN.db" \
-    "$folder_pangenome/rhizobia-GENOMES.db" \
-    "$folder_pangenome/rhizobia/summary" \
-    "rhizobia"
-
-zsh 07e-summarize_pan.sh \
-    "$folder_pangenome/ensifer/ensifer-PAN.db" \
-    "$folder_pangenome/rhizobia-GENOMES.db" \
-    "$folder_pangenome/ensifer/summary" \
-    "ensifer"
+# # Generate an anvi’o genomes storage
+# # Create a input list of external genomes
+# echo -e "name\tcontigs_db_path" > "$folder_pangenome/list_genomes_for_anvio.txt"
+# for i in {1..41}
+# do
+#     echo "$sample_ids[$i]\t$folder_genomes/$sample_ids[$i]/06-pangenome_prep/genome.db" >> "$folder_pangenome/list_genomes_for_anvio.txt"
+# done
+#
+# # Generate one storage database for holding the 23 genomes
+# zsh 07b-create_anvio_pan.sh \
+#     "$folder_pangenome/list_genomes_for_anvio.txt" \
+#     "$folder_pangenome/rhizobia-GENOMES.db"
+#
+#
+# # Run a pangenome analysis
+# # For all rhizobia genomes
+# for i in {1..41}
+# do
+#     echo $sample_ids[$i]
+# done >| "$folder_pangenome/list_genomes_rhizobia.txt"
+#
+# zsh 07c-run_anvio_pan.sh \
+#     "$folder_pangenome/rhizobia-GENOMES.db" \
+#     "rhizobia" \
+#     "$folder_pangenome/rhizobia" \
+#     "$folder_pangenome/list_genomes_rhizobia.txt"
+#
+# # For only ensifer spp
+# for i in {2..6} {8..11} 13 {15..17} {19..23} {24..41}
+# do
+#     echo $sample_ids[$i]
+# done >| "$folder_pangenome/list_genomes_ensifer.txt"
+#
+# zsh 07c-run_anvio_pan.sh \
+#     "$folder_pangenome/rhizobia-GENOMES.db" \
+#     "ensifer" \
+#     "$folder_pangenome/ensifer" \
+#     "$folder_pangenome/list_genomes_ensifer.txt"
+#
+#
+# # Calculate ANI
+# for i in {1..23} {24..41}
+# do
+#     echo -e "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
+# done >| "$folder_pangenome/list_genomes_for_ani_rhizobia.txt"
+#
+# zsh 07a-fastani.sh \
+#     "$folder_pangenome/list_genomes_for_ani_rhizobia.txt" \
+#     "$folder_pangenome/fastani_rhizobia.txt"
+#
+# for i in {2..6} {8..11} 13 {15..17} {19..23} {24..41}
+# do
+#     echo -e "$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
+# done >| "$folder_pangenome/list_genomes_for_ani_ensifer.txt"
+#
+# zsh 07a-fastani.sh \
+#     "$folder_pangenome/list_genomes_for_ani_ensifer.txt" \
+#     "$folder_pangenome/fastani_ensifer.txt"
+#
+# # Add the ANI metric among genomes
+# zsh 07d-import_ani.sh \
+#     "$folder_pangenome/fastani_rhizobia.out" \
+#     "$folder_pangenome/rhizobia/rhizobia-PAN.db"
+#
+# zsh 07d-import_ani.sh \
+#     "$folder_pangenome/fastani_ensifer.out" \
+#     "$folder_pangenome/ensifer/ensifer-PAN.db"
+#
+# # Summarize the pangenomes
+# zsh 07e-summarize_pan.sh \
+#     "$folder_pangenome/rhizobia/rhizobia-PAN.db" \
+#     "$folder_pangenome/rhizobia-GENOMES.db" \
+#     "$folder_pangenome/rhizobia/summary" \
+#     "rhizobia"
+#
+# zsh 07e-summarize_pan.sh \
+#     "$folder_pangenome/ensifer/ensifer-PAN.db" \
+#     "$folder_pangenome/rhizobia-GENOMES.db" \
+#     "$folder_pangenome/ensifer/summary" \
+#     "ensifer"
 
 
 # Roary
 rm -rf $folder_pangenome/roary_gff
 mkdir -p $folder_pangenome/roary_gff/
-for i in {1..23}
+for i in {1..23} {24..41}
 do
     cp "$folder_genomes/$sample_ids[$i]/05-gene_annotation/prokka/annotated.gff" "$folder_pangenome/roary_gff/$sample_ids[$i].gff"
 done

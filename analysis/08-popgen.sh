@@ -37,9 +37,9 @@ snippy-core \
     --ref "$folder_genomes/usda1106/02-denovo_assembly/ncbi/genome.gbff" \
     "$folder_genomes/Chang_Q5C_"{2..6}"/03-variant_calling/snippy_usda1106/snippy" \
     "$folder_genomes/Chang_Q5C_"{8..11}"/03-variant_calling/snippy_usda1106/snippy" \
-    "$folder_genomes/Chang_Q5C_"{13}"/03-variant_calling/snippy_usda1106/snippy" \
+    "$folder_genomes/Chang_Q5C_13/03-variant_calling/snippy_usda1106/snippy" \
     "$folder_genomes/Chang_Q5C_"{15..17}"/03-variant_calling/snippy_usda1106/snippy" \
-    "$folder_genomes/Chang_Q5C_"{19}"/03-variant_calling/snippy_usda1106/snippy" \
+    "$folder_genomes/Chang_Q5C_19/03-variant_calling/snippy_usda1106/snippy" \
     "$folder_genomes/Chang_W8S_"{1..18}"/03-variant_calling/snippy_usda1106/snippy" \
     --prefix "$folder_genomics/popgen/snippy_usda1106/snippy_usda1106"
 
@@ -84,9 +84,9 @@ snippy-core \
     --ref "$folder_genomes/wsm419/02-denovo_assembly/ncbi/genome.gbff" \
     "$folder_genomes/Chang_Q5C_"{2..6}"/03-variant_calling/snippy_wsm419/snippy" \
     "$folder_genomes/Chang_Q5C_"{8..11}"/03-variant_calling/snippy_wsm419/snippy" \
-    "$folder_genomes/Chang_Q5C_"{13}"/03-variant_calling/snippy_wsm419/snippy" \
+    "$folder_genomes/Chang_Q5C_13/03-variant_calling/snippy_wsm419/snippy" \
     "$folder_genomes/Chang_Q5C_"{15..17}"/03-variant_calling/snippy_wsm419/snippy" \
-    "$folder_genomes/Chang_Q5C_"{19}"/03-variant_calling/snippy_wsm419/snippy" \
+    "$folder_genomes/Chang_Q5C_19/03-variant_calling/snippy_wsm419/snippy" \
     "$folder_genomes/Chang_W8S_"{1..18}"/03-variant_calling/snippy_wsm419/snippy" \
     --prefix "$folder_genomics/popgen/snippy_wsm419/snippy_wsm419"
 

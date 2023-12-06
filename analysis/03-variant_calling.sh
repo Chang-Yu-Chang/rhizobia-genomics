@@ -11,17 +11,17 @@ cd $folder_shell
 #     "$folder_data/temp/00-genomes_mapping.csv" \
 #     $folder_genomics
 #
-# # Index the reference genomes using the four NCBI genomes
-# for i in {20..23}
-# do
-#     zsh 03b-index_references.sh \
-#         "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
-#         "$folder_genomics/references/$sample_ids[$i].mmi"
-# done
+#Index the reference genomes using the four NCBI genomes
+for i in {20..23}
+do
+    zsh 03b-index_references.sh \
+        "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
+        "$folder_genomics/references/$sample_ids[$i].mmi"
+done
 
 
 # Process each genome
-for i in {28..41}
+for i in {1..41}
 do
     mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling"
     # Use reference E. meliloti usda1106

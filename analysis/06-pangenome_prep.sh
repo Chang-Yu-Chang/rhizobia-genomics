@@ -8,7 +8,7 @@ cd $folder_shell
 echo "06-pangenome_prep"
 gff_parser=~/bioinformatics/anvio/gff_parser.py # For using the gff_parser.py. This has to be downloaded
 
-for i in {16..23}
+for i in {24..41}
 do
     genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
 

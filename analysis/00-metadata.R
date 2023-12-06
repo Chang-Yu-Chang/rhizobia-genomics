@@ -4,19 +4,12 @@ renv::load()
 suppressPackageStartupMessages({
     library(tidyverse)
     library(janitor)
+    library(RColorBrewer)
 })
 
 # This main folder depends on your home directory and user name
 folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
 folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of data
-
-# Curate the mapping file below ----
-# Genomics
-# genomes <- tibble(
-#     genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), "usda1105", "em1021", "em1022", "wsm419"),
-#     genome_id = factor(c(paste0("g", c(2:6, 8:11, 13, 15:17, 19)), "usda1105", "em1021", "em1022", "wsm419")),
-#     accession = c(rep(NA, 14), c("GCF_002197065.1", "GCF_000006965", "GCF_013315775", "GCF_000017145"))
-# )
 
 # Table for genomic workflow
 genomes_mapping <- tibble(
@@ -39,22 +32,21 @@ isolates_mapping <- tibble(
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
     rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9),
                       rep("suburban", 10), rep("urban", 7)),
-    sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_XXX_", c(20:37))),
-    genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_XXX_", c(20:37))),
+    sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
+    genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19,20, 21:37))
 )
-"INCLUDE THE GENOME ID INTO ONE SINGLE TABLE"
 
 write_csv(isolates_mapping, paste0(folder_data, "temp/00-isolates_mapping.csv"))
 
-# list_strains <- c("H1M1R1", "H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H3M4R2", "H4M5R1", "L1M2R2", "L2M2R1", "L2M4R1", "L3M4R1", "L3M5R1", "L3M6R2", "L4M2R2", "L4M3R3", "L4M4R1", "L4M4R3", "L4M7R1", "blank")
-# rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
-# rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2", NA))
-# rhizobia_site_colors <- c(`high-elevation` = "#0C6291", `mid-elevation` = "#CBD4C2", `low-elevation` = "#BF4342", `urban` = "deeppink", `suburban` = "yellowgreen")
-# rhizobia_site_colors <- c(`high-elevation` = "#1f78b4", `low-elevation` = "#ff7f00", `urban` = "#33a02c", `suburban` = "#6a3d9a")
-rhizobia_site_colors <- brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)] %>% setNames(c("high-elevation", "low-elevation", "suburban", "urban"))
+# Table for both
+isolates <- full_join(genomes_mapping, isolates_mapping) %>%
+    select(genome_name, genome_id, exp_id, rhizobia_site)
+    #filter(!genome_id %in% paste0("g", c(1,7,12,14,18)))
 
-# plant_site_colors <- c(H = "#0C6291", S = "#CBD4C2", L = "#BF4342")
+write_csv(isolates, paste0(folder_data, "temp/00-isolates.csv"))
+
+# Trait vectors
 traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg", "nodule_weight_mg",
             "number_of_root_tips", "number_of_branch_points",
             "total_root_length_px", "branching_frequency_per_px", "network_area_px2",
@@ -64,11 +56,6 @@ traits2 <- c(traits,
              paste0(rep(c("root_length_diameter_range_", "projected_area_diameter_range_", "surface_area_diameter_range_", "volume_diameter_range_"), each = 6),
                     rep(1:6, 4), rep(c("_px", "_px2", "_px2", "_px3"), each = 6)))
 
-
-# rhizobia <- tibble(
-#     strain = list_strains[-20],
-#     rhizobia_site = str_sub(list_strains[-20], 1, 1)
-# )
 
 trait_axis_names <- c(
     "dry_weight_mg" = "shoot biomass (mg)",
@@ -101,9 +88,16 @@ theme_facets <- theme(
 )
 
 
+# Colors
+rhizobia_site_colors <- brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)] %>% setNames(c("high-elevation", "low-elevation", "suburban", "urban"))
 
 
 
 
 
 
+# list_strains <- c("H1M1R1", "H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H3M4R2", "H4M5R1", "L1M2R2", "L2M2R1", "L2M4R1", "L3M4R1", "L3M5R1", "L3M6R2", "L4M2R2", "L4M3R3", "L4M4R1", "L4M4R3", "L4M7R1", "blank")
+# rhizobia_strains <- c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2")
+# rhizobia_alphas <- setNames(c(.5,.7,.9, .5,.7,.9, .5), c("H2M3R1", "H3M1R1", "H4M5R1", "L2M2R1", "L3M5R1", "L4M2R2", NA))
+# rhizobia_site_colors <- c(`high-elevation` = "#0C6291", `mid-elevation` = "#CBD4C2", `low-elevation` = "#BF4342", `urban` = "deeppink", `suburban` = "yellowgreen")
+# rhizobia_site_colors <- c(`high-elevation` = "#1f78b4", `low-elevation` = "#ff7f00", `urban` = "#33a02c", `suburban` = "#6a3d9a")

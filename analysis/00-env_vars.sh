@@ -17,7 +17,7 @@ sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
 accessions=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
 # Make folders for temporary genomic files
-for i in {1..23}
+for i in {1..41}
 do
     for wf in 01-reads_qc 02-denovo_assembly 03-variant_calling 04-taxonomy 05-gene_annotation 06-pangenome_prep
     do
