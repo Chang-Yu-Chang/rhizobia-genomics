@@ -71,7 +71,7 @@ egc %>%
 # 4 singleton   5286 0.0201
 
 
-# 1. clustering using accessory genes ----
+# 2. clustering using accessory genes ----
 egc %>%
     distinct(bin_name, gene_cluster_id) %>%
     filter(bin_name != "core") %>%
@@ -89,7 +89,7 @@ egc_wide <- egc %>%
 
 write_csv(egc_wide, paste0(folder_data, "temp/17-egc_wide.csv"))
 
-# 2. permutation ----
+# 3. permutation ----
 # Extract only the unique gene id
 egc_g <- egc %>%
     select(unique_id, gene_cluster_id, genome_name) %>%
@@ -146,3 +146,14 @@ write_csv(pangenome_boots, file = paste0(folder_data, "temp/17-pangenome_boots.c
 
 
 
+
+# 4. cross-refernece gene caller to identify the contig where the gene is from ----
+
+list_gcalls <- rep(list(NA), nrow(isolates))
+for (i in 1:length(list_gcalls)) {
+    list_gcalls[[i]] <- read_table(paste0(folder_genomes, isolates$genome_name[i], "/06-pangenome_prep/gene_calls.txt"), show_col_types = F) %>%
+        mutate(genome_id = isolates$genome_id[i]) %>%
+        select(genome_id, contig_id = contig, gene_callers_id, direction)
+}
+gcalls <- bind_rows(list_gcalls)
+write_csv(gcalls, paste0(folder_data, "temp/17-gcalls.csv"))

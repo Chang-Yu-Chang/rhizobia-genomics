@@ -67,6 +67,50 @@ mash_c_top <- mash_c %>%
 write_csv(mash_c_top, paste0(folder_data, "temp/14-mash_c_top.csv"))
 
 
+# 3. clean the taxonomy name ----
+# Genomes
+isolates_mash <- mash_g_top %>%
+    slice(1) %>%
+    select(genome_id, genome_name, exp_id, rhizobia_site, query_comment) %>%
+    # Extract the species name
+    mutate(species_name = str_extract(query_comment, "Sinorhizobium.*|Ensifer.*|Rhizobium.*")) %>%
+    mutate(species_name = str_extract(species_name, "\\S+\\s+\\S+")) %>%
+    mutate(species_name = str_replace(species_name, "Sinorhizobium", "Ensifer")) %>%
+    # Genus0
+    mutate(genus = str_extract(species_name, "\\S+"))
+
+write_csv(isolates_mash, paste0(folder_data, "temp/14-isolates_mash.csv"))
+
+# Contigs
+contigs_large <- read_csv(paste0(folder_data, "temp/12-contigs_large.csv"), show_col_types = F)
+contigs_mash <- mash_c_top %>%
+    slice(1) %>%
+    right_join(contigs_large) %>%
+    left_join(isolates) %>%
+    select(genome_id, contig_length, query_comment) %>%
+    # Assign genetic element by size
+    group_by(genome_id) %>%
+    mutate(ge_type = case_when(
+        contig_length == max(contig_length) ~ "chromosome",
+        T ~ "plasmid"
+    )) %>%
+    # Genetic element name
+    mutate(ge_name = ifelse(ge_type == "plasmid", str_extract(query_comment, ".*plasmid\\s\\S+") %>% str_remove(".*plasmid\\s") %>% str_remove(","), NA)) %>%
+    mutate(ge_name = ifelse(ge_type == "chromosome", "chromosome", ge_name)) %>%
+    # # Extract the contig name
+    # mutate(contig_name = str_extract(query_comment, "Ensifer\\s\\S+|Sinorhizobium.*plasmid\\s\\S+|Sinorhizobium.*chromosome|Sinorhizobium\\s\\S+\\s\\S+|Rhizobium.*plasmid|Rhizobium\\s\\S+\\s\\S+")) %>%
+    # # Extract genus
+    # mutate(genus = str_extract(contig_name, "\\S+") %>% str_replace("Sinorhizobium", "Ensifer")) %>%
+    # # Extract species name
+    # mutate(species = str_extract(contig_name, "\\S+\\s\\S+") %>% str_replace("Sinorhizobium", "Ensifer")) %>%
+    # Genetic element
+    select(genome_id, contig_id, contig_length,  ge_type, ge_name) %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    arrange(genome_id, desc(contig_length))
+
+
+write_csv(contigs_mash, paste0(folder_data, "temp/14-contigs_mash.csv"))
+
 # # 3. find the contigs with top length
 # mash_c_top <- read_csv(paste0(folder_data, "temp/38-mash_c_top.csv"), show_col_types = F)
 #
@@ -89,38 +133,38 @@ write_csv(mash_c_top, paste0(folder_data, "temp/14-mash_c_top.csv"))
 #     left_join(select(isolates, genome_id, strain_site_group)) %>%
 #     select(site = strain_site_group, genome_id, everything()) %>%
 #     filter(genome_id %in% c("g2", "g3", "g15"))
+# #
 #
-
-# 3. aggregate sourmash results ----
-# 3.1 read sourmahs results
-list_sm <- rep(list(NA), nrow(isolates))
-
-for (i in 1:length(list_sm)) {
-    list_sm[[i]] <- read_csv(paste0(folder_genomes, isolates$genome_name, "/04-taxonomy/sourmash/gathered.csv"), show_col_types = F) %>%
-        mutate(query_md5 = as.character(query_md5)) %>%
-        mutate(genome_id = i)
-}
-
-tb_sm <- bind_rows(list_sm[-1]) %>%  select(genome_id, everything())
-write_csv(tb_sm, paste0(folder_data, "temp/14-tb_sm.csv"))
-
-tb_sm %>%
-    group_by(genome_id) %>%
-    summarize(n_matches = n())
-# 3.2
-tb_sm_tax <- tb_sm %>%
-    group_by(genome_id) %>%
-    slice(1) %>%
-    #select(genome_id, intersect_bp, name) %>%
-    mutate(`intersect_bp (Mbp)` = intersect_bp/1000000) %>%
-    mutate(name = str_replace(name, "GC[A|F]_\\d+\\.1 ", "")) %>%
-    #mutate(contig_id = 1:n()) %>%
-    select(genome_id, `intersect_bp (Mbp)`, f_orig_query, f_match, name)
-
-write_csv(tb_sm_tax, paste0(folder_data, "temp/14-tb_sm_tax.csv"))
-
-
-# 4. extract the genus and species level information from mash ----
+# # 3. aggregate sourmash results ----
+# # 3.1 read sourmahs results
+# list_sm <- rep(list(NA), nrow(isolates))
+#
+# for (i in 1:length(list_sm)) {
+#     list_sm[[i]] <- read_csv(paste0(folder_genomes, isolates$genome_name, "/04-taxonomy/sourmash/gathered.csv"), show_col_types = F) %>%
+#         mutate(query_md5 = as.character(query_md5)) %>%
+#         mutate(genome_id = i)
+# }
+#
+# tb_sm <- bind_rows(list_sm[-1]) %>%  select(genome_id, everything())
+# write_csv(tb_sm, paste0(folder_data, "temp/14-tb_sm.csv"))
+#
+# tb_sm %>%
+#     group_by(genome_id) %>%
+#     summarize(n_matches = n())
+# # 3.2
+# tb_sm_tax <- tb_sm %>%
+#     group_by(genome_id) %>%
+#     slice(1) %>%
+#     #select(genome_id, intersect_bp, name) %>%
+#     mutate(`intersect_bp (Mbp)` = intersect_bp/1000000) %>%
+#     mutate(name = str_replace(name, "GC[A|F]_\\d+\\.1 ", "")) %>%
+#     #mutate(contig_id = 1:n()) %>%
+#     select(genome_id, `intersect_bp (Mbp)`, f_orig_query, f_match, name)
+#
+# write_csv(tb_sm_tax, paste0(folder_data, "temp/14-tb_sm_tax.csv"))
+#
+#
+# # 4. extract the genus and species level information from mash ----
 
 
 
