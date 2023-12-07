@@ -8,7 +8,7 @@ cd $folder_shell
 refseq_db="/Users/cychang/bioinformatics/mash/refseq.genomes+plasmid.k21.s1000.msh"
 gtdb_db="/Users/cychang/bioinformatics/sourmash/gtdb-rs214-k31.zip"
 
-for i in {24..41}
+for i in {1..41}
 do
     #echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
     genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"

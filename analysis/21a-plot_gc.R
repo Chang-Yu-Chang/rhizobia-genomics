@@ -16,10 +16,11 @@ gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_c
 
 
 # 0. clean up data ----
+factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id), temperature = factor(temperature, c("25c", "30c", "35c")))
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_summs <- gc_summs %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_prms <- gc_prms %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
-gc_summs <- gc_prm_summs %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+gc_summs <- factorize_vars(gc_summs)
+gc_prms <- factorize_vars(gc_prms)
+gc_summs <- factorize_vars(gc_summs)
 
 
 # 1. Raw data ----
@@ -135,6 +136,48 @@ p3 <- gc_prm_summs %>%
 
 p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
 ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 12)
+
+# 6. reaction norm ----
+p1 <- gc_prm_summs %>%
+    left_join(isolates_mapping) %>%
+    ggplot() +
+    geom_line(aes(x = temperature, y = lag, group = exp_id, color = rhizobia_site)) +
+    scale_color_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = "lag time (hr)")
+
+p2 <- gc_prm_summs %>%
+    left_join(isolates_mapping) %>%
+    ggplot() +
+    geom_line(aes(x = temperature, y = r, group = exp_id, color = rhizobia_site)) +
+    scale_color_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1)
+    ) +
+    guides() +
+    labs(x = "", y = expression(growth~rate(h^-1)))
+
+p3 <- gc_prm_summs %>%
+    left_join(isolates_mapping) %>%
+    ggplot() +
+    geom_line(aes(x = temperature, y = maxOD, group = exp_id, color = rhizobia_site)) +
+    scale_color_manual(values = rhizobia_site_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
+        legend.position = "none"
+    ) +
+    guides() +
+    labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
+
+p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
+ggsave(paste0(folder_data, "temp/21a-06-reaction_norm.png"), p, width = 6, height = 12)
 
 
 # 6. check the taxonomy ----

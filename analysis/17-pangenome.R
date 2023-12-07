@@ -41,7 +41,7 @@ egc <- egc %>%
     select(unique_id, gene_cluster_id, bin_name, genome_name, genome_id, everything())
 
 
-write_csv(egc, paste0(folder_data, "temp/11-egc.csv"))
+write_csv(egc, paste0(folder_data, "temp/17-egc.csv"))
 
 # 1. numbers ----
 # Total number of gene clusters
@@ -87,7 +87,7 @@ egc_wide <- egc %>%
     pivot_wider(names_from = gene_cluster_id, values_from = value, values_fill = 0) %>%
     mutate(across(starts_with("GC"), factor))
 
-write_csv(egc_wide, paste0(folder_data, "temp/11-egc_wide.csv"))
+write_csv(egc_wide, paste0(folder_data, "temp/17-egc_wide.csv"))
 
 # 2. permutation ----
 # Extract only the unique gene id
@@ -132,7 +132,7 @@ for (j in 1:(n_g-1)) { # number of genomes sampled
 
 pangenome_boots <- bind_rows(list_pangenome)
 
-write_csv(pangenome_boots, file = paste0(folder_data, "temp/11-pangenome_boots.csv"))
+write_csv(pangenome_boots, file = paste0(folder_data, "temp/17-pangenome_boots.csv"))
 
 
 

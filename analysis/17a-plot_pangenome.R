@@ -12,8 +12,8 @@ suppressPackageStartupMessages({
 })
 
 #egc <- read_delim(paste0(folder_data, "genomics/pangenome/ensifer/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
-egc <- read_csv(paste0(folder_data, "temp/11-egc.csv"))
-egc_wide <- read_csv(paste0(folder_data, "temp/11-egc_wide.csv"))
+egc <- read_csv(paste0(folder_data, "temp/17-egc.csv"))
+egc_wide <- read_csv(paste0(folder_data, "temp/17-egc_wide.csv"))
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F) %>%
     filter(!genome_id %in% paste0("g", c(1,7,12,14,18)))
 nrow(isolates) # This should be 32 ensifer isolates + 4 ncbi genomes
@@ -59,7 +59,7 @@ p <- isolates_mca %>%
     labs(x = paste0("PC1 (", round(mca_var$ev[1]*100, 1), "%)"),
          y = paste0("PC2 (", round(mca_var$ev[2]*100, 1), "%)"))
 
-ggsave(paste0(folder_data, "temp/11a-01-mca_accessory_genes.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "temp/17a-01-mca_accessory_genes.png"), p, width = 5, height = 4)
 
 # 2. gene frequency spectrum ----
 p <- egc %>%
@@ -76,7 +76,7 @@ p <- egc %>%
     guides() +
     labs(x = "# of genomes that gene cluster has hits", y = "# of genes")
 
-ggsave(paste0(folder_data, "temp/11a-02-gene_frequency.png"), p, width = 4, height = 4)
+ggsave(paste0(folder_data, "temp/17a-02-gene_frequency.png"), p, width = 4, height = 4)
 
 
 # 3. permutation of genome
@@ -123,7 +123,7 @@ p2 <- pangenome_boots %>%
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", rel_widths = c(1, 1.2), labels = c("A", "B"), scale = 0.95) + paint_white_background()
 
-ggsave(paste0(folder_data, "temp/11a-03-gene_frequency_permuted.png"), plot = p, width = 12, height = 4)
+ggsave(paste0(folder_data, "temp/17a-03-gene_frequency_permuted.png"), plot = p, width = 12, height = 4)
 
 #
 egc_count <- egc %>%

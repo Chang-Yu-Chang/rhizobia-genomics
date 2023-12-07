@@ -11,10 +11,11 @@ suppressPackageStartupMessages({
 
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
 
-list_gcs <- rep(list(NA), 2)
+list_gcs <- rep(list(NA), 3)
 list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F) # 30C
 list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv"), show_col_types = F) # 35C
-names(list_gcs) <- c("30c", "35c")
+list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curve4/rhizobia_growth_curve.csv"), show_col_types = F) # 25C
+names(list_gcs) <- c("30c", "35c", "25c")
 
 # Tidy up time series
 clean_well_names <- function (x) paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
