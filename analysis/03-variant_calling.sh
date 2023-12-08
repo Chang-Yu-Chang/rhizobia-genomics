@@ -6,13 +6,13 @@ source 00-env_vars.sh
 
 cd $folder_shell
 
-# # Download and prepared NCBI genomes
-# zsh 03a-download_ncbi_genomes.sh \
-#     "$folder_data/temp/00-genomes_mapping.csv" \
-#     $folder_genomics
-#
+# Download and prepared NCBI genomes
+zsh 03a-download_ncbi_genomes.sh \
+    "$folder_data/temp/00-genomes_mapping.csv" \
+    $folder_genomics
+
 #Index the reference genomes using the four NCBI genomes
-for i in {20..23}
+for i in {38..41}
 do
     zsh 03b-index_references.sh \
         "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
@@ -77,15 +77,3 @@ do
 
 
 done
-
-# Merge the called SNPs and SVs
-# Call structure variants
-#cd "$folder_anvio/06-alignment/sniffles"
-# echo $folder_anvio/06-alignment/snf/$i.snf >> list_snf.tsv; done
-# sniffles --input list_snf.tsv --vcf sv.vcf
-
-
-
-
-
-

@@ -32,7 +32,7 @@ rm -rf README.md ensifer_ncbi.zip ncbi_dataset
 # Move the genome files
 mamba activate anvio-8
 
-for i in {20..23}
+for i in {38..41}
 do
     # Move files
     mkdir -p "$2/genomes/$sample_ids[$i]/02-denovo_assembly/ncbi"

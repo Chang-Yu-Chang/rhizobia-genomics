@@ -56,7 +56,7 @@ p <- egcalls %>%
 ggsave(paste0(folder_data, "temp/17b-01-contig_length_vs_genes.png"), p, width = 4, height = 4)
 
 
-# 2. plot the gene content tree ----
+# 2. plot the genome tree by gene content ----
 egcalls_wide <- egcalls %>%
     distinct(genome_id, gene_cluster_id) %>%
     mutate(value = 1) %>%
@@ -65,24 +65,23 @@ isolates_label <- egcalls_wide[,1] %>% left_join(isolates_mash)
 
 egcc_m <- as.matrix(egcalls_wide[,-1])
 dim(egcc_m)
-rownames(egcc_m) <- as.character(isolates_label$genome_id)
+rownames(egcc_m) <- as.character(isolates_label$species_name)
 jdm <- proxy::dist(egcc_m, method = "Jaccard")
 te <- as.phylo(hclust(jdm))
 #clade_highlight <- tibble(node = c(109, 114, 116), ge_type = c("chromosome", "pSymA like", "pSymB like"))
-te$tip.label
-isolates_label <- tibble(node = 1:length(te$tip.label), genome_id = te$tip.label) %>% left_join(isolates_label)
-
-table_data <- data.frame(tip_label = c(1, 2, 3, 4),
-                         label = c("Label_A", "Label_B", "Label_C", "Label_D"))
-
-merged_data <- left_join(data.frame(tip_label = tip_labels), table_data, by = c("tip_label"))
+# te$tip.label
+# isolates_label <- tibble(node = 1:length(te$tip.label), genome_id = te$tip.label) %>% left_join(isolates_label)
+#
+# table_data <- data.frame(tip_label = c(1, 2, 3, 4),
+#                          label = c("Label_A", "Label_B", "Label_C", "Label_D"))
+# merged_data <- left_join(data.frame(tip_label = tip_labels), table_data, by = c("tip_label"))
 
 p <- te %>%
     #full_join(rename(isolates_label, tip.label = genome_id), by = "tip.label") %>%
     ggtree(layout = "rectangular") +
-    #layout_circular() +
+    layout_circular() +
     geom_tiplab() +
-    geom_tiplab(data = isolates_label, aes(label = genome_id)) +
+    #geom_tiplab(data = isolates_label, aes(label = genome_id)) +
     #geom_text(aes(label=node), hjust=-.3) +
     # geom_hilight(data = clade_highlight, aes(node = node, fill = ge_type), type = "roundrect") +
     theme_tree() +

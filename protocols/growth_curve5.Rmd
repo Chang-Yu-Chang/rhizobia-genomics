@@ -1,0 +1,161 @@
+---
+title: "growth curve batch 5, a second run at 25C"
+output: pdf_document
+header-includes:
+    - \usepackage{fancyhdr}
+    - \pagestyle{fancy}
+toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(knitr)
+#library(kableExtra)
+library(cowplot)
+library(janitor)
+source(here::here("analysis/00-metadata.R"))
+```
+
+
+## Growth curve of 32 strains
+
+
+```{r}
+isolates_ensifer <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
+```
+
+```{r}
+tb <- isolates_ensifer %>% 
+    mutate(` ` = 1:n()) %>%
+    select(` `, genome_id, exp_id)
+
+cbind(tb[1:8,], tb[9:16,], tb[17:24,], tb[25:32,]) %>% 
+    kable()
+```
+
+
+- revive glycerol stock of rhizobia on TY agar
+    - prepare labelled plates
+    - use a sterilized inoculation loop to streak the glycerol stock on TY agar
+    - incubate the petri plates at 30C for 2-3 days until the colony is identifiably large
+
+- prepare ensifer inoculum
+    - prepare a DW96 filled with 300uL of PBS
+    - pick colonies from the petri plate and dissolve the colonies in the PBS. Use wells in column 1, 5, and 9
+    - dispense 100 uL of the dissolved colony to a NUNC96 and measure od at 600 nm
+    - standardize the OD600 to 0.1. For target od = 0.1 `od_target` and target inoculum volume = 100 uL `volume_target`, and given the measured od of dissolved colonies  `od_dissolved`, use the code below to calculate the needed volume of the dissolved colonies `volume_dissolved` and the pbs volume `volume_pbs`
+    - prepare another NUNC96, follow the table to add required volume of dissolved colonies and pbs to make 100 uL of standardized inoculum
+    - measure the od of the standardized inoculum as `od_inoculum`
+
+- prepare 100 uL of TY medium in NUNC96
+    - inoculate 2 uL of the standardized inoculum to each well 
+
+
+
+```{r fig.height=3.5}
+#' This code is to plot the NUNC96 plate layout
+# Create a data frame for the well positions
+gc_plate <- as_tibble(expand.grid(row = LETTERS[1:8], column = 1:12))
+gc_plate <- gc_plate %>%
+    mutate(
+        row = factor(gc_plate$row, levels = rev(LETTERS[1:8])),
+        column = factor(gc_plate$column, levels = 1:12),
+        well = paste0(gc_plate$row, sprintf("%02d", gc_plate$column)),
+        exp_id = c(
+            rep(isolates_ensifer$exp_id[1:8], 2),
+            rep(isolates_ensifer$exp_id[9:16], 2),
+            rep(isolates_ensifer$exp_id[17:24], 2),
+            rep(isolates_ensifer$exp_id[25:32], 2),
+            rep("blank", 32)
+        ),
+        genome_id = c(
+            rep(isolates_ensifer$genome_id[1:8], 2),
+            rep(isolates_ensifer$genome_id[9:16], 2),
+            rep(isolates_ensifer$genome_id[17:24], 2),
+            rep(isolates_ensifer$genome_id[25:32], 2),
+            rep("blank", 32)
+        )
+    ) %>% 
+    select(well, everything())
+# Report the layout
+write_csv(gc_plate, paste0(folder_data, "raw/growth_curve5/gc_plate.csv"))
+```
+
+
+```{r fig.height=3.5}
+p <- gc_plate %>% 
+    ggplot() +
+    geom_point(aes(x = column, y = row), fill = "white", color = "black", shape = 21, size = 10) +
+    geom_text(aes(x = column, y = row, label = genome_id), size = 3) +
+    coord_equal() +
+    scale_x_discrete(position = "top") +
+    theme_bw() +
+    theme(
+        axis.ticks = element_blank(),
+        panel.border = element_rect(color = "black", fill = NA),
+        plot.margin = margin(1, 1, 1, 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = "", y = "")
+```
+
+
+```{r fig.height=3.5}
+p
+```
+
+
+```{r}
+# Use the code below to standardize OD
+clean_well_names <- function (x) {
+    y <- paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
+    return(y)
+}
+
+wide_to_long <- function (x) {
+    x %>% 
+        rename(row = ...1) %>%
+        pivot_longer(cols = -row, names_to = "column", values_to = "od600")
+        
+}
+```
+
+
+
+\newpage 
+
+```{r message=F}
+#"READ THE ACTUAL DATA HERE AS mi"
+mi <- read_csv(paste0(folder_data, "raw/growth_curve5/inocula_before_standardization.csv"), show_col_types = F)
+# Match well to inocula
+mi_before <- mi %>%
+    select(-...14) %>%
+    wide_to_long() %>%
+    left_join(gc_plate, by = join_by("row", "column")) %>%
+    filter(column %in% c(1, 3, 5, 7, 9, 11)) %>%
+    arrange(column)
+
+od600_blank <- mean(mi_before$od600[mi_before$genome_id == "blank"])
+
+mi_before %>%
+    filter(genome_id != "blank") %>% 
+    mutate(od600 = od600 - od600_blank) %>% 
+    arrange(column, row) %>% 
+    mutate(od_dissolved = od600) %>%
+    mutate(od_target = 0.1, volume_target = 100) %>% 
+    mutate(volume_dissolved = round(volume_target * od_target / od_dissolved, 2)) %>%
+    mutate(volume_pbs = round(volume_target - volume_dissolved, 2)) %>%
+    select(genome_id, well, od_dissolved, od_target, volume_target, volume_dissolved, volume_pbs) %>% 
+    kable()
+
+```
+
+
+
+
+
+
+
+
+
