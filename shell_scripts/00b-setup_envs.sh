@@ -68,6 +68,17 @@ mamba create -n busco
 mamba activate busco
 mamba install --yes -c bioconda busco=5.4.7
 
+# Install barrnap v0.9
+# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
+mamba create -n barrnap
+mamba activate barrnap
+mamba install --yes -c bioconda barrnap=0.9
+
+# Downalod the RefSeq 16S databased
+#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
+# Make it into a database
+#makeblastdb -in $refseq_16s_db -dbtype nucl
+
 # Install Mash v2.3
 # Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
 mamba create -n mash
@@ -231,6 +242,10 @@ mamba create -y -n ggcaller
 mamba activate ggcaller
 mamba install --yes -c bioconda ggcaller=1.3.2
 
+# Install plink2 v2.00a5
+mamba create -y -n plink2
+mamba activate plink2
+mamba install --yes -c bioconda plink2=2.00a5
 
 
 
