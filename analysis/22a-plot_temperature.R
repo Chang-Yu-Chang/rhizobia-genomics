@@ -12,7 +12,7 @@ dml <- read_csv(paste0(folder_data, "temp/22-dml.csv"))
 site_cd <- read_csv(paste0(folder_data, "temp/22-site_cd.csv"))
 diff_tmax <- read_csv(paste0(folder_data, "temp/22-diff_tmax.csv"))
 tb_season <- read_csv(paste0(folder_data, "temp/22-tb_season.csv"))
-tb_month <- read_csv(paste0(folder_data, "temp/22-tb_month.csv"))
+tb_month <- read_csv(paste0(folder_data, "temp/22-tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
 
 site_colors <- setNames(c(brewer.pal(6, "Blues")[3:6], brewer.pal(6, "Reds")[3:6], "gold"), site_cd$site)
 site_group_colors <- setNames(c(brewer.pal(6, "Blues")[6], brewer.pal(6, "Reds")[6], "gold"), c("H", "L", "S"))
@@ -131,8 +131,8 @@ p <- diff_tmax %>%
 ggsave(paste0(folder_data, "temp/22a-03-resample_difference_HL.png"), p, width = 4, height = 4)
 
 
-# For each site, use the August data
-dml %>%
+# 4. For each site, use the August data  ----
+p <- dml %>%
     mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
     mutate(ymonth = month(ydate)) %>%
     filter(ymonth %in% 7:8) %>%
@@ -147,5 +147,5 @@ dml %>%
     guides() +
     labs()
 
-
+ggsave(paste0(folder_data, "temp/22a-04-august_HL.png"), p, width = 8, height = 4)
 

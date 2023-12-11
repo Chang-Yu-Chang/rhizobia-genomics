@@ -21,59 +21,35 @@ done
 
 
 # Process each genome
-for i in {1..41}
+#for i in {1..41}
+for i in {2..6} {8..11} 13 {15..17} {19..41}
 do
     mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling"
-    # Use reference E. meliloti usda1106
-    ## Align the genome to the reference usda1106
-    mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/snippy"
-    zsh 03c-align_genome.sh \
-        "$folder_genomics/references/usda1106.mmi" \
-        "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/genome.sam"
 
-    ## Convert SAM to BAM
-    zsh 03d-convert_sam_to_bam.sh \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/genome.sam" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/genome.bam"
+    for ref in usda1106 wsm419
+    do
+        # Use reference E. meliloti usda1106  and E. medicae wsm419
+        ## Align the genome to the reference
+        mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/snippy"
+        zsh 03c-align_genome.sh \
+            "$folder_genomics/references/$ref.mmi" \
+            "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.sam"
 
-    # Call SNPs via snippy using reference usda1106
-    zsh 03e-snippy.sh \
-        "$folder_genomics/genomes/usda1106/02-denovo_assembly/ncbi/genome.gbff" \
-        "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/snippy"
+        ## Convert SAM to BAM
+        zsh 03d-convert_sam_to_bam.sh \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.sam" \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.bam"
 
-    ## Call SVs via sniffle
-    zsh 03f-sniffle.sh \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/genome.bam" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_usda1106/genome.snf"
+        # Call SNPs via snippy using reference
+        zsh 03e-snippy.sh \
+            "$folder_genomics/genomes/$ref/02-denovo_assembly/genome.fasta" \
+            "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/snippy"
 
-
-
-    # Use reference E. medicae wsm419
-    ## Align the genome to the reference usda1106
-    mkdir -p "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/snippy"
-    zsh 03c-align_genome.sh \
-        "$folder_genomics/references/usda1106.mmi" \
-        "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/genome.sam"
-
-    ## Convert SAM to BAM
-    zsh 03d-convert_sam_to_bam.sh \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/genome.sam" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/genome.bam"
-
-    # Call SNPs via snippy using reference usda1106
-    zsh 03e-snippy.sh \
-        "$folder_genomics/genomes/usda1106/02-denovo_assembly/ncbi/genome.gbff" \
-        "$folder_genomics/genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/snippy"
-
-    ## Call SVs via sniffle
-    zsh 03f-sniffle.sh \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/genome.bam" \
-        "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_wsm419/genome.snf"
-
-
-
+        ## Call SVs via sniffle
+        zsh 03f-sniffle.sh \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.bam" \
+            "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.snf"
+    done
 done

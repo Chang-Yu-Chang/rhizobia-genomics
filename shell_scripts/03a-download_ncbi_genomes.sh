@@ -13,7 +13,7 @@ sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
 accessions=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
 # Download the Ensifer genomes
-datasets download genome accession $accessions[20,23] \
+datasets download genome accession $accessions[38,41] \
     --include genome,gff3,gbff \
     --filename "$2/ensifer_ncbi.zip"
 # GCF_002197065.1 is E. meliloti usda1106

@@ -16,7 +16,7 @@ gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_c
 
 
 # 0. clean up data ----
-factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id), temperature = factor(temperature, c("25c", "30c", "35c")))
+factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id), temperature = factor(temperature, c("25c", "30c", "35c", "40c")))
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
 gc_summs <- factorize_vars(gc_summs)
 gc_prms <- factorize_vars(gc_prms)
@@ -25,25 +25,36 @@ gc_summs <- factorize_vars(gc_summs)
 
 # 1. Raw data ----
 p <- gcs %>%
+    mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, group = well)) +
-    facet_grid(.~temperature) +
+    facet_wrap(~temperature, nrow = 2) +
+    scale_x_continuous(breaks = seq(0, 48, 12)) +
     theme_classic() +
-    theme() +
+    theme(
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major.x = element_line(color = "grey90")
+    ) +
     guides() +
-    labs()
+    labs(x = "time (hr)")
 
-ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 12, height = 5)
+ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 10, height = 8)
 
 
 # 2. Growth curves by well ----
 p <- gcs %>%
+    mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
     ggplot() +
-    geom_line(aes(x = t, y = abs, color = exp_id, linetype = temperature), linewidth = 1) +
+    geom_line(aes(x = t, y = abs, color = exp_id, alpha = temperature), linewidth = 1) +
+    scale_x_continuous(breaks = seq(0, 48, 12)) +
+    scale_alpha_manual(values = c("25c" = 0.1, "30c" = 0.4, "35c" = 0.7, "40c" = 1)) +
+    #scale_color_manual(values = rep(brewer.pal(n = 9, name = "Set1"), 5)) +
     facet_grid(row ~ column) +
-    theme_light() +
+    theme_classic() +
     theme(
-        panel.border = element_rect(color = "black", fill = NA)
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major.x = element_line(color = "grey90"),
+        plot.background = element_rect(color = NA, fill = "white")
     ) +
     guides() +
     labs()
@@ -54,14 +65,17 @@ ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height
 p <- gc_summs %>%
     left_join(isolates_mapping) %>%
     ggplot() +
-    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, linetype = temperature)) +
+    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, alpha = temperature)) +
+    scale_x_continuous(breaks = seq(0, 48, 12)) +
+    scale_alpha_manual(values = c("25c" = 0.1, "30c" = 0.4, "35c" = 0.7, "40c" = 1)) +
     #geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs, fill = rhizobia_site), alpha = 0.2) +
     facet_wrap(~exp_id, ncol = 4) +
     scale_color_manual(values = rhizobia_site_colors) +
     scale_fill_manual(values = rhizobia_site_colors) +
     theme_classic() +
     theme(
-        panel.border = element_rect(color = 1, fill = NA)
+        panel.border = element_rect(color = 1, fill = NA),
+        panel.grid.major.x = element_line(color = "grey90")
     ) +
     #guides(color = "none", fill = "none") +
     labs(x = "time (hrs)", y = expression(OD[600]))
@@ -78,10 +92,11 @@ p <- gc_summs %>%
     theme_classic() +
     theme(
         panel.border = element_rect(color = 1, fill = NA),
-        legend.position = "right"
+        panel.grid.major.x = element_line(color = "grey90"),
+        legend.position = "top"
     ) +
     labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 9, height = 4)
+ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 12, height = 4)
 
 
 # 5. plot all trait mean by strain_site_group ----

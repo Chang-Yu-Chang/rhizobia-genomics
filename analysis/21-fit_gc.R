@@ -11,11 +11,12 @@ suppressPackageStartupMessages({
 
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
 
-list_gcs <- rep(list(NA), 3)
+list_gcs <- rep(list(NA), 4)
 list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F) # 30C
 list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv"), show_col_types = F) # 35C
 list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curve4/rhizobia_growth_curve.csv"), show_col_types = F) # 25C
-names(list_gcs) <- c("30c", "35c", "25c")
+list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curve5/rhizobia_growth_curve.csv"), show_col_types = F) # 40C
+names(list_gcs) <- c("30c", "35c", "25c", "40c")
 
 # Tidy up time series
 clean_well_names <- function (x) paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
@@ -50,8 +51,9 @@ subtract_blank <- function (gc, gc_blank) {
 summarize_gc <- function (gc) {
     #' This function takes the gc (after blank) and average across replicates
     gc %>%
-    group_by(t, exp_id) %>%
-        summarize(mean_abs = mean(abs), sd_abs = sd(abs))
+        group_by(t, exp_id) %>%
+        summarize(mean_abs = mean(abs), sd_abs = sd(abs)) %>%
+        ungroup()
 }
 # Smooth and fit GAM to growth curves
 compute.gam <- function(x) {
@@ -205,8 +207,10 @@ list_gcs <- list_gcs %>% lapply(function(gc) {
         #
         gc <- gc %>% filter(t <= 48)
         gc_summ <- gc_summ %>% filter(t <= 48)
-        return(list(gc = gc, gc_summ = gc_summ, gc_prm = gc_prm, gc_prm_summ = gc_prm_summ))
+        return(list(gc = gc, gc_blank = gc_blank, gc_summ = gc_summ, gc_prm = gc_prm, gc_prm_summ = gc_prm_summ))
     })
+# list_gcs$`40c`$gc_summ
+# list_gcs$`30c`$gc_summ
 gcs <- list_gcs %>% lapply(function(x) `[[`(x, "gc")) %>% bind_rows(.id = "temperature")
 gc_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_summ")) %>% bind_rows(.id = "temperature")
 gc_prms <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm")) %>% bind_rows(.id = "temperature")
@@ -217,3 +221,4 @@ write_csv(gcs, paste0(folder_data, 'temp/21-gcs.csv'))
 write_csv(gc_summs, paste0(folder_data, 'temp/21-gc_summs.csv'))
 write_csv(gc_prms, paste0(folder_data, 'temp/21-gc_prms.csv'))
 write_csv(gc_prm_summs, paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
+
