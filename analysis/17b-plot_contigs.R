@@ -38,6 +38,16 @@ egcalls <- egc %>%
     filter(!is.na(contig_length))
 
 
+# 0.3 gene numbers on each ----
+# egcalls %>%
+#     unite(col = "contig_unique_id", genome_id, contig_id, remove = F) %>%
+#     select(gene_cluster_id, contig_unique_id) %>%
+#     distinct() %>%
+#     mutate(value = 1) %>%
+#     pivot_wider(names_from = contig_unique_id, values_fill = 0) %>%
+#     filter()
+
+
 # 1. plot the number of genes on each contig ----
 p <- egcalls %>%
     distinct(genome_id, contig_id, contig_length, gene_cluster_id) %>%
@@ -56,74 +66,130 @@ p <- egcalls %>%
 ggsave(paste0(folder_data, "temp/17b-01-contig_length_vs_genes.png"), p, width = 4, height = 4)
 
 
-# 2. plot the genome tree by gene content ----
+# 2. plot the trees by gene content ----
+# Genome tree
 egcalls_wide <- egcalls %>%
     distinct(genome_id, gene_cluster_id) %>%
     mutate(value = 1) %>%
     pivot_wider(id_cols = genome_id, names_from = gene_cluster_id, values_from = value, values_fill = 0)
-isolates_label <- egcalls_wide[,1] %>% left_join(isolates_mash)
+isolates_label <- egcalls_wide[,1] %>%
+    left_join(isolates_mash) %>%
+    mutate(id = genome_id) %>%
+    select(id, everything())
 
 egcc_m <- as.matrix(egcalls_wide[,-1])
 dim(egcc_m)
-rownames(egcc_m) <- as.character(isolates_label$species_name)
+rownames(egcc_m) <- as.character(isolates_label$genome_id)
 jdm <- proxy::dist(egcc_m, method = "Jaccard")
 te <- as.phylo(hclust(jdm))
-#clade_highlight <- tibble(node = c(109, 114, 116), ge_type = c("chromosome", "pSymA like", "pSymB like"))
-# te$tip.label
-# isolates_label <- tibble(node = 1:length(te$tip.label), genome_id = te$tip.label) %>% left_join(isolates_label)
-#
-# table_data <- data.frame(tip_label = c(1, 2, 3, 4),
-#                          label = c("Label_A", "Label_B", "Label_C", "Label_D"))
-# merged_data <- left_join(data.frame(tip_label = tip_labels), table_data, by = c("tip_label"))
 
-p <- te %>%
-    #full_join(rename(isolates_label, tip.label = genome_id), by = "tip.label") %>%
-    ggtree(layout = "rectangular") +
-    layout_circular() +
-    geom_tiplab() +
-    #geom_tiplab(data = isolates_label, aes(label = genome_id)) +
-    #geom_text(aes(label=node), hjust=-.3) +
-    # geom_hilight(data = clade_highlight, aes(node = node, fill = ge_type), type = "roundrect") +
-    theme_tree() +
+p1 <- te %>%
+    ggtree() %<+% isolates_label +
+    geom_tippoint(aes(color = rhizobia_population), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = rhizobia_population), offset = 0.01) +
+    geom_nodelab(size = 2, nudge_x = -0.006, nudge_y = 1) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    scale_x_continuous(limits = c(-0.1, 0.6)) +
+    theme_tree(legend.position = 'centre') +
     theme(
-        plot.margin = unit(c(10, 10, 10, 10), "mm")
+        legend.position = c(0.2,0.8)
     ) +
-    labs()
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "genome gene content")
+p2 <- te %>%
+    ggtree() %<+% isolates_label +
+    geom_tippoint(aes(color = species_name), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = species_name), offset = 0.01) +
+    geom_nodelab(size = 2, nudge_x = -0.006, nudge_y = 1) +
+    scale_color_manual(values = ensifer_sp_colors) +
+    scale_x_continuous(limits = c(-0.1, 0.6)) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.8)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "genome gene content")
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
+ggsave(paste0(folder_data, "temp/17b-02-tree_genomes.png"), p, width = 12, height = 6)
 
-ggsave(paste0(folder_data, "temp/17b-02-tree_genomes.png"), p, width = 10, height = 10)
 
 
-
-# 3. plot the contig tree ----
+# 3. plot the contig tree by site and species----
 egcalls_wide <- egcalls %>%
     distinct(genome_id, contig_id, gene_cluster_id) %>%
     mutate(value = 1) %>%
     pivot_wider(id_cols = c(genome_id, contig_id), names_from = gene_cluster_id, values_from = value, values_fill = 0) %>%
     unite(col = "contig_unique_id", genome_id, contig_id, remove = F)
 
-contigs_label <- egcalls_wide[,1] %>% left_join(contigs_mash)
+contigs_label <- egcalls_wide[,1] %>%
+    left_join(contigs_mash) %>%
+    mutate(id = contig_unique_id) %>%
+    select(id, everything()) %>%
+    left_join(isolates_label[,-1], by = "genome_id")
+
 egcc_m <- as.matrix(egcalls_wide[,-c(1,2,3)])
 dim(egcc_m)
-rownames(egcc_m) <- as.character(contigs_label$ge_name)
+rownames(egcc_m) <- contigs_label$id
 jdm <- proxy::dist(egcc_m, method = "Jaccard")
 te <- as.dendrogram(hclust(jdm))
-clade_highlight <- tibble(node = c(109, 114, 116), ge_type = c("chromosome", "pSymA like", "pSymB like"))
 
-p <- te %>%
-    ggtree(layout = "rectangular") +
-    layout_circular() +
-    geom_tiplab() +
-    #geom_text(aes(label=node), hjust=-.3) +
-    geom_hilight(data = clade_highlight, aes(node = node, fill = ge_type), type = "roundrect") +
+p1 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = rhizobia_population), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = rhizobia_population), offset = 0.01) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    theme_tree2(legend.position = 'centre') +
     theme(
-        plot.margin = unit(c(10, 10, 10, 10), "mm")
+        legend.position = c(0.2,0.9)
     ) +
-    labs()
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "contig gene content")
+p2 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = species_name), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = species_name), offset = 0.01) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    scale_color_npg() +
+    theme_tree2(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.9)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "contig gene content")
 
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
 ggsave(paste0(folder_data, "temp/17b-03-tree_contigs.png"), p, width = 15, height = 15)
 
 
+# 4. plot the contig tree contig type----
+p1 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = ge_name), size = 2) +
+    geom_tiplab(aes(label = ge_name, color = ge_name), offset = 0.01) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    scale_color_manual(values = c(RColorBrewer::brewer.pal(8, "Set1"), RColorBrewer::brewer.pal(8, "Set2"))) +
+    theme_tree2(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.9)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""), ncol = 2)) +
+    labs(title = "contig gene content")
+p2 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = ge_type), size = 2) +
+    geom_tiplab(aes(label = ge_name, color = ge_type), offset = 0.01) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    scale_color_npg() +
+    theme_tree2(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.9)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "contig gene content")
 
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
+ggsave(paste0(folder_data, "temp/17b-04-tree_contigs.png"), p, width = 15, height = 15)
 
 
 

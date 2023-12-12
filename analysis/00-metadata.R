@@ -30,8 +30,8 @@ isolates_mapping <- tibble(
                "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-2 ",
                "fp1-2", "fp1-3", "fp2-2", "crp1-2", "crp1-3", "crp2-2", "gp1-1", "gp1-2",
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
-    rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9),
-                      rep("suburban", 10), rep("urban", 7)),
+    rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9), rep("suburban", 10), rep("urban", 7)),
+    rhizobia_population = c(rep("MLBS", 15), rep("Phila",17)),
     sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19:37))
@@ -44,7 +44,7 @@ isolates <- full_join(genomes_mapping, isolates_mapping) %>%
     # Fill in for ncbi strains
     mutate(rhizobia_site = ifelse(batch_name == "ncbi", "ncbi", rhizobia_site),
            exp_id = ifelse(batch_name == "ncbi", "ncbi", exp_id)) %>%
-    select(genome_name, genome_id, exp_id, rhizobia_site)
+    select(genome_name, genome_id, exp_id, rhizobia_population, rhizobia_site)
 
 write_csv(isolates, paste0(folder_data, "temp/00-isolates.csv"))
 
@@ -92,8 +92,8 @@ theme_facets <- theme(
 
 # Colors
 rhizobia_site_colors <- brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)] %>% setNames(c("high-elevation", "low-elevation", "suburban", "urban"))
-
-
+rhizobia_population_colors <- c(MLBS = "#EF476F", Phila = "#004c54")
+ensifer_sp_colors <- c(`Ensifer medicae` = "#6E2594", `Ensifer meliloti` = "#D38F22", `Ensifer sp.` = "#84828F", `Ensifer adhaerens` = "#CEE7E6")
 
 
 

@@ -4,12 +4,13 @@ suppressPackageStartupMessages({
     library(tidyverse)
     library(cowplot)
     library(janitor)
+    library(ggsci)
     library(RColorBrewer)
     source(here::here("analysis/00-metadata.R"))
 })
 
 dml <- read_csv(paste0(folder_data, "temp/22-dml.csv"))
-site_cd <- read_csv(paste0(folder_data, "temp/22-site_cd.csv"))
+sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"))
 diff_tmax <- read_csv(paste0(folder_data, "temp/22-diff_tmax.csv"))
 tb_season <- read_csv(paste0(folder_data, "temp/22-tb_season.csv"))
 tb_month <- read_csv(paste0(folder_data, "temp/22-tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
@@ -19,17 +20,19 @@ site_group_colors <- setNames(c(brewer.pal(6, "Blues")[6], brewer.pal(6, "Reds")
 season_fills <- setNames(grey(c(0,1,0,1)), c("spring", "summer", "fall", "winter"))
 month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
 
+
+
 # 1. Plot the raw data for the years ----
 p1 <- dml %>%
     filter(site_group != "S") %>%
     ggplot() +
     geom_rect(data = tb_month, aes(xmin = start, xmax = end, fill = ymonth), ymin = -Inf, ymax = Inf, alpha = 0.1) +
     geom_hline(yintercept = 0, color = "black", linetype = 1) +
-    geom_line(aes(x = yday, y = tmax_deg_c, color = site)) +
-    scale_color_manual(values = site_colors) +
+    geom_line(aes(x = yday, y = tmax_deg_c, color = population, group = site)) +
+    scale_color_manual(values = rhizobia_population_colors) +
     scale_fill_manual(values = month_fills) +
     scale_x_continuous(expand = c(0,0)) +
-    scale_y_continuous(limits = c(-26, 33), breaks = seq(-20, 30, 10)) +
+    scale_y_continuous(limits = c(-26, 40), breaks = seq(-20, 40, 10)) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = "black", fill = NA),
@@ -37,18 +40,18 @@ p1 <- dml %>%
         panel.grid.minor.y = element_line(color = "black", linewidth = 0.1, linetype = 2)
     ) +
     guides(fill = "none") +
-    labs(x = "day", y = "max daily temperature")
+    labs(x = "day", y = expression(t[max]))
 
 p2 <- dml %>%
     filter(site_group != "S") %>%
     ggplot() +
     geom_rect(data = tb_month, aes(xmin = start, xmax = end, fill = ymonth), ymin = -Inf, ymax = Inf, alpha = 0.1) +
     geom_hline(yintercept = 0, color = "black", linetype = 1) +
-    geom_line(aes(x = yday, y = tmin_deg_c, color = site)) +
-    scale_color_manual(values = site_colors) +
+    geom_line(aes(x = yday, y = tmin_deg_c, color = population, group = site)) +
+    scale_color_manual(values = rhizobia_population_colors) +
     scale_fill_manual(values = month_fills) +
     scale_x_continuous(expand = c(0,0)) +
-    scale_y_continuous(limits = c(-26, 33), breaks = seq(-20, 30, 10)) +
+    scale_y_continuous(limits = c(-26, 40), breaks = seq(-20, 40, 10)) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = "black", fill = NA),
@@ -56,7 +59,7 @@ p2 <- dml %>%
         panel.grid.minor.y = element_line(color = "black", linewidth = 0.1, linetype = 2)
     ) +
     guides(fill = "none") +
-    labs(x = "day", y = "min daily temperature")
+    labs(x = "day", y = expression(t[min]))
 
 p <- plot_grid(p1, p2, nrow = 2, labels = c("A", "B"))
 ggsave(paste0(folder_data, "temp/22a-01-daily_t.png"), p, width = 10, height = 8)
@@ -148,4 +151,5 @@ p <- dml %>%
     labs()
 
 ggsave(paste0(folder_data, "temp/22a-04-august_HL.png"), p, width = 8, height = 4)
+
 

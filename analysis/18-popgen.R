@@ -3,70 +3,200 @@
 renv::load()
 suppressPackageStartupMessages({
     library(tidyverse)
+    library(cowplot)
     library(janitor)
     library(ggsci)
     library(vcfR) # for handling VCF
-    #library(VariantAnnotation)
     library(poppr) # for pop gen analysis
+    library(ggtree)
     source(here::here("analysis/00-metadata.R"))
 })
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F)
-isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
-snp_usda <- read_table(paste0(folder_data, "genomics/popgen/snippy_usda1106/snippy_usda1106.tab"), show_col_types = F)
-vcf_usda <- read.vcfR(paste0(folder_data, "genomics/popgen/snippy_usda1106/snippy_usda1106.vcf"))
+isolates_mash <- read_csv(paste0(folder_data, "temp/14-isolates_mash.csv"), show_col_types = F)
+# isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
+# genomes_mapping <- read_csv(paste0(folder_data, "temp/00-genomes_mapping.csv"), show_col_types = F)
 
+#
+snp <- read_table(paste0(folder_data, "genomics/popgen/usda1106/snippy/core.tab"), show_col_types = F)
+gs <- read_table(paste0(folder_data, "genomics/popgen/usda1106/snippy/core.txt"), show_col_types = F)
+vcf <- read.vcfR(paste0(folder_data, "genomics/popgen/usda1106/snippy/core.vcf"))
 
+# SNPs on chromosome
+vcfR::getCHROM(vcf) %>% table()
 # VCF to genlight
-gl_usda <- vcfR2genlight(vcf_usda)
-
-#pop(gl_usda) <- isolates_mapping$rhizobia_site
-#ploidy(gl_usda)
-#gl_usda@ind.names <- isolates_mapping$genome_id
-
-
+gl <- vcfR2genlight(vcf)
+# Rearrange the metadata
+isolates_arr <- isolates %>%
+    filter(!is.na(exp_id), exp_id != "ncbi") %>%
+    left_join(isolates_mash) %>%
+    arrange(match(genome_id, gl$ind.names))
 # PCA
-pca_usda <- glPca(gl_usda, nf = 2)
-
+pca <- glPca(gl, nf = 10, center = T, scale = T)
 # convert scores of vcf.pca into a tibble
-sc_usda <- as_tibble(pca_usda$scores)
+sc <- as_tibble(pca$scores) %>%
+    bind_cols(isolates_arr)
 
 
 
+# 1. PCs ----
+pcs <- round(100 * pca$eig / sum(pca$eig), 2)
+p <- tibble(eigenvalue = 1:length(pca$eig), pvar = pcs) %>%
+    ggplot() +
+    geom_col(aes(x = eigenvalue, y = pvar)) +
+    scale_x_continuous(limits = c(0.5,10), breaks = 1:10) +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs(x = "eigenvalues", y = "variance explained (%)")
 
-# add the country data into a column of vcf.pca.scores tibble
-vcf.pca.scores$country <- metadata$country
+ggsave(paste0(folder_data, "temp/18-01-snp_PCs.png"), p, width = 4, height = 3)
+
+# 2. PCA based on SNPs ----
+set.seed(1)
+p1 <- sc %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = rhizobia_population), shape = 21, size = 3, stroke = 1, position = position_jitter(width = 10, height = 10)) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 variance = ", pcs[1], "%"), y = paste0("PC2 variance = ", pcs[2], "%"))
+
+p2 <- sc %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = species_name), shape = 21, size = 3, stroke = 1, position = position_jitter(width = 10, height = 10)) +
+    scale_color_npg() +
+    scale_color_manual(values = ensifer_sp_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 variance = ", pcs[1], "%"), y = paste0("PC2 variance = ", pcs[2], "%"))
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"))
+ggsave(paste0(folder_data, "temp/18-02-snp_PCA.png"), p, width = 10, height = 3)
+
+# 3. PCA based on medicae and meliloti only ----
+ids_kept <- which(isolates_arr$species_name %in% c("Ensifer meliloti", "Ensifer medicae"))
+gl_mm <- gl[ids_kept]
+pca <- glPca(gl_mm, nf = 10, center = T, scale = T)
+# convert scores of vcf.pca into a tibble
+sc <- as_tibble(pca$scores) %>%
+    bind_cols(isolates_arr[ids_kept,])
+pcs <- round(100 * pca$eig / sum(pca$eig), 2)
+
+set.seed(1)
+p1 <- sc %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = rhizobia_population), shape = 21, size = 3, stroke = 1) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 variance = ", pcs[1], "%"), y = paste0("PC2 variance = ", pcs[2], "%"))
+
+p2 <- sc %>%
+    ggplot() +
+    geom_point(aes(x = PC1, y = PC2, color = species_name), shape = 21, size = 3, stroke = 1) +
+    scale_color_manual(values = ensifer_sp_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black")
+    ) +
+    guides() +
+    labs(x = paste0("PC1 variance = ", pcs[1], "%"), y = paste0("PC2 variance = ", pcs[2], "%"))
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"))
+ggsave(paste0(folder_data, "temp/18-03-snp_PCA_mm.png"), p, width = 10, height = 3)
 
 
-# We will also determine the variance each PC contributes the data, which will help us understand potential drivers of patterns in our dataset. Lets plot the eigenvectors to try an understand this a bit more.
 
-barplot(100 * vcf.pca$eig / sum(vcf.pca$eig), col="green")
-title(ylab = "Percent of variance explained")
-title(xlab = "Eigenvalues")
+# 4. tree based on all 32 genomes ----
+# Generated pairwise distances between samples that we will plot in a tree format
+tree_data <- aboot(gl, tree = "upgma", distance = bitwise.dist, sample = 100, showtree = F, cutoff = 50)
+
+tree_tips <- isolates_arr %>%
+    mutate(id = genome_id) %>%
+    select(id, everything())
+
+p1 <- tree_data %>%
+    ggtree() %<+% tree_tips +
+    geom_tippoint(aes(color = rhizobia_population), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = rhizobia_population), offset = 0.01) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    scale_x_continuous(limits = c(-0.01, 0.32)) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.8)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "SNPs")
+
+p2 <- tree_data %>%
+    ggtree() %<+% tree_tips +
+    geom_tippoint(aes(color = species_name), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = species_name), offset = 0.01) +
+    scale_color_manual(values = ensifer_sp_colors) +
+    scale_x_continuous(limits = c(-0.01, 0.32)) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.8)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "SNPs")
 
 
-
-vcfR::getCHROM(vcf_usda) %>% table()
-
-gi_usda <- vcfR2genind(vcf_usda)
-class(gi_usda)
-gc_usda <- as.genclone(gi_usda)
-class(gc_usda)
-
-gc_usda$pop <- factor(isolates_mapping$rhizobia_site)
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
+ggsave(paste0(folder_data, "temp/18-04-snp_tree.png"), p, width = 10, height = 6)
 
 
-glPca(gc_usda)
+# 5. tree based on medicae and meliloti only ----
+tree_data <- aboot(gl_mm, tree = "upgma", distance = bitwise.dist, sample = 100, showtree = F, cutoff = 50)
+
+tree_tips <- isolates_arr[ids_kept,] %>%
+    mutate(id = genome_id) %>%
+    select(id, everything())
+
+p1 <- tree_data %>%
+    ggtree() %<+% tree_tips +
+    geom_tippoint(aes(color = rhizobia_population), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = rhizobia_population), offset = 0.0001) +
+    #geom_nodelab(size = 2, nudge_x = -0.006, nudge_y = 1) +
+    scale_color_manual(values = rhizobia_population_colors) +
+    scale_x_continuous(limits = c(-0.001, 0.006)) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.8)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "SNPs")
+
+p2 <- tree_data %>%
+    ggtree() %<+% tree_tips +
+    geom_tippoint(aes(color = species_name), size = 2) +
+    geom_tiplab(aes(label = genome_id, color = species_name), offset = 0.0001) +
+    #geom_nodelab(size = 2, nudge_x = -0.006, nudge_y = 1) +
+    scale_color_manual(values = ensifer_sp_colors) +
+    scale_x_continuous(limits = c(-0.001, 0.006)) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.8)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "SNPs")
 
 
-
-popsub(gc_usda, sublist = "urban", drop = T)
-
-amova(gc_usda)
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
+ggsave(paste0(folder_data, "temp/18-05-snp_tree_mm.png"), p, width = 10, height = 6)
 
 
-
-
+#stat_ellipse(level = 0.95, size = 1) +
 
 
 if (FALSE) {
@@ -104,7 +234,7 @@ class(gi_usda)
 gc_usda <- as.genclone(gi_usda)
 class(gc_usda)
 
-gc_usda$pop <- factor(isolates_mapping$rhizobia_site)
+gc_usda$pop <- factor(isolates_mapping$rhizobia_population)
 
 
 poppr(gc_usda)
@@ -150,7 +280,7 @@ set.seed(1)
 p1 <- isolates_pca %>%
     ggplot() +
     geom_point(aes(x = PC1, y = PC2, color = site), shape = 21, size = 3, stroke = 1.5, position = position_jitter(width = 0.02, height = 0.02)) +
-    scale_color_manual(values = rhizobia_site_colors) +
+    scale_color_manual(values = rhizobia_population_colors) +
     theme_classic() +
     theme(
         #legend.background = element_rect(fill = "white", color = "black"),
@@ -163,3 +293,17 @@ p1 <- isolates_pca %>%
     labs(x = paste0("PC1 (", round(eig[1]*100,1), "%)"),
          y = paste0("PC2 (", round(eig[2]*100,1), "%)"))
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

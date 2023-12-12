@@ -16,7 +16,7 @@ do
     mamba activate snippy
 
     mkdir "$folder_genomics/popgen/$ref/snippy/genomes"
-    for i in {2..6} {8..11} 13 {15..17} 19 {24..41}
+    for i in {2..6} {8..11} 13 {15..17} 19 {20..37}
     do
         mkdir -p $folder_genomics/popgen/$ref/snippy/genomes/g$i
         cp $folder_genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/snippy/* $folder_genomics/popgen/$ref/snippy/genomes/g$i/
@@ -25,7 +25,7 @@ do
 
     snippy-core \
         --ref "$folder_genomes/$ref/02-denovo_assembly/genome.fasta" \
-        $folder_genomes/Chang_Q5C_"{2..6z}"/03-variant_calling/snippy_$ref/ \
+        $folder_genomics/popgen/$ref/snippy/genomes/* \
         --prefix "$folder_genomics/popgen/$ref/snippy/core"
 
         # "$folder_genomes/Chang_Q5C_"{2..6z}"/03-variant_calling/snippy_$ref/snippy" \
@@ -34,26 +34,27 @@ do
         # "$folder_genomes/Chang_Q5C_"{15..17}"/03-variant_calling/snippy_$ref/snippy" \
         # "$folder_genomes/Chang_Q5C_19/03-variant_calling/snippy_$ref/snippy" \
         # "$folder_genomes/Chang_W8S_"{1..18}"/03-variant_calling/snippy_$ref/snippy" \
+
     # Call structure variants
     conda activate
     mamba activate sniffles
 
     mkdir -p "$folder_genomics/popgen/$ref/sniffle"
     cd "$folder_genomics/popgen/$ref/sniffle"
-    for i in {2..6} {8..11} 13 {15..17} 19 {24..41}
+    for i in {2..6} {8..11} 13 {15..17} 19 {20..37}
     do
         echo "$folder_genomics/genomes/$sample_ids[$i]/03-variant_calling/snippy_$ref/genome.snf"
     done |> list_snf.tsv
     sniffles --allow-overwrite --input list_snf.tsv --vcf sv.vcf
 
 
-    # Filtering with bcftools
-    conda activate
-    mamba activate bcftools
-
-    bcftools stats "$folder_genomics/popgen/$ref/snippy/core.vcf"
-
-    bcftools filter -i'%QUAL>=30' input.vcf -o output_filtered.vcf
+    # # Filtering with bcftools
+    # conda activate
+    # mamba activate bcftools
+    #
+    # bcftools stats "$folder_genomics/popgen/$ref/snippy/core.vcf"
+    #
+    # bcftools filter -i'%QUAL>=30' input.vcf -o output_filtered.vcf
 
     # LD pruning
     # conda activate

@@ -7,6 +7,8 @@ suppressPackageStartupMessages({
     library(tidyverse)
     library(janitor)
     library(RColorBrewer)
+    library(elevatr) # for getting elevation
+    library(sf)
     source(here::here("analysis/00-metadata.R"))
 })
 
@@ -21,29 +23,49 @@ dms2dec <- function(x) {
         }) %>%
         return
 }
-site_cd <- readxl::read_excel(paste0(folder_data, "raw/High and low elevation sites_Sept 2022.xlsx"))
+sites_mlbs <- readxl::read_excel(paste0(folder_data, "raw/High and low elevation sites_Sept 2022.xlsx"))
+sites_phila <- read_csv(paste0(folder_data, "raw/sites_phila.csv"), show_col_types = F) %>%
+    drop_na() %>%
+    mutate(description = tolower(description) %>% str_remove("'")) %>%
+    separate(col = coord, into = c("latitude_dec", "longitude_dec"), sep = ",\\s", convert = T)
+
+
 
 # 0. Clean up the site coordinates ----
-site_cd <- site_cd %>%
+# mlbs
+sites_mlbs <- sites_mlbs %>%
     clean_names() %>%
     mutate(latitude_dec = dms2dec(latitude_degrees_minutes_seconds)) %>%
     mutate(longitude_dec = dms2dec(longitude_degrees_minutes_seconds)) %>%
     mutate(elevation_m = elevation_feet / 3.28084) %>%
-    mutate(site_group = str_sub(site,1 , 1))
+    mutate(site_group = str_sub(site,1 , 1)) %>%
+    select(site_group, site, latitude_dec, longitude_dec, elevation_m)
 
+# phila
+temp <- sites_phila %>%
+    st_as_sf(coords = c("longitude_dec", "latitude_dec"), crs = 4326) %>%
+    get_elev_point()
 
-write_csv(site_cd, paste0(folder_data, "temp/22-site_cd.csv"))
+sites_phila <- sites_phila %>%
+    mutate(elevation_m = temp$elevation) %>%
+    select(site_group, site, latitude_dec, longitude_dec, elevation_m)
+
+# bind rows
+sites <- bind_rows(mutate(sites_mlbs, population = "MLBS"), mutate(sites_phila, population = "Phila")) %>%
+    select(population, everything())
+
+write_csv(sites, paste0(folder_data, "temp/22-sites.csv"))
 
 # 1. Extract the climatology data from Daymet ----
-list_dm <- rep(list(NA), nrow(site_cd))
-for (i in 1:nrow(site_cd)) {
-    dm <- download_daymet(site = site_cd$site[i],
-                          lat = site_cd$latitude_dec[i],
-                          lon = site_cd$longitude_dec[i],
+list_dm <- rep(list(NA), nrow(sites))
+for (i in 1:nrow(sites)) {
+    dm <- download_daymet(site = sites$site[i],
+                          lat = sites$latitude_dec[i],
+                          lon = sites$longitude_dec[i],
                           start = 2022,
                           end = 2022,
                           internal = TRUE)
-    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = site_cd$site[i])
+    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], population = sites$population[i])
 
 }
 
@@ -55,6 +77,7 @@ dml <- bind_rows(list_dm) %>%
 
 
 write_csv(dml, paste0(folder_data, "temp/22-dml.csv"))
+
 
 
 # 2. Resample the difference between a H and a L temperature ---

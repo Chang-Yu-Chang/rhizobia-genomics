@@ -71,7 +71,7 @@ write_csv(mash_c_top, paste0(folder_data, "temp/14-mash_c_top.csv"))
 # Genomes
 isolates_mash <- mash_g_top %>%
     slice(1) %>%
-    select(genome_id, genome_name, exp_id, rhizobia_site, query_comment) %>%
+    select(genome_id, genome_name, exp_id, rhizobia_population, rhizobia_site, query_comment) %>%
     # Extract the species name
     mutate(species_name = str_extract(query_comment, "Sinorhizobium.*|Ensifer.*|Rhizobium.*")) %>%
     mutate(species_name = str_extract(species_name, "\\S+\\s+\\S+")) %>%
