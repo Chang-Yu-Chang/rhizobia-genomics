@@ -17,10 +17,9 @@ isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types
 egc <- read_csv(paste0(folder_data, "temp/17-egc.csv"), show_col_types = F)
 gcalls <- read_csv(paste0(folder_data, "temp/17-gcalls.csv"), show_col_types = F)
 contigs_mash <- read_csv(paste0(folder_data, "temp/14-contigs_mash.csv"), show_col_types = F)
+contigs_blast <- read_csv(paste0(folder_data, "temp/14-contigs_blast.csv"), show_col_types = F)
 isolates_mash <- read_csv(paste0(folder_data, "temp/14-isolates_mash.csv"), show_col_types = F)
 nrow(isolates) # This should be 32 ensifer isolates + 4 ncbi genomes
-
-#n_g <- nrow(isolates)
 
 # 0. Data wrangling ----
 # 0.1.
@@ -114,7 +113,7 @@ ggsave(paste0(folder_data, "temp/17b-02-tree_genomes.png"), p, width = 12, heigh
 
 
 
-# 3. plot the contig tree by site and species----
+# 3. plot the contig tree by site and mash species----
 egcalls_wide <- egcalls %>%
     distinct(genome_id, contig_id, gene_cluster_id) %>%
     mutate(value = 1) %>%
@@ -123,9 +122,10 @@ egcalls_wide <- egcalls %>%
 
 contigs_label <- egcalls_wide[,1] %>%
     left_join(contigs_mash) %>%
+    left_join(contigs_blast) %>%
     mutate(id = contig_unique_id) %>%
     select(id, everything()) %>%
-    left_join(isolates_label[,-1], by = "genome_id")
+    left_join(isolates_label[,c("genome_id", "rhizobia_population")], by = "genome_id")
 
 egcc_m <- as.matrix(egcalls_wide[,-c(1,2,3)])
 dim(egcc_m)
@@ -139,7 +139,7 @@ p1 <- te %>%
     geom_tiplab(aes(label = genome_id, color = rhizobia_population), offset = 0.01) +
     scale_color_manual(values = rhizobia_population_colors) +
     scale_x_continuous(limits = c(-1.1, 0.3)) +
-    theme_tree2(legend.position = 'centre') +
+    theme_tree(legend.position = 'centre') +
     theme(
         legend.position = c(0.2,0.9)
     ) +
@@ -150,46 +150,81 @@ p2 <- te %>%
     geom_tippoint(aes(color = species_name), size = 2) +
     geom_tiplab(aes(label = genome_id, color = species_name), offset = 0.01) +
     scale_x_continuous(limits = c(-1.1, 0.3)) +
-    scale_color_npg() +
-    theme_tree2(legend.position = 'centre') +
+    scale_color_manual(values = ensifer_sp_colors) +
+    theme_tree(legend.position = 'centre') +
     theme(
         legend.position = c(0.2,0.9)
     ) +
     guides(color = guide_legend(override.aes = aes(label = ""))) +
-    labs(title = "contig gene content")
+    labs(title = "contig gene content; blast species")
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
 ggsave(paste0(folder_data, "temp/17b-03-tree_contigs.png"), p, width = 15, height = 15)
 
 
-# 4. plot the contig tree contig type----
+# 4. plot the contig tree by mash contig type----
 p1 <- te %>%
     ggtree() %<+% contigs_label +
     geom_tippoint(aes(color = ge_name), size = 2) +
     geom_tiplab(aes(label = ge_name, color = ge_name), offset = 0.01) +
     scale_x_continuous(limits = c(-1.1, 0.3)) +
     scale_color_manual(values = c(RColorBrewer::brewer.pal(8, "Set1"), RColorBrewer::brewer.pal(8, "Set2"))) +
-    theme_tree2(legend.position = 'centre') +
+    theme_tree(legend.position = 'centre') +
     theme(
         legend.position = c(0.2,0.9)
     ) +
     guides(color = guide_legend(override.aes = aes(label = ""), ncol = 2)) +
-    labs(title = "contig gene content")
+    labs(title = "contig gene content; mash")
 p2 <- te %>%
     ggtree() %<+% contigs_label +
     geom_tippoint(aes(color = ge_type), size = 2) +
     geom_tiplab(aes(label = ge_name, color = ge_type), offset = 0.01) +
     scale_x_continuous(limits = c(-1.1, 0.3)) +
     scale_color_npg() +
-    theme_tree2(legend.position = 'centre') +
+    #scale_color_manual(values = ensifer_sp_colors) +
+    theme_tree(legend.position = 'centre') +
     theme(
         legend.position = c(0.2,0.9)
     ) +
     guides(color = guide_legend(override.aes = aes(label = ""))) +
-    labs(title = "contig gene content")
+    labs(title = "contig gene content; mash")
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
-ggsave(paste0(folder_data, "temp/17b-04-tree_contigs.png"), p, width = 15, height = 15)
+ggsave(paste0(folder_data, "temp/17b-04-tree_contigs_mash.png"), p, width = 15, height = 15)
+
+
+# 5. plot the contig tree by blast contig type----
+p1 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = contig_name), size = 2) +
+    geom_tiplab(aes(label = contig_name, color = contig_name), offset = 0.01) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    scale_color_manual(values = c(RColorBrewer::brewer.pal(8, "Set1"), RColorBrewer::brewer.pal(8, "Set2"))) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.9)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""), ncol = 2)) +
+    labs(title = "contig gene content; blast")
+p2 <- te %>%
+    ggtree() %<+% contigs_label +
+    geom_tippoint(aes(color = species_name), size = 2) +
+    geom_tiplab(aes(label = contig_name, color = species_name), offset = 0.01) +
+    scale_x_continuous(limits = c(-1.1, 0.3)) +
+    scale_color_manual(values = ensifer_sp_colors) +
+    theme_tree(legend.position = 'centre') +
+    theme(
+        legend.position = c(0.2,0.9)
+    ) +
+    guides(color = guide_legend(override.aes = aes(label = ""))) +
+    labs(title = "contig gene content; blast")
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", labels = c("A", "B"), scale = 0.9) + paint_white_background()
+ggsave(paste0(folder_data, "temp/17b-05-tree_contigs_blast.png"), p, width = 15, height = 15)
+
+
+
+
 
 
 

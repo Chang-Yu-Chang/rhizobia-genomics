@@ -74,7 +74,7 @@ mamba create -n barrnap
 mamba activate barrnap
 mamba install --yes -c bioconda barrnap=0.9
 
-# Downalod the RefSeq 16S databased
+# Downalod the RefSeq 16S database
 #https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
 # Make it into a database
 #makeblastdb -in $refseq_16s_db -dbtype nucl
@@ -246,7 +246,6 @@ mamba install --yes -c bioconda ggcaller=1.3.2
 mamba create -y -n plink2
 mamba activate plink2
 mamba install --yes -c bioconda plink2=2.00a5
-
 
 
 

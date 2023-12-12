@@ -1,0 +1,1 @@
+]2;conda activate]1;]2;mamba activate blast]1;]2;blastn -query $1 -db $2 -out $3 -outfmt  -num_alignments 10]1;

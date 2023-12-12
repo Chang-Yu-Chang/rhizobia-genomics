@@ -7,7 +7,6 @@ source ~/.zshrc
 # $3: output rrna in a table in txt
 # $4: refseq_16s_db
 # $5: output blast prediction in txt
-# $6: output taxonomy prediction in txt
 
 # Extracrt rRNA
 conda activate

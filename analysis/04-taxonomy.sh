@@ -8,35 +8,48 @@ cd $folder_shell
 refseq_db="/Users/cychang/bioinformatics/mash/refseq.genomes+plasmid.k21.s1000.msh"
 gtdb_db="/Users/cychang/bioinformatics/sourmash/gtdb-rs214-k31.zip"
 refseq_16s_db="/Users/cychang/bioinformatics/16s/refseq_16s.fasta"
+blast_genomes_db="$folder_genomics/blast_db/genomes"
+
+# Make customized database
+zsh 04a-make_db.sh $folder_genomics
 
 for i in {1..41}
 do
     genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
     mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy"
+#
+#     # Estimate genome distance via mash
+#     mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/mash"
+#     zsh 04b-mash.sh \
+#         $genome_fa \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/mash" \
+#         $refseq_db
+#
+#     # Compare genomes via sourmash
+#     mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/sourmash"
+#     zsh 04c-sourmash.sh \
+#         $genome_fa \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/sourmash" \
+#         $gtdb_db
+#
+#     # Extract 16S rRNA from genome and blast
+#     mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s"
+#     zsh 04d-blast_16s.sh \
+#         $genome_fa \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/rrna.fasta" \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/rrna.txt" \
+#         $refseq_16s_db \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/blast.txt" \
+#         "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/taxonomy.txt"
 
-    # Estimate genome distance via mash
-    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/mash"
-    zsh 04a-mash.sh \
+    # Blast genomes to a customized database of meliloti and medicae
+    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/blast_genome"
+    zsh 04e-blast_genome.sh \
         $genome_fa \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/mash" \
-        $refseq_db
+        $blast_genomes_db \
+        "$folder_genomes/$sample_ids[$i]/04-taxonomy/blast_genome/taxonomy.txt"
 
-    # Compare genomes via sourmash
-    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/sourmash"
-    zsh 04b-sourmash.sh \
-        $genome_fa \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/sourmash" \
-        $gtdb_db
-
-    # Extract 16S rRNA from genome and blast
-    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s"
-    zsh 04c-blast_16s.sh \
-        $genome_fa \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/rrna.fasta" \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/rrna.txt" \
-        $refseq_16s_db \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/blast.txt" \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/16s/taxonomy.txt"
+    # Blast contigs to a customized database of chromosomes and plasmids
 
 
 

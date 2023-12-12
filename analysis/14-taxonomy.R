@@ -140,3 +140,77 @@ write_csv(blast_16s, paste0(folder_data, "temp/14-blast_16s.csv"))
 #     filter(genome_id == "g8") %>%
 #     select(genome_id, qseqid, stitle) %>%
 #     view
+
+# 5. aggregate genome blast results----
+list_blasts <- rep(list(NA), nrow(isolates))
+for (i in 1:nrow(isolates)) {
+    blast <- read_delim(paste0(folder_genomes, isolates$genome_name[i], "/04-taxonomy/blast_genome/blast.txt"), show_col_types = F, delim = "\t", col_names = c("qseqid", "sseqid", "stitle", "bitscore", "evalue", "length", "pident"))
+    list_blasts[[i]] <- blast %>%
+        arrange(qseqid, desc(bitscore)) %>%
+        mutate(genome_id = isolates$genome_id[i]) %>%
+        select(genome_id, everything())
+}
+
+blast_genomes <- bind_rows(list_blasts)
+
+
+#
+refs <- tibble(
+    stitle = c(
+        "NC_003047.1 Sinorhizobium meliloti 1021, complete sequence",
+        "NC_003037.1 Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",
+        "NC_003078.1 Sinorhizobium meliloti 1021 plasmid pSymB, complete sequence",
+        "NZ_CP054390.1 Sinorhizobium meliloti WSM1022 chromosome",
+        "NZ_CP054392.1 Sinorhizobium meliloti WSM1022 plasmid pA",
+        "NZ_CP054391.1 Sinorhizobium meliloti WSM1022 plasmid pB",
+        "NZ_CP021797.1 Sinorhizobium meliloti strain USDA1106 chromosome, complete genome",
+        "NZ_CP021798.1 Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",
+        "NZ_CP021799.1 Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",
+        "NC_009636.1 Sinorhizobium medicae WSM419, complete sequence",
+        "NC_009620.1 Sinorhizobium medicae WSM419 plasmid pSMED01, complete sequence",
+        "NC_009621.1 Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",
+        "NC_009622.1 Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence"
+    ),
+    species_name = c(rep("Ensifer meliloti", 9), rep("Ensifer medicae", 4)),
+    contig_name = c(rep(c("chromosome", "pSymA", "pSymB"), 3), "chromosome", "pSMED01", "pSMED02", "pSMED03")
+)
+
+
+# Clean up
+blast_genomes_top <- blast_genomes %>%
+    #mutate(species_name = str_extract(stitle, "\\S+\\s\\S+\\s\\S+") %>% str_remove("NR_\\S+\\s")) %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    #filter(genome_id == "g4") %>%
+    filter(bitscore > 1000) %>%
+    filter(pident > 90) %>%
+    group_by(genome_id, qseqid) %>%
+    arrange(genome_id, qseqid, desc(bitscore)) %>%
+    slice(1) %>%
+    left_join(refs) %>%
+    select(-sseqid, -stitle)
+
+blast_genomes_top <- blast_genomes_top %>%
+    filter(genome_id %in% isolates$genome_id[!is.na(isolates$exp_id)])
+write_csv(blast_genomes_top, paste0(folder_data, "temp/14-blast_genomes_top.csv"))
+
+# 6. join the contig level information data ----
+contigs_large <- read_csv(paste0(folder_data, "temp/12-contigs_large.csv"), show_col_types = F)
+#contigs <- read_csv(paste0(folder_data, "temp/12-contigs.csv"), show_col_types = F)
+blast_genomes_top <- read_csv(paste0(folder_data, "temp/14-blast_genomes_top.csv"), show_col_types = F)
+blast_16s <- read_csv(paste0(folder_data, "temp/14-blast_16s.csv"), show_col_types = F)
+
+
+contigs_blast <- blast_genomes_top %>%
+    rename(contig_id = qseqid) %>%
+    left_join(contigs_large) %>%
+    filter(genome_id %in% isolates$genome_id[!is.na(isolates$exp_id)]) %>%
+    drop_na %>%
+    select(genome_id, contig_id, bitscore, length, pident, species_name, contig_name, contig_length)
+
+write_csv(contigs_blast, paste0(folder_data, "temp/14-contigs_blast.csv"))
+
+
+
+
+
+
