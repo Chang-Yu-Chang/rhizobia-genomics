@@ -94,7 +94,7 @@ theme_facets <- theme(
 rhizobia_site_colors <- brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)] %>% setNames(c("high-elevation", "low-elevation", "suburban", "urban"))
 rhizobia_population_colors <- c(MLBS = "#EF476F", Phila = "#004c54")
 ensifer_sp_colors <- c(`Ensifer medicae` = "#6E2594", `Ensifer meliloti` = "#D38F22", `Ensifer sp.` = "#84828F", `Ensifer adhaerens` = "#CEE7E6")
-
+contig_colors <- c(chromosome = "steelblue4", pSymA = "#6c2593", pSymB = "#c48de2", pSMED02 = "#9E6B1A", pSMED01 = "#E8BB73")
 
 
 
