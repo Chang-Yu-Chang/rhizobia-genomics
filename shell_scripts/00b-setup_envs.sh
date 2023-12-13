@@ -37,6 +37,124 @@ mamba create -n medaka
 mamba activate medaka
 mamba install --yes -c bioconda medaka=1.8.0
 
+
+
+# Install ncbi-datasets v15.27.1
+mamba create -y -n ncbi-datasets
+mamba activate ncbi-datasets
+mamba install --yes -c bioconda ncbi-datasets=15.27.1
+
+# Install minimap2 v2.26
+mamba create -y -n minimap2
+mamba activate minimap2
+mamba install --yes -c bioconda minimap2=2.26
+
+# # Install BWA v0.7.17
+# # BWA is a software package for mapping low-divergent sequences against a large reference genome,
+# mamba create -y -n bwa
+# mamba activate bwa
+# mamba install --yes -c bioconda bwa=0.7.17
+
+# Install Samtools v1.18
+# samtools are Tools for dealing with SAM, BAM and CRAM files
+mamba create -y -n samtools
+mamba activate samtools
+mamba install --yes -c bioconda samtools=1.18
+
+# Install Snippy v4.6.0
+# Snippy is Rapid haploid variant calling and core genome alignment
+mamba create -y -n snippy
+mamba activate snippy
+mamba install --yes -c bioconda snippy=4.6.0
+mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
+
+# # Install bcftools 1.18
+# # BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
+# mamba create -y -n bcftools
+# mamba activate bcftools
+# mamba install --yes -c bioconda bcftools=1.18
+#
+# # Install vcftools 0.1.16
+# # vcftools is A set of tools written in Perl and C++ for working with VCF files.
+# mamba create -y -n vcftools
+# mamba activate vcftools
+# mamba install --yes -c bioconda vcftools=0.1.16
+
+# Install sniffles2 v2.2
+# A fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
+mamba create -y -n sniffles
+mamba activate sniffles
+mamba install --yes -c bioconda sniffles=2.2
+
+
+# Install Mash v2.3
+# Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
+mamba create -n mash
+mamba activate mash
+mamba install --yes -c bioconda mash=2.3
+# Download the RefSeq database. It includes both genomes and plasmids
+mkdir -p ~/bioinformatics/mash
+cd ~/bioinformatics/mash/
+wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O refseq.genomes%2Bplasmid.k21.s1000.msh
+
+# Install Sourmash v4.8.4
+# Quickly search, compare, and analyze genomic and metagenomic data sets
+mamba create -n sourmash
+mamba activate sourmash
+mamba install --yes -c bioconda sourmash=4.6.1
+# Download a prefetch GTDB R8 genomic database for k=31
+mkdir -p ~/bioinformatics/sourmash
+cd ~/bioinformatics/sourmash/
+# Install zip that is used for sourmash gather
+wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
+
+
+# # genomic representatives; this is 4.4GB with 85,205 species-level genomes. This took ~7min
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-reps.k31.sbt.zip -O gtdb-rs214-reps.k31.sbt.zip
+# # genomic all genomes; this is 23GB with 402,709 genomes. This took 40min
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.sbt.zip -O gtdb-rs214-k31.sbt.zip
+# # download species-level lineages
+# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214.lineages.csv.gz -O gtdb-rs214.lineages.csv.gz
+# gunzip gtdb-rs214.lineages.csv.gz
+#
+#wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/genbank-2022.03/genbank-2022.03-bacteria-k31.zip -O genbank-2022.03-bacteria-k31.zip
+# Create a Sequence Bloom Tree (SBT) database from the download database
+#sourmash index -k 31 genbank-2022.03-bacteria-k31.sbt.zip genbank-2022.03-bacteria-k31.zip
+# `sourmash index` to create a Sequence Bloom Tree (SBT) that can be quickly searched on disk; this is the same format in which we provide GenBank and other databases
+# This will take a while
+#wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
+
+# Install barrnap v0.9
+# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
+mamba create -n barrnap
+mamba activate barrnap
+mamba install --yes -c bioconda barrnap=0.9
+# Downalod the RefSeq 16S database
+#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
+# Make it into a database
+#makeblastdb -in $refseq_16s_db -dbtype nucl
+
+# Install blast v2.14.1
+mamba create -n blast
+mamba activate blast
+mamba install --yes -c bioconda blast=2.14.1
+
+
+# Install prokka v1.14.5
+mamba create -n prokka
+mamba activate prokka
+mamba install --yes -c bioconda prokka=1.14.5
+
+
+
+
+
+
+
+
+
+
+
 # Install Bakta v1.6.1
 # bakta, a new command-line software tool for the robust, taxon-independent, thorough and, nonetheless, fast annotation of bacterial genomes.
 mamba create -n bakta
@@ -68,52 +186,6 @@ mamba create -n busco
 mamba activate busco
 mamba install --yes -c bioconda busco=5.4.7
 
-# Install barrnap v0.9
-# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
-mamba create -n barrnap
-mamba activate barrnap
-mamba install --yes -c bioconda barrnap=0.9
-
-# Downalod the RefSeq 16S database
-#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
-# Make it into a database
-#makeblastdb -in $refseq_16s_db -dbtype nucl
-
-# Install Mash v2.3
-# Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
-mamba create -n mash
-mamba activate mash
-mamba install --yes -c bioconda mash=2.3
-# Download the RefSeq database. It includes both genomes and plasmids
-mkdir -p ~/bioinformatics/mash
-cd ~/bioinformatics/mash/
-wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O refseq.genomes%2Bplasmid.k21.s1000.msh
-
-# Install Sourmash v4.8.4
-# Quickly search, compare, and analyze genomic and metagenomic data sets
-mamba create -n sourmash
-mamba activate sourmash
-mamba install --yes -c bioconda sourmash=4.6.1
-# Download a prefetch GTDB R8 genomic database for k=31
-mkdir -p ~/bioinformatics/sourmash
-cd ~/bioinformatics/sourmash/
-# Install zip that is used for sourmash gather
-wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
-
-# # genomic representatives; this is 4.4GB with 85,205 species-level genomes. This took ~7min
-# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-reps.k31.sbt.zip -O gtdb-rs214-reps.k31.sbt.zip
-# # genomic all genomes; this is 23GB with 402,709 genomes. This took 40min
-# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.sbt.zip -O gtdb-rs214-k31.sbt.zip
-# # download species-level lineages
-# wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214.lineages.csv.gz -O gtdb-rs214.lineages.csv.gz
-# gunzip gtdb-rs214.lineages.csv.gz
-#
-#wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/genbank-2022.03/genbank-2022.03-bacteria-k31.zip -O genbank-2022.03-bacteria-k31.zip
-# Create a Sequence Bloom Tree (SBT) database from the download database
-#sourmash index -k 31 genbank-2022.03-bacteria-k31.sbt.zip genbank-2022.03-bacteria-k31.zip
-# `sourmash index` to create a Sequence Bloom Tree (SBT) that can be quickly searched on disk; this is the same format in which we provide GenBank and other databases
-# This will take a while
-#wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
 
 
 # Install FastANI v1.31
@@ -188,52 +260,12 @@ rm -rf .git # remove the git
 PLASMID_DB=$(pwd)
 python3 INSTALL.py kma_index
 
-# Install minimap2 v2.26
-mamba create -y -n minimap2
-mamba activate minimap2
-mamba install --yes -c bioconda minimap2=2.26
-
-# Install BWA v0.7.17
-# BWA is a software package for mapping low-divergent sequences against a large reference genome,
-mamba create -y -n bwa
-mamba activate bwa
-mamba install --yes -c bioconda bwa=0.7.17
-
-# Install Samtools v1.18
-# samtools are Tools for dealing with SAM, BAM and CRAM files
-mamba create -y -n samtools
-mamba activate samtools
-mamba install --yes -c bioconda samtools=1.18
-
-# Install Snippy v4.6.0
-# Snippy is Rapid haploid variant calling and core genome alignment
-mamba create -y -n snippy
-mamba activate snippy
-mamba install --yes -c bioconda snippy=4.6.0
-mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
-
-# Install bcftools 1.18
-# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
-mamba create -y -n bcftools
-mamba activate bcftools
-mamba install --yes -c bioconda bcftools=1.18
-
-# Install vcftools 0.1.16
-# vcftools is A set of tools written in Perl and C++ for working with VCF files.
-mamba create -y -n vcftools
-mamba activate vcftools
-mamba install --yes -c bioconda vcftools=0.1.16
 
 # Install Freebayes v1.3.6
 mamba create -y -n freebayes
 mamba activate freebayes
 mamba install --yes -c bioconda freebayes=1.3.6
 
-# Install sniffles2 v2.2
-# A fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
-mamba create -y -n sniffles
-mamba activate sniffles
-mamba install --yes -c bioconda sniffles=2.2
 
 # Install ggcaller v1.3.2
 # ggCaller traverses Bifrost graphs constructed from bacterial genomes to identify putative gene sequences, known as open reading frames (ORFs).

@@ -595,6 +595,10 @@ p <- plot_grid(p1,p3,p2,p4,p5,p6, rel_widths = c(1,0.15,0.15,0.5,0.5,0.5),
 ggsave(paste0(folder_data, "temp/17b-07-tree_contig_heatmap.png"), p, width = 20, height = 20)
 
 
+isolates_gc %>%
+    left_join(isolates_label) %>%
+    filter(species_name=="Ensifer medicae") %>%
+    filter(temperature=="30c")
 
 
 
