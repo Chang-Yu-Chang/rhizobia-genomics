@@ -16,25 +16,10 @@ isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types
     filter(!genome_id %in% paste0("g", c(1,7,12,14,18)))
 egc <- read_csv(paste0(folder_data, "temp/17-egc.csv"), show_col_types = F)
 gcalls <- read_csv(paste0(folder_data, "temp/17-gcalls.csv"), show_col_types = F)
-contigs_mash <- read_csv(paste0(folder_data, "temp/14-contigs_mash.csv"), show_col_types = F)
-contigs_blast <- read_csv(paste0(folder_data, "temp/14-contigs_blast.csv"), show_col_types = F)
-isolates_mash <- read_csv(paste0(folder_data, "temp/14-isolates_mash.csv"), show_col_types = F)
+egcalls <- read_csv(paste0(folder_data, "temp/17-egcalls.csv"), show_col_types = F)
 nrow(isolates) # This should be 32 ensifer isolates + 4 ncbi genomes
 
 # 0. Data wrangling ----
-# 0.1.
-contigs_mash <- contigs_mash %>%
-    drop_na() %>%
-    unite(col = "contig_unique_id", genome_id, contig_id, remove = F)
-
-
-# 0.2. join data ----
-egcalls <- egc %>%
-    left_join(gcalls) %>%
-    select(unique_id, gene_cluster_id, genome_id, contig_id, gene_callers_id, max_num_paralogs, prokka_prodigal_acc) %>%
-    left_join(contigs_mash) %>%
-    right_join(isolates) %>%
-    filter(!is.na(contig_length))
 
 
 # 0.3 gene numbers on each ----

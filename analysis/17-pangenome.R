@@ -136,17 +136,6 @@ write_csv(pangenome_boots, file = paste0(folder_data, "temp/17-pangenome_boots.c
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 # 4. cross-refernece gene caller to identify the contig where the gene is from ----
 
 list_gcalls <- rep(list(NA), nrow(isolates))
@@ -157,3 +146,23 @@ for (i in 1:length(list_gcalls)) {
 }
 gcalls <- bind_rows(list_gcalls)
 write_csv(gcalls, paste0(folder_data, "temp/17-gcalls.csv"))
+
+#
+gcalls <- read_csv(paste0(folder_data, "temp/17-gcalls.csv"), show_col_types = F)
+contigs_mash <- read_csv(paste0(folder_data, "temp/14-contigs_mash.csv"), show_col_types = F)
+contigs_blast <- read_csv(paste0(folder_data, "temp/14-contigs_blast.csv"), show_col_types = F)
+isolates_mash <- read_csv(paste0(folder_data, "temp/14-isolates_mash.csv"), show_col_types = F)
+nrow(isolates) # This should be 32 ensifer isolates + 4 ncbi genomes
+
+contigs_mash <- contigs_mash %>%
+    drop_na() %>%
+    unite(col = "contig_unique_id", genome_id, contig_id, remove = F)
+
+egcalls <- egc %>%
+    left_join(gcalls) %>%
+    select(unique_id, gene_cluster_id, genome_id, contig_id, gene_callers_id, max_num_paralogs, prokka_prodigal_acc) %>%
+    left_join(contigs_mash) %>%
+    right_join(isolates) %>%
+    filter(!is.na(contig_length))
+
+write_csv(egcalls, paste0(folder_data, "temp/17-egcalls.csv"))
