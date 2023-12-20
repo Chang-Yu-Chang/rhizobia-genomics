@@ -2,11 +2,12 @@
 source ~/.zshrc
 source 00-env_vars.sh
 
-# This script aggregates the SNPs and SVs into one vcf
+# This script performs analysis comparing distance between genomes
+
+# 1. aggregates the SNPs and SVs into one vcf
 
 cd $folder_shell
 echo "08-popgen"
-
 
 for ref in usda1106 wsm419
 do
@@ -99,4 +100,44 @@ do
     # bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t[%GT\t]\n' your_file.vcf > output_table.tsv
 
 done
+
+# 2. The generates the kmers comparision matrix based on kmer signature of each genome
+conda activate
+mamba activate sourmash
+
+mkdir -p "$folder_genomics/popgen/genome_kmer"
+cd "$folder_genomics/popgen/genome_kmer"
+for i in {2..6} {8..11} 13 {15..17} 19 {20..37}
+do
+    echo "$folder_genomics/genomes/$sample_ids[$i]/04-taxonomy/genome_kmer/genome.sig"
+done |> list_sig.txt
+
+sourmash compare -o "$folder_genomics/popgen/genome_kmer/genome_kmer.txt" --from-file list_sig.txt
+sourmash compare --from-file list_sig.txt --csv "$folder_genomics/popgen/genome_kmer/genome_kmer.txt"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
