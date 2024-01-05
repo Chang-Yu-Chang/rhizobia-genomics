@@ -1,0 +1,1 @@
+2024-01-05 15:41:20	-	chaotic_franklin	-	e94a17331129cff2b9e2558d7698209f0cc3fcac	4405e3af-0ee9-452e-a9f4-3fb9a8f94477	nextflow run nf-core/bacass -r 2.1.0 -params-file nf-params.json
