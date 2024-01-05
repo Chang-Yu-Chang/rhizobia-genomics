@@ -1,9 +1,0 @@
-{
-  "assembler": "Unicycler",
-  "assembly_type": "long",
-  "input": "~/Dropbox/lab/local-adaptation/data/genomics",
-  "outdir": "~/Dropbox/lab/local-adaptaion/data/genomics",
-  "skip_pycoqc": true,
-  "skip_polish": true,
-  "skip_multiqc": true
-}

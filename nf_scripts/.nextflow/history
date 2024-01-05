@@ -1,5 +1,0 @@
-2024-01-05 15:18:14	828ms	shrivelled_marconi	OK	04df53284a4ee81a729e58c10b71db9a	3776e3f1-981d-4468-a7ac-c0a23d887173	nextflow run tutorial.nf
-2024-01-05 15:18:39	1.1s	insane_babbage	OK	74f3ca882b01ed1729a2bf3b248a91b4	3776e3f1-981d-4468-a7ac-c0a23d887173	nextflow run tutorial.nf -resume
-2024-01-05 15:20:03	1.6s	stoic_wiles	OK	74f3ca882b01ed1729a2bf3b248a91b4	52ab0c95-b773-4c19-a049-ad1fd51bb6ee	nextflow run tutorial.nf --str haha
-2024-01-05 15:20:15	1.6s	zen_goldwasser	OK	74f3ca882b01ed1729a2bf3b248a91b4	70c9f8fe-8c0c-42ca-8f6d-b0e2b31eddee	nextflow run tutorial.nf --str 'how do you do it?'
-2024-01-05 15:27:08	3.5s	boring_angela	OK	7588c46ffefb4e3c06d4ab32c745c4d5e56cdad8	876fa380-b708-4964-822d-ef1c47833a39	nextflow run hello
