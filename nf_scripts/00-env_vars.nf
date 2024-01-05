@@ -4,8 +4,6 @@
 //params.transcriptome_file = "$projectDir/data/ggal/transcriptome.fa"
 //params.multiqc = "$projectDir/multiqc"
 params {
-  raw_reads = "/Users/cychang/Dropbox/lab/local-adaptation/data/genomics/raw_reads/Chang_Q5C_1.fastq.gz"
-
   inputdir = 'path/to/your/input/'
   outdir = "/Users/cychang/Dropbox/lab/local-adaptation/data/genomics"
   workdir = 'path/to/custom_work_dir'
