@@ -166,3 +166,59 @@ egcalls <- egc %>%
     filter(!is.na(contig_length))
 
 write_csv(egcalls, paste0(folder_data, "temp/17-egcalls.csv"))
+
+# 5. calculate pairwise jaccard genetic distance between genomes based on gene content ----
+egcalls <- read_csv(paste0(folder_data, "temp/17-egcalls.csv"), show_col_types = F)
+
+egcalls_wide <- egcalls %>%
+    distinct(genome_id, gene_cluster_id) %>%
+    mutate(value = 1) %>%
+    pivot_wider(id_cols = genome_id, names_from = gene_cluster_id, values_from = value, values_fill = 0)
+isolates_label <- egcalls_wide[,1] %>%
+    left_join(isolates_mash) %>%
+    mutate(id = genome_id) %>%
+    select(id, everything())
+
+egcc_m <- as.matrix(egcalls_wide[,-1])
+dim(egcc_m) # 36 genomes
+rownames(egcc_m) <- as.character(isolates_label$genome_id)
+jdm <- proxy::dist(egcc_m, method = "Jaccard")
+dist_jac <- as.matrix(jdm) %>%
+    as_tibble() %>%
+    mutate(genome_id1 = colnames(.)) %>%
+    pivot_longer(cols = -genome_id1, names_to = "genome_id2", values_to = "distance_jaccard")
+write_csv(dist_jac, paste0(folder_data, "temp/17-dist_jac.csv"))
+
+# 6. calculate pairwise genomic fluidity genetic distance between genomes based on gene content ----
+egcalls <- read_csv(paste0(folder_data, "temp/17-egcalls.csv"), show_col_types = F)
+fluidity <- function (tb) {
+    uk = sum(tb[,1] == 1 & tb[,2] == 0)
+    ul = sum(tb[,1] == 0 & tb[,2] == 1)
+    mk = sum(tb[,1])
+    ml = sum(tb[,2])
+    gf <- (uk + ul) / (mk + ml)
+    return(gf)
+}
+
+dist_flu <- isolates_mapping %>%
+    mutate(genome_id = factor(genome_id, genome_id)) %>%
+    tidyr::expand(genome_id1 = genome_id, genome_id2 = genome_id) %>%
+    mutate(distance_fluidity = NA)
+
+for (i in 1:nrow(dist_flu)) {
+    if (dist_flu$genome_id1[i] == dist_flu$genome_id2[i]) {
+        dist_flu$distance_fluidity[i] <- 0
+        next
+    }
+
+    list_g_pair <- egcalls %>%
+        filter(genome_id %in% c(dist_flu$genome_id1[i], dist_flu$genome_id2[i])) %>%
+        distinct(gene_cluster_id, genome_id) %>%
+        mutate(value = 1) %>%
+        pivot_wider(names_from = genome_id, values_from = value, values_fill = 0) %>%
+        select(-gene_cluster_id)
+
+    dist_flu$distance_fluidity[i] <- fluidity(list_g_pair)
+}
+
+write_csv(dist_flu, paste0(folder_data, "temp/17-dist_flu.csv"))
