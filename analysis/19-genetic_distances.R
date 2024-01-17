@@ -6,9 +6,6 @@ suppressPackageStartupMessages({
     library(cowplot)
     library(janitor)
     library(ggsci)
-    #library(vcfR) # for handling VCF
-    #library(poppr) # for pop gen analysis
-    #library(ggtree)
     source(here::here("analysis/00-metadata.R"))
 })
 
@@ -48,6 +45,8 @@ dists <- dist_kmer %>%
     left_join(dist_jac) %>%
     left_join(dist_flu) %>%
     filter(genome_id1 < genome_id2)
+write_csv(dists, paste0(folder_data, "temp/19-dists_genetic.csv"))
+
 
 # 1. genetic distance ----
 p1 <- dists %>%
@@ -160,7 +159,7 @@ dists_meta <- dists_meta %>%
         rhizobia_population1 == "MLBS" & rhizobia_population2 == "MLBS" ~ "within MLBS",
         rhizobia_population1 == "Phila" & rhizobia_population2 == "Phila" ~ "within Phila",
         rhizobia_population1 == "MLBS" & rhizobia_population2 == "Phila" ~ "between MLBS and Phila",
-        rhizobia_population1 == "Phila" & rhizobia_population2 == "MLBS" ~ "conspecific",
+        rhizobia_population1 == "Phila" & rhizobia_population2 == "MLBS" ~ "between MLBS and Phila",
         TRUE ~ "others"
     ))
 

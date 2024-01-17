@@ -27,7 +27,7 @@ write_csv(genomes_mapping, paste0(folder_data, "temp/00-genomes_mapping.csv"))
 # Table for the 32 strains with growth curve and/or plant inoculation data
 isolates_mapping <- tibble(
     exp_id = c("H2M3R1", "H2M3R2", "H3M1R1", "H3M3R2", "H3M4R1", "H4M5R1", "L1M2R2", "L2M2R1",
-               "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-2 ",
+               "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-2",
                "fp1-2", "fp1-3", "fp2-2", "crp1-2", "crp1-3", "crp2-2", "gp1-1", "gp1-2",
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
     rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9), rep("suburban", 10), rep("urban", 7)),
