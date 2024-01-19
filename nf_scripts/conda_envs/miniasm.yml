@@ -1,0 +1,15 @@
+name: miniasm
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - any2fasta=0.4.2
+  - k8=0.2.5
+  - libcxx=16.0.6
+  - libzlib=1.2.13
+  - miniasm=0.3
+  - minimap2=2.26
+  - perl=5.32.1
+  - zlib=1.2.13
+prefix: /Users/cychang/miniconda3/envs/intel_env/envs/miniasm

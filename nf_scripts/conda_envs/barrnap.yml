@@ -1,0 +1,15 @@
+name: barrnap
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - barrnap=0.9
+  - bedtools=2.31.1
+  - bzip2=1.0.8
+  - hmmer=3.4
+  - libcxx=16.0.6
+  - libzlib=1.2.13
+  - perl=5.32.1
+  - xz=5.2.6
+prefix: /Users/cychang/miniconda3/envs/intel_env/envs/barrnap

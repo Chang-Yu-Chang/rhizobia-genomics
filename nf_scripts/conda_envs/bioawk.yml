@@ -1,0 +1,10 @@
+name: bioawk
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioawk=1.0
+  - libzlib=1.2.13
+  - zlib=1.2.13
+prefix: /Users/cychang/miniconda3/envs/intel_env/envs/bioawk

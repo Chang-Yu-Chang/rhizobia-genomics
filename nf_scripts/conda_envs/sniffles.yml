@@ -1,0 +1,36 @@
+name: sniffles
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bzip2=1.0.8
+  - c-ares=1.21.0
+  - ca-certificates=2023.7.22
+  - krb5=1.21.2
+  - libcurl=8.4.0
+  - libcxx=16.0.6
+  - libdeflate=1.18
+  - libedit=3.1.20191231
+  - libev=4.33
+  - libffi=3.4.2
+  - libnghttp2=1.58.0
+  - libsqlite=3.44.0
+  - libssh2=1.11.0
+  - libzlib=1.2.13
+  - ncurses=6.4
+  - openssl=3.1.4
+  - pip=23.3.1
+  - pysam=0.22.0
+  - python=3.10.13
+  - python_abi=3.10
+  - readline=8.2
+  - setuptools=68.2.2
+  - sniffles=2.2
+  - tk=8.6.13
+  - tzdata=2023c
+  - wheel=0.41.3
+  - xz=5.2.6
+  - zlib=1.2.13
+  - zstd=1.5.5
+prefix: /Users/cychang/miniconda3/envs/intel_env/envs/sniffles

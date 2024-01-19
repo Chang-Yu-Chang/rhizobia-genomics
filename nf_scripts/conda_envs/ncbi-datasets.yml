@@ -1,0 +1,9 @@
+name: ncbi-datasets
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - ca-certificates=2023.7.22
+  - ncbi-datasets-cli=15.27.1
+prefix: /Users/cychang/miniconda3/envs/intel_env/envs/ncbi-datasets
