@@ -2,12 +2,12 @@
 source ~/.zshrc
 source 00-env_vars.sh
 
-# This script performs analysis comparing distance between genomes
-
-# 1. aggregates the SNPs and SVs into one vcf
-
 cd $folder_shell
 echo "08-popgen"
+
+# This script performs analysis comparing distance between genomes
+
+# 1. aggregates the SNPs and SVs into one vcf. THis is using the genome alignment
 
 for ref in usda1106 wsm419
 do
@@ -115,14 +115,53 @@ done |> list_sig.txt
 sourmash compare -o "$folder_genomics/popgen/genome_kmer/genome_kmer.txt" --from-file list_sig.txt
 sourmash compare --from-file list_sig.txt --csv "$folder_genomics/popgen/genome_kmer/genome_kmer.txt"
 
+# 3. aggregates the SNPs and SVs into one vcf. THis is using the raw read alignment
+
+for ref in usda1106 wsm419 em1021
+do
+    mkdir -p "$folder_genomics/popgen/read_$ref"
+    # Snippy to call SNPs
+    conda activate
+    mamba activate snippy
+
+    mkdir -p "$folder_genomics/popgen/read_$ref/snippy/genomes"
+    # for i in {4..6} {8..11} 13 {16..17} 19 {20..37}
+    # do
+    #     mkdir -p $folder_genomics/popgen/read_$ref/snippy/genomes/g$i
+    #     cp $folder_genomes/$sample_ids[$i]/03-variant_calling/read_$ref/snippy/* $folder_genomics/popgen/read_$ref/snippy/genomes/g$i/
+    # done
+
+    #
+    # cd $folder_genomics/popgen/read_$ref/snippy/genomes/
+    # snippy-core \
+    #     --ref "$folder_genomes/$ref/02-denovo_assembly/genome.fasta" \
+    #     $folder_genomics/popgen/read_$ref/snippy/genomes/* \
+    #     --prefix "$folder_genomics/popgen/read_$ref/snippy/core"
+
+done
+
+ref=em1021
+cd $folder_genomics/popgen/read_$ref/snippy/genomes/
+snippy-core \
+    --ref "$folder_genomes/$ref/02-denovo_assembly/genome.fasta" \
+    g20 g21 g22 g23 g24 g25 g26 g27 g31 g32 g33 g34 g35 g36 g37 \
+    --prefix "$folder_genomics/popgen/read_$ref/snippy/core"
+
+ref=wsm419
+cd $folder_genomics/popgen/read_$ref/snippy/genomes/
+snippy-core \
+    --ref "$folder_genomes/$ref/02-denovo_assembly/genome.fasta" \
+    g4 g5 g6 g8 g9 g11 g13 g16 g17 g19 g28 g29 g30 \
+    --prefix "$folder_genomics/popgen/read_$ref/snippy/core"
 
 
 
+# 4. Filter SNPs to retain those with delpth values 20-230
+mamba activate bcftools
+bcftools stats core.vcf
 
-
-
-
-
+mamba activate vcftools
+vcftools --vcf core.vcf --out output
 
 
 
