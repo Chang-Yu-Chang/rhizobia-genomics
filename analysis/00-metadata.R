@@ -1,11 +1,7 @@
-# This script stores the metadata shared by all scripts
+#' This script stores the metadata shared by all scripts
 
-renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(janitor)
-    library(RColorBrewer)
-})
+library(tidyverse)
+library(janitor)
 
 # This main folder depends on your home directory and user name
 folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
