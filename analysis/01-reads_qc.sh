@@ -6,14 +6,14 @@ source 00-env_vars.sh
 
 cd $folder_shell
 
-for i in {24..41}
+for i in {1..38}
 do
     echo "$folder_raw/$batch_names[$i]/$sample_ids[$i]"
-    raw_reads="$folder_raw/$batch_names[$i]/$sample_ids[$i]/reads/raw_reads.fastq.gz"
-    filtered_reads="$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.fastq.gz"
+    raw_reads="$folder_genomics/raw_reads/$genome_ids[$i].fastq.gz"
+    filtered_reads="$folder_genomics/assembly/$genome_id[$i]/filtered_reads.fastq.gz"
 
     # Filter the worst 5% reads via filtlong
-    mkdir -p "$folder_genomes/$sample_ids[$i]/01-reads_qc"
+    mkdir -p "$folder_genomes/assembly/$genome_id[$i]"
     zsh 01a-filter_reads.sh \
         $raw_reads \
         $filtered_reads
@@ -21,12 +21,12 @@ do
     # Extract the filtered reads to a txt file
     zsh 01b-extract_reads.sh \
         $filtered_reads \
-        "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.txt"
-
+        "$folder_genomics/assembly/$genome_id[$i]/filtered_reads.txt" 
+    
     # Plot the read data
     Rscript 01c-plot_reads.R \
-        "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads.txt" \
-        "$folder_genomes/$sample_ids[$i]/01-reads_qc/filtered_reads_qc.png"
+        "$folder_genomics/assembly/$genome_id[$i]/filtered_reads.txt"  \
+        "$folder_genomics/assembly/$genome_id[$i]/filtered_reads_qc.png" 
 done
 
 
