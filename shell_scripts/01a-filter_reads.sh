@@ -8,6 +8,6 @@ source ~/.zshrc
 conda activate
 mamba activate filtlong
 
-#filtlong --keep_percent 95 $1 | gzip > $2
-filtlong --keep_percent 95 $1
+filtlong --keep_percent 95 $1 | gzip > $2
+#filtlong --keep_percent 95 $1 
 # `--keep_percent 95` throw out the worst 5% of reads

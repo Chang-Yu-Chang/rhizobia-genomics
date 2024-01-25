@@ -41,14 +41,11 @@ cat ~/miniconda3/envs/intel_env/.condarc
 #   - bioconda
 #   - defaults
 
-
 # 4. Install mamba under the created conda env intel_env
 conda install -c conda-forge mamba
 mamba init
 # Note that this command only modifies .bash_profile if you work in bash. For zsh environment, copy-paste the generated text from .bash_profile to .zshrc. Close and re-open a shell session. This step is essential for mamba activate to work
 mamba env list
-
-
 
 # 5. Install docker
 brew install docker # use homebrew to install docker

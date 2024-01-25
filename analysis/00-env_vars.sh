@@ -13,4 +13,4 @@ folder_genomics="$folder_data/genomics"
 table_file="$folder_data/temp/00-genomes.csv"
 batch_names=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 1)}")
 sample_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
-#accessions=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 4)}")
+genome_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
