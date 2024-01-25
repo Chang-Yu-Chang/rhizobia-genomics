@@ -1,14 +1,13 @@
 #' This script plots the trait data of plant inoculation experiments
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(RColorBrewer)
-    library(ellipse) # for calculating the ellipse
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(RColorBrewer)
+library(ellipse) # for calculating the ellipse
+source(here::here("analysis/00-metadata.R"))
+
 
 # 0. read data ----
 treatments <- read_csv(paste0(folder_data, "temp/23-treatments.csv"))
