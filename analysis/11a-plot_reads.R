@@ -1,24 +1,20 @@
 #' This script summarize assembled genome information
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(janitor)
-    library(seqinr)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(janitor)
+library(seqinr)
+source(here::here("analysis/00-metadata.R"))
 
-# 0.1 read data ----
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F) %>% filter(!is.na(rhizobia_population))
-filtered_reads <- read_csv(paste0(folder_data, "temp/11-filtered_reads.csv"), show_col_types = F)
+genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
+filtered_reads <- read_csv(paste0(folder_data, "temp/11-filtered_reads.csv"))
 
-# 0.2 clean up ----
-sum(filtered_reads$length>80000) # 6 reads with > 8kb length
-filtered_reads <- filtered_reads %>%
-    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-    filter(length < 80000)
+# Clean up 
+# sum(filtered_reads$length>80000) # 6 reads with > 8kb length
+# filtered_reads <- filtered_reads %>%
+#     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+#     filter(length < 80000)
 
-# 0.3. numbers ----
 # Number of reads per sample
 n_reads <- filtered_reads %>%
     group_by(genome_id) %>%
