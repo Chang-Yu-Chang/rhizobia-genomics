@@ -8,21 +8,33 @@ cd $folder_shell
 
 mkdir -p $folder_genomics/annotation
 
-for i in 1 8 16 18 {22..38}
+for i in 8 19 24 25
 do
-    genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
-
     # Annotate genomes via prokka
     mkdir -p $folder_genomics/annotation/$genome_ids[$i]/prokka
     zsh 03a-prokka.sh \
-        $genome_fa \
+        $folder_genomics/genomes/$genome_ids[$i].fasta \
         $folder_genomics/annotation/$genome_ids[$i]/prokka
-
 done
+
+
+for ref in em1021 em1022 usda1106 wsm419
+do
+    # Annotate genomes via prokka
+    mkdir -p $folder_genomics/annotation/$ref/prokka
+    zsh 03a-prokka.sh \
+        $folder_genomics/genomes/$ref.fasta \
+        $folder_genomics/annotation/$ref/prokka
+done
+
+
+
+
+
 
 # Consolidate annotation gff
 mkdir -p $folder_genomics/gff
 for i in {1..38}
 do
-    cp $folder_genomics/annotation/prokka/$genome_ids[$i]/annotation.gff $folder_genomics/gff/$genome_ids[$i].gff
+    cp $folder_genomics/annotation/$genome_ids[$i]/prokka/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
 done

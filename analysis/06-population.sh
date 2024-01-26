@@ -7,14 +7,18 @@ cd $folder_shell
 # This script performs analysis comparing distance between genomes
 mkdir -p $folder_genomics/popgen
 
-
 # 1. Calculate ANI
 mkdir -p $folder_genomics/popgen/fastani
-for i in {1..42}
-do
-    echo -e $folder_genomics/genomes/$genome_ids[$i].fasta
-done >| $folder_genomics/popgen/fastani/list_genomes_for_ani.txt
 
+## Create a list of genome fasta files
+for i in {1..38}; do; echo -e $folder_genomics/genomes/$genome_ids[$i].fasta
+done >| $folder_genomics/popgen/fastani/list_genomes.txt
+echo $folder_genomics/genomes/em1021.fasta >> $folder_genomics/popgen/fastani/list_genomes.txt
+echo $folder_genomics/genomes/em1022.fasta >> $folder_genomics/popgen/fastani/list_genomes.txt
+echo $folder_genomics/genomes/usda1106.fasta >> $folder_genomics/popgen/fastani/list_genomes.txt
+echo $folder_genomics/genomes/wsm419.fasta >> $folder_genomics/popgen/fastani/list_genomes.txt
+
+## Compute ani
 zsh 06a-fastani.sh \
     $folder_genomics/popgen/fastani/list_genomes_for_ani.txt \
     $folder_genomics/popgen/fastani/ani.txt
@@ -39,16 +43,16 @@ done
 
 ## Create a list of kmer signatures
 for i in {1..38}; do; echo $folder_genomics/popgen/kmer/$genome_ids[$i].sig
-done |> $folder_genomics/popgen/kmer/list_sig.txt
-echo $folder_genomics/popgen/kmer/em1021.sig >> $folder_genomics/popgen/kmer/list_sig.txt
-echo $folder_genomics/popgen/kmer/em1022.sig >> $folder_genomics/popgen/kmer/list_sig.txt
-echo $folder_genomics/popgen/kmer/usda1106.sig >> $folder_genomics/popgen/kmer/list_sig.txt
-echo $folder_genomics/popgen/kmer/wsm419.sig >> $folder_genomics/popgen/kmer/list_sig.txt
+done |> $folder_genomics/popgen/kmer/list_sigs.txt
+echo $folder_genomics/popgen/kmer/em1021.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+echo $folder_genomics/popgen/kmer/em1022.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+echo $folder_genomics/popgen/kmer/usda1106.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+echo $folder_genomics/popgen/kmer/wsm419.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
 
 
 ## Compare signatures
 zsh 06c-compare_kmer.sh \
-    $folder_genomics/popgen/kmer/list_sig.txt \
+    $folder_genomics/popgen/kmer/list_sigs.txt \
     $folder_genomics/popgen/kmer/kmer.txt
     
 
