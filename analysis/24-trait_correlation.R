@@ -210,3 +210,20 @@ tb_reps_exp2 <- generate_reps(trait1 = "35c_r", trait = "nodule_number") # THis 
 write_csv(tb_reps_exp1, paste0(folder_data, "temp/24-tb_reps_exp1.csv"))
 write_csv(tb_reps_exp2, paste0(folder_data, "temp/24-tb_reps_exp2.csv"))
 
+
+# 3. Calcualte the mean values 
+tr_gc_wide <- tr_gc %>%
+    group_by(exp_id, temperature) %>%
+    summarize(r_se = sd(r, na.rm = T), lag_se = sd(r,na.rm = T), maxOD_se = sd(maxOD,na.rm = T),
+                r = mean(r, na.rm = T), lag = mean(r,na.rm = T), maxOD = mean(maxOD,na.rm = T)) %>%
+    pivot_wider(names_from = temperature, values_from = c(r, lag, maxOD, r_se, lag_se, maxOD_se)) %>%
+    ungroup()
+tr_sym_wide <- tr_sym %>%
+    group_by(exp_id) %>%
+    summarize(nodule_number_se = sd(nodule_number, na.rm = T), dry_weight_mg_se = sd(dry_weight_mg, na.rm = T),
+                nodule_number = mean(nodule_number, na.rm = T), dry_weight_mg = mean(dry_weight_mg, na.rm = T)) %>%
+    filter(exp_id != "filter")
+
+tr_traits_mean <- tr_gc_wide %>% left_join(tr_sym_wide)
+write_csv(tr_traits_mean, paste0(folder_data, "temp/24-tb_traits_mean.csv"))
+

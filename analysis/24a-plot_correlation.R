@@ -9,9 +9,10 @@ source(here::here("analysis/00-metadata.R"))
 
 
 tb_traits <- read_csv(paste0(folder_data, "temp/24-tb_traits.csv"))
-tb_traits_dif <- read_csv(paste0(folder_data, "temp/24-tb_traits_dif.csv"))
-tb_reps_exp1 <- read_csv(paste0(folder_data, "temp/24-tb_reps_exp1.csv"))
-tb_reps_exp2 <- read_csv(paste0(folder_data, "temp/24-tb_reps_exp2.csv"))
+tb_traits_mean <- read_csv(paste0(folder_data, "temp/24-tb_traits_mean.csv"))
+# tb_traits_dif <- read_csv(paste0(folder_data, "temp/24-tb_traits_dif.csv"))
+# tb_reps_exp1 <- read_csv(paste0(folder_data, "temp/24-tb_reps_exp1.csv"))
+# tb_reps_exp2 <- read_csv(paste0(folder_data, "temp/24-tb_reps_exp2.csv"))
 
 # 
 length(unique(tb_traits$trait1)) # 12 growth traits
@@ -171,12 +172,31 @@ ggsave(paste0(folder_data, "temp/24a-02-correlation.png"), p, width = 10, height
 tb_traits_dif %>%
     filter(trait1 == name_trait1[1], trait2 == name_trait2[1]) 
 
+# 3. Plot mean value
+p1 <- tb_traits_mean %>%
+    ggplot() +
+    geom_point(aes(x = r_30c, y = dry_weight_mg), size = 3, shape = 21, stroke = 1) +
+    geom_segment(aes(x = r_30c, xend = r_30c, y = dry_weight_mg - dry_weight_mg_se, yend = dry_weight_mg + dry_weight_mg_se)) +
+    geom_segment(aes(x = r_30c - r_se_30c, xend = r_30c + r_se_30c, y = dry_weight_mg, yend = dry_weight_mg)) +
+    theme_classic()
 
-# 3. Plot the trait pairs that are correlated 
-tb_traits_dif %>%
-    filter(n >= 95)  %>%
+p2 <- tb_traits_mean %>%
+    ggplot() +
+    geom_point(aes(x = r_30c, y = nodule_number), size = 3, shape = 21, stroke = 1) +
+    geom_segment(aes(x = r_30c, xend = r_30c, y = nodule_number - nodule_number_se, yend = nodule_number + nodule_number_se)) +
+    geom_segment(aes(x = r_30c - r_se_30c, xend = r_30c + r_se_30c, y = nodule_number, yend = nodule_number)) +
+    theme_classic()
+
+p <- plot_grid(p1, p2, nrow = 1, scale = 0.95) + theme(plot.background = element_rect(color = NA, fill = "white"))
+
+ggsave(paste0(folder_data, "temp/24a-03-trait_mean.png"), p, width = 8, height = 4)
+
+# # 3. Plot the trait pairs that are correlated 
+# tb_traits_dif %>%
+#     filter(n >= 95)  %>%
     
     # ggplot() +
     # geom_histogram(aes(x = value, fill = name), position = "identity", alpha = 0.3) +
     # geom_vline(xintercept = 0) +
     # theme_classic()
+
