@@ -12,8 +12,7 @@ genome_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
 for i in {1..38}
 do 
-    cp $folder_data/raw/$batch_names[$i]/$sample_names[$i]/reads/raw_reads.fastq.gz \
+    cp -u $folder_data/raw/$batch_names[$i]/$sample_names[$i]/reads/raw_reads.fastq.gz \
         $folder_genomics/raw_reads/$genome_ids[$i].fastq.gz
 done
 
-cp $folder_data/temp/00-genomes.csv $folder_genomics/raw_reads/00-genomes.csv

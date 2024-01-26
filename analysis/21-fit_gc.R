@@ -7,13 +7,13 @@ library(data.table)
 library(mgcv)
 source(here::here("analysis/00-metadata.R"))
 
-gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
+gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"))
 
 list_gcs <- rep(list(NA), 4)
-list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv"), show_col_types = F) # 30C
-list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv"), show_col_types = F) # 35C
-list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curve4/rhizobia_growth_curve.csv"), show_col_types = F) # 25C
-list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curve5/rhizobia_growth_curve.csv"), show_col_types = F) # 40C
+list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv")) # 30C
+list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv")) # 35C
+list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curve4/rhizobia_growth_curve.csv")) # 25C
+list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curve5/rhizobia_growth_curve.csv")) # 40C
 names(list_gcs) <- c("30c", "35c", "25c", "40c")
 
 # Tidy up time series
@@ -28,7 +28,6 @@ wide_to_long <- function (gc) {
         mutate(well = clean_well_names(well)) %>%
         left_join(gc_plate) %>%
         rename(abs = od600)
-
 }
 extract_blank <- function (gc) {
     #' This function takes the long format of gc to calculate the average abs of blank at each time point
@@ -44,7 +43,6 @@ subtract_blank <- function (gc, gc_blank) {
         mutate(abs = abs - abs_blank) %>%
         mutate(abs = ifelse(abs < 0, 0, abs)) %>%
         filter(exp_id != "blank")
-
 }
 summarize_gc <- function (gc) {
     #' This function takes the gc (after blank) and average across replicates

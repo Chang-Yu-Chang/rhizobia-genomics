@@ -9,7 +9,7 @@ cd $folder_shell
 
 mkdir -p $folder_genomics/annotation
 
-for i in {1..38}
+for i in {22..26}
 do
     genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
 

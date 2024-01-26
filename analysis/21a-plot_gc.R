@@ -6,11 +6,11 @@ library(cowplot)
 library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
-isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
-gcs <- read_csv(paste0(folder_data, 'temp/21-gcs.csv'), show_col_types = F)
-gc_summs <- read_csv(paste0(folder_data, 'temp/21-gc_summs.csv'), show_col_types = F)
-gc_prms <- read_csv(paste0(folder_data, 'temp/21-gc_prms.csv'), show_col_types = F)
-gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_col_types = F)
+isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"))
+gcs <- read_csv(paste0(folder_data, 'temp/21-gcs.csv'))
+gc_summs <- read_csv(paste0(folder_data, 'temp/21-gc_summs.csv'))
+gc_prms <- read_csv(paste0(folder_data, 'temp/21-gc_prms.csv'))
+gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
 
 
 # 0. clean up data ----

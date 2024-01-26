@@ -9,11 +9,11 @@ source(here::here("analysis/00-metadata.R"))
 genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
 filtered_reads <- read_csv(paste0(folder_data, "temp/11-filtered_reads.csv"))
 
-# Clean up 
-# sum(filtered_reads$length>80000) # 6 reads with > 8kb length
-# filtered_reads <- filtered_reads %>%
-#     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-#     filter(length < 80000)
+# Remove reads that are too long
+sum(filtered_reads$length > 80000) # 9 reads with > 80kb length
+filtered_reads <- filtered_reads %>%
+    mutate(genome_id = factor(genome_id, genomes$genome_id)) %>%
+    filter(length < 80000)
 
 # Number of reads per sample
 n_reads <- filtered_reads %>%
@@ -21,23 +21,19 @@ n_reads <- filtered_reads %>%
     dplyr::count(name = "n_reads") %>%
     ungroup()
 range(n_reads$n_reads) # 47161 234638
-median(n_reads$n_reads) # 104054.5
+median(n_reads$n_reads) # 109573.5
 
 
-
-# 1. Read length vs. q score ----
+# 1. Read length vs. q score
 filtered_reads_median <- filtered_reads %>%
     group_by(genome_id) %>%
     summarize(median_q_score = median(q_score), median_length = median(length))
 
 p <- filtered_reads %>%
-    #filter(genome_id %in% c("g2", "g3")) %>%
     ggplot() +
     geom_hline(data = filtered_reads_median, aes(yintercept = median_q_score), linetype = 2, color = "maroon") +
     geom_point(aes(x = length/1000, y = q_score), size = 0.2, alpha = 0.2) +
     geom_text(data = filtered_reads_median, aes(y = median_q_score, label = paste0("median:", median_q_score)), x = Inf, color = "maroon", hjust = 1.2, vjust = -1) +
-    #scale_x_continuous(labels = scales::label_comma()) +
-    #scale_y_continuous(limits = c(0, 41)) +
     facet_wrap(~genome_id, ncol = 5) +
     theme_classic() +
     theme(
@@ -63,7 +59,7 @@ ggsave(paste0(folder_data, "temp/11a-02-read_length.png"), p, width = 10, height
 #
 range(filtered_reads_median$median_length) # 2748 5367
 
-# 3. weighted histogram of read length ----
+# 3. weighted histogram of read length
 p <- filtered_reads %>%
     ggplot() +
     geom_histogram(aes(x = length/1000, weight = length/1000, y = after_stat(count/1000) ), color = "black", fill = "white", binwidth = 1) +
@@ -78,7 +74,7 @@ ggsave(paste0(folder_data, "temp/11a-03-weighted_read_length.png"), p, width = 1
 #
 range(filtered_reads_median$median_q_score) # 18.26 20.24
 
-# 4. Calculat estimated coverage ----
+# 4. Calculat estimated coverage
 filtered_reads_coverage <- filtered_reads %>%
     group_by(genome_id) %>%
     summarize(total_length = sum(length)) %>%
