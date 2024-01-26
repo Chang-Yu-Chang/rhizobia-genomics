@@ -27,3 +27,10 @@ do
     #     $bakta_db
 
 done
+
+# Consolidate annotation gff
+mkdir -p $folder_genomics/gff
+for i in {1..38}
+do
+    cp $folder_genomics/annotation/prokka/$genome_ids[$i]/annotation.gff $folder_genomics/gff/$genome_ids[$i].gff
+done

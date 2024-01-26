@@ -4,17 +4,10 @@ source ~/.zshrc
 # This uses roary to analyze pangenome
 # $1: output roary folder
 # $2: folder where the prokka annotation gffs are stored
-# $3:
-# $4:
 
 conda activate
 mamba activate roary
 
-# list_gff=("${(@f)$(tail -n +2 $2 | cut -d ',' -f 1)}")
-# echo $list_gff
-
-
-#cd $folder_temp_result/summary/42-roary
 roary -f $1 -e -n -i 95 -cd 99 -s $2/*
 # `-f STR` output directory
 # `-e` create a multiFASTA alignment of core genes using PRANK

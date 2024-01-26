@@ -72,6 +72,7 @@ do
 done
 
 
+# Consolidate genome fasta
 for i in {1..38}
 do
     dir=$folder_genomics/assembly/$genome_ids[$i]

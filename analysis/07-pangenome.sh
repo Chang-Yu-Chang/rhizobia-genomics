@@ -5,37 +5,30 @@ source 00-env_vars.sh
 # This script implements pangenome analysis
 
 cd $folder_shell
-echo "07-pangenome"
 mkdir -p $folder_genomics/pangenome
-folder_pangenome="$folder_genomics/pangenome"
+
+# Calculate ANI
+mkfor -p $folder_genomics/fastani
+for i in {1..42}
+do
+    echo -e $folder_genomics/genomes/$genome_ids[$i].fasta
+done >| $folder_genomics/fastani/list_genomes_for_ani.txt
+
+zsh 07a-fastani.sh \
+    $folder_genomics/fastani/list_genomes_for_ani.txt \
+    $folder_genomics/fastani/ani.txt
 
 # Roary
-rm -rf $folder_pangenome/roary_gff
-mkdir -p $folder_pangenome/roary_gff/
-for i in {1..23} {24..41}
-do
-    cp "$folder_genomes/$sample_ids[$i]/05-gene_annotation/prokka/annotated.gff" "$folder_pangenome/roary_gff/$sample_ids[$i].gff"
-done
-
-zsh 07f-roary.sh \
-    "$folder_pangenome/roary_rhizobia" \
-    "$folder_pangenome/roary_gff"
+mkdir -p $folder_genomics/pangenome/roary
+zsh 07b-roary.sh \
+    $folder_genomics/pangenome/roary \
+    $folder_genomics/gff
 
 # Panaroo
-mkdir -p $folder_pangenome/panaroo_gff/
-
-for i in {2..6} {8..11} 13 {15..17}, {19..37} {38..42}
-do
-    cp "$folder_genomes/$sample_ids[$i]/05-gene_annotation/prokka/annotated.gff" "$folder_pangenome/panaroo_gff/$sample_ids[$i].gff"
-done
-
-
-mamba activate panaroo
-panaroo -i $folder_pangenome/panaroo_gff/*.gff \
-    -o $folder_pangenome/panaroo_ensifer \
-    -t 10 \
-    --clean-mode moderate --remove-invalid-genes
-
+mkdir -p $folder_genomics/pangenome/panaroo
+zsh 07c-panaroo.sh \
+    $folder_genomics/pangenome/panaroo \
+    $folder_genomics/gff/*.gff 
 
 
 
