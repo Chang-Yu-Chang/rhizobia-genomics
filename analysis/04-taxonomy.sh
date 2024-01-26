@@ -53,11 +53,6 @@ do
         $blast_genomes_db \
         $dir/blast_genome/taxonomy.txt
 
-    # Compare the k-mer signature among genomes
-    mkdir -p $dir/kmer
-    zsh 04f-genome_kmer.sh \
-        $genome_fa \
-        $dir/kmer/genome.sig
 done
 
 

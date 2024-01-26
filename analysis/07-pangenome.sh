@@ -7,26 +7,15 @@ source 00-env_vars.sh
 cd $folder_shell
 mkdir -p $folder_genomics/pangenome
 
-# Calculate ANI
-mkfor -p $folder_genomics/fastani
-for i in {1..42}
-do
-    echo -e $folder_genomics/genomes/$genome_ids[$i].fasta
-done >| $folder_genomics/fastani/list_genomes_for_ani.txt
-
-zsh 07a-fastani.sh \
-    $folder_genomics/fastani/list_genomes_for_ani.txt \
-    $folder_genomics/fastani/ani.txt
-
 # Roary
 mkdir -p $folder_genomics/pangenome/roary
-zsh 07b-roary.sh \
+zsh 07a-roary.sh \
     $folder_genomics/pangenome/roary \
     $folder_genomics/gff
 
 # Panaroo
 mkdir -p $folder_genomics/pangenome/panaroo
-zsh 07c-panaroo.sh \
+zsh 07b-panaroo.sh \
     $folder_genomics/pangenome/panaroo \
     $folder_genomics/gff/*.gff 
 
