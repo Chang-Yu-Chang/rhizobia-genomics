@@ -7,9 +7,17 @@ source 00-env_vars.sh
 cd $folder_shell
 mkdir -p $folder_genomics/variants
 
+
+
 # Process each genome
 for ref in em1021 wsm419
 do
+    # Index the reference genome
+    conda activate
+    mamba activate minimap2
+    minimap2 -d $folder_genomics/genomes/$ref.mmi $folder_genomics/genomes/$ref.fasta
+
+
     mkdir -p $folder_genomics/variants/$ref
     
     for i in {1..38}
@@ -18,11 +26,28 @@ do
         mkdir -p $folder_genomics/variants/$ref/$genome_ids[$i]
         dir=$folder_genomics/variants/$ref/$genome_ids[$i]
 
-        ## Align the filtered reads to reference genomes
+        # Align the filtered reads to reference genome
         zsh 03a-align_reads.sh \
+            $folder_genomics/genomes/$ref.mmi \
+            $folder_genomics/raw_reads/$genome_ids[$i].fastq.gz \
+            $dir/genome.sam
+
+        # Convert SAM to BAM
+        zsh 03b-convert_sam_to_bam.sh \
+            $dir/genome.sam \
+            $dir/genome.bam
+
+        # Call SNPs via snippy using reference
+        mkdir -p $dir/snippy
+        zsh 03c-snippy.sh \
             $folder_genomics/genomes/$ref.fasta \
-            $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.fastq.gz \
-            $dir
+            $dir/genome.bam \
+            $dir/snippy
+
+        # zsh 03a-align_reads.sh \
+        #     $folder_genomics/genomes/$ref.fasta \
+        #     $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.fastq.gz \
+        #     $dir
     done
 
     # Snippy all samples

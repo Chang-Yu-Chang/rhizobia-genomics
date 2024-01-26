@@ -1,14 +1,12 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
 
-# This aligns the filtered reads to the reference genome and calls SNPs
+# This aligns the genome to the reference
 # $1: reference genome in fasta
-# $2: target reads in fastq
-# $3: snippy output folder
+# $2: target genome
+# $3: target genome sam file
 
 conda activate
-mamba activate snippy
+mamba activate minimap2
 
-snippy --ref $1 --ctgs $2 --outdir $3 --force
-
-
+minimap2 -ax map-ont $1 $2 > $3
