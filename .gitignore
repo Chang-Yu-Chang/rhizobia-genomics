@@ -2,13 +2,15 @@
 nf_scripts/.nextflow*
 nf_scripts/work/
 
+#
+*/deprecated/
+*/deprecated1/
+*/deprecated2/
+*/deprecated3/
 
 # busco lineage
 shell_scripts/busco_*.log
 shell_scripts/busco_downloads/*
-
-# snakemake logs
-.snakemake/log/*
 
 # DS
 .DS_Store
@@ -53,5 +55,4 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 de
-#
-deprecated/
+

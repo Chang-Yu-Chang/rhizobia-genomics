@@ -29,6 +29,3 @@ do
         $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt \
         $folder_genomics/assembly/$genome_ids[$i]/filtered_reads_qc.png
 done
-
-
-

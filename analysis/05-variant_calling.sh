@@ -43,7 +43,7 @@ do
             $dir/snippy
     done
 
-    # Snippy all samples
+    # Snippy consolidate all sample vcfs
     snippy-core \
         --ref $folder_genomes/genomes/$ref.fasta \
         $folder_genomics/variants/* \

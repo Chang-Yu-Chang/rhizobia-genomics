@@ -30,4 +30,3 @@ for (i in 1:nrow(genomes)) {
 filtered_reads <- bind_rows(list_filtered_reads)
 
 write_csv(filtered_reads, paste0(folder_data, "temp/11-filtered_reads.csv"))
-

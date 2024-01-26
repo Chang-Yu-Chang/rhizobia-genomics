@@ -17,7 +17,6 @@ do
         $folder_genomics/annotation/$genome_ids[$i]/prokka
 done
 
-
 for ref in em1021 em1022 usda1106 wsm419
 do
     # Annotate genomes via prokka
@@ -26,11 +25,6 @@ do
         $folder_genomics/genomes/$ref.fasta \
         $folder_genomics/annotation/$ref/prokka
 done
-
-
-
-
-
 
 # Consolidate annotation gff
 mkdir -p $folder_genomics/gff

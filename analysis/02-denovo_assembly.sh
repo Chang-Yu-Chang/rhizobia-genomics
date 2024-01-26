@@ -50,27 +50,11 @@ do
         $dir/flye/assembly.fasta \
         $dir/medaka
     
-    # # Clean up consensus name
-    # zsh 02f-clean_names.sh \
-    #     $dir/medaka/consensus.fasta \
-    #     $dir/genome.fasta \
-    #     $dir/cleaned_names.txt
+    # Remove small contigs
+    #mkdir -p $dir/
 
-    # # Check assembly quality via quast
-    # mkdir -p $dir/quast
-    # zsh 02g-quast.sh \
-    #     $dir/genome.fasta \
-    #     $dir/quast
-
-    # # Check assembly quality via busco
-    # mkdir -p $dir/busco
-    # zsh 02h-busco.sh \
-    #     $dir/genome.fasta \
-    #     $dir/busco
-
-
+    
 done
-
 
 # Consolidate genome fasta
 for i in {1..38}
@@ -78,5 +62,3 @@ do
     dir=$folder_genomics/assembly/$genome_ids[$i]
     cp $dir/medaka/consensus.fasta $folder_genomics/genomes/$genome_ids[$i].fasta
 done
-
-
