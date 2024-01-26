@@ -8,23 +8,21 @@ library(RColorBrewer)
 library(ellipse) # for calculating the ellipse
 source(here::here("analysis/00-metadata.R"))
 
-
-# 0. read data ----
-treatments <- read_csv(paste0(folder_data, "temp/23-treatments.csv"))
-treatments_long <- read_csv(paste0(folder_data, "temp/23-treatments_long.csv"))
-treatments_wide <- read_csv(paste0(folder_data, "temp/23-treatments_wide.csv"))
+plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
+plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
+plants_wide <- read_csv(paste0(folder_data, "temp/23-plants_wide.csv"))
 
 
 # 1. plot all plant traits ----
-length(unique(treatments_long$id)) # 231 plants
-length(unique(treatments_long$rhizobia)) # 14 rhizobia + 1 control
-treatments_long %>%
+length(unique(plants_long$id)) # 231 plants
+length(unique(plants_long$rhizobia)) # 14 rhizobia + 1 control
+plants_long %>%
     arrange(rhizobia_site) %>%
     distinct(id, rhizobia_site, rhizobia) %>%
     group_by(rhizobia_site, rhizobia) %>%
     count()
 
-p <- treatments_long %>%
+p <- plants_long %>%
     ggplot() +
     geom_boxplot(aes(x = rhizobia, y = value, color = rhizobia_site), outlier.shape = NA) +
     geom_jitter(aes(x = rhizobia, y = value, color = rhizobia_site), width = 0.2, height = 0, shape = 21) +
@@ -42,7 +40,7 @@ p <- treatments_long %>%
 ggsave(paste0(folder_data, "temp/23a-01-plant_traits.png"), p, width = 10, height = 10)
 
 # 2. Plot the nodule vs. plant biomass ----
-p <- treatments_wide %>%
+p <- plants_wide %>%
     filter(rhizobia_site != "control") %>%
     ggplot() +
     geom_point(aes(x = nodule_number, y = dry_weight_mg, color = rhizobia_site), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
@@ -60,7 +58,7 @@ ggsave(paste0(folder_data, "temp/23a-02-nodule_vs_shoot.png"), p, width = 5, hei
 
 
 # 3. facet plot ----
-p <- treatments_wide %>%
+p <- plants_wide %>%
     filter(rhizobia_site != "control") %>%
     ggplot() +
     geom_point(aes(x = nodule_number, y = dry_weight_mg, color = rhizobia_site), shape = 21, size = 2, stroke = 1)+
@@ -89,7 +87,7 @@ lm_x_y <- function (dat, x_var, y_var) {
         select(term, estimate, p.value)
 }
 
-treatments_wide %>%
+plants_wide %>%
     filter(rhizobia_site != "control") %>%
     nest(data = c(id, rhizobia, dry_weight_mg, nodule_number, root_weight_mg)) %>%
     mutate(lm = map(data, ~lm_x_y(.x, "nodule_number", "dry_weight_mg"))) %>%
@@ -97,7 +95,7 @@ treatments_wide %>%
     unnest(lm)
 
 # 4. plot the root traits ----
-p <- treatments %>%
+p <- plants %>%
     select(id, rhizobia, rhizobia_site, all_of(traits2)) %>%
     #select(id, rhizobia_site, rhizobia, dry_weight_mg, nodule_number, root_weight_mg) %>%
     filter(!is.na(dry_weight_mg), dry_weight_mg != 0) %>%
@@ -121,21 +119,21 @@ ggsave(paste0(folder_data, "temp/23a-04-root_traits.png"), p, width = 8, height 
 # 5. plot the trait correlation ----
 
 # Names
-treatments_traits <- treatments %>%
+plants_traits <- plants %>%
     filter(rhizobia_site %in% c("high-elevation", "low-elevation")) %>%
     select(all_of(traits))
-tb_traits <- tibble(trait = ordered(names(treatments_traits), names(treatments_traits))) %>%
+tb_traits <- tibble(trait = ordered(names(plants_traits), names(plants_traits))) %>%
     expand(trait, trait) %>%
     rename(trait1 = trait...1, trait2 = trait...2) %>%
     filter(trait1 < trait2) %>%
     arrange(trait1, trait2)
 
 # Calculate cor
-cor_matrix <- cor(treatments_traits, use = "complete.obs")
+cor_matrix <- cor(plants_traits, use = "complete.obs")
 cor_x_y <- function (dat) cor.test(unlist(dat[,1]), unlist(dat[,2]), method = "spearman", exact = F) %>% broom::tidy() %>% clean_names()
 tb_cortest <- tb_traits %>%
     rowwise() %>%
-    mutate(traits = list(select(treatments_traits, trait1, trait2))) %>%
+    mutate(traits = list(select(plants_traits, trait1, trait2))) %>%
     ungroup() %>%
     # Compute cor test
     mutate(cortest = map(traits, ~cor_x_y(.x))) %>%
@@ -152,8 +150,8 @@ tb_cortest <- tb_traits %>%
 # tb_cor <- as_tibble(cor_matrix) %>%
 #     mutate(trait1 = colnames(.)) %>%
 #     pivot_longer(-trait1, names_to = "trait2", values_to = "cor") %>%
-#     mutate(trait1 = ordered(trait1, names(treatments_traits))) %>%
-#     mutate(trait2 = ordered(trait2, names(treatments_traits))) %>%
+#     mutate(trait1 = ordered(trait1, names(plants_traits))) %>%
+#     mutate(trait2 = ordered(trait2, names(plants_traits))) %>%
 #     filter(trait1 < trait2) %>%
 #     arrange(trait1, trait2)
 
@@ -164,7 +162,7 @@ tb_cortest <- tb_traits %>%
 tb_ell <- tb_traits %>%
     rowwise() %>%
     # Calculate ellipse
-    mutate(cor_m = list(ellipse(cor_matrix, which = which(names(treatments_traits) %in% c(trait1, trait2))))) %>%
+    mutate(cor_m = list(ellipse(cor_matrix, which = which(names(plants_traits) %in% c(trait1, trait2))))) %>%
     mutate(cor_tb = list(tibble(x = cor_m[,which(colnames(cor_m) == trait1)], y = cor_m[,which(colnames(cor_m) == trait2)]))) %>%
     select(-cor_m) %>%
     unnest(cor_tb)

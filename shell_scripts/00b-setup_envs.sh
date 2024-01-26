@@ -138,4 +138,8 @@ mamba install --yes -c bioconda fastani=1.31
 mamba create -n roary
 mamba activate roary
 mamba install --yes -c bioconda roary=3.13.0
-roary -h
+
+# Install seqtk v1.4
+mamba create -n seqtk
+mamba activate seqtk
+mamba install --yes -c bioconda seqtk=1.4

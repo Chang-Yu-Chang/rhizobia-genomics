@@ -6,10 +6,10 @@ library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
 gc_prms <- read_csv(paste0(folder_data, "temp/21-gc_prms.csv"))
-treatments <- read_csv(paste0(folder_data, "temp/23-treatments.csv"))
+plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
 isolates_mapping
 unique(gc_prms$exp_id)
-unique(treatments$rhizobia)
+unique(plants$rhizobia)
 
 # 0. Clean up
 tr_gc <- gc_prms %>%
@@ -24,13 +24,7 @@ tr_gc_long <- tr_gc %>%
     mutate(trait = paste0(temperature, "_", name)) %>% 
     select(exp_id, trait, value)
 
-tr_sym <- treatments %>%
-    rename(exp_id = rhizobia) %>%
-    # Clean the expID name
-    mutate(exp_id = str_replace(exp_id, "b_", "_")) %>%
-    mutate(exp_id = str_remove(exp_id, "_c\\d")) %>%
-    mutate(exp_id = str_replace(exp_id, "p_", "p")) %>%
-    mutate(exp_id = str_replace(exp_id, "_", "-")) %>%
+tr_sym <- plants %>%
     left_join(isolates_mapping) %>%
     select(exp_id, sym_unique_id = id, contains("mg"), contains("nodule"), contains("px")) 
 

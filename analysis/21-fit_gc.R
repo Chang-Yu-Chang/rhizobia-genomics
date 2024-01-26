@@ -217,4 +217,3 @@ write_csv(gcs, paste0(folder_data, 'temp/21-gcs.csv'))
 write_csv(gc_summs, paste0(folder_data, 'temp/21-gc_summs.csv'))
 write_csv(gc_prms, paste0(folder_data, 'temp/21-gc_prms.csv'))
 write_csv(gc_prm_summs, paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
-
