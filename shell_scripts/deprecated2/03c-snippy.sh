@@ -3,8 +3,8 @@ source ~/.zshrc
 
 # This calls SNPs via snippy
 # $1: reference genome in gbff
-# $2: target genome in fasta
-# $3: target genome snippy output
+# $2: raw reads in fasta
+# $3: snippy output
 
 conda activate
 mamba activate snippy

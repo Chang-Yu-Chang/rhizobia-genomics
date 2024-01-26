@@ -6,7 +6,7 @@ source 00-env_vars.sh
 
 cd $folder_shell
 
-for i in {1..38}
+for i in {3..38}
 do
     echo $genome_ids[$i]
     dir=$folder_genomics/assembly/$genome_ids[$i]
@@ -72,6 +72,10 @@ do
 done
 
 
-
+for i in {1..38}
+do
+    dir=$folder_genomics/assembly/$genome_ids[$i]
+    cp $dir/medaka/consensus.fasta $folder_genomics/genomes/$genome_ids[$i].fasta
+done
 
 

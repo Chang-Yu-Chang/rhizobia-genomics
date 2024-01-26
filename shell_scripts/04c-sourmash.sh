@@ -6,7 +6,6 @@ source ~/.zshrc
 # $2: sourmash_folder
 # $3: gtdb_db
 
-conda activate
 mamba activate sourmash
 
 sourmash_sig="$2/consensus.sig"
@@ -18,7 +17,7 @@ sourmash sketch dna --check-sequence -f -p scaled=1000,k=31 $1 -o "$2/consensus.
 # `-p scaled=1000,k=31` signature parameters to use
 # `-o` output computed signatures to this directory
 
-# We recommend using the Zipfile databases for sourmash gather and the SBT databases for sourmash search.
+# Create a csv tablefor matches
 sourmash gather $2/consensus.sig $3 --save-matches $2/matches.zip -o $gathered_csv
 
 

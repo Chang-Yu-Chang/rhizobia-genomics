@@ -3,7 +3,7 @@
 # This main folder depends on your home directory and user name
 folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
 folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of data
-folder_genomes <- paste0(folder_data, "genomics/genomes/")
+folder_genomics <- paste0(folder_data, "genomics/")
 
 # Table for genomic workflow
 genomes_mapping <- tibble(

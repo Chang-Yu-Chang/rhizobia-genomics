@@ -10,14 +10,33 @@ gtdb_db="/Users/cychang/bioinformatics/sourmash/gtdb-rs214-k31.zip"
 refseq_16s_db="/Users/cychang/bioinformatics/16s/refseq_16s.fasta"
 blast_genomes_db="$folder_genomics/blast_db/genomes"
 
-# Make customized database
+# Make customized genome database
 zsh 04a-make_db.sh $folder_genomics
 
-for i in {1..41}
+mkdir -p $folder_genomics/taxonomy
+
+for i in {1..38}
 do
-    genome_fa="$folder_genomes/$sample_ids[$i]/02-denovo_assembly/genome.fasta"
-    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy"
-#
+    echo $genome_ids[$i]
+    genome_fa="$folder_genomics/genomes/$genome_ids[$i].fasta"
+    mkdir -p $folder_genomics/taxonomy/$genome_ids[$i]
+
+    # Compare strains to database
+    mkdir -p $folder_genomics/taxonomy/$genome_ids[$i]/sourmash
+    zsh 04c-sourmash.sh \
+        $genome_fa \
+        $folder_genomics/taxonomy/$genome_ids[$i]/sourmash \
+        $gtdb_db
+    
+    # Compare the k-mer signature among genomes
+    mkdir -p $folder_genomics/taxonomy/$genome_ids[$i]/kmer
+    zsh 04f-genome_kmer.sh \
+        $genome_fa \
+        $folder_genomics/taxonomy/$genome_ids[$i]/kmer/genome.sig
+
+
+
+
 #     # Estimate genome distance via mash
 #     mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/mash"
 #     zsh 04b-mash.sh \
@@ -48,13 +67,6 @@ do
 #         $genome_fa \
 #         $blast_genomes_db \
 #         "$folder_genomes/$sample_ids[$i]/04-taxonomy/blast_genome/taxonomy.txt"
-
-    # Compare the k-mer signature among genomes
-    mkdir -p "$folder_genomes/$sample_ids[$i]/04-taxonomy/genome_kmer"
-    zsh 04f-genome_kmer.sh \
-        $genome_fa \
-        "$folder_genomes/$sample_ids[$i]/04-taxonomy/genome_kmer/genome.sig"
-
 
 done
 

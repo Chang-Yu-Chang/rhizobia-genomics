@@ -2,13 +2,10 @@
 #' arg1: filtered reads in txt
 #' arg2: qc png file name
 
-renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(janitor)
-    library(cowplot)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(janitor)
+library(cowplot)
+source(here::here("analysis/00-metadata.R"))
 
 compute_q <- function (asc) {
     #' Compute the mean phred (Quality score) of a raw read
@@ -17,7 +14,11 @@ compute_q <- function (asc) {
     round(-10*log10(sum(10^(-phred/10))/nchar(asc)), 2)
 }
 
-bash_var <- commandArgs(trailingOnly = TRUE)
+#bash_var <- commandArgs(trailingOnly = TRUE)
+bash_var <- c(
+    paste0(folder_genomics, "/assembly/g2/filtered_reads.txt"),
+    paste0(folder_genomics, "/assembly/g2/filtered_reads_qc.png")
+)
 file_reads = bash_var[1]
 file_fig = bash_var[2]
 
@@ -67,8 +68,7 @@ p3 <- reads %>%
     labs(x = "read length (kb)", y = " # of bases (kb)")
 
 p <- plot_grid(p1,p2,p3, nrow = 2, align = "hv", scale = 0.96, labels = LETTERS[1:4]) + theme(plot.background = element_rect(fill = "white", color = NA))
-
-ggsave(filename = file_fig, plot = p, width = 10, height = 10)
+ggsave(file_fig, p, width = 10, height = 10)
 
 
 
