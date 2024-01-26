@@ -1,12 +1,10 @@
 #' This script plots the growth curve data
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+source(here::here("analysis/00-metadata.R"))
 
 isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"), show_col_types = F)
 gcs <- read_csv(paste0(folder_data, 'temp/21-gcs.csv'), show_col_types = F)

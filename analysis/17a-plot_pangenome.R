@@ -1,15 +1,13 @@
 #' This script plots the pangenome
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(FactoMineR) # for MCA
-    library(ellipse)
-    library(ggsci)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(FactoMineR) # for MCA
+library(ellipse)
+library(ggsci)
+source(here::here("analysis/00-metadata.R"))
 
 #egc <- read_delim(paste0(folder_data, "genomics/pangenome/ensifer/summary/ensifer_gene_clusters_summary.txt"), delim = "\t", show_col_types = F)
 egc <- read_csv(paste0(folder_data, "temp/17-egc.csv"))

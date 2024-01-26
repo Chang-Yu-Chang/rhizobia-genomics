@@ -2,15 +2,13 @@
 #' climate for our sampling sites given the coordinate
 
 renv::load()
-suppressPackageStartupMessages({
-    library(daymetr)
-    library(tidyverse)
-    library(janitor)
-    library(RColorBrewer)
-    library(elevatr) # for getting elevation
-    library(sf)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(daymetr)
+library(tidyverse)
+library(janitor)
+library(RColorBrewer)
+library(elevatr) # for getting elevation
+library(sf)
+source(here::here("analysis/00-metadata.R"))
 
 
 dms2dec <- function(x) {

@@ -1,13 +1,11 @@
 #' This script joins the genetic distance
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+source(here::here("analysis/00-metadata.R"))
 
 genome_kmer <- read_delim(paste0(folder_data, "genomics_old/popgen/genome_kmer/genome_kmer.txt"), show_col_types = F)
 list_sig <- read_delim(paste0(folder_data, "genomics_old/popgen/genome_kmer/list_sig.txt"), delim = "\t", col_names = "file_name", show_col_types = F)

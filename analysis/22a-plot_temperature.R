@@ -1,13 +1,12 @@
 #' This script plots the temperature data
+
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    library(RColorBrewer)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+library(RColorBrewer)
+source(here::here("analysis/00-metadata.R"))
 
 dml <- read_csv(paste0(folder_data, "temp/22-dml.csv"))
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"))

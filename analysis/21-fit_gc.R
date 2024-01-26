@@ -1,13 +1,11 @@
 #' This script fits the growth curve data
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(janitor)
-    library(data.table)
-    library(mgcv)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(janitor)
+library(data.table)
+library(mgcv)
+source(here::here("analysis/00-metadata.R"))
 
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"), show_col_types = F)
 

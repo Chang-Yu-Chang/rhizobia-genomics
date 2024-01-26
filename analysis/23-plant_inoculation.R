@@ -2,11 +2,9 @@
 #' This script analyses the hand measured phenotypes: dry weight, nodule count, root weight, nodule weight
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(janitor)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(janitor)
+source(here::here("analysis/00-metadata.R"))
 
 # 1. raw data wrangling  ----
 # 1.1 read data

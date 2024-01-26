@@ -1,16 +1,14 @@
 #' This script runs population genetics analysis
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    library(vcfR) # for handling VCF
-    library(poppr) # for pop gen analysis
-    library(ggtree)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+library(vcfR) # for handling VCF
+library(poppr) # for pop gen analysis
+library(ggtree)
+source(here::here("analysis/00-metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F)
 isolates_mash <- read_csv(paste0(folder_data, "temp/14-isolates_mash.csv"), show_col_types = F)

@@ -1,14 +1,11 @@
 #' This script joins the phenotypic distance
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    source(here::here("analysis/00-metadata.R"))
-})
-
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+source(here::here("analysis/00-metadata.R"))
 
 dists_genetic <- read_csv(paste0(folder_data, 'temp/19-dists_genetic.csv'), show_col_types = F)
 dists_trait <- read_csv(paste0(folder_data, "temp/29-dists_trait.csv"), show_col_types = F)

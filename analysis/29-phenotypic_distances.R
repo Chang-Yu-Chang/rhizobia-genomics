@@ -1,13 +1,11 @@
 #' This script joins the phenotypic distance
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+source(here::here("analysis/00-metadata.R"))
 
 gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_col_types = F)
 treatments_long <- read_csv(paste0(folder_data, "temp/23-treatments_long.csv"), show_col_types = F)

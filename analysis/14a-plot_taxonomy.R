@@ -1,12 +1,10 @@
 #' This script assigns the taxonomy to isolates
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+source(here::here("analysis/00-metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F)
 contigs_large <- read_csv(paste0(folder_data, "temp/12-contigs_large.csv"), show_col_types = F)

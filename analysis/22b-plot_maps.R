@@ -1,15 +1,13 @@
 #' This script plots the map of sampling site
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggmap)
-    #library(ggsn) # add scale to map
-    library(ggsci)
-    library(RColorBrewer)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggmap)
+#library(ggsn) # add scale to map
+library(ggsci)
+library(RColorBrewer)
+source(here::here("analysis/00-metadata.R"))
 
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 

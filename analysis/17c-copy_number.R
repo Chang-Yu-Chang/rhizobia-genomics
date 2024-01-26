@@ -1,16 +1,14 @@
 #' This script plots the gene content by the contigs
 
 renv::load()
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(cowplot)
-    library(janitor)
-    library(ggsci)
-    library(proxy) # for computing jaccard matrix
-    library(ape)
-    library(ggtree)
-    source(here::here("analysis/00-metadata.R"))
-})
+library(tidyverse)
+library(cowplot)
+library(janitor)
+library(ggsci)
+library(proxy) # for computing jaccard matrix
+library(ape)
+library(ggtree)
+source(here::here("analysis/00-metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"), show_col_types = F) %>%
     filter(!genome_id %in% paste0("g", c(1,7,12,14,18)))
