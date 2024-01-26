@@ -10,26 +10,26 @@ mkdir -p $folder_genomics/variants
 # Process each genome
 for ref in em1021 wsm419
 do
-    mkdir -p "$folder_genomics/variants/$ref"
+    mkdir -p $folder_genomics/variants/$ref
     
     for i in {1..38}
     do
         echo $genome_ids[$i]
-        mkdir -p "$folder_genomics/variants/$ref/$genome_ids[$i]"
-        dir="$folder_genomics/variants/$ref/$genom e_ids[$i]"
+        mkdir -p $folder_genomics/variants/$ref/$genome_ids[$i]
+        dir=$folder_genomics/variants/$ref/$genome_ids[$i]
 
         ## Align the filtered reads to reference genomes
         zsh 03a-align_reads.sh \
-            "$folder_genomics/genomes/$ref.fasta" \
-            "$folder_genomics/assembly/$genome_ids[$i]/filtered_reads.fastq.gz" \
+            $folder_genomics/genomes/$ref.fasta \
+            $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.fastq.gz \
             $dir
     done
 
     # Snippy all samples
     snippy-core \
-        --ref "$folder_genomes/genomes/$ref.fasta" \
+        --ref $folder_genomes/genomes/$ref.fasta \
         $folder_genomics/variants/* \
-        --prefix "$folder_genomics/variants_core/$ref/core"
+        --prefix $folder_genomics/variants_core/$ref/core
 done
 
 
