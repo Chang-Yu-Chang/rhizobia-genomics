@@ -8,7 +8,7 @@ cd $folder_shell
 
 mkdir -p $folder_genomics/annotation
 
-for i in {27..38}
+for i in {1..38}
 do
     echo $genome_ids[$i]
     # Annotate genomes via prokka

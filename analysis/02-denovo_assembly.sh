@@ -6,7 +6,7 @@ source 00-env_vars.sh
 
 cd $folder_shell
 
-for i in {3..38}
+for i in {1..38}
 do
     echo $genome_ids[$i]
     dir=$folder_genomics/assembly/$genome_ids[$i]

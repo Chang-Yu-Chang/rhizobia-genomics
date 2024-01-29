@@ -20,7 +20,7 @@ echo $folder_genomics/genomes/wsm419.fasta >> $folder_genomics/popgen/fastani/li
 
 ## Compute ani
 zsh 06a-fastani.sh \
-    $folder_genomics/popgen/fastani/list_genomes_for_ani.txt \
+    $folder_genomics/popgen/fastani/list_genomes.txt \
     $folder_genomics/popgen/fastani/ani.txt
 
 # 2. Compare the k-mer signature among genomes

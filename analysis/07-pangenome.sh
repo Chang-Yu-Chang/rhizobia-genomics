@@ -41,5 +41,5 @@ mamba activate seqtk
 seqtk subseq pan_genome_reference.fa list_core_gene.txt > core_gene.fasta
 
 # Call variants from aligned genes
-zsh 07c-core_genes.sh
+#zsh 07c-core_genes.sh
 
