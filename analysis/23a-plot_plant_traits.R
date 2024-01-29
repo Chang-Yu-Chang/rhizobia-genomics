@@ -13,7 +13,7 @@ plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
 plants_wide <- read_csv(paste0(folder_data, "temp/23-plants_wide.csv"))
 
 
-# 1. plot all plant traits ----
+# 1. plot all plant traits
 length(unique(plants_long$id)) # 231 plants
 length(unique(plants_long$rhizobia)) # 14 rhizobia + 1 control
 plants_long %>%
@@ -39,7 +39,7 @@ p <- plants_long %>%
 
 ggsave(paste0(folder_data, "temp/23a-01-plant_traits.png"), p, width = 10, height = 10)
 
-# 2. Plot the nodule vs. plant biomass ----
+# 2. Plot the nodule vs. plant biomass
 p <- plants_wide %>%
     filter(rhizobia_site != "control") %>%
     ggplot() +

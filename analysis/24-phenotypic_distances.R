@@ -37,6 +37,8 @@ isolates_traits <- isolates_mapping %>%
 
 nrow(isolates_traits) # 32 strains with growth rate data 
 
+write_csv(isolates_traits, paste0(folder_data, "temp/24-isolates_traits.csv"))
+
 # 1. Calculate pairwise euclidean distance
 # For the 32 strains with only growth data
 temp_mapping <- tibble(genome_id = isolates_traits$genome_id, item = factor(1:nrow(isolates_traits)))
@@ -73,7 +75,6 @@ dist_traits <- dist_gc %>% left_join(dist_sym)
 
 # 2. calculate distance by geography
 dist_traits <- dist_traits %>%
-    select(genome_id1, genome_id2) %>%
     rowwise() %>%
     mutate(d_geo = distVincentySphere(
         isolates_site[match(genome_id1, isolates_site$genome_id), c("latitude_dec", "longitude_dec")],
