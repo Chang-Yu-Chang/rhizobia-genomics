@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: genome in fasta
 # $2: prokka folder
 
-conda activate
 mamba activate prokka
 
 prokka --force --outdir $2 --kingdom Bacteria --locustag $1 --prefix annotated --gcode 11 $1

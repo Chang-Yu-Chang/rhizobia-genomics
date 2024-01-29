@@ -9,7 +9,6 @@ source ~/.zshrc
 # $3: filtered_reads in fastq.gz
 # $4: downsampled_reads2 in fastq
 
-conda activate
 mamba activate filtlong
 
 filtlong --target_bases $(($1 * 100)) --mean_q_weight 10 --assembly $2 $3 | > $4

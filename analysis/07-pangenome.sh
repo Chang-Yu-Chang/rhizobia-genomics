@@ -17,7 +17,7 @@ zsh 07a-roary.sh \
 mkdir -p $folder_genomics/pangenome/panaroo
 
 # Create a list of gff
-for i in {1..38}; do; echo -e $folder_genomics/gff/$genome_ids[$i].gff
+for i in {1..22} {24..38}; do; echo -e $folder_genomics/gff/$genome_ids[$i].gff
 done >| $folder_genomics/pangenome/panaroo/list_gffs.txt
 echo $folder_genomics/gff/em1021.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt
 echo $folder_genomics/gff/em1022.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt

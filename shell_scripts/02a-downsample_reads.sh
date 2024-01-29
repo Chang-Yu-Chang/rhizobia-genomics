@@ -5,8 +5,6 @@ source ~/.zshrc
 # $1: filtered_reads in fastq
 # $2: downsampled_reads in fastq
 
-
-conda activate
 mamba activate filtlong
 
 filtlong --target_bases 250000000 $1 | gzip > $2

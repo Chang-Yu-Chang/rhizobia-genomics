@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: raw_reads
 # $2: filtered_reads
 
-conda activate
 mamba activate filtlong
 
 filtlong --keep_percent 95 $1 | gzip > $2

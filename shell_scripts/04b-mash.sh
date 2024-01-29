@@ -6,7 +6,6 @@ source ~/.zshrc
 # $2: mash_folder
 # $3: refseq_db
 
-conda activate
 mamba activate mash
 
 # Split the consensus into individual contigs

@@ -6,7 +6,6 @@ source ~/.zshrc
 # $2: raw reads in bam
 # $3: snippy output folder
 
-conda activate
 mamba activate snippy
 
 snippy --cpus 10 --ref $1 --outdir $3 --force --bam $2

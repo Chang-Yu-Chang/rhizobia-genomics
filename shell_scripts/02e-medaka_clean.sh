@@ -6,7 +6,6 @@ source ~/.zshrc
 # $2: draft_assembly in fasta
 # $3: medaka_folder
 
-conda activate
 mamba activate medaka
 
 medaka_consensus -i $1 -d $2 -o $3 -t 10 -m r941_min_high_g303

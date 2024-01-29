@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: output roary folder
 # $2: prokka annotation gffs
 
-conda activate
 mamba activate roary
 
 roary -f $1 -e -n -i 95 -cd 99 -s $2

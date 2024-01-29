@@ -7,7 +7,6 @@ source ~/.zshrc
 # $3: output blast prediction in txt
 
 # Blast
-conda activate
 mamba activate blast
 
 # Concatenate genome

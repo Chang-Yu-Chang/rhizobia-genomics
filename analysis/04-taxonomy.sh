@@ -30,11 +30,11 @@ do
     #     $refseq_db
     
     # Compare strains to database
-    mkdir -p $dir/sourmash
-    zsh 04c-sourmash.sh \
-        $genome_fa \
-        $dir/sourmash \
-        $gtdb_db
+    # mkdir -p $dir/sourmash
+    # zsh 04c-sourmash.sh \
+    #     $genome_fa \
+    #     $dir/sourmash \
+    #     $gtdb_db
     
     # Extract 16S rRNA from genome and blast
     mkdir -p $dir/16s

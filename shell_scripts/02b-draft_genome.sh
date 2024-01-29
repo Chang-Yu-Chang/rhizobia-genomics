@@ -6,7 +6,6 @@ source ~/.zshrc
 # $2: assembly_prefix
 # $3: draft_genome in fasta
 
-conda activate
 mamba activate miniasm
 
 # Overlap raw reads using minimap

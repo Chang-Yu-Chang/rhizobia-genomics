@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: list of genomes for ani in txt
 # $2: fasani output in out
 
-conda activate
 mamba activate fastani
 
 fastANI -t 10 \

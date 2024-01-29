@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: downsampled_reads2 in fastq
 # $2: flye folder
 
-conda activate
 mamba activate flye
 
 flye --meta --nano-corr $1 --out-dir $2 --threads 20
