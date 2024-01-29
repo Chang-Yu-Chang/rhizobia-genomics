@@ -15,6 +15,7 @@ barrnap -o $2 < $1 > $3
 
 
 # Blast
+conda activate
 mamba activate blast
 
-blastn -query $2 -db $4 -out $5 -outfmt '6 qseqid sseqid stitle bitscore evalue length pident' -num_alignments 10
+blastn -query $2 -db $4 -out $5 -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore' -num_alignments 10

@@ -3,10 +3,13 @@
 renv::load()
 library(tidyverse)
 library(janitor)
+library(geosphere) # For computing the geographic distance between two locations
 source(here::here("analysis/00-metadata.R"))
 
-gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'), show_col_types = F)
-plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"), show_col_types = F)
+isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"))
+sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"))
+gc_prm_summs <- read_csv(paste0(folder_data, "temp/21-gc_prm_summs.csv"))
+plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
 
 # 0. clean up; basically one sample per row
 # 0.1. growth traits
@@ -22,11 +25,15 @@ isolates_sym <- plants_long %>%
     rename(exp_id = exp_id) %>%
     ungroup()
 
+# 0.3 coordinate of sites
+isolates_site <- isolates_mapping %>% left_join(sites)
+
 # 0.3 join the data
 isolates_traits <- isolates_mapping %>%
     select(exp_id, genome_id) %>%
     left_join(isolates_gc) %>%
-    left_join(isolates_sym)
+    left_join(isolates_sym) %>%
+    left_join(isolates_site)
 
 nrow(isolates_traits) # 32 strains with growth rate data 
 
@@ -64,4 +71,16 @@ dist_sym <- isolates_traits %>%
 # 
 dist_traits <- dist_gc %>% left_join(dist_sym)
 
+# 2. calculate distance by geography
+dist_traits <- dist_traits %>%
+    select(genome_id1, genome_id2) %>%
+    rowwise() %>%
+    mutate(d_geo = distVincentySphere(
+        isolates_site[match(genome_id1, isolates_site$genome_id), c("latitude_dec", "longitude_dec")],
+        isolates_site[match(genome_id2, isolates_site$genome_id), c("latitude_dec", "longitude_dec")]
+        ) / 1000 # convert from m to km
+    )
+
 write_csv(dist_traits, paste0(folder_data, "temp/24-dist_traits.csv"))
+
+

@@ -23,8 +23,10 @@ isolates_mapping <- tibble(
                "L2M4R1", "L3M5R1", "L4M2R2", "L4M3R3", "L4M4R1", "L4M7R1", "L3M1R1", "src-2",
                "fp1-2", "fp1-3", "fp2-2", "crp1-2", "crp1-3", "crp2-2", "gp1-1", "gp1-2",
                "gp1-3", "bg-2", "bg-3", "pms-1", "pms-2", "pms-3", "ppf-1", "40th-1"),
-    rhizobia_site = c(rep("high-elevation", 6), rep("low-elevation", 9), rep("suburban", 10), rep("urban", 7)),
-    rhizobia_population = c(rep("MLBS", 15), rep("Phila",17)),
+    site = c("H2", "H2", "H3", "H3", "H3", "H4", "L1", "L2", "L2", "L3", "L4", "L4", "L4", "L4", "L3",
+    "src", "fp", "fp", "fp", "crp", "crp", "crp", "gp", "gp", "gp", "bg", "bg", "pms", "pms", "pms", "ppf", "40th"),
+    site_group = c(rep("high elevation", 6), rep("low elevation", 9), rep("suburban", 10), rep("urban", 7)),
+    population = c(rep("MLBS", 15), rep("Phila",17)),
     sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19:37))
@@ -34,7 +36,7 @@ isolates_mapping <- tibble(
 
 # Join tables
 isolates <- full_join(genomes_mapping, isolates_mapping) %>%
-    select(genome_name, genome_id, exp_id, rhizobia_population, rhizobia_site)
+    select(genome_name, genome_id, exp_id, population, site_group, site)
 
 isolates$exp_id[38:43] <- c("lab-em1021-1", "lab-em1021-2", "lab-em1022-1", "lab-em1022-2", "lab-wsm419-1", "lab-wsm419-2")
 isolates$exp_id[44:47] <- isolates$genome_name[44:47]

@@ -29,14 +29,19 @@ sites_phila <- read_csv(paste0(folder_data, "raw/sites_phila.csv"), show_col_typ
 
 
 
-# 0. Clean up the site coordinates ----
+# 0. Clean up the site coordinates
 # mlbs
 sites_mlbs <- sites_mlbs %>%
     clean_names() %>%
     mutate(latitude_dec = dms2dec(latitude_degrees_minutes_seconds)) %>%
     mutate(longitude_dec = dms2dec(longitude_degrees_minutes_seconds)) %>%
     mutate(elevation_m = elevation_feet / 3.28084) %>%
-    mutate(site_group = str_sub(site,1 , 1)) %>%
+    mutate(site = str_remove(site, "-")) %>%
+    mutate(site_group = case_when(
+        str_sub(site, 1 , 1) == "H" ~ "high elevation",
+        str_sub(site, 1 , 1) == "L" ~ "low elevation",
+        str_sub(site, 1 , 1) == "S" ~ "mid elevation"
+    )) %>%
     select(site_group, site, latitude_dec, longitude_dec, elevation_m)
 
 # phila
@@ -49,12 +54,13 @@ sites_phila <- sites_phila %>%
     select(site_group, site, latitude_dec, longitude_dec, elevation_m)
 
 # bind rows
-sites <- bind_rows(mutate(sites_mlbs, population = "MLBS"), mutate(sites_phila, population = "Phila")) %>%
+sites <- bind_rows(mutate(sites_mlbs, population = "MLBS"), 
+        mutate(sites_phila, population = "Phila")) %>%
     select(population, everything())
 
 write_csv(sites, paste0(folder_data, "temp/22-sites.csv"))
 
-# 1. Extract the climatology data from Daymet ----
+# 1. Extract the climatology data from Daymet
 list_dm <- rep(list(NA), nrow(sites))
 for (i in 1:nrow(sites)) {
     dm <- download_daymet(site = sites$site[i],
@@ -78,7 +84,8 @@ write_csv(dml, paste0(folder_data, "temp/22-dml.csv"))
 
 
 
-# 2. Resample the difference between a H and a L temperature ---
+
+# 2. Resample the difference between a H and a L temperature
 ## tmax
 set.seed(1)
 n_resample <- 100
@@ -115,7 +122,7 @@ write_csv(diff_tmin, paste0(folder_data, "temp/22-diff_tmin.csv"))
 
 
 
-# 3. Shade for month ----
+# 3. Shade for month
 tb_season <- dml %>%
     distinct(yday, ydate, ymonth) %>%
     mutate(season = case_when(
@@ -158,3 +165,4 @@ tb_month <- dml %>%
 write_csv(tb_summer, paste0(folder_data, "temp/22-tb_summer.csv"))
 write_csv(tb_season, paste0(folder_data, "temp/22-tb_season.csv"))
 write_csv(tb_month, paste0(folder_data, "temp/22-tb_month.csv"))
+

@@ -11,11 +11,9 @@ mkdir -p $folder_genomics/variants
 for ref in em1021 wsm419
 do
     # Index the reference genome
-    conda activate
     mamba activate minimap2
     minimap2 -d $folder_genomics/genomes/$ref.mmi $folder_genomics/genomes/$ref.fasta
-
-
+    
     mkdir -p $folder_genomics/variants/$ref
     
     for i in {1..38}
@@ -46,6 +44,6 @@ do
     # Snippy consolidate all sample vcfs
     snippy-core \
         --ref $folder_genomes/genomes/$ref.fasta \
-        $folder_genomics/variants/* \
+        $folder_genomics/variants/$ref/* \
         --prefix $folder_genomics/variants_core/$ref/core
 done
