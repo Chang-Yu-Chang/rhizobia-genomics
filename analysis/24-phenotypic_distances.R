@@ -37,28 +37,28 @@ dist_gc <- isolates_traits %>%
     select(starts_with(c("r_", "lag_", "maxOD"))) %>%
     # Scale the traits
     scale() %>%
-    dist(method = "euclidean") %>%
+    dist(method = "euclidean", diag = T) %>%
     broom::tidy() %>%
     left_join(rename(temp_mapping, genome_id1 = genome_id, item1 = item)) %>%
     left_join(rename(temp_mapping, genome_id2 = genome_id, item2 = item)) %>%
-    rename(distance_growth = distance) %>%
-    select(genome_id1, genome_id2, distance_growth) %>%
+    rename(d_growth = distance) %>%
+    select(genome_id1, genome_id2, d_growth) %>%
     # Normalize
-    mutate(distance_growth = distance_growth / max(distance_growth, na.rm = T))
+    mutate(d_growth = d_growth / max(d_growth, na.rm = T))
 
 # For the 12 strains with both symbiosis and growth traits
 dist_sym <- isolates_traits %>%
     select(dry_weight_mg, nodule_number, root_weight_mg) %>%
     # Scale the traits
     scale() %>%
-    dist(method = "euclidean") %>%
+    dist(method = "euclidean", diag = T) %>%
     broom::tidy() %>%
     left_join(rename(temp_mapping, genome_id1 = genome_id, item1 = item)) %>%
     left_join(rename(temp_mapping, genome_id2 = genome_id, item2 = item)) %>%
-    rename(distance_symbiosis = distance) %>%
-    select(genome_id1, genome_id2, distance_symbiosis) %>%
+    rename(d_symbiosis = distance) %>%
+    select(genome_id1, genome_id2, d_symbiosis) %>%
     # Normalize
-    mutate(distance_symbiosis = distance_symbiosis / max(distance_symbiosis, na.rm = T)) %>%
+    mutate(d_symbiosis = d_symbiosis / max(d_symbiosis, na.rm = T)) %>%
     drop_na
 
 
