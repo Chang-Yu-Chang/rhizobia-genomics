@@ -19,12 +19,17 @@ mkdir -p $folder_genomics/pangenome/panaroo
 # Create a list of gff
 for i in {1..38}; do; echo -e $folder_genomics/gff/$genome_ids[$i].gff
 done >| $folder_genomics/pangenome/panaroo/list_gffs.txt
-
-# for i in {1..5}; do; echo -e $folder_genomics/gff/$genome_ids[$i].gff
-# done >| $folder_genomics/pangenome/panaroo/list_gffs.txt
+echo $folder_genomics/gff/em1021.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt
+echo $folder_genomics/gff/em1022.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt
+echo $folder_genomics/gff/usda1106.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt
+echo $folder_genomics/gff/wsm419.gff >> $folder_genomics/pangenome/panaroo/list_gffs.txt
 
 # Generate gene presence-absence table
 # It also performs multiple sequence alignment of core genes using MAFFT
+# for i in {1..38}; do
+#     cp $folder_genomics/annotation/$genome_ids[$i]/prokka/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
+# done
+
 zsh 07b-panaroo.sh \
     $folder_genomics/pangenome/panaroo \
     $folder_genomics/pangenome/panaroo/list_gffs.txt

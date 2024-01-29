@@ -29,7 +29,10 @@ done
 
 # Consolidate annotation gff
 mkdir -p $folder_genomics/gff
-for i in {1..38}
-do
+for i in {1..38}; do
     cp $folder_genomics/annotation/$genome_ids[$i]/prokka/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
+done
+
+for ref in em1021 em1022 usda1106 wsm419; do
+    cp $folder_genomics/annotation/$ref/prokka/annotated.gff $folder_genomics/gff/$ref.gff
 done
