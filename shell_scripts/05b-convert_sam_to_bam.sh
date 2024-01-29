@@ -5,7 +5,6 @@ source ~/.zshrc
 # $1: target genome sam file
 # $2: target genome bam file
 
-conda activate
 mamba activate samtools
 
 # Convert SAM to BAM: For each alignment use samtools to convert the SAM file to BAM and sort it.
