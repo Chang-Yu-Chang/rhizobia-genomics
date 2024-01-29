@@ -64,6 +64,8 @@ p <- plot_grid(p1, p2, p3, p4, byrow = T, nrow = 2)
 ggsave(paste0(folder_data, "temp/31a-03-pairwise_distance.png"), p, width = 8, height = 8)
 
 # Stat
+cor.test(dists$d_ani, dists$d_kmer)
+
 cor.test(dists$d_ani, dists$d_growth)
 cor.test(dists$d_kmer, dists$d_growth)
 cor.test(dists$d_ani, dists$d_symbiosis)

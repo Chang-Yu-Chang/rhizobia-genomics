@@ -61,8 +61,7 @@ dist_sym <- isolates_traits %>%
     mutate(d_symbiosis = d_symbiosis / max(d_symbiosis, na.rm = T)) %>%
     drop_na
 
-
-# 0.5 join the distances
+# 
 dist_traits <- dist_gc %>% left_join(dist_sym)
 
 write_csv(dist_traits, paste0(folder_data, "temp/24-dist_traits.csv"))
