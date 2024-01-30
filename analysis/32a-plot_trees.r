@@ -3,19 +3,24 @@
 renv::load()
 library(tidyverse)
 library(cowplot)
+library(ggsci)
 library(ape)
 library(ggtree)
 library(tidytree)
 source(here::here("analysis/00-metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-isolates_traits <- read_csv(paste0(folder_data, "temp/24-isolates_traits.csv"))
+isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
+isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
 
-dist_genetics <- read_csv(paste0(folder_data, "temp/24-genetics.csv"))
-dist_traits <- read_csv(paste0(folder_data, "temp/24-dist_traits.csv"))
+dist_genetics <- read_csv(paste0(folder_data, "temp/19-dist_genetics.csv"))
+dist_traits <- read_csv(paste0(folder_data, "temp/29-dist_traits.csv"))
 dists <- read_csv(paste0(folder_data, 'temp/31-dists.csv'))
 dists_long <- read_csv(paste0(folder_data, "temp/31-dists_long.csv"))
 
+# 
+isolates_contigs <- isolates_contigs %>%
+    filter(!genome_id %in% c("g20", "g28", "g2", "g3", "g15"))  
 
 # Make trees
 make_tree <- function(di) {
@@ -46,26 +51,49 @@ tree_geo <- dists %>% select(genome_id1, genome_id2, d_geo) %>% drop_na() %>% ma
 
 
 # 1. Plot the trees by populations
-plot_tree <- function (tree, gtitle) {
+plot_tree1 <- function (tree, gtitle) {
     tree %>%
         left_join(rename(isolates_traits, label = genome_id), by = "label") %>%
         as.treedata() %>%
         ggtree() +
         geom_tiplab(aes(color = population)) +
         geom_tippoint(aes(color = population)) +
+        scale_color_aaas() +
         theme_tree(legend.position = 'centre') +
-        theme(
-            legend.position = c(0.2,0.9)
-        ) +
+        theme(legend.position = c(0.8,0.2)) +
         guides(color = guide_legend(override.aes = aes(label = ""), title = NULL)) +
         labs(title = gtitle)
 }
-p1 <- plot_tree(tree_ani, "ani")
-p2 <- plot_tree(tree_kmer, "kmer")
-p3 <- plot_tree(tree_jaccard, "jaccard")
-p4 <- plot_tree(tree_fluidity, "fluidity")
-p5 <- plot_tree(tree_growth, "growth")
-p6 <- plot_tree(tree_geo, "geo")
-p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(paste0(folder_data, "temp/32a-01-trees.png"), p, width = 15, height = 10)
+p1 <- plot_tree1(tree_ani, "ani")
+p2 <- plot_tree1(tree_kmer, "kmer")
+p3 <- plot_tree1(tree_jaccard, "jaccard")
+p4 <- plot_tree1(tree_fluidity, "fluidity")
+p5 <- plot_tree1(tree_growth, "growth")
+p6 <- plot_tree1(tree_geo, "geo")
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-01-trees_population.png"), p, width = 15, height = 10)
 
+
+# 2. Plot the trees by species
+plot_tree2 <- function (tree, gtitle) {
+    tree %>%
+        left_join(rename(isolates_contigs, label = genome_id), by = "label") %>%
+        as.treedata() %>%
+        ggtree() +
+        geom_tiplab(aes(color = species)) +
+        geom_tippoint(aes(color = species)) +
+        scale_color_manual(values = c(meliloti = "#423E37", medicae = "#E3B23C")) +
+        theme_tree(legend.position = 'centre') +
+        theme(legend.position = c(0.8,0.2)) +
+        guides(color = guide_legend(override.aes = aes(label = ""), title = NULL)) +
+        labs(title = gtitle)
+}
+p1 <- plot_tree2(tree_ani, "ani")
+p2 <- plot_tree2(tree_kmer, "kmer")
+p3 <- plot_tree2(tree_jaccard, "jaccard")
+p4 <- plot_tree2(tree_fluidity, "fluidity")
+p5 <- plot_tree2(tree_growth, "growth")
+p6 <- plot_tree2(tree_geo, "geo")
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-02-trees_species.png"), p, width = 15, height = 10)
+p
