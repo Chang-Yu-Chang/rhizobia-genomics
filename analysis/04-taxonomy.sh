@@ -11,11 +11,13 @@ refseq_16s_db=/Users/cychang/bioinformatics/16s/refseq_16s.fasta
 blast_genomes_db=$folder_genomics/blast_db/genomes
 
 # Make customized genome database
-zsh 04a-make_db.sh $folder_genomics
+zsh 04a-make_db.sh \
+    $folder_genomics \
+    $folder_data/raw/ensifer_ncbi.csv
 
 mkdir -p $folder_genomics/taxonomy
 
-for i in {2..38}
+for i in {1..38}
 do
     echo $genome_ids[$i]
     genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
@@ -30,11 +32,11 @@ do
     #     $refseq_db
     
     #Compare strains to database via sourmash
-    mkdir -p $dir/sourmash
-    zsh 04c-sourmash.sh \
-        $genome_fa \
-        $dir/sourmash \
-        $gtdb_db
+    # mkdir -p $dir/sourmash
+    # zsh 04c-sourmash.sh \
+    #     $genome_fa \
+    #     $dir/sourmash \
+    #     $gtdb_db
     
     # Extract 16S rRNA from genome and blast
     # mkdir -p $dir/16s
@@ -45,12 +47,12 @@ do
     #     $refseq_16s_db \
     #     $dir/16s/blast_16s.txt 
 
-    # # Blast genomes to a customized database of meliloti and medicae
-    # mkdir -p $dir/blast_genome
-    # zsh 04e-blast_genome.sh \
-    #     $genome_fa \
-    #     $blast_genomes_db \
-    #     $dir/blast_genome/blast_genome.txt
+    # # Blast genomes to a customized database of ensifer strains
+    mkdir -p $dir/blast_genome
+    zsh 04e-blast_genome.sh \
+        $genome_fa \
+        $blast_genomes_db \
+        $dir/blast_genome/blast_genome.txt
 
 done
 
@@ -63,15 +65,15 @@ do
     mkdir -p $dir
     
     # Extract 16S rRNA from genome and blast
-    mkdir -p $dir/16s
-    zsh 04d-blast_16s.sh \
-        $genome_fa \
-        $dir/16s/rrna.fasta \
-        $dir/16s/rrna.txt \
-        $refseq_16s_db \
-        $dir/16s/blast_16s.txt 
+    # mkdir -p $dir/16s
+    # zsh 04d-blast_16s.sh \
+    #     $genome_fa \
+    #     $dir/16s/rrna.fasta \
+    #     $dir/16s/rrna.txt \
+    #     $refseq_16s_db \
+    #     $dir/16s/blast_16s.txt 
 
-    # Blast genomes to a customized database of meliloti and medicae
+    # Blast genomes to a customized database of ensifer strains
     mkdir -p $dir/blast_genome
     zsh 04e-blast_genome.sh \
         $genome_fa \
