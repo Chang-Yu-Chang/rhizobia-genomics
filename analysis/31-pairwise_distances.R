@@ -1,4 +1,4 @@
-#' This script joins the phenotypic distance
+#' This script joins the distances
 
 renv::load()
 library(tidyverse)
@@ -11,7 +11,14 @@ dist_traits <- read_csv(paste0(folder_data, "temp/29-dist_traits.csv"))
 # Join the distances in genetics and traits
 dists <- dist_genetics %>% left_join(dist_traits)
 dists_long <- dists %>%
-    pivot_longer(cols = c(-genome_id1, -genome_id2), names_to = "d_type", names_prefix = "d_")
+    pivot_longer(cols = c(-genome_id1, -genome_id2), names_to = "d_type", names_prefix = "d_") %>%
+    mutate(d_group = case_when(
+        d_type %in% c("ani", "kmer", "jaccard", "fluidity") ~ "genetic",
+        d_type %in% c("growth", "symbiosis") ~ "composite trait",
+        d_type == "geo" ~ "geographic",
+        TRUE ~ "trait" 
+    )) %>%
+    select(genome_id1, genome_id2, d_group, d_type, value)
 
 
 write_csv(dists, paste0(folder_data, "temp/31-dists.csv"))

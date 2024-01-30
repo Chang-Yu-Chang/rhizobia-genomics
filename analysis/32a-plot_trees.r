@@ -96,4 +96,4 @@ p5 <- plot_tree2(tree_growth, "growth")
 p6 <- plot_tree2(tree_geo, "geo")
 p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/32a-02-trees_species.png"), p, width = 15, height = 10)
-p
+
