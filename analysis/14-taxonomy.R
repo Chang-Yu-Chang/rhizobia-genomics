@@ -98,4 +98,4 @@ isolates_abm <- isolates_contigs %>%
     filter(genome_id %in% paste0("g", 38:43)) %>%
     left_join(select(isolates, genome_name, genome_id)) %>%
     select(genome_name, contig_length, scomment, everything()) 
-write_csv(isolates_abd, paste0(folder_data, "temp/14-isolates_abm.csv"))
+write_csv(isolates_abm, paste0(folder_data, "temp/14-isolates_abm.csv"))
