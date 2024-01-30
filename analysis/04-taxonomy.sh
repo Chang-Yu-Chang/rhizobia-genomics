@@ -55,6 +55,30 @@ do
 done
 
 
+for ref in em1021 em1022 usda1106 wsm419
+do
+    echo $ref
+    genome_fa=$folder_genomics/genomes/$ref.fasta
+    dir=$folder_genomics/taxonomy/$ref
+    mkdir -p $dir
+    
+    # Extract 16S rRNA from genome and blast
+    mkdir -p $dir/16s
+    zsh 04d-blast_16s.sh \
+        $genome_fa \
+        $dir/16s/rrna.fasta \
+        $dir/16s/rrna.txt \
+        $refseq_16s_db \
+        $dir/16s/blast_16s.txt 
+
+    # Blast genomes to a customized database of meliloti and medicae
+    mkdir -p $dir/blast_genome
+    zsh 04e-blast_genome.sh \
+        $genome_fa \
+        $blast_genomes_db \
+        $dir/blast_genome/blast_genome.txt
+
+done
 
 
 
