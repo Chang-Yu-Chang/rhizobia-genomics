@@ -70,3 +70,19 @@ p <- plot_grid(p1, p2, p3, p4, p5, p6,
 ggsave(paste0(folder_data, "temp/31a-02-genetics_vs_trait.png"), p, width = 12, height = 18)
 
 
+# 3. plot the two composite traits
+dists_i <- dists %>%
+    filter(genome_id1 != genome_id2) %>%
+    select(d_growth, d_symbiosis) %>%
+    drop_na()
+p <- dists_i %>%
+    ggplot() +
+    geom_point(aes(x = d_growth, y = d_symbiosis), shape = 1, size = 2, alpha = 0.8) +
+    geom_smooth(aes(x = d_growth, y = d_symbiosis), method = "lm") +
+    scale_x_continuous(breaks = c(0,0.5,1)) +
+    scale_y_continuous(breaks = c(0,0.5,1)) +
+    theme_bw() +
+    theme() +
+    labs()
+ggsave(paste0(folder_data, "temp/31a-03-growth_vs_symbiosis.png"), p, width = 4, height = 4)
+cor.test(dists_i$d_growth, dists_i$d_symbiosis, method = "spearman")

@@ -6,16 +6,16 @@ library(cowplot)
 library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
-genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
+isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 contigs <- read_csv(paste0(folder_data, "temp/12-contigs.csv")) %>%
     left_join(genomes) %>%
-    mutate(genome_id = factor(genome_id, genomes$genome_id))
+    mutate(genome_id = factor(genome_id, isolates$genome_id))
 
 
 # 1. Number of contigs
 p <- contigs %>%
     group_by(genome_id) %>%
-    count(name = "n_contigs") %>%
+    dplyr::count(name = "n_contigs") %>%
     ggplot() +
     geom_histogram(aes(x = n_contigs), color = "black", fill = "white", binwidth = 1) +
     scale_x_continuous(breaks = seq(0, 12, 1)) +
@@ -51,4 +51,5 @@ g_size <- contigs %>%
     group_by(genome_id) %>%
     summarize(genome_size = sum(contig_length)/10^6)
 
-mean(g_size$genome_size) # 6.93XX Mbp
+range(g_size$genome_size) #  6.691694 14.442432
+mean(g_size$genome_size) # 7.607185
