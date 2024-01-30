@@ -11,7 +11,7 @@ pa <- read_delim(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_a
 pa <- pa %>% clean_names()
 
 
-# Compute pairwise distance in gene presence and absence 
+# 1. Compute pairwise distance in gene presence and absence 
 pat <- t(as.matrix(pa[,-1]))
 
 dim(pat)
@@ -25,7 +25,7 @@ dist_jaccard <- jdm %>%
 
 write_csv(dist_jaccard, paste0(folder_data, "temp/13-dist_jaccard.csv"))
 
-# Compute genomic fluidity
+# 2. Compute genomic fluidity in pairs
 fluidity <- function (tb) {
     uk = sum(tb[,1] == 1 & tb[,2] == 0)
     ul = sum(tb[,1] == 0 & tb[,2] == 1)
