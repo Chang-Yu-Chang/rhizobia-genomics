@@ -17,7 +17,7 @@ dists <- read_csv(paste0(folder_data, 'temp/31-dists.csv'))
 dists_long <- read_csv(paste0(folder_data, "temp/31-dists_long.csv"))
 
 
-# Function for making tree
+# Make trees
 make_tree <- function(di) {
     #' This functions creates a phylo object from a long-format distance matrix
     colnames(di)[3] <- "dd"
@@ -36,6 +36,8 @@ make_tree <- function(di) {
 
 tree_ani <- dists %>% select(genome_id1, genome_id2, d_ani) %>% make_tree()
 tree_kmer <- dists %>% select(genome_id1, genome_id2, d_kmer) %>% make_tree()
+tree_jaccard <- dists %>% select(genome_id1, genome_id2, d_jaccard) %>% drop_na() %>% make_tree()
+tree_fluidity <- dists %>% select(genome_id1, genome_id2, d_fluidity) %>% drop_na() %>% make_tree()
 tree_growth <- dists %>% select(genome_id1, genome_id2, d_growth) %>% drop_na() %>% make_tree()
 tree_geo <- dists %>% select(genome_id1, genome_id2, d_geo) %>% drop_na() %>% make_tree()
 #tree_symbiosis <- dists %>% select(genome_id1, genome_id2, d_symbiosis) %>% drop_na() %>% make_tree()
@@ -60,8 +62,10 @@ plot_tree <- function (tree, gtitle) {
 }
 p1 <- plot_tree(tree_ani, "ani")
 p2 <- plot_tree(tree_kmer, "kmer")
-p3 <- plot_tree(tree_growth, "growth")
-p4 <- plot_tree(tree_geo, "geo")
-p <- plot_grid(p1, p2, p3, p4, nrow = 2, scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(paste0(folder_data, "temp/32a-01-trees.png"), p, width = 10, height = 10)
+p3 <- plot_tree(tree_jaccard, "jaccard")
+p4 <- plot_tree(tree_fluidity, "fluidity")
+p5 <- plot_tree(tree_growth, "growth")
+p6 <- plot_tree(tree_geo, "geo")
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-01-trees.png"), p, width = 15, height = 10)
 

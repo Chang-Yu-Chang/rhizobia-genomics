@@ -16,7 +16,7 @@ genomes <- bind_rows(genomes, tibble(batch_name = rep("ncbi", 4), genome_name = 
 dist_ani <- read_delim(paste0(folder_data, "genomics/popgen/fastani/ani.txt"), delim = "\t", col_names = F)
 list_genomes <- read_delim(paste0(folder_data, "genomics/popgen/fastani/list_genomes.txt"), delim = "\t", col_names = F)
 
-# 1.1 clean the tabkes
+# 1.1 clean the tables
 colnames(dist_ani) <- c("genome_id1", "genome_id2", "d_ani", "frag1", "frag2")
 dist_ani <- dist_ani %>%
     # Compute so that d_ani represents the genomic distance instance of similarity
@@ -26,7 +26,7 @@ dist_ani <- dist_ani %>%
     mutate(genome_id1 = ordered(genome_id1, genomes$genome_id), genome_id2 = ordered(genome_id2, genomes$genome_id)) %>%
     arrange(genome_id1, genome_id2) %>%
     filter(genome_id1 <= genome_id2) 
-write_csv(dist_ani, paste0(folder_data, "temp/13-dist_ani.csv"))
+write_csv(dist_ani, paste0(folder_data, "temp/19-dist_ani.csv"))
 
 # 2. k-mers 
 dist_kmer <- read_delim(paste0(folder_data, "genomics/popgen/kmer/kmer.txt"))
@@ -42,16 +42,20 @@ dist_kmer <- dist_kmer %>%
     arrange(genome_id1, genome_id2) %>%
     filter(genome_id1 <= genome_id2)
 
-write_csv(dist_kmer, paste0(folder_data, "temp/13-dist_kmer.csv"))
+write_csv(dist_kmer, paste0(folder_data, "temp/19-dist_kmer.csv"))
 
-# 3. genomic fluidity
+# 3. gene content
+dist_jaccard <- read_csv(paste0(folder_data, "temp/13-dist_jaccard.csv"))
+dist_fluidity <- read_csv(paste0(folder_data, "temp/13-dist_fluidity.csv"))
 
 # 4. Join the and tables
 dist_genetics <- dist_ani %>%
     select(genome_id1, genome_id2, d_ani) %>%
-    left_join(dist_kmer)
+    left_join(dist_kmer) %>%
+    left_join(dist_jaccard) %>%    
+    left_join(dist_fluidity) 
 
-write_csv(dist_genetics, paste0(folder_data, "temp/13-dist_genetics.csv"))
+write_csv(dist_genetics, paste0(folder_data, "temp/19-dist_genetics.csv"))
 
 if (FALSE) {
 

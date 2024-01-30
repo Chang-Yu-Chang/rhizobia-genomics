@@ -37,7 +37,7 @@ isolates_traits <- isolates_mapping %>%
 
 nrow(isolates_traits) # 32 strains with growth rate data 
 
-write_csv(isolates_traits, paste0(folder_data, "temp/24-isolates_traits.csv"))
+write_csv(isolates_traits, paste0(folder_data, "temp/29-isolates_traits.csv"))
 
 # 1. Calculate pairwise euclidean distance
 # For the 32 strains with only growth data
@@ -82,6 +82,6 @@ dist_traits <- dist_traits %>%
         ) / 1000 # convert from m to km
     )
 
-write_csv(dist_traits, paste0(folder_data, "temp/24-dist_traits.csv"))
+write_csv(dist_traits, paste0(folder_data, "temp/29-dist_traits.csv"))
 
 
