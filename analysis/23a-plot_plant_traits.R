@@ -8,28 +8,28 @@ library(RColorBrewer)
 library(ellipse) # for calculating the ellipse
 source(here::here("analysis/00-metadata.R"))
 
-plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
+isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
+sysplants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
 plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
 plants_wide <- read_csv(paste0(folder_data, "temp/23-plants_wide.csv"))
 
 
 # 1. plot all plant traits
 length(unique(plants_long$id)) # 231 plants
-length(unique(plants_long$rhizobia)) # 14 rhizobia + 1 control
+length(unique(plants_long$exp_id)) # 14 rhizobia + 1 control
 plants_long %>%
-    arrange(rhizobia_site) %>%
-    distinct(id, rhizobia_site, rhizobia) %>%
-    group_by(rhizobia_site, rhizobia) %>%
+    arrange(site_group) %>%
+    distinct(id, site_group, exp_id) %>%
+    group_by(site_group, exp_id) %>%
     count()
 
 p <- plants_long %>%
     ggplot() +
-    geom_boxplot(aes(x = rhizobia, y = value, color = rhizobia_site), outlier.shape = NA) +
-    geom_jitter(aes(x = rhizobia, y = value, color = rhizobia_site), width = 0.2, height = 0, shape = 21) +
-    facet_grid(trait~rhizobia_site, scales = "free", space = "free_x") +
-    scale_color_manual(values = rhizobia_site_colors) +
+    geom_boxplot(aes(x = exp_id, y = value, color = site_group), outlier.shape = NA) +
+    geom_jitter(aes(x = exp_id, y = value, color = site_group), width = 0.2, height = 0, shape = 21) +
+    facet_grid(trait~site_group, scales = "free", space = "free_x") +
+    #scale_color_manual(values = site_group_colors) +
     theme_classic() +
-    theme_facets +
     theme(
         panel.border = element_rect(color = "black", fill = NA),
         axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
@@ -41,9 +41,9 @@ ggsave(paste0(folder_data, "temp/23a-01-plant_traits.png"), p, width = 10, heigh
 
 # 2. Plot the nodule vs. plant biomass
 p <- plants_wide %>%
-    filter(rhizobia_site != "control") %>%
+    filter(site_group != "control") %>%
     ggplot() +
-    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = rhizobia_site), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
+    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = site_group), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
     scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
     scale_x_continuous(breaks = seq(0, 50, 10)) +
     coord_equal() +
@@ -59,15 +59,15 @@ ggsave(paste0(folder_data, "temp/23a-02-nodule_vs_shoot.png"), p, width = 5, hei
 
 # 3. facet plot ----
 p <- plants_wide %>%
-    filter(rhizobia_site != "control") %>%
+    filter(site_group != "control") %>%
     ggplot() +
-    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = rhizobia_site), shape = 21, size = 2, stroke = 1)+
+    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = site_group), shape = 21, size = 2, stroke = 1)+
     scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
     scale_x_continuous(breaks = seq(0, 50, 10)) +
-    facet_wrap(~rhizobia_site, nrow = 2) +
+    facet_wrap(~site_group, nrow = 2) +
     coord_equal() +
     theme_classic() +
-    theme_facets +
+    #theme_facets +
     # theme(
     #     panel.grid.major = element_line(color = "grey95"),
     #     strip.background = element_rect(fill = "grey95", color = NA),
@@ -77,6 +77,26 @@ p <- plants_wide %>%
     labs(x = "# of nodules", y = "shoot biomass (mg)")
 
 ggsave(paste0(folder_data, "temp/23a-03-nodule_vs_shoot_facet.png"), p, width = 8, height = 6)
+
+
+"Work on making the correlation within composite traits"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Stat for slope in regression
 lm_x_y <- function (dat, x_var, y_var) {
@@ -88,23 +108,23 @@ lm_x_y <- function (dat, x_var, y_var) {
 }
 
 plants_wide %>%
-    filter(rhizobia_site != "control") %>%
-    nest(data = c(id, rhizobia, dry_weight_mg, nodule_number, root_weight_mg)) %>%
+    filter(site_group != "control") %>%
+    nest(data = c(id, exp_id, dry_weight_mg, nodule_number, root_weight_mg)) %>%
     mutate(lm = map(data, ~lm_x_y(.x, "nodule_number", "dry_weight_mg"))) %>%
-    select(rhizobia_site, lm) %>%
+    select(site_group, lm) %>%
     unnest(lm)
 
 # 4. plot the root traits ----
 p <- plants %>%
-    select(id, rhizobia, rhizobia_site, all_of(traits2)) %>%
-    #select(id, rhizobia_site, rhizobia, dry_weight_mg, nodule_number, root_weight_mg) %>%
+    #select(id, exp_id, site_group, all_of(traits2)) %>%
+    #select(id, site_group, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
     filter(!is.na(dry_weight_mg), dry_weight_mg != 0) %>%
-    pivot_longer(cols = c(-id, -rhizobia, -rhizobia_site), names_to = "trait") %>%
+    pivot_longer(cols = c(-id, -exp_id, -site_group), names_to = "trait") %>%
     ggplot() +
-    geom_boxplot(aes(x = rhizobia, y = value, color = rhizobia_site), outlier.shape = NA) +
-    geom_jitter(aes(x = rhizobia, y = value, color = rhizobia_site), width = 0.2, height = 0, shape = 21) +
-    facet_grid(trait~rhizobia_site, scales = "free", space = "free_x") +
-    scale_color_manual(values = rhizobia_site_colors) +
+    geom_boxplot(aes(x = exp_id, y = value, color = site_group), outlier.shape = NA) +
+    geom_jitter(aes(x = exp_id, y = value, color = site_group), width = 0.2, height = 0, shape = 21) +
+    facet_grid(trait~site_group, scales = "free", space = "free_x") +
+    scale_color_manual(values = site_group_colors) +
     theme_classic() +
     theme_facets +
     theme(
@@ -117,10 +137,9 @@ p <- plants %>%
 ggsave(paste0(folder_data, "temp/23a-04-root_traits.png"), p, width = 8, height = 40)
 
 # 5. plot the trait correlation ----
-
 # Names
 plants_traits <- plants %>%
-    filter(rhizobia_site %in% c("high-elevation", "low-elevation")) %>%
+    filter(site_group %in% c("high-elevation", "low-elevation")) %>%
     select(all_of(traits))
 tb_traits <- tibble(trait = ordered(names(plants_traits), names(plants_traits))) %>%
     expand(trait, trait) %>%

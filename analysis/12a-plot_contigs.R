@@ -44,7 +44,7 @@ p <- contigs %>%
     guides(fill = guide_legend(title = "")) +
     labs(x = "genome", y = "genome size (Mbp)", title = "contigs > 10kb")
 
-ggsave(paste0(folder_data, "temp/12a-02-genome_size.png"), plot = p, width = 8, height = 6)
+ggsave(paste0(folder_data, "temp/12a-02-genome_size.png"), plot = p, width = 15, height = 6)
 
 # genome size
 g_size <- contigs %>%
