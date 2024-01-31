@@ -48,7 +48,10 @@ write_csv(dist_kmer, paste0(folder_data, "temp/19-dist_kmer.csv"))
 dist_jaccard <- read_csv(paste0(folder_data, "temp/13-dist_jaccard.csv"))
 dist_fluidity <- read_csv(paste0(folder_data, "temp/13-dist_fluidity.csv"))
 
-# 4. Join the and tables
+# 4. 825 core genes
+dist_scccg <- read_csv(paste0(folder_data, "temp/15-dist_sccg.csv"))
+
+# Join the and tables
 dist_genetics <- dist_ani %>%
     select(genome_id1, genome_id2, d_ani) %>%
     left_join(dist_kmer) %>%
