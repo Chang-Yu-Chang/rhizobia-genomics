@@ -14,7 +14,7 @@ dists <- dist_genetics %>% left_join(dist_traits)
 dists_long <- dists %>%
     pivot_longer(cols = c(-genome_id1, -genome_id2), names_to = "d_type", names_prefix = "d_") %>%
     mutate(d_group = case_when(
-        d_type %in% c("ani", "kmer", "jaccard", "fluidity") ~ "genetic",
+        d_type %in% c("ani", "kmer", "jaccard", "fluidity", "hamming", "jc") ~ "genetic",
         d_type %in% c("growth", "symbiosis") ~ "composite trait",
         d_type == "geo" ~ "geographic",
         TRUE ~ "trait" 
@@ -26,7 +26,7 @@ write_csv(dists, paste0(folder_data, "temp/31-dists.csv"))
 write_csv(dists_long, paste0(folder_data, "temp/31-dists_long.csv"))
 
 # Correlation between traits
-list_genomics <- c("ani", "kmer", "jaccard", "fluidity")
+list_genomics <- c("ani", "kmer", "jaccard", "fluidity", "hamming", "jc")
 list_traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg",
         str_subset(colnames(isolates_traits), "r_"),
         str_subset(colnames(isolates_traits), "lag_"),

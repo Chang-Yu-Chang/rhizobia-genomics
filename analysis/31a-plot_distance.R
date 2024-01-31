@@ -38,14 +38,18 @@ plot_dots <- function (dists_long, d_trait) {
         labs(x = "d_genomic", y = d_trait)
 }
 
-p1 <- plot_dots(dists_long, "d_growth") +
+p1 <- dists_long %>%
+    filter(d_type != "fluidity") %>%
+    plot_dots("d_growth") +
     theme(axis.title.x = element_blank(), strip.text.x = element_text(size = 13), strip.background = element_rect(color = NA, fill = "white")) +
     labs(x = NULL)
-p2 <- plot_dots(dists_long, "d_symbiosis") + 
-    theme(plot.margin = unit(c(0,0,0,0), "mm")) 
+p2 <- dists_long %>%
+    filter(d_type != "fluidity") %>%
+    plot_dots("d_symbiosis") + 
+    theme(axis.title.x = element_blank(), strip.text.x = element_text(size = 13), strip.background = element_rect(color = NA, fill = "white"))
 p <- plot_grid(p1, p2, nrow = 2, align = "vh", axis = "lrtb", scale = 0.9) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(paste0(folder_data, "temp/31a-01-genetics_vs_phenotypes.png"), p, width = 12, height = 6)
+ggsave(paste0(folder_data, "temp/31a-01-genetics_vs_phenotypes.png"), p, width = 15, height = 6)
 
 # 2. genetic distance vs one trait
 p1 <- plot_dots(dists_long, "d_r_30c") +
