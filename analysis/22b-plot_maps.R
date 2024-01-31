@@ -11,7 +11,7 @@ source(here::here("analysis/00-metadata.R"))
 
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 
-# 1. Plot both populations in one map ----
+# 1. Plot both populations in one map 
 google_api <- "AIzaSyCmRu9YUWIQzq5U48yDeFPAiUYSft86pWw"
 register_google(google_api)
 

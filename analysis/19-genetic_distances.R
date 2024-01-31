@@ -63,7 +63,7 @@ if (FALSE) {
 dist_jac <- read_csv(paste0(folder_data, "temp/17-dist_jac.csv"), show_col_types = F)
 dist_flu <- read_csv(paste0(folder_data, "temp/17-dist_flu.csv"), show_col_types = F)
 
-# 0.3 join ----
+# 0.3 join 
 dists <- dist_kmer %>%
     left_join(dist_jac) %>%
     left_join(dist_flu) %>%
@@ -71,7 +71,7 @@ dists <- dist_kmer %>%
 write_csv(dists, paste0(folder_data, "temp/19-dists_genetic.csv"))
 
 
-# 1. genetic distance ----
+# 1. genetic distance 
 p1 <- dists %>%
     ggplot() +
     geom_point(aes(x = d_kmer, y = d_jaccard), shape = 21) +
@@ -105,7 +105,7 @@ p3 <- dists %>%
 p <- plot_grid(p1, p2, p3, nrow = 1, align = "h", axis = "tb")
 ggsave(paste0(folder_data, "temp/19-01-g_dist.png"), p, width = 12, height = 4)
 
-# 2. genetic distance colored by pair types ----
+# 2. genetic distance colored by pair types 
 dists_meta <- dists %>%
     left_join(rename_with(isolates_mash, function (x) paste0(x, 1))) %>%
     left_join(rename_with(isolates_mash, function (x) paste0(x, 2)))
@@ -172,7 +172,7 @@ p3 <- dists_meta %>%
 p <- plot_grid(p1, p2, p3, nrow = 1, align = "h", axis = "tb")
 ggsave(paste0(folder_data, "temp/19-02-g_dist_sp.png"), p, width = 12, height = 4)
 
-# 3. genetic distance colored by population ----
+# 3. genetic distance colored by population 
 dists_meta <- dists %>%
     left_join(rename_with(isolates_mash, function (x) paste0(x, 1))) %>%
     left_join(rename_with(isolates_mash, function (x) paste0(x, 2)))

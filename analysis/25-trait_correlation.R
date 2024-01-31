@@ -1,4 +1,4 @@
-#' This script implement trait coreelation test
+#' This script compares the correaltion between the two composite traits: growth and symbiosis
 
 renv::load()
 library(tidyverse)

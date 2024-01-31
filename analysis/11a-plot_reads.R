@@ -44,7 +44,7 @@ p <- filtered_reads %>%
 
 ggsave(paste0(folder_data, "temp/11a-01-length_vs_q.png"), p, width = 10, height = 10)
 
-# 2. histogram of read length ----
+# 2. histogram of read length 
 p <- filtered_reads %>%
     ggplot() +
     geom_histogram(aes(x = length/1000), color = "black", fill = "white", binwidth = 1) +

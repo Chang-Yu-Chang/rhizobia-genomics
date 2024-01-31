@@ -57,7 +57,7 @@ p <- plants_wide %>%
 ggsave(paste0(folder_data, "temp/23a-02-nodule_vs_shoot.png"), p, width = 5, height = 4)
 
 
-# 3. facet plot ----
+# 3. facet plot 
 p <- plants_wide %>%
     filter(site_group != "control") %>%
     ggplot() +
@@ -114,7 +114,7 @@ plants_wide %>%
     select(site_group, lm) %>%
     unnest(lm)
 
-# 4. plot the root traits ----
+# 4. plot the root traits 
 p <- plants %>%
     #select(id, exp_id, site_group, all_of(traits2)) %>%
     #select(id, site_group, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
@@ -136,7 +136,7 @@ p <- plants %>%
 
 ggsave(paste0(folder_data, "temp/23a-04-root_traits.png"), p, width = 8, height = 40)
 
-# 5. plot the trait correlation ----
+# 5. plot the trait correlation 
 # Names
 plants_traits <- plants %>%
     filter(site_group %in% c("high-elevation", "low-elevation")) %>%

@@ -13,7 +13,7 @@ gc_prms <- read_csv(paste0(folder_data, 'temp/21-gc_prms.csv'))
 gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
 
 
-# 0. clean up data ----
+# 0. clean up data
 factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id), temperature = factor(temperature, c("25c", "30c", "35c", "40c")))
 isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
 gc_summs <- factorize_vars(gc_summs)
@@ -21,7 +21,7 @@ gc_prms <- factorize_vars(gc_prms)
 gc_summs <- factorize_vars(gc_summs)
 
 
-# 1. Raw data ----
+# 1. Raw data
 p <- gcs %>%
     mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
     ggplot() +
@@ -39,7 +39,7 @@ p <- gcs %>%
 ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 10, height = 8)
 
 
-# 2. Growth curves by well ----
+# 2. Growth curves by well 
 p <- gcs %>%
     mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
     ggplot() +
@@ -59,7 +59,7 @@ p <- gcs %>%
 
 ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height = 15)
 
-# 3. Average OD by exp_id ----
+# 3. Average OD by exp_id 
 p <- gc_summs %>%
     left_join(isolates_mapping) %>%
     ggplot() +
@@ -79,7 +79,7 @@ p <- gc_summs %>%
     labs(x = "time (hrs)", y = expression(OD[600]))
 ggsave(paste0(folder_data, "temp/21a-03-gc_mean.png"), p, width = 8, height = 12)
 
-# 4. Average OD by exp_id, overlayed ----
+# 4. Average OD by exp_id, overlayed 
 p <- gc_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(group = exp_id)) +
@@ -97,7 +97,7 @@ p <- gc_summs %>%
 ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 12, height = 4)
 
 
-# 5. plot all trait mean by strain_site_group ----
+# 5. plot all trait mean by strain_site_group 
 p1 <- gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     ggplot(aes(x = rhizobia_site, y = lag, fill = rhizobia_site)) +
@@ -150,7 +150,7 @@ p3 <- gc_prm_summs %>%
 p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
 ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 12)
 
-# 6. reaction norm ----
+# 6. reaction norm 
 p1 <- gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     ggplot() +
@@ -193,7 +193,7 @@ p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
 ggsave(paste0(folder_data, "temp/21a-06-reaction_norm.png"), p, width = 6, height = 12)
 
 
-# 6. check the taxonomy ----
+# 6. check the taxonomy 
 gc_prm_summs %>%
     left_join(isolates_mapping) %>%
     filter(rhizobia_site %in% c("high-elevation", "low-elevation")) %>%
@@ -218,7 +218,7 @@ gc_prm_summs %>%
 # wilcox.test(gc_h$maxOD, gc_l$maxOD) # p=0.8518
 #
 #
-# # 8. plot all trait raw by strain_site_group ----
+# # 8. plot all trait raw by strain_site_group 
 # p1 <- gc_prms %>%
 #     ggplot(aes(x = strain_site_group, y = lag, fill = strain_site_group)) +
 #     geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +

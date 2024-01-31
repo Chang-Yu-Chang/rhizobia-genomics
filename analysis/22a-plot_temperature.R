@@ -21,7 +21,7 @@ month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
 
 
 
-# 1. Plot the raw data for the years ----
+# 1. Plot the raw data for the years 
 p1 <- dml %>%
     filter(site_group != "S") %>%
     ggplot() +
@@ -63,7 +63,7 @@ p2 <- dml %>%
 p <- plot_grid(p1, p2, nrow = 2, labels = c("A", "B"))
 ggsave(paste0(folder_data, "temp/22a-01-daily_t.png"), p, width = 10, height = 8)
 
-# 2. Plot the H vs L temperature ----
+# 2. Plot the H vs L temperature 
 temp <- dml %>%
     group_by(site_group, yday) %>%
     summarize(mean_tmax_deg_c = mean(tmax_deg_c), mean_tmin_deg_c = mean(tmin_deg_c))
@@ -112,7 +112,7 @@ p <- plot_grid(p1, p2, nrow = 2, labels = c("A", "B"))
 
 ggsave(paste0(folder_data, "temp/22a-02-H_vs_L.png"), p, width = 10, height = 8)
 
-# 3. Plot the resampled temperature difference ----
+# 3. Plot the resampled temperature difference 
 ## Summary stat
 diff_tmax %>%
     group_by(yday) %>%
@@ -133,7 +133,7 @@ p <- diff_tmax %>%
 ggsave(paste0(folder_data, "temp/22a-03-resample_difference_HL.png"), p, width = 4, height = 4)
 
 
-# 4. For each site, use the August data  ----
+# 4. For each site, use the August data  
 p <- dml %>%
     mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
     mutate(ymonth = month(ydate)) %>%

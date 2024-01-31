@@ -19,7 +19,7 @@ length(unique(tb_traits$trait1)) # 12 growth traits
 length(unique(tb_traits$trait2)) # 37 symbiosis traits
 # 12*37=444
 
-# 1. plot the correaltion of one pair of trait  ----
+# 1. plot the correaltion of one pair of trait  
 name_trait1 <- tb_reps_exp1$trait1[1]
 name_trait2 <- tb_reps_exp1$trait2[1]
 colors_pair <- c(across = "grey", within = "maroon")
