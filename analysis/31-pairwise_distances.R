@@ -5,6 +5,7 @@ library(tidyverse)
 library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
+isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
 dist_genetics <- read_csv(paste0(folder_data, 'temp/19-dist_genetics.csv'))
 dist_traits <- read_csv(paste0(folder_data, "temp/29-dist_traits.csv"))
 

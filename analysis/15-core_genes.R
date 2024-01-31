@@ -31,8 +31,10 @@ write_csv(tibble(x = list_sccg), paste0(folder_data, "temp/15-list_sccg.csv"))
 
 # Compute the hamming distance 
 hamming <- function (seq1, seq2) {
-    d_ham <- sum(strsplit(seq1, '')[[1]] != strsplit(seq2, '')[[1]])
-    return(d_ham / nchar(seq1))
+    stopifnot(nchar(seq1) == nchar(seq2))
+    n_diff <- sum(strsplit(seq1, '')[[1]] != strsplit(seq2, '')[[1]])
+    d_ham <- n_diff / nchar(seq1)
+    return(d_ham)
 }
 
 tb_sccg <- tibble(gene_name = list_sccg, dat = NA)
@@ -40,7 +42,7 @@ for (i in 1:length(list_sccg)) {
     aln <- read.alignment(paste0(folder_alignment, list_sccg[i]), format = "fasta")
     genome_ids <- str_extract(aln$nam, "\\w+;") %>% str_remove(";") %>% str_remove("_R_")
     tb_ham <- crossing(seq_id1 = 1:aln$nb, seq_id2 = 1:aln$nb, d_hamming = NA) %>%
-        filter(seq_id1 < seq_id2) %>%
+        filter(seq_id1 <= seq_id2) %>%
         # Compute hamming
         rowwise() %>%
         mutate(d_hamming = hamming(aln$seq[[seq_id1]], aln$seq[[seq_id2]])) %>%
@@ -66,12 +68,53 @@ dist_sccg_ham %>%
     distinct(genome_id1, genome_id2) %>%
     nrow() # choose(41,2) = 820
 
+# Compute Jukes-Cantor distance
+jc <- function(seq1, seq2) {
+  stopifnot(nchar(seq1) == nchar(seq2))
+  n <- nchar(seq1)
+  p <- sum(strsplit(seq1, '')[[1]] != strsplit(seq2, '')[[1]]) / n
+  d_jc <- -3/4 * log(1 - (4/3) * p / (3 - 4 * p))
+  
+  return(d_jc)
+}
 
+seq1 <- "ACGTACGTACGT"
+seq2 <- "ACCTACGTACGT"
+jc(seq1, seq2)
+
+tb_sccg <- tibble(gene_name = list_sccg, dat = NA)
+for (i in 1:length(list_sccg)) {
+    aln <- read.alignment(paste0(folder_alignment, list_sccg[i]), format = "fasta")
+    genome_ids <- str_extract(aln$nam, "\\w+;") %>% str_remove(";") %>% str_remove("_R_")
+    tb_ham <- crossing(seq_id1 = 1:aln$nb, seq_id2 = 1:aln$nb, d_jc = NA) %>%
+        filter(seq_id1 <= seq_id2) %>%
+        # Compute jc
+        rowwise() %>%
+        mutate(d_jc = jc(aln$seq[[seq_id1]], aln$seq[[seq_id2]])) %>%
+        ungroup() %>%
+        # Mathc genome ids
+        mutate(genome_id1 = genome_ids[seq_id1], genome_id2 = genome_ids[seq_id2]) %>%
+        select(genome_id1, genome_id2, d_jc)
+    tb_sccg$dat[[i]] <- list(tb_ham)
+    print(i)
+}
+
+dist_sccg_jc <- tb_sccg %>%
+    unnest(dat) %>%
+    unnest(dat) %>%
+    mutate(genome_id1 = ordered(genome_id1, genome_ids), genome_id2 = ordered(genome_id2, genome_ids)) 
+    
+to_swap <- which(dist_sccg_jc$genome_id1 > dist_sccg_jc$genome_id2) 
+x <- dist_sccg_jc$genome_id2[to_swap]
+dist_sccg_jc$genome_id2[to_swap] <- dist_sccg_jc$genome_id1[to_swap]
+dist_sccg_jc$genome_id1[to_swap] <- x
 
 
 # Average across single copy core genes
 dist_sccg <- dist_sccg_ham %>%
+    left_join(dist_sccg_jc) %>%
     group_by(genome_id1, genome_id2) %>%
-    summarize(d_hamming = mean(d_hamming))
+    summarize(d_hamming = mean(d_hamming), d_jc = mean(d_jc, na.rm = T))
 
 write_csv(dist_sccg, paste0(folder_data, "temp/15-dist_sccg.csv"))
+

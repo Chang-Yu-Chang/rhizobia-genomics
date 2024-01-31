@@ -51,14 +51,23 @@ dist_fluidity <- read_csv(paste0(folder_data, "temp/13-dist_fluidity.csv"))
 # 4. 825 core genes
 dist_scccg <- read_csv(paste0(folder_data, "temp/15-dist_sccg.csv"))
 
-# Join the and tables
+# Join the distance tables
 dist_genetics <- dist_ani %>%
     select(genome_id1, genome_id2, d_ani) %>%
     left_join(dist_kmer) %>%
     left_join(dist_jaccard) %>%    
-    left_join(dist_fluidity) 
+    left_join(dist_fluidity) %>%
+    left_join(dist_scccg)
 
 write_csv(dist_genetics, paste0(folder_data, "temp/19-dist_genetics.csv"))
+
+
+
+
+
+
+
+
 
 if (FALSE) {
 

@@ -10,8 +10,7 @@ isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
 dists <- read_csv(paste0(folder_data, "temp/31-dists.csv"))
 dists_long <- read_csv(paste0(folder_data, "temp/31-dists_long.csv"))
 
-nrow(dists) # 903
-choose(42,2)+42 
+nrow(dists) # choose(42,2)+42  = 903
 
 dists_long <- dists_long %>% 
     mutate(d_type = factor(d_type, unique(dists_long$d_type)))
@@ -70,7 +69,7 @@ p <- plot_grid(p1, p2, p3, p4, p5, p6,
 ggsave(paste0(folder_data, "temp/31a-02-genetics_vs_trait.png"), p, width = 12, height = 18)
 
 
-# 3. plot the two composite traits
+# 3. plot the mean value of two composite traits
 dists_i <- dists %>%
     filter(genome_id1 != genome_id2) %>%
     select(d_growth, d_symbiosis) %>%
@@ -86,3 +85,4 @@ p <- dists_i %>%
     labs()
 ggsave(paste0(folder_data, "temp/31a-03-growth_vs_symbiosis.png"), p, width = 4, height = 4)
 cor.test(dists_i$d_growth, dists_i$d_symbiosis, method = "spearman")
+
