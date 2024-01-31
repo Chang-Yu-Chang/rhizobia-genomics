@@ -13,6 +13,8 @@ sysplants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
 plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
 plants_wide <- read_csv(paste0(folder_data, "temp/23-plants_wide.csv"))
 
+site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", 
+                 `suburban` = "#0C6291", `urban` = "#BF4342", control = "grey")
 
 # 1. plot all plant traits
 length(unique(plants_long$id)) # 231 plants
@@ -28,7 +30,7 @@ p <- plants_long %>%
     geom_boxplot(aes(x = exp_id, y = value, color = site_group), outlier.shape = NA) +
     geom_jitter(aes(x = exp_id, y = value, color = site_group), width = 0.2, height = 0, shape = 21) +
     facet_grid(trait~site_group, scales = "free", space = "free_x") +
-    #scale_color_manual(values = site_group_colors) +
+    scale_color_manual(values = site_group_colors) +
     theme_classic() +
     theme(
         panel.border = element_rect(color = "black", fill = NA),
@@ -39,12 +41,13 @@ p <- plants_long %>%
 
 ggsave(paste0(folder_data, "temp/23a-01-plant_traits.png"), p, width = 10, height = 10)
 
-# 2. Plot the nodule vs. plant biomass
+# 2. Plot the nodule vs plant biomass
 p <- plants_wide %>%
     filter(site_group != "control") %>%
     ggplot() +
-    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = site_group), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
-    scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
+    geom_smooth(aes(x = nodule_number, y = dry_weight_mg), method = "lm")+
+    geom_point(aes(x = nodule_number, y = dry_weight_mg), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
+    #scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
     scale_x_continuous(breaks = seq(0, 50, 10)) +
     coord_equal() +
     theme_classic() +
@@ -56,39 +59,52 @@ p <- plants_wide %>%
 
 ggsave(paste0(folder_data, "temp/23a-02-nodule_vs_shoot.png"), p, width = 5, height = 4)
 
+# Stats
+lm(dry_weight_mg ~ nodule_number, data = plants_wide) %>%
+    broom::tidy()
 
-# 3. facet plot 
-p <- plants_wide %>%
+# 3. Plot the pairwise comparison of the three symbiosis traits
+plot_dots <- function(tb_wide, trait1, trait2) {
+    tb_wide %>%
+        ggplot() +
+        geom_smooth(aes(x = {{trait1}}, y = {{trait2}}), method = "lm")+
+        geom_point(aes(x = {{trait1}}, y = {{trait2}}), shape = 21, size = 2, alpha = 0.5, stroke = 1)+
+        #scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
+        #scale_x_continuous(breaks = seq(0, 50, 10)) +
+        #facet_wrap(~site_group, nrow = 2) +
+        #coord_equal() +
+        theme_classic() +
+        theme(
+            panel.grid.major = element_line(color = "grey95")
+        ) +
+        guides() 
+    #    labs(x = "# of nodules", y = "shoot biomass (mg)")
+}
+p1 <- plants_wide %>%
     filter(site_group != "control") %>%
-    ggplot() +
-    geom_point(aes(x = nodule_number, y = dry_weight_mg, color = site_group), shape = 21, size = 2, stroke = 1)+
-    scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(1,2,5,6)]) +
-    scale_x_continuous(breaks = seq(0, 50, 10)) +
-    facet_wrap(~site_group, nrow = 2) +
-    coord_equal() +
-    theme_classic() +
-    #theme_facets +
-    # theme(
-    #     panel.grid.major = element_line(color = "grey95"),
-    #     strip.background = element_rect(fill = "grey95", color = NA),
-    #     panel.border = element_rect(fill = NA, color = "black")
-    # ) +
-    guides() +
+    plot_dots(nodule_number, dry_weight_mg) +
     labs(x = "# of nodules", y = "shoot biomass (mg)")
+p2 <- plants_wide %>%
+    filter(site_group != "control") %>%
+    plot_dots(nodule_number, root_weight_mg) +
+    labs(x = "# of nodules", y = "root biomass (mg)")
+p3 <- plants_wide %>%
+    filter(site_group != "control") %>%
+    plot_dots(root_weight_mg, dry_weight_mg) +
+    labs(x = "root biomass (mg)", y = "shoot biomass (mg)")
+p <- plot_grid(p1, p2, p3,
+    nrow = 1, align = "h", axis = "tb", scale = 0.95, labels = LETTERS[1:3]
+) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(paste0(folder_data, "temp/23a-03-nodule_vs_shoot_facet.png"), p, width = 8, height = 6)
+ggsave(paste0(folder_data, "temp/23a-03-symbiosis_trait_pairs.png"), p, width = 9, height = 3)
+
+# Are the symbiosis traits mutually correlated?
+cor.test(plants_wide$nodule_number, plants_wide$dry_weight_mg) %>% broom::tidy()
+cor.test(plants_wide$nodule_number, plants_wide$root_weight_mg) %>% broom::tidy()
+cor.test(plants_wide$root_weight_mg, plants_wide$dry_weight_mg) %>% broom::tidy()
 
 
-"Work on making the correlation within composite traits"
-
-
-
-
-
-
-
-
-
+if (FALSE) {
 
 
 
@@ -225,3 +241,5 @@ ggsave(paste0(folder_data, "temp/23a-05-trait_cor.png"), p, width = 12, height =
 
 
 
+
+}
