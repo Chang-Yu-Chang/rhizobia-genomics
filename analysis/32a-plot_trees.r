@@ -68,9 +68,9 @@ plot_tree1 <- function (tree, gtitle) {
         left_join(rename(isolates_traits, label = genome_id), by = "label") %>%
         as.treedata() %>%
         ggtree() +
-        geom_tiplab(aes(color = population)) +
+        geom_tiplab(aes(color = population), size = 3) +
         #geom_tippoint(aes(color = population)) +
-        scale_color_aaas() +
+        scale_color_manual(values = c(MLBS = "#0F6290", Phila = "#85325C")) +
         theme_tree(legend.position = 'centre') +
         theme(
             legend.position = c(0.85,0.25),
@@ -98,7 +98,7 @@ plot_tree2 <- function (tree, gtitle) {
         left_join(rename(isolates_contigs, label = genome_id), by = "label") %>%
         as.treedata() %>%
         ggtree() +
-        geom_tiplab(aes(color = species)) +
+        geom_tiplab(aes(color = species), size = 3) +
         #geom_tippoint(aes(color = species)) +
         scale_color_manual(values = c(meliloti = "#423E37", medicae = "#E3B23C")) +
         theme_tree(legend.position = 'centre') +
