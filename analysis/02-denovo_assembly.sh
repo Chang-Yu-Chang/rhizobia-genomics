@@ -62,3 +62,20 @@ do
     dir=$folder_genomics/assembly/$genome_ids[$i]
     cp $dir/medaka/consensus.fasta $folder_genomics/genomes/$genome_ids[$i].fasta
 done
+
+# Split the genome into contigs
+mamba activate samtools
+mkdir $folder_genomics/contigs
+
+for i in {1..38}; do
+    genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
+    contig_names=($(grep -e "^>" $genome_fa | sed 's/^>//'))
+    # Use samtools faidx to extract each contig and save it to a separate file
+    for cn in "${contig_names[@]}"; do
+        contig_length=$(samtools faidx $genome_fa $cn | wc -c)
+        if [[ $contig_length -gt 10000 ]]
+        then
+            samtools faidx $genome_fa $cn > $folder_genomics/contigs/${genome_ids[$i]}_${cn}.fasta
+        fi
+    done
+done

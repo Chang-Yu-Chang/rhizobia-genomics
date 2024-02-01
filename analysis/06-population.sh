@@ -55,7 +55,6 @@ zsh 06c-compare_kmer.sh \
     $folder_genomics/popgen/kmer/list_sigs.txt \
     $folder_genomics/popgen/kmer/kmer.txt
     
-
 # 3. aggregae the VCFs into one 
 mkdir -p $folder_genomics/variants/vcfgz_wsm419
 for i in {1..38}; do;
@@ -73,6 +72,39 @@ bcftools merge -O v --file-list $folder_genomics/variants/list_vcfgz_wsm419.txt 
     #$folder_genomics/variants/list_vcfs_wsm419.txt
 
 bcftools merge -O v -o $folder_genomics/variants/wsm419.vcf -l $folder_genomics/variants/list_vcfs_wsm419.txt
+
+
+# 4. Compare ani across contigs (>10kb)
+# 5. Compare kmer across contigs (>10kb)
+mkdir -p $folder_genomics/popgen/kmer_contigs
+
+list_contigs=($(ls $folder_genomics/contigs |  sed 's/\.fasta$//'))
+
+## Create kmer signatures
+for con in "${list_contigs[@]}";
+do
+    echo $con
+    zsh 06b-genome_kmer.sh \
+        $folder_genomics/contigs/$con.fasta \
+        $folder_genomics/popgen/kmer_contigs/$con.sig
+done
+
+## Create a list of kmer signatures
+list_sigs=($(ls $folder_genomics/popgen/kmer_contigs |  sed 's/\.sig$//'))
+for sig in ${list_sigs[@]}; do; 
+    echo $folder_genomics/popgen/kmer_contigs/$sig.sig
+done |> $folder_genomics/popgen/kmer_contigs/list_sigs.txt
+# echo $folder_genomics/popgen/kmer/em1021.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+# echo $folder_genomics/popgen/kmer/em1022.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+# echo $folder_genomics/popgen/kmer/usda1106.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+# echo $folder_genomics/popgen/kmer/wsm419.sig >> $folder_genomics/popgen/kmer/list_sigs.txt
+## Compare signatures
+zsh 06c-compare_kmer.sh \
+    $folder_genomics/popgen/kmer_contigs/list_sigs.txt \
+    $folder_genomics/popgen/kmer_contigs/kmer_contigs.txt
+    
+
+
 
 # # 3. aggregates the SNPs and SVs into one vcf. This is using the raw read alignment
 # for ref in em1021 wsm419
