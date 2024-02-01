@@ -40,10 +40,4 @@ do
             $dir/genome.bam \
             $dir/snippy
     done
-
-    # Snippy consolidate all sample vcfs
-    snippy-core \
-        --ref $folder_genomes/genomes/$ref.fasta \
-        $folder_genomics/variants/$ref/* \
-        --prefix $folder_genomics/variants_core/$ref/core
 done

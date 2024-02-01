@@ -56,23 +56,41 @@ zsh 06c-compare_kmer.sh \
     $folder_genomics/popgen/kmer/kmer.txt
     
 
-# 3. aggregates the SNPs and SVs into one vcf. This is using the raw read alignment
-for ref in em1021 wsm419
-do
-    mkdir -p $folder_genomics/popgen/snp/$ref
-    # Snippy to call SNPs
-    mamba activate snippy
-    mkdir -p $folder_genomics/popgen/snp/$ref/
-    # for i in {4..6} {8..11} 13 {16..17} 19 {20..37}
-    # do
-    #     mkdir -p $folder_genomics/popgen/read_$ref/snippy/genomes/g$i
-    #     cp $folder_genomes/$sample_ids[$i]/03-variant_calling/read_$ref/snippy/* $folder_genomics/popgen/read_$ref/snippy/genomes/g$i/
-    # done
-    snippy-core \
-        --ref $folder_genomics/genomes/$ref.fasta \
-        $folder_genomics/variants/$ref/em1021/* \
-        --prefix  $folder_genomics/popgen/snp/$ref/core
+# 3. aggregae the VCFs into one 
+mkdir -p $folder_genomics/variants/vcfgz_wsm419
+for i in {1..38}; do;
+    bgzip -c $folder_genomics/variants/wsm419/$genome_ids[$i]/snippy/snps.vcf > $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+    tabix -p vcf $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
 done
+
+for i in {1..38}; do; echo $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+done |> $folder_genomics/variants/list_vcfgz_wsm419.txt
+
+mamba activate bcftools
+bcftools merge -O v --file-list $folder_genomics/variants/list_vcfgz_wsm419.txt \
+    --force-samples \
+    -o $folder_genomics/variants/wsm419.vcf.gz
+    #$folder_genomics/variants/list_vcfs_wsm419.txt
+
+bcftools merge -O v -o $folder_genomics/variants/wsm419.vcf -l $folder_genomics/variants/list_vcfs_wsm419.txt
+
+# # 3. aggregates the SNPs and SVs into one vcf. This is using the raw read alignment
+# for ref in em1021 wsm419
+# do
+#     mkdir -p $folder_genomics/popgen/snp/$ref
+#     # Snippy to call SNPs
+#     mamba activate snippy
+#     mkdir -p $folder_genomics/popgen/snp/$ref/
+#     # for i in {4..6} {8..11} 13 {16..17} 19 {20..37}
+#     # do
+#     #     mkdir -p $folder_genomics/popgen/read_$ref/snippy/genomes/g$i
+#     #     cp $folder_genomes/$sample_ids[$i]/03-variant_calling/read_$ref/snippy/* $folder_genomics/popgen/read_$ref/snippy/genomes/g$i/
+#     # done
+#     snippy-core \
+#         --ref $folder_genomics/genomes/$ref.fasta \
+#         $folder_genomics/variants/$ref/*/snippy \
+#         --prefix  $folder_genomics/popgen/snp/$ref/core
+# done
 
 # ref=em1021
 # cd $folder_genomics/popgen/read_$ref/snippy/genomes/

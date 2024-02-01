@@ -8,8 +8,6 @@ source(here::here("analysis/00-metadata.R"))
 
 genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
 folder_genomes <- paste0(folder_genomics, "genomes/")
-
-#
 genomes <- bind_rows(genomes, tibble(batch_name = rep("ncbi", 4), genome_name = c("em1021", "em1022", "usda1106", "wsm419"), genome_id = c("em1021", "em1022", "usda1106", "wsm419"), exp_id = c("em1021", "em1022", "usda1106", "wsm419")))
 
 # 1. ANI 
