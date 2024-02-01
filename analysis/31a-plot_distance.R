@@ -198,9 +198,10 @@ plot_two_dists_color <- function (dists, dist1, dist2, by_color) {
         ggplot() +
         geom_point(aes(x = d1, y = d2, color = bc), shape = 1, size = 2, alpha = 0.5) +
         geom_smooth(aes(x = d1, y = d2, color = bc), method = "lm") +
+        scale_color_manual(values = c("meliloti pair" = "#423E37", "medicae pair" = "#E3B23C")) +
         # scale_x_continuous(breaks = c(0,0.5,1)) +
         # scale_y_continuous(breaks = c(0,0.5,1)) +
-        scale_color_npg() +
+        #scale_color_npg() +
         theme_bw() +
         theme(
             legend.position = "top"
@@ -242,5 +243,38 @@ tb_sp <- crossing(d1 = c("d_growth", "d_symbiosis"), d2 = c("d_ani", "d_kmer", "
     select(-dat) %>%
     unnest(result) %>%
     filter(p.value < 0.05)
-
 tb_sp
+
+# 7. Plot only the d_ani and d_growth
+plot_two_dists_color <- function (dists, dist1, dist2, by_color) {
+    dist_i <- dists[,c(dist1, dist2, by_color)] %>% setNames(c("d1", "d2", "bc"))
+    dist_i %>%
+        drop_na() %>%
+        ggplot() +
+        geom_point(aes(x = d1, y = d2, color = bc), shape = 1, size = 2, alpha = 0.5) +
+        geom_smooth(aes(x = d1, y = d2, color = bc), method = "lm") +
+        scale_color_manual(values = c("meliloti pair" = "#423E37", "medicae pair" = "#E3B23C")) +
+        # scale_x_continuous(breaks = c(0,0.5,1)) +
+        # scale_y_continuous(breaks = c(0,0.5,1)) +
+        #scale_color_npg() +
+        theme_bw() +
+        theme(
+            legend.position = "top"
+        ) +
+        guides(color = guide_legend(title = NULL)) +
+        labs(x = dist1, y = dist2)
+}
+
+dists_species %>%
+    filter(species1 == "meliloti", species2 == "meliloti") %>%
+    plot_two_dists_color("d_hamming", "d_jaccard", "species_pair")
+
+dists_species %>%
+    filter(species1 == "medicae", species2 == "medicae") %>%
+    plot_two_dists_color("d_hamming", "d_jaccard", "species_pair")
+
+x <- dists_species %>%
+    filter(species1 == "medicae", species2 == "medicae") %>%
+    select(d_hamming, d_jaccard) 
+
+cor.test(x$d_hamming, x$d_jaccard, method = "spearman")

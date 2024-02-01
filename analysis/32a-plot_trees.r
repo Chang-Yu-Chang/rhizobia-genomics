@@ -120,16 +120,16 @@ plot_tree3 <- function (tree, gtitle) {
         left_join(rename(isolates_contigs, label = genome_id), by = "label") %>%
         as.treedata() %>%
         ggtree() +
-        geom_tiplab(size = 3) +
+        geom_tiplab(aes(color = species), size = 3) +
         #geom_tippoint(aes(color = species)) +
-        #scale_color_manual(values = c(meliloti = "#423E37", medicae = "#E3B23C")) +
+        scale_color_manual(values = c(meliloti = "#423E37", medicae = "#E3B23C")) +
         theme_tree(legend.position = 'centre') +
         theme(
             legend.position = c(0.85,0.25),
             legend.background = element_rect(fill = NA, color = NA)
         ) +
         #guides(color = guide_legend(override.aes = aes(label = ""), title = NULL)) +
-        guides(color = guide_legend(title = NULL)) +
+        guides(color = "none") +
         labs(title = gtitle)
 }
 
@@ -145,3 +145,18 @@ names(p_trees) <- names(list_trees_meliloti)
 for (i in 1:length(list_trees_medicae)) p_trees[[i]] <- plot_tree3(list_trees_medicae[[i]], names(list_trees_medicae)[i])
 p <- plot_grid(plotlist = p_trees, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/32a-06-trees_medicae.png"), p, width = 20, height = 10)
+
+
+# 7. Plot medicae or meliloti vs hamming or jaccard
+list_trees_p <- list(
+    hamming_meliloti = list_trees_meliloti$hamming,
+    jaccard_meliloti = list_trees_meliloti$jaccard,
+    growth_meliloti = list_trees_meliloti$growth,
+    hamming_medicae = list_trees_medicae$hamming,
+    jaccard_medicae = list_trees_medicae$jaccard,
+    growth_medicae = list_trees_medicae$growth
+)
+p_trees <- rep(list(NA), length(list_trees_p))
+for (i in 1:length(list_trees_p)) p_trees[[i]] <- plot_tree3(list_trees_p[[i]], names(list_trees_p)[i])
+p <- plot_grid(plotlist = p_trees, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-07-trees.png"), p, width = 15, height = 10)
