@@ -49,7 +49,7 @@ ref_genome <- ref_genome %>%
         str_detect(scomment, "chromosome") ~ "chromosome",
         str_detect(scomment, "ctg") ~ str_extract(scomment, "ctg\\d+"),
         #str_detect(scomment, "ctg") ~ str_replace(scomment, ".+ctg", "ctg", ) %>% str_replace("ctg\\d+ .+", "ctg\\d+"),
-        str_detect(scomment, "plasmid") ~ str_extract(scomment, "plasmid [A-Z|0-9|a-z]+")
+        str_detect(scomment, "plasmid") ~ str_extract(scomment, "plasmid [A-Z|0-9|a-z|_]+")
     )) 
 # Manually correct the comments
 # NC_003047.1 is 1021 chromsome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000006965.1/
@@ -81,6 +81,39 @@ b_genome <- b_genome %>%
 
 write_csv(ref_genome, paste0(folder_data, "temp/14-ref_genome.csv"))
 write_csv(b_genome, paste0(folder_data, "temp/14-b_genome.csv"))
+
+# Out put for each contig, the best alignment
+isolates_contigs <- read_csv(paste0(folder_data, 'temp/12-contigs.csv'))
+
+contigs <- b_genome %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    mutate(contig_id = paste0(genome_id, "_", qseqid)) %>%
+    select(genome_id, contig_id, species, strain, replicon, bitscore) %>%
+    group_by(genome_id, contig_id) %>%
+    slice(1) %>%
+    ungroup() %>%
+    left_join(mutate(isolates_contigs, contig_id = paste0(genome_id, "_", contig_id))) %>%
+    mutate(replicon = case_when(
+        str_detect(replicon, "psymA") ~ str_replace(replicon, "psymA", "pSymA"),
+        str_detect(replicon, "psymB") ~ str_replace(replicon, "psymB", "pSymB"),
+        str_detect(replicon, "pA") ~ str_replace(replicon, "pA", "pSymA"),
+        str_detect(replicon, "pB") ~ str_replace(replicon, "pB", "pSymB"),
+        str_detect(replicon, "pSMED01") ~ str_replace(replicon, "pSMED01", "pSymA like"),
+        str_detect(replicon, "pSMED02") ~ str_replace(replicon, "pSMED02", "pSymB like"),
+        str_detect(replicon, "pSMED03") ~ str_replace(replicon, "pSMED03", "accessory"),
+        str_detect(replicon, "pWSM1115_1") ~ str_replace(replicon, "pWSM1115_1", "pSymA like"),
+        str_detect(replicon, "pWSM1115_2") ~ str_replace(replicon, "pWSM1115_2", "pSymB like"),
+        str_detect(replicon, "pWSM1115_3") ~ str_replace(replicon, "pWSM1115_3", "accessory"),
+        str_detect(replicon, "pSU277_1") ~ str_replace(replicon, "pSU277_1", "pSymA like"),
+        str_detect(replicon, "pSU277_2") ~ str_replace(replicon, "pSU277_2", "pSymB like"),
+        str_detect(replicon, "pSU277_3") ~ str_replace(replicon, "pSU277_3", "accessory"),
+        str_detect(replicon, "pSU277_4") ~ str_replace(replicon, "pSU277_4", "accessory"),
+        T ~ replicon
+    )) %>%
+    filter(!str_detect(replicon, "ctg"))
+unique(contigs$replicon)
+#view(ref_genome)
+write_csv(contigs, paste0(folder_data, "temp/14-contigs.csv"))
 
 # 3. Assign isolates to taxonomy
 contigs <- read_csv(paste0(folder_data, "temp/12-contigs.csv"))

@@ -1,4 +1,4 @@
-#' This script plot the NJ trees
+#' This script plots the NJ trees at the genome level
 
 renv::load()
 library(tidyverse)
@@ -160,3 +160,4 @@ p_trees <- rep(list(NA), length(list_trees_p))
 for (i in 1:length(list_trees_p)) p_trees[[i]] <- plot_tree3(list_trees_p[[i]], names(list_trees_p)[i])
 p <- plot_grid(plotlist = p_trees, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/32a-07-trees.png"), p, width = 15, height = 10)
+

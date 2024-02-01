@@ -101,7 +101,7 @@ done |> $folder_genomics/popgen/kmer_contigs/list_sigs.txt
 ## Compare signatures
 zsh 06c-compare_kmer.sh \
     $folder_genomics/popgen/kmer_contigs/list_sigs.txt \
-    $folder_genomics/popgen/kmer_contigs/kmer_contigs.txt
+    $folder_genomics/popgen/kmer_contigs/kmer.txt
     
 
 

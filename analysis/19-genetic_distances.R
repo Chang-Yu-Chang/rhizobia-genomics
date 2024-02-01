@@ -26,11 +26,11 @@ dist_ani <- dist_ani %>%
     filter(genome_id1 <= genome_id2) 
 write_csv(dist_ani, paste0(folder_data, "temp/19-dist_ani.csv"))
 
-# 2. k-mers 
+# 2. k-mers  
+# 2.1 genome kmers
 dist_kmer <- read_delim(paste0(folder_data, "genomics/popgen/kmer/kmer.txt"))
 list_sigs <- read_delim(paste0(folder_data, "genomics/popgen/kmer/list_sigs.txt"), delim = "\t", col_names = F)
 
-# 2.1 clean the tables
 dist_kmer <- dist_kmer %>%
     mutate(genome_id1 = colnames(.)) %>%
     pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "d_kmer")  %>%
@@ -41,6 +41,26 @@ dist_kmer <- dist_kmer %>%
     filter(genome_id1 <= genome_id2)
 
 write_csv(dist_kmer, paste0(folder_data, "temp/19-dist_kmer.csv"))
+
+
+# 2.2 contig kmers
+dist_kmer_contigs <- read_delim(paste0(folder_data, "genomics/popgen/kmer_contigs/kmer.txt"))
+list_sigs <- read_delim(paste0(folder_data, "genomics/popgen/kmer_contigs/list_sigs.txt"), delim = "\t", col_names = F)
+list_sigs <- str_extract(list_sigs$X1, "g\\d+_contig_\\d+")
+length(list_sigs) # 228 contigs
+dist_kmer_contigs <- dist_kmer_contigs %>%
+    mutate(contig_id1 = colnames(.)) %>%
+    pivot_longer(-contig_id1, names_to = "contig_id2", values_to = "d_kmer")  %>%
+    mutate(contig_id1 = str_remove(contig_id1, ".+/contigs/") %>% str_remove(".fasta")) %>%
+    mutate(contig_id2 = str_remove(contig_id2, ".+/contigs/") %>% str_remove(".fasta")) %>%
+    mutate(genome_id1 = str_remove(contig_id1, "_contig_\\d"), genome_id2 = str_remove(contig_id2, "_contig_\\d")) %>%
+    mutate(contig_id1 = ordered(contig_id1, list_sigs), contig_id2 = ordered(contig_id2, list_sigs)) %>%
+    arrange(contig_id1, contig_id2) %>%
+    filter(contig_id1 <= contig_id2) %>%
+    select(starts_with("genome_id"), starts_with("contig"), d_kmer)
+
+nrow(dist_kmer_contigs) # choose(228,2) + 228 = 26106
+write_csv(dist_kmer_contigs, paste0(folder_data, "temp/19-dist_kmer_contigs.csv"))
 
 # 3. gene content
 dist_jaccard <- read_csv(paste0(folder_data, "temp/13-dist_jaccard.csv"))

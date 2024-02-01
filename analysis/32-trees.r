@@ -10,6 +10,7 @@ source(here::here("analysis/00-metadata.R"))
 
 #gd <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_data.csv"))
 dists <- read_csv(paste0(folder_data, 'temp/31-dists.csv'))
+isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
 isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
 list_traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg",
@@ -86,11 +87,48 @@ for (i in 1:length(list_dists)) {
         make_tree(paste0("d_", list_dists[i]))
 } 
 
-#
-save(list_trees, list_trees_meliloti, list_trees_medicae,
-    file = paste0(folder_data, "temp/32-trees.RData"))
 
 # Compute the incongruence among trees using RF distance
 TreeDistance(list_trees, list_trees)
 TreeDistance(list_trees_meliloti, list_trees_meliloti)
 TreeDistance(list_trees_medicae, list_trees_medicae)
+
+
+
+# Make contig trees
+dist_kmer_contigs <- read_csv(paste0(folder_data, 'temp/19-dist_kmer_contigs.csv'))
+contigs <- read_csv(paste0(folder_data, 'temp/14-contigs.csv'))
+dist_kmer_contigs <- dist_kmer_contigs %>%
+    left_join(rename(rename_all(contigs, ~ paste0(.x, "1")))) %>%
+    left_join(rename(rename_all(contigs, ~ paste0(.x, "2")))) 
+
+
+make_tree_c <- function(di, d_trait) {
+    #' This functions creates a phylo object from a long-format distance matrix
+    di <- bind_cols(select(di, contig_id1, contig_id2), tibble(dd = unlist(di[,d_trait]))) 
+    colnames(di)[3] <- "dd"
+    dist1 <- tibble(contig_id1 = di$contig_id1, contig_id2 = di$contig_id2, dd = di$dd) 
+    dist1_swapped <- tibble(contig_id1 = di$contig_id2, contig_id2 = di$contig_id1, dd = di$dd)
+    dist1_swapped <- filter(dist1_swapped, contig_id1 != contig_id2)
+    dist2 <- bind_rows(dist1, dist1_swapped) %>%
+        drop_na(dd) %>%
+        pivot_wider(names_from = contig_id2, values_from = dd) %>%
+        select(-contig_id1) %>%
+        as.matrix() 
+    tree <- dist2 %>%
+        nj() 
+    return(tree)
+}
+
+
+list_trees_contigs <- list(
+    ensifer = dist_kmer_contigs %>% make_tree_c("d_kmer"),
+    meliloti =  dist_kmer_contigs %>% filter(species1 == "meliloti", species2 == "meliloti") %>% make_tree_c("d_kmer"),
+    medicae =  dist_kmer_contigs %>% filter(species1 == "medicae", species2 == "medicae") %>% make_tree_c("d_kmer")
+)
+
+
+save(list_trees, list_trees_meliloti, list_trees_medicae, list_trees_contigs, 
+    file = paste0(folder_data, "temp/32-trees.RData"))
+
+
