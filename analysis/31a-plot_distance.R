@@ -12,11 +12,13 @@ isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv")
 dists <- read_csv(paste0(folder_data, "temp/31-dists.csv"))
 dists_long <- read_csv(paste0(folder_data, "temp/31-dists_long.csv"))
 
-nrow(dists) # choose(42,2)+42  = 903
-
+# 
+dists <- dists %>% filter(genome_id1 != genome_id2)
 dists_long <- dists_long %>% 
+    filter(genome_id1 != genome_id2) %>%
     mutate(d_type = factor(d_type, unique(dists_long$d_type)))
 
+nrow(dists) # choose(42,2) = 861
 # 1. genetic distances vs phenotypic distances
 plot_dots <- function (dists_long, d_trait) {
     #' Plot the scatterplot of genomic distance agains a trait distance
@@ -187,3 +189,58 @@ p <- plot_grid(p1, p2,p3,p4,p5,p6,p7,p8,p9,p10,
     nrow = 2, align = "vh", axis = "lrtb", scale = 0.9) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/31a-06-genetics_vs_phenotypes.png"), p, width = 15, height = 6)
+
+# 7. Plot within species
+plot_two_dists_color <- function (dists, dist1, dist2, by_color) {
+    dist_i <- dists[,c(dist1, dist2, by_color)] %>% setNames(c("d1", "d2", "bc"))
+    dist_i %>%
+        drop_na() %>%
+        ggplot() +
+        geom_point(aes(x = d1, y = d2, color = bc), shape = 1, size = 2, alpha = 0.5) +
+        geom_smooth(aes(x = d1, y = d2, color = bc), method = "lm") +
+        # scale_x_continuous(breaks = c(0,0.5,1)) +
+        # scale_y_continuous(breaks = c(0,0.5,1)) +
+        scale_color_npg() +
+        theme_bw() +
+        theme(
+            legend.position = "top"
+        ) +
+        guides(color = guide_legend(title = NULL)) +
+        labs(x = dist1, y = dist2)
+}
+
+dists_species <- dists %>%
+    mutate(species_pair = case_when(
+        species1 == "medicae" & species2 == "medicae" ~ "medicae pair",
+        species1 == "meliloti" & species2 == "meliloti" ~ "meliloti pair"
+    ))
+
+p1 <- dists_species %>% plot_two_dists_color("d_ani", "d_growth", "species_pair")
+p2 <- dists_species %>% plot_two_dists_color("d_kmer", "d_growth", "species_pair")
+p3 <- dists_species %>% plot_two_dists_color("d_jaccard", "d_growth", "species_pair")
+p4 <- dists_species %>% plot_two_dists_color("d_hamming", "d_growth", "species_pair")
+p5 <- dists_species %>% plot_two_dists_color("d_jc", "d_growth", "species_pair")
+
+p6 <- dists_species %>% plot_two_dists_color("d_ani", "d_symbiosis", "species_pair")
+p7 <- dists_species %>% plot_two_dists_color("d_kmer", "d_symbiosis", "species_pair")
+p8 <- dists_species %>% plot_two_dists_color("d_jaccard", "d_symbiosis", "species_pair")
+p9 <- dists_species %>% plot_two_dists_color("d_hamming", "d_symbiosis", "species_pair")
+p10 <- dists_species %>% plot_two_dists_color("d_jc", "d_symbiosis", "species_pair")
+
+p <- plot_grid(p1, p2,p3,p4,p5,p6,p7,p8,p9,p10,
+    nrow = 2, align = "vh", axis = "lrtb", scale = 0.9) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/31a-06-genetics_vs_phenotypes.png"), p, width = 15, height = 6)
+
+# Stats
+d_temp <- dists_species %>% filter(species_pair == "medicae pair") %>% filter(genome_id1 != genome_id2)
+
+tb_sp <- crossing(d1 = c("d_growth", "d_symbiosis"), d2 = c("d_ani", "d_kmer", "d_jaccard", "d_hamming"), sp = c("meliloti pair", "medicae pair")) %>%
+    rowwise() %>%
+    mutate(dat = list(filter(dists_species, species_pair == sp) %>% select(d1, d2))) %>%
+    mutate(result = list(cor.test(unlist(dat[,1]), unlist(dat[,2]), method = "spearman") %>% broom::tidy())) %>%
+    select(-dat) %>%
+    unnest(result) %>%
+    filter(p.value < 0.05)
+
+tb_sp
