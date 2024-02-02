@@ -95,10 +95,11 @@ TreeDistance(list_trees_medicae, list_trees_medicae)
 
 
 
+
 # Make contig trees
-dist_kmer_contigs <- read_csv(paste0(folder_data, 'temp/19-dist_kmer_contigs.csv'))
+dist_genetics_contigs <- read_csv(paste0(folder_data, 'temp/19-dist_genetics_contigs.csv'))
 contigs <- read_csv(paste0(folder_data, 'temp/14-contigs.csv'))
-dist_kmer_contigs <- dist_kmer_contigs %>%
+dist_genetics_contigs <- dist_genetics_contigs %>%
     left_join(rename(rename_all(contigs, ~ paste0(.x, "1")))) %>%
     left_join(rename(rename_all(contigs, ~ paste0(.x, "2")))) 
 
@@ -122,9 +123,12 @@ make_tree_c <- function(di, d_trait) {
 
 
 list_trees_contigs <- list(
-    ensifer = dist_kmer_contigs %>% make_tree_c("d_kmer"),
-    meliloti =  dist_kmer_contigs %>% filter(species1 == "meliloti", species2 == "meliloti") %>% make_tree_c("d_kmer"),
-    medicae =  dist_kmer_contigs %>% filter(species1 == "medicae", species2 == "medicae") %>% make_tree_c("d_kmer")
+    ensifer_kmer = dist_genetics_contigs %>% make_tree_c("d_kmer"),
+    meliloti_kmer =  dist_genetics_contigs %>% filter(species1 == "meliloti", species2 == "meliloti") %>% make_tree_c("d_kmer"),
+    medicae_kmer =  dist_genetics_contigs %>% filter(species1 == "medicae", species2 == "medicae") %>% make_tree_c("d_kmer"),
+    ensifer_jaccard = dist_genetics_contigs %>% make_tree_c("d_jaccard"),
+    meliloti_jaccard =  dist_genetics_contigs %>% filter(species1 == "meliloti", species2 == "meliloti") %>% make_tree_c("d_jaccard"),
+    medicae_jaccard =  dist_genetics_contigs %>% filter(species1 == "medicae", species2 == "medicae") %>% make_tree_c("d_jaccard")
 )
 
 

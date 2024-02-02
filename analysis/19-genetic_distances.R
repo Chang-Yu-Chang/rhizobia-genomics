@@ -60,11 +60,11 @@ dist_kmer_contigs <- dist_kmer_contigs %>%
     select(starts_with("genome_id"), starts_with("contig"), d_kmer)
 
 nrow(dist_kmer_contigs) # choose(228,2) + 228 = 26106
-write_csv(dist_kmer_contigs, paste0(folder_data, "temp/19-dist_kmer_contigs.csv"))
 
 # 3. gene content
 dist_jaccard <- read_csv(paste0(folder_data, "temp/13-dist_jaccard.csv"))
 dist_fluidity <- read_csv(paste0(folder_data, "temp/13-dist_fluidity.csv"))
+dist_jaccard_contigs <- read_csv(paste0(folder_data, "temp/13-dist_jaccard_contigs.csv"))
 
 # 4. 825 core genes
 dist_scccg <- read_csv(paste0(folder_data, "temp/15-dist_sccg.csv"))
@@ -80,8 +80,10 @@ dist_genetics <- dist_ani %>%
 write_csv(dist_genetics, paste0(folder_data, "temp/19-dist_genetics.csv"))
 
 
+dist_genetics_contigs <- dist_kmer_contigs %>%
+    left_join(dist_jaccard_contigs)
 
-
+write_csv(dist_genetics_contigs, paste0(folder_data, "temp/19-dist_genetics_contigs.csv"))
 
 
 
