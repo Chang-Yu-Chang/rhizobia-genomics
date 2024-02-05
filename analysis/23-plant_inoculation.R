@@ -32,7 +32,8 @@ treatments_ttb <- treatments_ttb %>%
     mutate(id = id + nrow(treatments_cyc)) %>%
     mutate(site_group = tolower(site_group)) %>%
     arrange(id) %>%
-    clean_names()
+    clean_names() %>%
+    mutate(population = "PA")
 
 # Clean up my data
 features_cyc <- features_cyc %>%
@@ -41,7 +42,8 @@ features_cyc <- features_cyc %>%
 treatments_cyc <- treatments_cyc %>% 
     left_join(features_cyc, by = join_by(id)) %>%
     rename(exp_id = rhizobia, site = rhizobia_site) %>%
-    mutate(site = str_sub(exp_id, 1, 2))
+    mutate(site = str_sub(exp_id, 1, 2)) %>%
+    mutate(population = "VA")
 
 
 # 1.3 merge the data
@@ -63,9 +65,9 @@ write_csv(plants, paste0(folder_data, "temp/23-plants.csv"))
 # 2. Reshape data
 # Long
 plants_long <- plants %>%
-    select(id, site_group, site, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
+    select(id, population, site_group, site, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
     filter(!is.na(dry_weight_mg), dry_weight_mg != 0) %>%
-    pivot_longer(cols = c(-id, -exp_id, -site_group, -site), names_to = "trait")
+    pivot_longer(cols = c(-id, -population, -exp_id, -site_group, -site), names_to = "trait")
 length(unique(plants_long$id)) # 231 plants
 length(unique(plants_long$exp_id)) # 14 rhizobia + 1 control
 plants_long %>%
@@ -94,7 +96,7 @@ plants_long %>%
 
 # Wide
 plants_wide <- plants %>%
-    select(id, site_group, site, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
+    select(id, population, site_group, site, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
     filter(!is.na(dry_weight_mg), dry_weight_mg != 0)
 
 write_csv(plants_long, paste0(folder_data, "temp/23-plants_long.csv"))

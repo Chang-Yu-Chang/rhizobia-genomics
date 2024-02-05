@@ -6,7 +6,15 @@ library(cowplot)
 library(janitor)
 library(RColorBrewer)
 library(ellipse) # for calculating the ellipse
+library(lme4) # for linear mixed-effect models
+library(car) # companion to Applied Regression
+library(broom.mixed) # for tidy up lme4
+library(factoextra) # for plotting pca eclipse
 source(here::here("analysis/00-metadata.R"))
+
+# Set contrasts (sum-to-zero rather than R's default treatment contrasts)
+# http://rstudio-pubs-static.s3.amazonaws.com/65059_586f394d8eb84f84b1baaf56ffb6b47f.html
+options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 sysplants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
@@ -102,6 +110,267 @@ ggsave(paste0(folder_data, "temp/23a-03-symbiosis_trait_pairs.png"), p, width = 
 cor.test(plants_wide$nodule_number, plants_wide$dry_weight_mg) %>% broom::tidy()
 cor.test(plants_wide$nodule_number, plants_wide$root_weight_mg) %>% broom::tidy()
 cor.test(plants_wide$root_weight_mg, plants_wide$dry_weight_mg) %>% broom::tidy()
+
+# 4. Plot the symbiosis traits comparing the strains
+p1 <- plants_long %>% 
+    filter(trait == "dry_weight_mg") %>%
+    filter(exp_id != "control") %>%
+    filter(population == "VA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = exp_id, y = value), fill = "white") +
+    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "shoot biomass (mg)")
+p2 <- plants_long %>% 
+    filter(trait == "dry_weight_mg") %>%
+    filter(exp_id != "control") %>%
+    filter(population == "PA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = exp_id, y = value), fill = "white") +
+    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "shoot biomass (mg)")
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
+ggsave(paste0(folder_data, "temp/23a-04-trait_strain.png"), p, width = 5, height = 3)
+
+# Does rhizobia strain have effect on shoot biomass in VA?
+plants_test <- filter(plants, population == "VA")
+mod <- lmer(dry_weight_mg ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # Difference In PA
+
+# Does rhizobia strain have effect on shoot biomass in PA?
+plants_test <- filter(plants, population == "PA")
+mod <- lmer(dry_weight_mg ~ exp_id + (1|site_group) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3)  # Differnece berween urban and suburban
+
+
+# 5. Plot the symbiosis traits comparing the two populations
+p1 <- plants_long %>% 
+    filter(trait == "dry_weight_mg") %>%
+    filter(exp_id != "control") %>%
+    filter(population == "VA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = site_group, y = value), fill = "white") +
+    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank()    
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "shoot biomass (mg)")
+
+p2 <- plants_long %>% 
+    filter(trait == "dry_weight_mg") %>%
+    filter(exp_id != "control") %>%
+    filter(population == "PA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = site_group, y = value), fill = "white") +
+    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank()    
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "shoot biomass (mg)")
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
+ggsave(paste0(folder_data, "temp/23a-05-trait_population.png"), p, width = 5, height = 3)
+
+# Does rhizobia sites have effect on shoot biomass?
+plants_test <- filter(plants, population == "VA")
+mod <- lmer(dry_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # No difference between high and low elevation
+mod <- lmer(nodule_number ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # No difference between high and low elevation
+mod <- lmer(root_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # No difference between high and low elevation
+
+
+# Does rhizobia sites have effect on shoot biomass?
+plants_test <- filter(plants, population == "PA")
+mod <- lmer(dry_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3)  # Differnece berween urban and suburban
+mod <- lmer(nodule_number ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3)  # Differnece berween urban and suburban
+mod <- lmer(root_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3)  # Differnece berween urban and suburban
+
+# 6. Plot the PCA for the four sites
+pw1 <- plants_wide %>%
+    filter(population == "VA", exp_id != "control")
+pcobj1 <- pw1 %>%
+    select(dry_weight_mg, nodule_number, root_weight_mg) %>%
+    prcomp(center = TRUE, scale. = TRUE)
+
+p1 <- fviz_pca_ind(
+    pcobj1,
+    label = "none",
+    habillage = pw1$site_group,
+    addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
+) +
+    scale_color_manual(values = site_group_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black"),
+        legend.position = "top",
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.title = element_blank(),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs()
+
+pw2 <- plants_wide %>%
+    filter(population == "PA", exp_id != "control")
+pcobj2 <- pw2 %>%
+    select(dry_weight_mg, nodule_number, root_weight_mg) %>%
+    prcomp(center = TRUE, scale. = TRUE)
+
+p2 <- fviz_pca_ind(
+    pcobj2,
+    label = "none",
+    habillage = pw2$site_group,
+    addEllipses = TRUE, ellipse.level = 0.95, ellipse.alpha = 0
+) +
+    scale_color_manual(values = site_group_colors) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(fill = NA, color = "black"),
+        legend.position = "top",
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.title = element_blank(),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs()
+
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"), scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/23a-06-trait_pca.png"), p, width = 9, height = 5)
+
+# Does rhizobia sites have effect on PC1 of symbiosis in VA?
+plants_test <- mutate(pw1, pc1 = pcobj1$x[,1]) %>% left_join(plants)
+mod <- lmer(pc1 ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # No difference between high and low elevation
+
+# Does rhizobia sites have effect on PC1 of symbiosis in VA?
+plants_test <- mutate(pw2, pc1 = pcobj2$x[,1]) %>% left_join(plants)
+mod <- lmer(pc1 ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3)  # No differnece between urban and suburban
+#pcobj2$sdev^2 / sum(pcobj2$sdev^2)
+
+
+
+# 7. Plot all three traits in violin plot
+p1 <- plants_long %>% 
+    filter(exp_id != "control") %>%
+    filter(population == "VA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = exp_id, y = value), fill = "white") +
+    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_grid(trait~site_group, scales = "free") +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "")
+
+p2 <- plants_long %>% 
+    filter(exp_id != "control") %>%
+    filter(population == "PA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = exp_id, y = value), fill = "white") +
+    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_grid(trait~site_group, scales = "free") +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "")
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
+ggsave(paste0(folder_data, "temp/23a-07-trait_strain.png"), p, width = 8, height = 9)
+
+
+
+# 7. Plot all three traits in violin plot
+p1 <- plants_long %>% 
+    filter(exp_id != "control") %>%
+    filter(population == "VA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = site_group, y = value), fill = "white") +
+    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_grid(trait~site_group, scales = "free") +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "")
+
+p2 <- plants_long %>% 
+    filter(exp_id != "control") %>%
+    filter(population == "PA") %>%
+    ggplot() +
+    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+    geom_violin(aes(x = site_group, y = value), fill = "white") +
+    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
+    scale_fill_manual(values = site_group_colors) +
+    facet_grid(trait~site_group, scales = "free") +
+    theme_classic() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    guides(fill = "none") +
+    labs(x = " ", y = "")
+
+p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
+ggsave(paste0(folder_data, "temp/23a-09-trait_population.png"), p, width = 8, height = 9)
 
 
 if (FALSE) {
