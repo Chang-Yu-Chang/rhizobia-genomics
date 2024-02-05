@@ -54,8 +54,8 @@ sites_phila <- sites_phila %>%
     select(site_group, site, latitude_dec, longitude_dec, elevation_m)
 
 # bind rows
-sites <- bind_rows(mutate(sites_mlbs, population = "MLBS"), 
-        mutate(sites_phila, population = "Phila")) %>%
+sites <- bind_rows(mutate(sites_mlbs, population = "VA"), 
+        mutate(sites_phila, population = "PA")) %>%
     select(population, everything())
 
 write_csv(sites, paste0(folder_data, "temp/22-sites.csv"))

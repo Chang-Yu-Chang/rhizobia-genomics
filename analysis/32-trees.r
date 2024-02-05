@@ -37,9 +37,6 @@ dists_species <- dists %>%
         species1 == "meliloti" & species2 == "meliloti" ~ "meliloti pair"
     ))
 
-
-
-
 # Make trees
 make_tree <- function(di, d_trait) {
     #' This functions creates a phylo object from a long-format distance matrix
@@ -93,7 +90,8 @@ TreeDistance(list_trees, list_trees)
 TreeDistance(list_trees_meliloti, list_trees_meliloti)
 TreeDistance(list_trees_medicae, list_trees_medicae)
 
-
+# Make phylo object
+write.tree(list_trees$jaccard, paste0(folder_data, "temp/32-jaccard.tre"))
 
 
 # Make contig trees

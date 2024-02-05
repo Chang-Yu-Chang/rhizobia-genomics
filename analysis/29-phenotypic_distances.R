@@ -95,5 +95,3 @@ dist_traits <- dist_traits %>%
     select(genome_id1, genome_id2, d_growth, d_symbiosis, d_geo, everything())
 
 write_csv(dist_traits, paste0(folder_data, "temp/29-dist_traits.csv"))
-
-

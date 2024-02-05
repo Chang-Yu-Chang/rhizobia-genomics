@@ -36,7 +36,7 @@ plot_tree1 <- function (tree, gtitle) {
         ggtree() +
         geom_tiplab(aes(color = population), size = 3) +
         #geom_tippoint(aes(color = population)) +
-        scale_color_manual(values = c(MLBS = "#0F6290", Phila = "#85325C")) +
+        scale_color_manual(values = c(VA = "#0a5b0e", PA = "#d8cc4c")) +
         theme_tree(legend.position = 'centre') +
         theme(
             legend.position = c(0.85,0.25),
