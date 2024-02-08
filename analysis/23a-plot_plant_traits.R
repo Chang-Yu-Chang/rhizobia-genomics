@@ -18,6 +18,7 @@ options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 sysplants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
+plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
 plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
 plants_wide <- read_csv(paste0(folder_data, "temp/23-plants_wide.csv"))
 

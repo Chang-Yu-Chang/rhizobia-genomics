@@ -5,7 +5,6 @@ library(tidyverse)
 library(janitor)
 library(ape)
 library(tidytree)
-library(TreeDist) # For computing RF distance
 source(here::here("analysis/00-metadata.R"))
 
 #gd <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_data.csv"))
@@ -85,11 +84,6 @@ for (i in 1:length(list_dists)) {
 } 
 
 
-# Compute the incongruence among trees using RF distance
-TreeDistance(list_trees, list_trees)
-TreeDistance(list_trees_meliloti, list_trees_meliloti)
-TreeDistance(list_trees_medicae, list_trees_medicae)
-
 # Make phylo object
 write.tree(list_trees$jaccard, paste0(folder_data, "temp/32-jaccard.tre"))
 
@@ -133,4 +127,11 @@ list_trees_contigs <- list(
 save(list_trees, list_trees_meliloti, list_trees_medicae, list_trees_contigs, 
     file = paste0(folder_data, "temp/32-trees.RData"))
 
+if (FALSE) {
+    library(TreeDist) # For computing RF distance
+    # Compute the incongruence among trees using RF distance
+    TreeDistance(list_trees, list_trees)
+    TreeDistance(list_trees_meliloti, list_trees_meliloti)
+    TreeDistance(list_trees_medicae, list_trees_medicae)
 
+}

@@ -25,6 +25,9 @@ dists <- read_csv(paste0(folder_data, 'temp/31-dists.csv'))
 # dist_traits <- read_csv(paste0(folder_data, "temp/29-dist_traits.csv"))
 # dists_long <- read_csv(paste0(folder_data, "temp/31-dists_long.csv"))
 
+site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", 
+                 `suburban` = "#19c9cc", `urban` = "#bf42b9", control = "grey")
+
 
 
 # 1. Plot the trees by populations
@@ -51,6 +54,34 @@ names(p_trees) <- names(list_trees)
 for (i in 1:length(list_trees)) p_trees[[i]] <- plot_tree1(list_trees[[i]], names(list_trees)[i])
 p <- plot_grid(plotlist = p_trees, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/32a-01-trees_population.png"), p, width = 20, height = 10)
+p <- plot_grid(p_trees$hamming, p_trees$jaccard, nrow = 1, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-01a-trees_population2.png"), p, width = 8, height = 5)
+
+
+# Color by four site groups
+plot_tree3 <- function (tree, gtitle) {
+    tree %>%
+        as_tibble() %>%
+        left_join(rename(isolates_traits, label = genome_id), by = "label") %>%
+        as.treedata() %>%
+        ggtree() +
+        geom_tiplab(aes(color = site_group), size = 3) +
+        scale_color_manual(values = site_group_colors) +
+        theme_tree(legend.position = 'centre') +
+        theme(
+            legend.position = c(0.85,0.25),
+            legend.background = element_rect(fill = NA, color = NA)
+        ) +
+        #guides(color = guide_legend(override.aes = aes(label = ""), title = NULL)) +
+        guides(color = guide_legend(title = NULL)) +
+        labs(title = gtitle)
+}
+
+p_trees <- rep(list(NA), length(list_trees))
+names(p_trees) <- names(list_trees)
+for (i in 1:length(list_trees)) p_trees[[i]] <- plot_tree3(list_trees[[i]], names(list_trees)[i])
+p <- plot_grid(p_trees$hamming, p_trees$jaccard, nrow = 1, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-01b-trees_population3.png"), p, width = 8, height = 5)
 
 
 # 2. Plot the trees by species
@@ -77,6 +108,8 @@ names(p_trees) <- names(list_trees)
 for (i in 1:length(list_trees)) p_trees[[i]] <- plot_tree2(list_trees[[i]], names(list_trees)[i])
 p <- plot_grid(plotlist = p_trees, nrow = 2, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/32a-02-trees_species.png"), p, width = 20, height = 10)
+p <- plot_grid(p_trees$hamming, p_trees$jaccard, nrow = 1, scale = 0.85) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "temp/32a-02a-trees_species2.png"), p, width = 8, height = 5)
 
 
 # 3. Plot trees for each traits, colored by population

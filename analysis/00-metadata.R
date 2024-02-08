@@ -26,13 +26,13 @@ isolates_mapping <- tibble(
     site = c("H2", "H2", "H3", "H3", "H3", "H4", "L1", "L2", "L2", "L3", "L4", "L4", "L4", "L4", "L3",
     "src", "fp", "fp", "fp", "crp", "crp", "crp", "gp", "gp", "gp", "bg", "bg", "pms", "pms", "pms", "ppf", "40th"),
     site_group = c(rep("high elevation", 6), rep("low elevation", 9), rep("suburban", 10), rep("urban", 7)),
-    population = c(rep("MLBS", 15), rep("Phila",17)),
+    population = c(rep("VA", 15), rep("PA",17)),
     sample_id = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_name = c(paste0("Chang_Q5C_", c(2:6, 8:11, 13, 15:17, 19)), paste0("Chang_W8S_", c(1:18))),
     genome_id = paste0("g", c(2:6, 8:11, 13, 15:17, 19:37))
 )
 
-#write_csv(isolates_mapping, paste0(folder_data, "temp/00-isolates_mapping.csv"))
+write_csv(isolates_mapping, paste0(folder_data, "temp/00-isolates_mapping.csv"))
 
 # Join tables
 isolates <- full_join(genomes_mapping, isolates_mapping) %>%
