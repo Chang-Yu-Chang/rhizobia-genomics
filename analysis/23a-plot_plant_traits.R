@@ -113,93 +113,106 @@ cor.test(plants_wide$nodule_number, plants_wide$root_weight_mg) %>% broom::tidy(
 cor.test(plants_wide$root_weight_mg, plants_wide$dry_weight_mg) %>% broom::tidy()
 
 # 4. Plot the symbiosis traits comparing the strains
-p1 <- plants_long %>% 
-    filter(trait == "dry_weight_mg") %>%
-    filter(exp_id != "control") %>%
-    filter(population == "VA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = exp_id, y = value), fill = "white") +
-    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "shoot biomass (mg)")
-p2 <- plants_long %>% 
-    filter(trait == "dry_weight_mg") %>%
-    filter(exp_id != "control") %>%
-    filter(population == "PA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = exp_id, y = value), fill = "white") +
-    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "shoot biomass (mg)")
+#' Plot raw data and sem
 
+compute_trait_mean <- function (plants_long, tra = "dry_weight_mg", pop = "VA") {
+    pl <- plants_long %>%
+        filter(trait == tra) %>%
+        filter(exp_id != "control") %>%
+        filter(population == pop)
+
+    plm <- pl %>%
+        group_by(population, site_group, exp_id, trait) %>%
+        summarize(mean = mean(value), sem = sd(value)/sqrt(n()))
+    return(list(pl = pl, plm = plm))
+}
+plot_dots <- function (pl, plm) {
+    set.seed(1)
+    pl %>%
+        ggplot() +
+        geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+        geom_jitter(aes(x = exp_id, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
+        geom_point(data = plm, aes(x = exp_id, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
+        geom_errorbar(data = plm, aes(x = exp_id, ymin = mean-sem, ymax = mean+sem), width = 0.5) +
+        scale_fill_manual(values = site_group_colors) +
+        facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1)
+        ) +
+        guides(fill = "none") +
+        labs(x = " ", y = "shoot biomass (mg)")
+}
+
+t1 <- compute_trait_mean(plants_long, tra = "dry_weight_mg", pop = "VA")
+t2 <- compute_trait_mean(plants_long, tra = "dry_weight_mg", pop = "PA")
+p1 <- plot_dots(t1$pl, t1$plm)
+p2 <- plot_dots(t2$pl, t2$plm)
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
 ggsave(paste0(folder_data, "temp/23a-04-trait_strain.png"), p, width = 5, height = 3)
 
-# Does rhizobia strain have effect on shoot biomass in VA?
+# Stats
 plants_test <- filter(plants, population == "VA")
+## Does rhizobia strain have effect on shoot biomass in VA?
 mod <- lmer(dry_weight_mg ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3) # Difference In PA
+Anova(mod, type = 3) # yup
+## Does rhizobia strain have effect on nodule number in VA?
+mod <- lmer(nodule_number ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # yup
+## Does rhizobia strain have effect on root biomass in VA?
+mod <- lmer(root_weight_mg ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # nope
 
-# Does rhizobia strain have effect on shoot biomass in PA?
 plants_test <- filter(plants, population == "PA")
+## Does rhizobia strain have effect on shoot biomass in PA?
 mod <- lmer(dry_weight_mg ~ exp_id + (1|site_group) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3)  # Differnece berween urban and suburban
+Anova(mod, type = 3) # yes
+## Does rhizobia strain have effect on nodule number in VA?
+mod <- lmer(nodule_number ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # yes
+## Does rhizobia strain have effect on root biomass in VA?
+mod <- lmer(root_weight_mg ~ exp_id + (1|site_group) + (1|plant) + (1|waterblock), data = plants_test)
+Anova(mod, type = 3) # nope
 
 
 # 5. Plot the symbiosis traits comparing the two populations
-p1 <- plants_long %>% 
-    filter(trait == "dry_weight_mg") %>%
-    filter(exp_id != "control") %>%
-    filter(population == "VA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = site_group, y = value), fill = "white") +
-    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank()    
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "shoot biomass (mg)")
+compute_trait_mean2 <- function (plants_long, tra = "dry_weight_mg", pop = "VA") {
+    pl <- plants_long %>%
+        filter(trait == tra) %>%
+        filter(exp_id != "control") %>%
+        filter(population == pop)
 
-p2 <- plants_long %>% 
-    filter(trait == "dry_weight_mg") %>%
-    filter(exp_id != "control") %>%
-    filter(population == "PA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = site_group, y = value), fill = "white") +
-    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank()    
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "shoot biomass (mg)")
+    plm <- pl %>%
+        group_by(population, site_group, trait) %>%
+        summarize(mean = mean(value), sem = sd(value)/sqrt(n()))
+    return(list(pl = pl, plm = plm))
+}
+plot_dots2 <- function (pl, plm) {
+    set.seed(1)
+    pl %>%
+        ggplot() +
+        geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
+        geom_point(data = plm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
+        geom_errorbar(data = plm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.2) +
+        scale_fill_manual(values = site_group_colors) +
+        facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1)
+        ) +
+        guides(fill = "none") +
+        labs(x = " ", y = "shoot biomass (mg)")
+}
+
+t1 <- compute_trait_mean2(plants_long,tra = "dry_weight_mg", pop = "VA")
+t2 <- compute_trait_mean2(plants_long,tra = "dry_weight_mg", pop = "PA")
+p1 <- plot_dots2(t1$pl, t1$plm)
+p2 <- plot_dots2(t2$pl, t2$plm)
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
 ggsave(paste0(folder_data, "temp/23a-05-trait_population.png"), p, width = 5, height = 3)
@@ -207,21 +220,20 @@ ggsave(paste0(folder_data, "temp/23a-05-trait_population.png"), p, width = 5, he
 # Does rhizobia sites have effect on shoot biomass?
 plants_test <- filter(plants, population == "VA")
 mod <- lmer(dry_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3) # No difference between high and low elevation
+Anova(mod, type = 3) # no
 mod <- lmer(nodule_number ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3) # No difference between high and low elevation
+Anova(mod, type = 3) # no
 mod <- lmer(root_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3) # No difference between high and low elevation
-
+Anova(mod, type = 3) # no
 
 # Does rhizobia sites have effect on shoot biomass?
 plants_test <- filter(plants, population == "PA")
 mod <- lmer(dry_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3)  # Differnece berween urban and suburban
+Anova(mod, type = 3) # yes
 mod <- lmer(nodule_number ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3)  # Differnece berween urban and suburban
+Anova(mod, type = 3) # yes
 mod <- lmer(root_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
-Anova(mod, type = 3)  # Differnece berween urban and suburban
+Anova(mod, type = 3) # yes
 
 # 6. Plot the PCA for the four sites
 pw1 <- plants_wide %>%
@@ -274,7 +286,6 @@ p2 <- fviz_pca_ind(
     guides(fill = "none") +
     labs()
 
-
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"), scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(paste0(folder_data, "temp/23a-06-trait_pca.png"), p, width = 9, height = 5)
 
@@ -290,226 +301,84 @@ Anova(mod, type = 3)  # No differnece between urban and suburban
 #pcobj2$sdev^2 / sum(pcobj2$sdev^2)
 
 
+# 7. Plot all three traits in dot plots by strain
+compute_trait_mean3 <- function (plants_long, pop = "VA") {
+    pl <- plants_long %>%
+        filter(exp_id != "control") %>%
+        filter(population == pop)
 
-# 7. Plot all three traits in violin plot
-p1 <- plants_long %>% 
-    filter(exp_id != "control") %>%
-    filter(population == "VA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = exp_id, y = value), fill = "white") +
-    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_grid(trait~site_group, scales = "free") +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "")
+    plm <- pl %>%
+        group_by(population, site_group, exp_id, trait) %>%
+        summarize(mean = mean(value), sem = sd(value)/sqrt(n()))
+    return(list(pl = pl, plm = plm))
+}
+plot_dots3 <- function (pl, plm) {
+    set.seed(1)
+    pl %>%
+        ggplot() +
+        geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+        geom_jitter(aes(x = exp_id, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
+        geom_point(data = plm, aes(x = exp_id, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
+        geom_errorbar(data = plm, aes(x = exp_id, ymin = mean-sem, ymax = mean+sem), width = 0.5) +
+        scale_fill_manual(values = site_group_colors) +
+        facet_grid(trait~site_group, scales = "free") +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1)
+        ) +
+        guides(fill = "none") +
+        labs(x = " ", y = "")
+}
 
-p2 <- plants_long %>% 
-    filter(exp_id != "control") %>%
-    filter(population == "PA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = exp_id, y = value), fill = "white") +
-    geom_boxplot(aes(x = exp_id, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_grid(trait~site_group, scales = "free") +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "")
+t1 <- compute_trait_mean3(plants_long, pop = "VA")
+t2 <- compute_trait_mean3(plants_long, pop = "PA")
+p1 <- plot_dots3(t1$pl, t1$plm)
+p2 <- plot_dots3(t2$pl, t2$plm)
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
 ggsave(paste0(folder_data, "temp/23a-07-trait_strain.png"), p, width = 8, height = 9)
 
 
+# 6. Plot all three traits in violin plot
+compute_trait_mean4 <- function (plants_long, pop = "VA") {
+    pl <- plants_long %>%
+        filter(exp_id != "control") %>%
+        filter(population == pop)
 
-# 7. Plot all three traits in violin plot
-p1 <- plants_long %>% 
-    filter(exp_id != "control") %>%
-    filter(population == "VA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = site_group, y = value), fill = "white") +
-    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_grid(trait~site_group, scales = "free") +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "")
+    plm <- pl %>%
+        group_by(population, site_group, trait) %>%
+        summarize(mean = mean(value), sem = sd(value)/sqrt(n()))
+    return(list(pl = pl, plm = plm))
+}
+plot_dots4 <- function (pl, plm) {
+    set.seed(1)
+    pl %>%
+        ggplot() +
+        geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
+        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
+        geom_point(data = plm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
+        geom_errorbar(data = plm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.2) +
+        scale_fill_manual(values = site_group_colors) +
+        facet_grid(trait~site_group, scales = "free") +
+        theme_classic() +
+        theme(
+            panel.spacing.x = unit(0, "mm"),
+            strip.background = element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1)
+        ) +
+        guides(fill = "none") +
+        labs(x = " ", y = "")
+}
 
-p2 <- plants_long %>% 
-    filter(exp_id != "control") %>%
-    filter(population == "PA") %>%
-    ggplot() +
-    geom_rect(aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.02) +
-    geom_violin(aes(x = site_group, y = value), fill = "white") +
-    geom_boxplot(aes(x = site_group, y = value), width=0.1) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_grid(trait~site_group, scales = "free") +
-    theme_classic() +
-    theme(
-        panel.spacing.x = unit(0, "mm"),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = " ", y = "")
+t1 <- compute_trait_mean4(plants_long, "VA")
+t2 <- compute_trait_mean4(plants_long, "PA")
+p1 <- plot_dots4(t1$pl, t1$plm)
+p2 <- plot_dots4(t2$pl, t2$plm)
+
+
 
 p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", labels = c("VA", "PA"))
-ggsave(paste0(folder_data, "temp/23a-09-trait_population.png"), p, width = 8, height = 9)
+ggsave(paste0(folder_data, "temp/23a-08-trait_population.png"), p, width = 8, height = 9)
 
-
-if (FALSE) {
-
-
-
-
-
-
-
-
-
-# Stat for slope in regression
-lm_x_y <- function (dat, x_var, y_var) {
-    formula <- as.formula(paste(y_var, "~", x_var))
-    lm(formula, data = dat) %>%
-        broom::tidy() %>%
-        filter(term == x_var) %>%
-        select(term, estimate, p.value)
-}
-
-plants_wide %>%
-    filter(site_group != "control") %>%
-    nest(data = c(id, exp_id, dry_weight_mg, nodule_number, root_weight_mg)) %>%
-    mutate(lm = map(data, ~lm_x_y(.x, "nodule_number", "dry_weight_mg"))) %>%
-    select(site_group, lm) %>%
-    unnest(lm)
-
-# 4. plot the root traits 
-p <- plants %>%
-    #select(id, exp_id, site_group, all_of(traits2)) %>%
-    #select(id, site_group, exp_id, dry_weight_mg, nodule_number, root_weight_mg) %>%
-    filter(!is.na(dry_weight_mg), dry_weight_mg != 0) %>%
-    pivot_longer(cols = c(-id, -exp_id, -site_group), names_to = "trait") %>%
-    ggplot() +
-    geom_boxplot(aes(x = exp_id, y = value, color = site_group), outlier.shape = NA) +
-    geom_jitter(aes(x = exp_id, y = value, color = site_group), width = 0.2, height = 0, shape = 21) +
-    facet_grid(trait~site_group, scales = "free", space = "free_x") +
-    scale_color_manual(values = site_group_colors) +
-    theme_classic() +
-    theme_facets +
-    theme(
-        panel.border = element_rect(color = "black", fill = NA),
-        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-    ) +
-    guides(color = "none") +
-    labs()
-
-ggsave(paste0(folder_data, "temp/23a-04-root_traits.png"), p, width = 8, height = 40)
-
-# 5. plot the trait correlation 
-# Names
-plants_traits <- plants %>%
-    filter(site_group %in% c("high-elevation", "low-elevation")) %>%
-    select(all_of(traits))
-tb_traits <- tibble(trait = ordered(names(plants_traits), names(plants_traits))) %>%
-    expand(trait, trait) %>%
-    rename(trait1 = trait...1, trait2 = trait...2) %>%
-    filter(trait1 < trait2) %>%
-    arrange(trait1, trait2)
-
-# Calculate cor
-cor_matrix <- cor(plants_traits, use = "complete.obs")
-cor_x_y <- function (dat) cor.test(unlist(dat[,1]), unlist(dat[,2]), method = "spearman", exact = F) %>% broom::tidy() %>% clean_names()
-tb_cortest <- tb_traits %>%
-    rowwise() %>%
-    mutate(traits = list(select(plants_traits, trait1, trait2))) %>%
-    ungroup() %>%
-    # Compute cor test
-    mutate(cortest = map(traits, ~cor_x_y(.x))) %>%
-    select(-traits) %>%
-    unnest(cortest) %>%
-    select(trait1, trait2, cor=estimate, p_value, method, alternative) %>%
-    mutate(asterisk = case_when(
-        p_value < 0.001 ~ "***",
-        p_value < 0.01 ~ "**",
-        p_value < 0.05 ~ "*",
-        T ~ "n.s."
-    ))
-
-# tb_cor <- as_tibble(cor_matrix) %>%
-#     mutate(trait1 = colnames(.)) %>%
-#     pivot_longer(-trait1, names_to = "trait2", values_to = "cor") %>%
-#     mutate(trait1 = ordered(trait1, names(plants_traits))) %>%
-#     mutate(trait2 = ordered(trait2, names(plants_traits))) %>%
-#     filter(trait1 < trait2) %>%
-#     arrange(trait1, trait2)
-
-
-
-
-# Calculate ellipse
-tb_ell <- tb_traits %>%
-    rowwise() %>%
-    # Calculate ellipse
-    mutate(cor_m = list(ellipse(cor_matrix, which = which(names(plants_traits) %in% c(trait1, trait2))))) %>%
-    mutate(cor_tb = list(tibble(x = cor_m[,which(colnames(cor_m) == trait1)], y = cor_m[,which(colnames(cor_m) == trait2)]))) %>%
-    select(-cor_m) %>%
-    unnest(cor_tb)
-
-tb_cortest_swap <- tibble(trait1 = tb_cortest$trait2, trait2 = tb_cortest$trait1, cor = tb_cortest$cor, asterisk = tb_cortest$asterisk)
-
-#
-p <- tb_ell %>%
-    left_join(tb_cortest) %>%
-    ggplot() +
-    geom_polygon(aes(x = x, y = y, fill = cor), color = "black") +
-    geom_text(data = tb_cortest_swap, x = 0, y = 0, aes(label = round(cor, 2))) +
-    geom_text(data = tb_cortest_swap, x = 0, y = 0, aes(label = asterisk), vjust = -0.5) +
-    facet_grid(trait2 ~ trait1, switch = "y", drop = F) +
-    scale_fill_gradient2(low = "maroon", high = "steelblue", breaks = c(1,0,-1), limits = c(-1,1)) +
-    theme_minimal() +
-    theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank(),
-        strip.clip = "off",
-        strip.text.x.top = element_text(angle = 90, hjust = 0, vjust = 0.5),
-        strip.text.y.left = element_text(angle = 0, hjust = 1),
-        #panel.border = element_rect(color = "black", fill = NA),
-        plot.background = element_rect(color = "white", fill = "white")
-    ) +
-    guides() +
-    labs()
-
-
-ggsave(paste0(folder_data, "temp/23a-05-trait_cor.png"), p, width = 12, height = 10)
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
