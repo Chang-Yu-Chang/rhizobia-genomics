@@ -55,23 +55,52 @@ zsh 06c-compare_kmer.sh \
     $folder_genomics/popgen/kmer/list_sigs.txt \
     $folder_genomics/popgen/kmer/kmer.txt
     
-# 3. aggregae the VCFs into one 
-mkdir -p $folder_genomics/variants/vcfgz_wsm419
-for i in {1..38}; do;
-    bgzip -c $folder_genomics/variants/wsm419/$genome_ids[$i]/snippy/snps.vcf > $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
-    tabix -p vcf $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
-done
+# 3. snippy
+for ref in "wsm419" "em1021"; do;
+    mkdir -p $folder_genomics/variants/"$ref"_snippy
+    cd $folder_genomics/variants/"$ref"_snippy
+    
+    # Make list of tab
+    for i in {1..38}; do;
+        echo "$genome_ids[$i]\t$folder_genomics/genomes/$genome_ids[$i].fasta"
+    done |> input.tab
+    
+    # Generate snippy scripts
+    snippy-multi input.tab --ref $folder_genomics/genomes/$ref.fasta --cpus 16 > runme.sh
 
-for i in {1..38}; do; echo $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
-done |> $folder_genomics/variants/list_vcfgz_wsm419.txt
+    # Run
+    zsh runme.sh
+done 
 
-mamba activate bcftools
-bcftools merge -O v --file-list $folder_genomics/variants/list_vcfgz_wsm419.txt \
-    --force-samples \
-    -o $folder_genomics/variants/wsm419.vcf.gz
-    #$folder_genomics/variants/list_vcfs_wsm419.txt
+# ## Rename samples; create vcf.zip
+# sample_path=$folder_genomics/variants/vcfgz_wsm419/s.txt
+# for i in {1..38}; do;    
+#     echo $genome_ids[$i] > $sample_path
+#     bcftools reheader -s $sample_path \
+#         -o $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf \
+#         $folder_genomics/variants/wsm419/$genome_ids[$i]/snippy/snps.vcf
 
-bcftools merge -O v -o $folder_genomics/variants/wsm419.vcf -l $folder_genomics/variants/list_vcfs_wsm419.txt
+#     bgzip -c $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf > $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+#     tabix -p vcf $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+# done
+
+# ## Create a list of name
+# for i in {1..38}; do; echo $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+# done |> $folder_genomics/variants/list_vcfgz_wsm419.txt
+
+# ## merge the vcfs
+# mamba activate bcftools
+# bcftools merge -O z \
+#     -l $folder_genomics/variants/list_vcfgz_wsm419.txt \
+#     -o $folder_genomics/variants/wsm419.vcf.gz
+
+# bcftools view -h $folder_genomics/variants/vcfgz_wsm419/$genome_ids[$i].vcf.gz
+# bcftools view -h $folder_genomics/variants/wsm419.vcf.gz
+
+# bcftools merge -O z \
+#     $folder_genomics/variants/vcfgz_wsm419/g2.vcf.gz  \
+#     $folder_genomics/variants/vcfgz_wsm419/g3.vcf.gz 
+
 
 
 # 4. Compare ani across contigs (>10kb)

@@ -11,6 +11,13 @@ isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 pa <- read_delim(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.Rtab"))
 pa <- pa %>% clean_names()
 
+# Transpose the gene presence-absence table
+gpa <- pa %>%
+    pivot_longer(cols = -gene) %>%
+    pivot_wider(names_from = gene, values_from = value, values_fill = 0) 
+
+write_csv(gpa, paste0(folder_data, "temp/13-gpa.csv"))
+
 # 1. Compute jaccard distance in gene presence and absence 
 pat <- t(as.matrix(pa[,-1]))
 dim(pat) # 41 x 31964
