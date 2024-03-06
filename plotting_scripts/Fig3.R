@@ -77,7 +77,7 @@ p2_1 <- isolates_i1 %>%
         legend.title = element_blank()
     ) +
     guides() +
-    labs(x = paste0("MDS1(", eigs1[1], "%)"), y = paste0("MDS1(", eigs1[2], "%)"))
+    labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
 p2_2 <- isolates_i2 %>% 
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
@@ -94,7 +94,7 @@ p2_2 <- isolates_i2 %>%
         legend.title = element_blank()
     ) +
     guides() +
-    labs(x = paste0("MDS1(", eigs2[1], "%)"), y = paste0("MDS1(", eigs2[2], "%)"))
+    labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
 
 
@@ -147,7 +147,7 @@ p3_1 <- isolates_i1 %>%
         legend.title = element_blank()
     ) +
     guides() +
-    labs(x = paste0("MDS1(", eigs1[1], "%)"), y = paste0("MDS1(", eigs1[2], "%)"))
+    labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
 p3_2 <- isolates_i2 %>% 
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
@@ -166,7 +166,7 @@ p3_2 <- isolates_i2 %>%
         legend.title = element_blank()
     ) +
     guides() +
-    labs(x = paste0("MDS1(", eigs2[1], "%)"), y = paste0("MDS1(", eigs2[2], "%)"))
+    labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
 
 # 
