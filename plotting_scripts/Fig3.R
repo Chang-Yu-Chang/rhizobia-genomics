@@ -16,6 +16,7 @@ site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342"
 # Read gene presence-absence data
 gpa <- read_csv(paste0(folder_data, "temp/13-gpa.csv"))
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
+isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
 
 gpa %>%
     rename(genome_id = name) %>%
