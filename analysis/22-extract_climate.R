@@ -74,25 +74,61 @@ for (i in 1:nrow(sites)) {
 }
 
 dml <- bind_rows(list_dm) %>%
-    mutate(site_group = str_sub(site,1 , 1)) %>%
     clean_names() %>%
     mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
-    mutate(ymonth = month(ydate))
-
+    mutate(ymonth = month(ydate)) %>%
+    left_join(sites) %>%
+    select(population, site_group, site, everything())
 
 write_csv(dml, paste0(folder_data, "temp/22-dml.csv"))
 
 
 
 
-# 2. Resample the difference between a H and a L temperature
-## tmax
+# 2. Resample the temperature difference between paire sites
+tb <- crossing(population = c("VA", "PA"), variable = c("tmax_deg_c", "tmin_deg_c"), yday = 1:365)
+
+compute_diff <- function(dml, pop, y, variable) {
+    if (pop == "VA") {
+        var1 <- dml %>% filter(population == pop, site_group == "low elevation", yday == y) %>% pull({{variable}})
+        var2 <- dml %>% filter(population == pop, site_group == "high elevation", yday == y) %>% pull({{variable}})
+    } else if (pop == "PA") {
+        var1 <- dml %>% filter(population == pop, site_group == "urban", yday == y) %>% pull({{variable}})
+        var2 <- dml %>% filter(population == pop, site_group == "suburban", yday == y) %>% pull({{variable}})
+    }
+    sample_var1 <- sample(var1, n_resample, replace = T)
+    sample_var2 <- sample(var2, n_resample, replace = T)
+    return(tibble(resample = 1:n_resample, 
+            sample_var1 = sample_var1,
+            sample_var2 = sample_var2,
+            diff_var = sample_var1 - sample_var2
+        ))
+}
+
+set.seed(1)
+n_resample <- 100
+# filter(dml, population == "PA", site_group == "suburban", yday == 1) %>% pull(tmax_deg_c)
+# filter(dml, population == "PA", site_group == "urban", yday == 1) %>% pull(tmax_deg_c)
+
+tbs <- tb %>%
+    rowwise() %>%
+    mutate(samples = list(compute_diff(dml, population, yday, variable)))
+
+diff_vars <- tbs %>%
+    ungroup() %>%
+    unnest(cols = samples)
+
+write_csv(diff_vars, paste0(folder_data, "temp/22-diff_vars.csv"))
+
+if(F) {
+
+## VA tmax
 set.seed(1)
 n_resample <- 100
 list_diff_tmax <- rep(list(tibble(resample = 1:n_resample)), 365)
 for (d in 1:365) {
-    tmax_H <- dml %>% filter(site_group == "H", yday == d) %>% pull(tmax_deg_c)
-    tmax_L <- dml %>% filter(site_group == "L", yday == d) %>% pull(tmax_deg_c)
+    tmax_H <- dml %>% filter(population == "VA", site_group == "high elevation", yday == d) %>% pull(tmax_deg_c)
+    tmax_L <- dml %>% filter(population == "VA", site_group == "low elevation", yday == d) %>% pull(tmax_deg_c)
     sampled_tmax_H <- sample(tmax_H, n_resample, replace = T)
     sampled_tmax_L <- sample(tmax_L, n_resample, replace = T)
     list_diff_tmax[[d]]$yday <- d
@@ -101,15 +137,15 @@ for (d in 1:365) {
 }
 
 diff_tmax <- bind_rows(list_diff_tmax)
-write_csv(diff_tmax, paste0(folder_data, "temp/22-diff_tmax.csv"))
+#write_csv(diff_tmax, paste0(folder_data, "temp/22-diff_tmax.csv"))
 
-## tmin
+## VA tmin
 set.seed(1)
 n_resample <- 100
 list_diff_tmin <- rep(list(tibble(resample = 1:n_resample)), 365)
 for (d in 1:365) {
-    tmin_L <- dml %>% filter(site_group == "L", yday == d) %>% pull(tmin_deg_c)
-    tmin_H <- dml %>% filter(site_group == "H", yday == d) %>% pull(tmin_deg_c)
+    tmin_H <- dml %>% filter(population == "VA", site_group == "high elevation", yday == d) %>% pull(tmin_deg_c)
+    tmin_L <- dml %>% filter(population == "VA", site_group == "low elevation", yday == d) %>% pull(tmin_deg_c)
     sampled_tmin_H <- sample(tmin_H, n_resample, replace = T)
     sampled_tmin_L <- sample(tmin_L, n_resample, replace = T)
     list_diff_tmin[[d]]$yday <- d
@@ -119,6 +155,7 @@ for (d in 1:365) {
 
 diff_tmin <- bind_rows(list_diff_tmin)
 write_csv(diff_tmin, paste0(folder_data, "temp/22-diff_tmin.csv"))
+}
 
 
 

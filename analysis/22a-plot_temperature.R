@@ -14,8 +14,9 @@ diff_tmax <- read_csv(paste0(folder_data, "temp/22-diff_tmax.csv"))
 tb_season <- read_csv(paste0(folder_data, "temp/22-tb_season.csv"))
 tb_month <- read_csv(paste0(folder_data, "temp/22-tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
 
-site_colors <- setNames(c(brewer.pal(6, "Blues")[3:6], brewer.pal(6, "Reds")[3:6], "gold"), site_cd$site)
-site_group_colors <- setNames(c(brewer.pal(6, "Blues")[6], brewer.pal(6, "Reds")[6], "gold"), c("H", "L", "S"))
+site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
+#site_colors <- setNames(c(brewer.pal(6, "Blues")[3:6], brewer.pal(6, "Reds")[3:6], "gold"), site_cd$site)
+#site_group_colors <- setNames(c(brewer.pal(6, "Blues")[6], brewer.pal(6, "Reds")[6], "gold"), c("H", "L", "S"))
 season_fills <- setNames(grey(c(0,1,0,1)), c("spring", "summer", "fall", "winter"))
 month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
 
