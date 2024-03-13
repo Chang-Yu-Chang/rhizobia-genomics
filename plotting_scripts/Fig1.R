@@ -97,8 +97,8 @@ diff_vars %>%
 plot_box <- function(diff_var_i) {
     diff_var_i %>%
         ggplot() +
-        geom_hline(yintercept = 0, color = "black") +
-        geom_boxplot(aes(x = variable, y = diff_var), outlier.size = 0) +
+        geom_hline(yintercept = 0, color = "maroon", alpha = 0.3) +
+        geom_boxplot(aes(x = variable, y = diff_var), outlier.size = 0, outlier.color = NA, fill = "grey90") +
         geom_jitter(aes(x = variable, y = diff_var), shape = 21, size = 1, color = "black", width = 0.2, alpha = 0.3) +
         scale_x_discrete(breaks = c("tmax_deg_c", "tmin_deg_c"), labels = c(expression(t[max]), expression(t[min]))) +
         theme_classic() +
@@ -110,12 +110,12 @@ plot_box <- function(diff_var_i) {
         guides() +
         labs()
 }
-
+set.seed(1)
 p3_1 <- plot_box(diff_var1) + 
-    scale_y_continuous(limits = c(-2, 7), breaks = -2:7, expand = c(0,0)) + 
+    scale_y_continuous(limits = c(-2, 7), breaks = -2:7, expand = c(0,.1)) + 
     ylab(expression(mean ~ "[" ~ t ~ "("~L~")" - t~ "("~H~")" ~ "]"))
 p3_2 <- plot_box(diff_var2) +
-    scale_y_continuous(limits = c(-2, 3), breaks = -2:7, expand = c(0,0)) +
+    scale_y_continuous(limits = c(-2, 3), breaks = -2:7, expand = c(0,.1)) +
     ylab(expression(mean ~ "[" ~ t ~ "("~U~")" - t~ "("~S~")" ~ "]"))
 p3 <- plot_grid(p3_1, p3_2, nrow = 2, align = "hv", axis = "lrbt", scale = 0.9)
 
@@ -130,3 +130,7 @@ p <- plot_grid(p1, p2, p3, nrow = 1, rel_widths = c(1,.6,.5), labels = c("A", "B
     theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig1.png"), p, width = 10, height = 5)
+
+
+
+
