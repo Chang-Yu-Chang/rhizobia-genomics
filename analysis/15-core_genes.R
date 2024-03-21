@@ -118,3 +118,13 @@ dist_sccg <- dist_sccg_ham %>%
 
 write_csv(dist_sccg, paste0(folder_data, "temp/15-dist_sccg.csv"))
 
+
+ref <- read.fasta(paste0(folder_data, "genomics/pangenome/panaroo/pan_genome_reference.fa"))
+length(ref)
+names(ref)
+str_subset(names(ref), "nod")
+
+length(ref$nodM_1)
+
+ref[str_subset(names(ref), "nod")] %>%
+    lapply(length)
