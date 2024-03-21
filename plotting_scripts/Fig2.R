@@ -31,7 +31,7 @@ isolates_gc <- gc_prm_summs %>%
 
 
 # Panel A. Cartoons
-p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig1A.png")) + draw_text("placeholder")
+p1 <- ggdraw() + draw_text("placeholder")
 
 # Panel B. Plot the 30C 
 compute_trait_mean <- function (isolates_gc, tra = "r_30c", pop = "VA") {
@@ -86,11 +86,13 @@ test_sign <- function (p) {
 isolates_test <- filter(isolates_gc, trait == "r_30c", population == "VA") %>% rename(r_30c = value)
 mod <- lmer(r_30c ~ site_group + (1|site), data = isolates_test)
 mod2_1 <- Anova(mod, type = 3) # no
+mod2_1
 
 # Does rhizobia sites have effect on shoot biomass?
 isolates_test <- filter(isolates_gc, trait == "r_30c", population == "PA") %>% rename(r_30c = value)
 mod <- lmer(r_30c ~ site_group + (1|site),, data = isolates_test)
 mod2_2 <- Anova(mod, type = 3) # no
+mod2_2
 
 sigs <- tibble(population = factor(c("VA", "PA")), sig = c(test_sign(mod2_1[2,3]), test_sign(mod2_2[2,3])))
 bar_y <- 1.3
@@ -120,7 +122,7 @@ p2 <- igcl %>%
         axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
     guides(fill = "none") +
-    labs(x = " ", y = "r at 30C (1/hr)")
+    labs(x = " ", y = expression(r~at~30*degree*C~(1/hr)))
 
 # Panel C. Plot the symbiosis traits comparing the two populations
 compute_trait_mean2 <- function (plants_long, tra = "dry_weight_mg", pop = "VA") {
@@ -190,10 +192,6 @@ p3 <- pl %>%
     # Significance bars
     annotate("segment", x = 1, xend = 2, y = bar_y, yend = bar_y) +
     geom_text(data = sigs, aes(label = sig), x = 1.5, y = bar_y, vjust = -1) +
-    # annotate("segment", x = 1, xend = 2, y = bar_y, yend = bar_y) +
-    # annotate("segment", x = 3, xend = 4, y = bar_y, yend = bar_y) +
-    # annotate("text", x = 1.5, y = bar_y, vjust = -1, label = test_sign(mod3_1[2,3])) + 
-    # annotate("text", x = 3.5, y = bar_y, vjust = -1, label = test_sign(mod3_2[2,3])) + 
     scale_fill_manual(values = site_group_colors) +
     scale_x_discrete(expand = c(0,0)) +
     scale_y_continuous(limits = c(0, bar_y*1.1)) +
@@ -216,7 +214,7 @@ p3 <- pl %>%
 # Panel D. PCoA plot of the three growth traits 
 isolates_test <- isolates_gc %>%
     pivot_wider(names_from = trait, values_from = value)
-pcs <- bind_rows(bind_cols(isolates_i1, pca1$x[,1:2]), bind_cols(isolates_i2, pca2$x[,1:2]))
+#pcs <- bind_rows(bind_cols(isolates_i1, pca1$x[,1:2]), bind_cols(isolates_i2, pca2$x[,1:2]))
 plot_pca <- function (isolates_i, eig1, eig2) {
     isolates_i %>%
         ggplot() +
@@ -294,5 +292,8 @@ p <- plot_grid(p_top, p_bottom, nrow = 2, rel_heights = c(1.5, 1), labels = c("A
     theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 7)
+
+
+
 
 
