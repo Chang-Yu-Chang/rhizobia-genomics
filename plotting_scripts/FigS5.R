@@ -9,8 +9,6 @@ source(here::here("analysis/00-metadata.R"))
 
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 diff_vars <- read_csv(paste0(folder_data, "temp/22-diff_vars.csv"), show_col_types = F)
-population_colors <- c("PA" = "gold2", "VA" = "olivedrab")
-site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
 
 
 # Barplots for temperature contrast between populations

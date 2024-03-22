@@ -43,9 +43,34 @@ isolates$exp_id[44:47] <- isolates$genome_name[44:47]
 write_csv(isolates, paste0(folder_data, "temp/00-isolates.csv"))
 
 # Genomes that need to be assembled locally
-genomes <- isolates %>% 
-    drop_na(exp_id) %>% 
+genomes <- isolates %>%
+    drop_na(exp_id) %>%
     filter(str_detect(genome_id, "g")) %>%
     left_join(select(genomes_mapping, batch_name, genome_name)) %>%
     select(batch_name, genome_name, genome_id, exp_id)
 write_csv(genomes, paste0(folder_data, "temp/00-genomes.csv"))
+
+
+# Color
+population_colors <- c("PA" = "gold2", "VA" = "olivedrab")
+site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
+site_colors <- rep(c("#0C6291", "#BF4342", "#0cc45f", "#a642bf"), each = 4) %>% setNames(sites$site[-9])
+site_alphas <- rep(seq(1, 0.4, length.out = 4), 4) %>% setNames(sites$site[-9])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

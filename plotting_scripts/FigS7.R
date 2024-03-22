@@ -14,8 +14,6 @@ source(here::here("analysis/00-metadata.R"))
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
 plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
-site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342",
-                       `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
 
 # Read growth rate data
 gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))

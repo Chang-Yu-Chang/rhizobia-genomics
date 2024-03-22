@@ -9,10 +9,6 @@ library(poppr) # for pop gen analysis
 library(vegan) # for computing jaccard
 source(here::here("analysis/00-metadata.R"))
 
-site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", 
-                 `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
-
-
 # Read gene presence-absence data
 gpa <- read_csv(paste0(folder_data, "temp/13-gpa.csv"))
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
@@ -25,11 +21,8 @@ gpa %>%
     summarize(n_genomes = sum(value)) %>%
     filter(n_genomes < 41)
 
-
 # Panel A. Cartoons
 p1 <- ggdraw() + draw_image(here::here("plots/cartoons/Fig1A.png")) + draw_text("placeholder")
-
-
 
 # Panel B. SNPs
 snp <- read_table(paste0(folder_data, "genomics/variants/em1021_snippy/core.tab"))
@@ -39,9 +32,9 @@ vcf <- read.vcfR(paste0(folder_data, "genomics/variants/em1021_snippy/core.vcf")
 vcfR::getCHROM(vcf) %>% table() # SNPs on chromosome
 gl <- vcfR2genlight(vcf) # VCF to genlight
 snps <- tab(gl); dim(snps)
+number of sn[ps ]
 
-
-## Test VA populaitons: high vs low elevation 
+## Test VA populaitons: high vs low elevation
 isolates_i1 <- isolates_test %>% filter(population == "VA")
 m <- snps[match(isolates_i1$genome_id, gl@ind.names),]; dim(m) # Filter the snps table for focal genomes
 #table(apply(m, 2, sum))
@@ -51,7 +44,7 @@ permanova1 # no
 pcoa1 <- cmdscale(dist_m1, eig = T)
 eigs1 <- round(pcoa1$eig / sum(pcoa1$eig)*100, 2)
 
-## Test PA populaitons: high vs low elevation 
+## Test PA populaitons: high vs low elevation
 isolates_i2 <- isolates_test %>% filter(population == "PA")
 m <- snps[match(isolates_i2$genome_id, gl@ind.names),]; dim(m) # Filter the snps table for focal genomes
 #m <- m[,apply(m, 2, sum) != 0]; dim(m) # 323 snps??
@@ -62,7 +55,7 @@ pcoa2 <- cmdscale(dist_m2, eig = T)
 eigs2 <- round(pcoa2$eig / sum(pcoa2$eig)*100, 2)
 
 ## Plot the mds
-p2_1 <- isolates_i1 %>% 
+p2_1 <- isolates_i1 %>%
     bind_cols(tibble(mds1 = pcoa1$points[,1], mds2 = pcoa1$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -80,7 +73,7 @@ p2_1 <- isolates_i1 %>%
     guides() +
     labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
-p2_2 <- isolates_i2 %>% 
+p2_2 <- isolates_i2 %>%
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -104,10 +97,10 @@ p2_2 <- isolates_i2 %>%
 
 
 # Panel C. GCVs
-isolates_test <- isolates %>% filter(genome_id %in% gpa$name, !is.na(site_group)) 
+isolates_test <- isolates %>% filter(genome_id %in% gpa$name, !is.na(site_group))
 gpa_test <- gpa %>% filter(name %in% isolates_test$genome_id)
 
-## Test VA populaitons: high vs low elevation 
+## Test VA populaitons: high vs low elevation
 isolates_i1 <- isolates_test %>% filter(population == "VA")
 labels <- isolates_i1$site_group; labels <- as.factor(labels)
 gpa_i <- gpa_test %>% filter(name %in% isolates_i1$genome_id)
@@ -119,7 +112,7 @@ permanova1 # no
 pcoa1 <- cmdscale(dist_m1, eig = T)
 eigs1 <- round(pcoa1$eig / sum(pcoa1$eig)*100, 2)
 
-## Test PA populaitons: high vs low elevation 
+## Test PA populaitons: high vs low elevation
 isolates_i2 <- isolates_test %>% filter(population == "PA")
 labels <- isolates_i2$site_group; labels <- as.factor(labels)
 gpa_i <- gpa_test %>% filter(name %in% isolates_i2$genome_id)
@@ -132,7 +125,7 @@ pcoa2 <- cmdscale(dist_m2, eig = T)
 eigs2 <- round(pcoa2$eig / sum(pcoa2$eig)*100, 2)
 
 ## Plot the mds
-p3_1 <- isolates_i1 %>% 
+p3_1 <- isolates_i1 %>%
     bind_cols(tibble(mds1 = pcoa1$points[,1], mds2 = pcoa1$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -150,7 +143,7 @@ p3_1 <- isolates_i1 %>%
     guides() +
     labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
-p3_2 <- isolates_i2 %>% 
+p3_2 <- isolates_i2 %>%
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -170,7 +163,7 @@ p3_2 <- isolates_i2 %>%
     labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
 
-# 
+#
 p_right <- plot_grid(p2_1, p2_2, p3_1, p3_2, nrow = 2, rel_heights = c(1, 1), scale = 0.95,
     align = "vh", axis = "tblr", labels = c("B", "", "C", ""))
 
@@ -178,7 +171,7 @@ p <- plot_grid(p1, p_right, rel_widths = c(1,1.5), labels = c("A", "")) +
     theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 6)
- 
+
 
 
 
@@ -186,10 +179,10 @@ ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 6)
 if (FALSE) {
 library(randomForest)
 
-isolates_test <- isolates %>% filter(genome_id %in% gpa$name, !is.na(site_group)) 
+isolates_test <- isolates %>% filter(genome_id %in% gpa$name, !is.na(site_group))
 gpa_test <- gpa %>% filter(name %in% isolates_test$genome_id)
 
-# Test VA populaitons: high vs low elevation 
+# Test VA populaitons: high vs low elevation
 isolates_i <- isolates_test %>% filter(population == "VA")
 labels <- isolates_i$site_group; labels <- as.factor(labels)
 gpa_i <- gpa_test %>% filter(name %in% isolates_i$genome_id)
@@ -202,7 +195,7 @@ print(sort(importance(rf_model), decreasing = T)[1:10])
 
 
 
-gpa %>% 
+gpa %>%
     pca <- glPca(gl, nf = 10, center = T, scale = T)
 # convert scores of vcf.pca into a tibble
 sc <- as_tibble(pca$scores) %>%
