@@ -112,8 +112,8 @@ compute_mean <- function (diff_var_i) {
 
 # VA tmax
 dml_i <- dml %>% filter(site_group %in% c("high elevation", "low elevation"), site_group != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(population == "VA", variable == "tmax_deg_c") 
-p <- plot_composites(dml_i, tmax_deg_c, diff_var_i, 
+diff_var_i <- diff_vars %>% filter(population == "VA", variable == "tmax_deg_c")
+p <- plot_composites(dml_i, tmax_deg_c, diff_var_i,
     expression(t[max](degree*C)),
     expression(mean ~ "[" ~ t[max] ~ "("~L~")" - t[max]~ "("~H~")" ~ "]"(degree*C)))
 ggsave(here::here("plots/FigS1.png"), p, width = 8, height = 8)
@@ -122,8 +122,8 @@ compute_mean(diff_var_i)
 # t = 46.509, df = 364, p-value < 2.2e-16
 
 # VA tmin
-dml_i <- dml %>% filter(site_group %in% c("high elevation", "low elevation"), site_group != "mid elevation") %>% mutate(site = factor(site, sites$site)) 
-diff_var_i <- diff_vars %>% filter(population == "VA", variable == "tmin_deg_c") 
+dml_i <- dml %>% filter(site_group %in% c("high elevation", "low elevation"), site_group != "mid elevation") %>% mutate(site = factor(site, sites$site))
+diff_var_i <- diff_vars %>% filter(population == "VA", variable == "tmin_deg_c")
 p <- plot_composites(dml_i, tmin_deg_c, diff_var_i,
     expression(t[min](degree*C)),
     expression(mean ~ "[" ~ t[min] ~ "("~L~")" - t[min]~ "("~H~")" ~ "]"(degree*C)))
@@ -135,7 +135,7 @@ compute_mean(diff_var_i)
 
 # PA tmax
 dml_i <- dml %>% filter(site_group %in% c("suburban", "urban"), site_group != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(population == "PA", variable == "tmax_deg_c") 
+diff_var_i <- diff_vars %>% filter(population == "PA", variable == "tmax_deg_c")
 p <- plot_composites(dml_i, tmax_deg_c, diff_var_i,
     expression(t[max](degree*C)),
     expression(mean ~ "[" ~ t[max] ~ "("~L~")" - t[max]~ "("~H~")" ~ "]"(degree*C)))
@@ -146,7 +146,7 @@ compute_mean(diff_var_i)
 
 # PA tmin
 dml_i <- dml %>% filter(site_group %in% c("suburban", "urban"), site_group != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(population == "PA", variable == "tmin_deg_c") 
+diff_var_i <- diff_vars %>% filter(population == "PA", variable == "tmin_deg_c")
 p <- plot_composites(dml_i, tmin_deg_c, diff_var_i,
     expression(t[min](degree*C)),
     expression(mean ~ "[" ~ t[min] ~ "("~L~")" - t[min]~ "("~H~")" ~ "]"(degree*C)))

@@ -6,8 +6,7 @@ library(tidyverse)
 library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
-# 1. raw data wrangling
-# 1.1 read data
+sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 treatments_ttb <- read_csv(paste0(folder_data, "raw/rhizobia/Terrence/corrected.csv")) %>% clean_names()
 treatments_cyc <- read_csv(paste0(folder_data, "raw/rhizobia/04-manual_phenotyping/treatments_assigned.csv")) %>% clean_names()
 features_cyc <- read_csv(paste0(folder_data, "raw/rhizobia/05-root_architecture/features.csv"))
@@ -15,10 +14,11 @@ features_cyc <- read_csv(paste0(folder_data, "raw/rhizobia/05-root_architecture/
 nrow(treatments_ttb) # 84 plants
 nrow(treatments_cyc) # 167 plants
 
-# 1.2 tidy up the variables
+# Clean up
 treatments_ttb <- treatments_ttb %>%
+    select(-location) %>%
     rename(id = plant, waterblock = block,
-           exp_id = rhizobia_strain, site_group = location,
+           exp_id = rhizobia_strain,
            dry_weight_mg = shoot_weight, nodule_number = nodules, root_weight_mg = root_weight) %>%
     # Clean the expID name
     mutate(exp_id = str_replace(exp_id, "b_", "_")) %>%
@@ -26,36 +26,36 @@ treatments_ttb <- treatments_ttb %>%
     mutate(exp_id = str_replace(exp_id, "p_", "p")) %>%
     mutate(exp_id = str_replace(exp_id, "_", "-")) %>%
     mutate(exp_id = str_replace(exp_id, "control-\\d", "control")) %>%
+    # Add the site name
+    mutate(site = str_remove(exp_id, "-\\d")) %>%
+    mutate(site = str_remove(site, "\\d$")) %>%
     # Correct unit
     mutate(dry_weight_mg = dry_weight_mg*10^3, root_weight_mg = root_weight_mg*10^3) %>%
     # Plant unique id
     mutate(id = id + nrow(treatments_cyc)) %>%
-    mutate(site_group = tolower(site_group)) %>%
+    #mutate(site_group = tolower(site_group)) %>%
     arrange(id) %>%
     clean_names() %>%
     mutate(population = "PA")
 
-# Clean up my data
+#
 features_cyc <- features_cyc %>%
     clean_names() %>%
     mutate(id = str_replace(file_name, ".png", "") %>% as.numeric())
-treatments_cyc <- treatments_cyc %>% 
+treatments_cyc <- treatments_cyc %>%
     left_join(features_cyc, by = join_by(id)) %>%
     rename(exp_id = rhizobia, site = rhizobia_site) %>%
+    replace_na(list(exp_id = "control")) %>%
     mutate(site = str_sub(exp_id, 1, 2)) %>%
     mutate(population = "VA")
 
 
 # 1.3 merge the data
-plants <- treatments_cyc %>% bind_rows(treatments_ttb) %>%
-    replace_na(list(exp_id = "control", site = "control", site_group = "control")) %>%
+plants <- bind_rows(treatments_cyc, treatments_ttb) %>%
     mutate(exp_id = str_replace(exp_id, "control_\\d", "control")) %>%
-    mutate(site_group = case_when(
-        str_detect(site, "H") ~ "high elevation",
-        str_detect(site, "L") ~ "low elevation",
-        T ~ site_group
-    )) %>%
-    mutate(site_group = factor(site_group, c("high elevation", "low elevation", "urban", "suburban", "control"))) 
+    left_join(select(sites, population, site, site_group)) %>%
+    replace_na(list(site_group = "control")) %>%
+    mutate(site_group = factor(site_group, c("high elevation", "low elevation", "urban", "suburban", "control")))
 
 nrow(plants) # 251 plants
 plants %>% filter(!is.na(dry_weight_mg), dry_weight_mg != 0) %>% nrow # 231 plants with non-zero shoot mass
@@ -101,3 +101,4 @@ plants_wide <- plants %>%
 
 write_csv(plants_long, paste0(folder_data, "temp/23-plants_long.csv"))
 write_csv(plants_wide, paste0(folder_data, "temp/23-plants_wide.csv"))
+
