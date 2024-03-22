@@ -13,6 +13,8 @@ diff_vars <- read_csv(paste0(folder_data, "temp/22-diff_vars.csv"))
 tb_season <- read_csv(paste0(folder_data, "temp/22-tb_season.csv"))
 tb_month <- read_csv(paste0(folder_data, "temp/22-tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
 
+site_colors <- rep(c("#0C6291", "#BF4342", "#0cc45f", "#a642bf"), each = 4) %>% setNames(sites$site[-9])
+site_alphas <- rep(seq(1, 0.4, length.out = 4), 4) %>% setNames(sites$site[-9])
 season_fills <- setNames(grey(c(0,1,0,1)), c("spring", "summer", "fall", "winter"))
 month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
 

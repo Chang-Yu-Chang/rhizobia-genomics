@@ -10,19 +10,12 @@ library(car) # companion to Applied Regression
 source(here::here("analysis/00-metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-contigs <- read_csv(paste0(folder_data, "temp/14-contigs.csv"))
+isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"))
 gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
 
-# Find the species for each isolate
-gs <- contigs %>%
-    filter(replicon == "chromosome") %>%
-    select(genome_id, species, strain) %>%
-    distinct(genome_id, species) %>%
-    mutate(species = ifelse(species %in% c("medicae", "meliloti"), species, "other"))
-
 # Three strains have more than one species. Remove them from it
-removed_st <- group_by(gs, genome_id) %>% count() %>% filter(n !=1)
+removed_st <- group_by(isolates_contigs, genome_id) %>% count() %>% filter(n !=1)
 
 #
 isolates_gc <- gc_prm_summs %>%
@@ -30,7 +23,8 @@ isolates_gc <- gc_prm_summs %>%
     pivot_longer(cols = -c(exp_id, temperature), names_to = "trait") %>%
     left_join(isolates) %>%
     filter(!(genome_id %in% removed_st$genome_id)) %>%
-    left_join(gs)
+    left_join(select(isolates_contigs, genome_id, species)) %>%
+    mutate(species = ifelse(species %in% c("medicae", "meliloti"), species, "other"))
 
 p <- isolates_gc %>%
     filter(temperature != "40c") %>%
@@ -38,7 +32,7 @@ p <- isolates_gc %>%
     ggplot() +
     geom_point(aes(x = temperature, y = value, color = species, group = exp_id), shape = 21, size = 2, stroke = 1) +
     geom_line(aes(x = temperature, y = value, color = species, group = exp_id), alpha = 0.5) +
-    scale_color_manual(values = brewer.pal(3, "set1")) +
+    scale_color_manual(values = brewer.pal(3, "Paired")) +
     facet_grid(trait ~ population, scales = "free_y") +
     theme_classic() +
     theme(
