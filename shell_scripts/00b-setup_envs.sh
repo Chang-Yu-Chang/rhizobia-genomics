@@ -37,8 +37,6 @@ mamba create -n medaka
 mamba activate medaka
 mamba install --yes -c bioconda medaka=1.8.0
 
-
-
 # Install ncbi-datasets v15.27.1
 mamba create -y -n ncbi-datasets
 mamba activate ncbi-datasets
@@ -143,3 +141,22 @@ mamba install --yes -c bioconda roary=3.13.0
 mamba create -n seqtk
 mamba activate seqtk
 mamba install --yes -c bioconda seqtk=1.4
+
+# Install panaroo v1.3.4
+# Panaroo is A Bacterial Pangenome Analysis Pipeline that can call large structural variants
+mamba create -n panaroo
+mamba activate panaroo
+mamba install --yes -c bioconda panaroo=1.3.4
+
+# Install pyseer v1.3.11
+# Sequence Element Enrichment Analysis (SEER)
+# pyseer uses linear models with fixed or mixed effects to estimate the effect of genetic variation in a bacterial population on a phenotype of interest, while accounting for potentially very strong confounding population structure. This allows for genome-wide association studies (GWAS) to be performed in clonal organisms such as bacteria and viruses.
+mamba create -n pyseer
+mamba activate pyseer
+mamba install --yes -c bioconda pyseer=1.3.11
+
+
+
+
+
+
