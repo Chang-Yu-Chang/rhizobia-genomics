@@ -1,6 +1,6 @@
-# nextflow 
-nf_scripts/.nextflow*
-nf_scripts/work/
+# nextflow
+#nf_scripts/.nextflow*
+#nf_scripts/work/
 
 #
 */deprecated/

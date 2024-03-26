@@ -2832,17 +2832,6 @@
       ],
       "Hash": "082e1a198e3329d571f4448ef0ede4bc"
     },
-    "randomForest": {
-      "Package": "randomForest",
-      "Version": "4.7-1.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "stats"
-      ],
-      "Hash": "b52825075358b1ebd159e262bf40649d"
-    },
     "rappdirs": {
       "Package": "rappdirs",
       "Version": "0.3.3",
