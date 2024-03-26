@@ -78,6 +78,16 @@ cd ~/bioinformatics/sourmash/
 # Install zip that is used for sourmash gather
 wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
 
+# Install barrnap v0.9
+# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
+mamba create -n barrnap
+mamba activate barrnap
+mamba install --yes -c bioconda barrnap=0.9
+# Downalod the RefSeq 16S database
+#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
+# Make it into a database
+#makeblastdb -in $refseq_16s_db -dbtype nucl
+
 # Install minimap2 v2.26
 # minimap2 is a versatile pairwise aligner for genomic and spliced nucleotide sequences
 mamba create -y -n minimap2
@@ -133,24 +143,16 @@ mamba create -n panaroo
 mamba activate panaroo
 mamba install --yes -c bioconda panaroo=1.3.4
 
-
-
-
-
-# Install barrnap v0.9
-# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
-mamba create -n barrnap
-mamba activate barrnap
-mamba install --yes -c bioconda barrnap=0.9
-# Downalod the RefSeq 16S database
-#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
-# Make it into a database
-#makeblastdb -in $refseq_16s_db -dbtype nucl
-
 # Install seqtk v1.4
+# seqtk is a fast and lightweight tool for processing sequences in the FASTA or FASTQ format.
 mamba create -n seqtk
 mamba activate seqtk
 mamba install --yes -c bioconda seqtk=1.4
+
+
+
+
+
 
 # Install pyseer v1.3.11
 # Sequence Element Enrichment Analysis (SEER)
@@ -158,10 +160,6 @@ mamba install --yes -c bioconda seqtk=1.4
 mamba create -n pyseer
 mamba activate pyseer
 mamba install --yes -c bioconda pyseer=1.3.11
-
-
-
-
 
 
 # # Install bwa v0.7.17
