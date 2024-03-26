@@ -7,18 +7,20 @@ cd
 mkdir -p ~/bioinformatics
 
 # Install filtlong v0.2.1
-# Filtlong is a tool for filtering long reads by quality.
+# filtlong is a tool for filtering long reads by quality.
 mamba create -n filtlong
 mamba activate filtlong
 mamba install --yes -c bioconda filtlong=0.2.1
 
 # Install bioawk v1.0
+# bioawk is BWK awk modified for biological data
 mamba create -n bioawk
 mamba activate bioawk
 mamba install --yes -c bioconda bioawk=1.0
 
 # Install miniasm v0.3
-# Miniasm is a very fast OLC-based de novo assembler for noisy long reads
+# miniasm is a very fast OLC-based de novo assembler for noisy long reads
+# This is used for drafting genomes from raw reads
 mamba create -n miniasm
 mamba activate miniasm
 mamba install --yes -c bioconda minimap2=2.26
@@ -26,62 +28,34 @@ mamba install --yes -c bioconda miniasm=0.3
 mamba install --yes -c bioconda any2fasta=0.4.2
 
 # Install flye assembler v2.9.2
-# Flye is a de novo assembler for single-molecule sequencing reads, such as those produced by PacBio and Oxford Nanopore Technologies
+# flye is a de novo assembler for single-molecule sequencing reads, such as those produced by PacBio and Oxford Nanopore Technologies
 mamba create -n flye
 mamba activate flye
 mamba install --yes -c bioconda flye=2.9.2
 
 # Install medaka v1.8.0
-# medaka is a tool to create consensus sequences and variant calls from nanopore sequencing data. This task is performed using neural networks applied a pileup of individual sequencing reads against a draft assembly. It provides state-of-the-art results outperforming sequence-graph based methods and signal-based methods, whilst also being faster.
+# medaka is a tool to create consensus sequences and variant calls from nanopore sequencing data
 mamba create -n medaka
 mamba activate medaka
 mamba install --yes -c bioconda medaka=1.8.0
 
+# Install prokka v1.14.5
+# prokka is for rapid prokaryotic genome annotation
+mamba create -n prokka
+mamba activate prokka
+mamba install --yes -c bioconda prokka=1.14.5
+
 # Install ncbi-datasets v15.27.1
+# ncbi-datasets is NCBI Datasets command-line tools
 mamba create -y -n ncbi-datasets
 mamba activate ncbi-datasets
 mamba install --yes -c bioconda ncbi-datasets=15.27.1
 
-# Install minimap2 v2.26
-mamba create -y -n minimap2
-mamba activate minimap2
-mamba install --yes -c bioconda minimap2=2.26
-
-# # Install bwa v0.7.17
-# # BWA is a software package for mapping low-divergent sequences against a large reference genome,
-# mamba create -y -n bwa
-# mamba activate bwa
-# mamba install --yes -c bioconda bwa=0.7.17
-
-# Install samtools v1.18
-# samtools are Tools for dealing with SAM, BAM and CRAM files
-mamba create -y -n samtools
-mamba activate samtools
-mamba install --yes -c bioconda samtools=1.18
-
-# Install bcftools 1.18
-# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
-mamba create -y -n bcftools
-mamba activate bcftools
-mamba install --yes -c bioconda bcftools=1.18
-
-# Install vcftools 0.1.16
-# vcftools is A set of tools written in Perl and C++ for working with VCF files.
-mamba create -y -n vcftools
-mamba activate vcftools
-mamba install --yes -c bioconda vcftools=0.1.16
-
-# Install snippy v4.6.0
-# Snippy is Rapid haploid variant calling and core genome alignment
-mamba create -y -n snippy
-mamba activate snippy
-mamba install --yes -c bioconda snippy=4.6.0
-mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
-# Install sniffles2 v2.2
-# A fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
-mamba create -y -n sniffles
-mamba activate sniffles
-mamba install --yes -c bioconda sniffles=2.2
+# Install blast v2.14.1
+# blast stands for Basic Local Alignment Search Tool, and can build a BLAST database with local sequences
+mamba create -n blast
+mamba activate blast
+mamba install --yes -c bioconda blast=2.14.1
 
 # Install mash v2.3
 # Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
@@ -104,6 +78,64 @@ cd ~/bioinformatics/sourmash/
 # Install zip that is used for sourmash gather
 wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
 
+# Install minimap2 v2.26
+# minimap2 is a versatile pairwise aligner for genomic and spliced nucleotide sequences
+mamba create -y -n minimap2
+mamba activate minimap2
+mamba install --yes -c bioconda minimap2=2.26
+
+# Install samtools v1.18
+# samtools are Tools for dealing with SAM, BAM and CRAM files
+mamba create -y -n samtools
+mamba activate samtools
+mamba install --yes -c bioconda samtools=1.18
+
+# Install bcftools 1.18
+# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
+mamba create -y -n bcftools
+mamba activate bcftools
+mamba install --yes -c bioconda bcftools=1.18
+
+# Install vcftools 0.1.16
+# vcftools is A set of tools written in Perl and C++ for working with VCF files.
+mamba create -y -n vcftools
+mamba activate vcftools
+mamba install --yes -c bioconda vcftools=0.1.16
+
+# Install snippy v4.6.0
+# snippy is Rapid haploid variant calling and core genome alignment
+mamba create -y -n snippy
+mamba activate snippy
+mamba install --yes -c bioconda snippy=4.6.0
+mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
+
+# Install sniffles2 v2.2
+# sniffles is a fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
+mamba create -y -n sniffles
+mamba activate sniffles
+mamba install --yes -c bioconda sniffles=2.2
+
+# Install fastANI v1.31
+# fastANI is developed for fast alignment-free computation of whole-genome Average Nucleotide Identity (ANI)
+mamba create -n fastani
+mamba activate fastani
+mamba install --yes -c bioconda fastani=1.31
+
+# Install roary v3.13.0
+# roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
+mamba create -n roary
+mamba activate roary
+mamba install --yes -c bioconda roary=3.13.0
+
+# Install panaroo v1.3.4
+# panaroo is A Bacterial Pangenome Analysis Pipeline that can call large structural variants
+mamba create -n panaroo
+mamba activate panaroo
+mamba install --yes -c bioconda panaroo=1.3.4
+
+
+
+
 
 # Install barrnap v0.9
 # Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
@@ -115,38 +147,10 @@ mamba install --yes -c bioconda barrnap=0.9
 # Make it into a database
 #makeblastdb -in $refseq_16s_db -dbtype nucl
 
-# Install blast v2.14.1
-mamba create -n blast
-mamba activate blast
-mamba install --yes -c bioconda blast=2.14.1
-
-# Install prokka v1.14.5
-mamba create -n prokka
-mamba activate prokka
-mamba install --yes -c bioconda prokka=1.14.5
-
-# Install fastANI v1.31
-# FastANI is developed for fast alignment-free computation of whole-genome Average Nucleotide Identity (ANI)
-mamba create -n fastani
-mamba activate fastani
-mamba install --yes -c bioconda fastani=1.31
-
-# Install roary v3.13.0
-# Roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
-mamba create -n roary
-mamba activate roary
-mamba install --yes -c bioconda roary=3.13.0
-
 # Install seqtk v1.4
 mamba create -n seqtk
 mamba activate seqtk
 mamba install --yes -c bioconda seqtk=1.4
-
-# Install panaroo v1.3.4
-# Panaroo is A Bacterial Pangenome Analysis Pipeline that can call large structural variants
-mamba create -n panaroo
-mamba activate panaroo
-mamba install --yes -c bioconda panaroo=1.3.4
 
 # Install pyseer v1.3.11
 # Sequence Element Enrichment Analysis (SEER)
@@ -160,3 +164,8 @@ mamba install --yes -c bioconda pyseer=1.3.11
 
 
 
+# # Install bwa v0.7.17
+# # BWA is a software package for mapping low-divergent sequences against a large reference genome,
+# mamba create -y -n bwa
+# mamba activate bwa
+# mamba install --yes -c bioconda bwa=0.7.17
