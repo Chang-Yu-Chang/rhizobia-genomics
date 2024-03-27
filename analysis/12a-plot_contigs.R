@@ -46,10 +46,40 @@ p <- contigs %>%
 
 ggsave(paste0(folder_data, "temp/12a-02-genome_size.png"), plot = p, width = 15, height = 6)
 
-# genome size
-g_size <- contigs %>%
+# contigs
+c_size <- contigs %>%
+    left_join(isolates) %>%
+    filter(population %in% c("VA", "PA")) %>%
     group_by(genome_id) %>%
-    summarize(genome_size = sum(contig_length)/10^6)
+    mutate(contig_size = contig_length/10^6)
 
-range(g_size$genome_size) #  6.691694 14.442432
-mean(g_size$genome_size) # 7.607185
+c_size %>%
+    filter(contig_length > 500000) %>%
+    filter(genome_id != "g28") %>%
+    count() %>%
+    pull(n) %>%
+    range() # 3 5
+
+
+# genome size
+g_size <- c_size %>%
+    group_by(genome_id) %>%
+    summarise(genome_size = sum(contig_length)/10^6)
+
+nrow(g_size) # 32 genomes
+g_size <- g_size %>% filter(genome_size < 14)
+round(range(g_size$genome_size), 2) #   6.79 8.02
+round(median(g_size$genome_size), 2) # 7.25
+
+
+
+
+
+
+
+
+
+
+
+
+
