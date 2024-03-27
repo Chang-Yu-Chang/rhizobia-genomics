@@ -2,7 +2,7 @@
 source ~/.zshrc
 source 00-env_vars.sh
 
-# This script annotates the de novo assembled contigs
+# This script annotates contigs
 
 cd $folder_shell
 

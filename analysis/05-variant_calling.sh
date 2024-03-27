@@ -16,7 +16,7 @@ do
 
     mkdir -p $folder_genomics/variants/$ref
 
-    for i in {1..38}
+    for i in {1..32}
     do
         echo $genome_ids[$i]
         mkdir -p $folder_genomics/variants/$ref/$genome_ids[$i]
@@ -49,7 +49,7 @@ for ref in "wsm419" "em1021"; do;
     cd $folder_genomics/variants/"$ref"_snippy
 
     # Make list of tab
-    for i in {1..38}; do;
+    for i in {1..32}; do;
         echo "$genome_ids[$i]\t$folder_genomics/genomes/$genome_ids[$i].fasta"
     done |> input.tab
 

@@ -2,7 +2,7 @@
 source ~/.zshrc
 source 00-env_vars.sh
 
-# This script annotates the de novo assembled genomes
+# This script annotates genomes
 
 cd $folder_shell
 

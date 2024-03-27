@@ -17,7 +17,7 @@ zsh 04a-make_db.sh \
 
 mkdir -p $folder_genomics/taxonomy
 
-for i in {1..38}
+for i in {1..32}
 do
     echo $genome_ids[$i]
     genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
@@ -30,14 +30,14 @@ do
     #     $genome_fa \
     #     $dir//mash" \
     #     $refseq_db
-    
+
     #Compare strains to database via sourmash
     # mkdir -p $dir/sourmash
     # zsh 04c-sourmash.sh \
     #     $genome_fa \
     #     $dir/sourmash \
     #     $gtdb_db
-    
+
     # Extract 16S rRNA from genome and blast
     # mkdir -p $dir/16s
     # zsh 04d-blast_16s.sh \
@@ -45,7 +45,7 @@ do
     #     $dir/16s/rrna.fasta \
     #     $dir/16s/rrna.txt \
     #     $refseq_16s_db \
-    #     $dir/16s/blast_16s.txt 
+    #     $dir/16s/blast_16s.txt
 
     # # Blast genomes to a customized database of ensifer strains
     mkdir -p $dir/blast_genome
@@ -63,7 +63,7 @@ do
     genome_fa=$folder_genomics/genomes/$ref.fasta
     dir=$folder_genomics/taxonomy/$ref
     mkdir -p $dir
-    
+
     # Extract 16S rRNA from genome and blast
     # mkdir -p $dir/16s
     # zsh 04d-blast_16s.sh \
@@ -71,7 +71,7 @@ do
     #     $dir/16s/rrna.fasta \
     #     $dir/16s/rrna.txt \
     #     $refseq_16s_db \
-    #     $dir/16s/blast_16s.txt 
+    #     $dir/16s/blast_16s.txt
 
     # Blast genomes to a customized database of ensifer strains
     mkdir -p $dir/blast_genome
