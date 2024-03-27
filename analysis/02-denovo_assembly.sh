@@ -21,7 +21,7 @@ do
     zsh 02a-downsample_reads.sh \
         $filtered_reads \
         $downsampled_reads
-    
+
     # Draft genome via miniasm
     mkdir -p $dir/miniasm
     zsh 02b-draft_genome.sh \
@@ -42,18 +42,18 @@ do
     zsh 02d-flye_assembly.sh \
         $downsampled_reads2 \
         $dir/flye
-    
+
     # Polish the assembled genome via medaka
     mkdir -p $dir/medaka
     zsh 02e-medaka_clean.sh \
         $raw_reads \
         $dir/flye/assembly.fasta \
         $dir/medaka
-    
+
     # Remove small contigs
     #mkdir -p $dir/
 
-    
+
 done
 
 # Consolidate genome fasta
@@ -63,19 +63,8 @@ do
     cp $dir/medaka/consensus.fasta $folder_genomics/genomes/$genome_ids[$i].fasta
 done
 
-# Split the genome into contigs
-mamba activate samtools
-mkdir $folder_genomics/contigs
 
-for i in {1..38}; do
-    genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
-    contig_names=($(grep -e "^>" $genome_fa | sed 's/^>//'))
-    # Use samtools faidx to extract each contig and save it to a separate file
-    for cn in "${contig_names[@]}"; do
-        contig_length=$(samtools faidx $genome_fa $cn | wc -c)
-        if [[ $contig_length -gt 10000 ]]
-        then
-            samtools faidx $genome_fa $cn > $folder_genomics/contigs/${genome_ids[$i]}_${cn}.fasta
-        fi
-    done
-done
+
+
+
+

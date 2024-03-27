@@ -13,9 +13,9 @@ do
     # Index the reference genome
     mamba activate minimap2
     minimap2 -d $folder_genomics/genomes/$ref.mmi $folder_genomics/genomes/$ref.fasta
-    
+
     mkdir -p $folder_genomics/variants/$ref
-    
+
     for i in {1..38}
     do
         echo $genome_ids[$i]
@@ -40,4 +40,22 @@ do
             $dir/genome.bam \
             $dir/snippy
     done
+done
+
+
+# Aggregate the vcfs
+for ref in "wsm419" "em1021"; do;
+    mkdir -p $folder_genomics/variants/"$ref"_snippy
+    cd $folder_genomics/variants/"$ref"_snippy
+
+    # Make list of tab
+    for i in {1..38}; do;
+        echo "$genome_ids[$i]\t$folder_genomics/genomes/$genome_ids[$i].fasta"
+    done |> input.tab
+
+    # Generate snippy scripts
+    snippy-multi input.tab --ref $folder_genomics/genomes/$ref.fasta --cpus 16 > runme.sh
+
+    # Run
+    zsh runme.sh
 done
