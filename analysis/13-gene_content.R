@@ -5,20 +5,31 @@ library(tidyverse)
 library(janitor)
 source(here::here("analysis/00-metadata.R"))
 
-genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv")) 
+genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
 isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-#pa <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.csv"))
 pa <- read_delim(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.Rtab"))
 pa <- pa %>% clean_names()
 
 # Transpose the gene presence-absence table
 gpa <- pa %>%
-    pivot_longer(cols = -gene) %>%
-    pivot_wider(names_from = gene, values_from = value, values_fill = 0) 
+    pivot_longer(cols = -gene, names_to = "genome_id") %>%
+    pivot_wider(names_from = gene, values_from = value, values_fill = 0)
 
 write_csv(gpa, paste0(folder_data, "temp/13-gpa.csv"))
 
-# 1. Compute jaccard distance in gene presence and absence 
+#
+genes_g2 <- gpa %>%
+    pivot_longer(cols = -genome_id) %>%
+    filter(genome_id == "g2") %>%
+    filter(value == 1)
+#
+#gff_g2 <- readGFF(paste0(folder_data, "genomics/gff/g2.gff")) %>% as_tibble %>% clean_names()
+gff_g2 %>% filter(name %in% genes_g2$name)
+
+
+
+
+# 1. Compute jaccard distance in gene presence and absence
 pat <- t(as.matrix(pa[,-1]))
 dim(pat) # 41 x 31964
 rownames(pat) <- colnames(pa)[-1]
@@ -46,7 +57,7 @@ dist_fluidity <- dist_jaccard %>%
     mutate(d_fluidity = NA)
 
 for (i in 1:nrow(dist_fluidity)) {
-    pa_i <- pa[,c(dist_fluidity$genome_id1[i], dist_fluidity$genome_id2[i])] 
+    pa_i <- pa[,c(dist_fluidity$genome_id1[i], dist_fluidity$genome_id2[i])]
     pa_i <- pa_i[pa_i[,dist_fluidity$genome_id1[i]] == 1 | pa_i[,dist_fluidity$genome_id2[i]] == 1,]
     dist_fluidity$d_fluidity[i] <- fluidity(pa_i)
 }
@@ -61,7 +72,7 @@ pd <- clean_names(pd) %>%
     select(genome_id = gff_file, contig_id = scaffold_name, annotation_id, description) %>%
     mutate(annotation_id = str_remove(annotation_id, ".+/genomes/"))
 
-gpa <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.csv")) 
+gpa <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.csv"))
 gpa <- gpa %>%
     clean_names() %>%
     select(starts_with("g"), em1021, em1022, usda1106, wsm419) %>%
@@ -76,11 +87,11 @@ pa_c <- gpa %>%
     #' The actual gene number in gpa is correct, but there are some genes in gpa that are not present in pd
     #' So I am not able to assign those genes to contigs
     drop_na(contig_id) %>%
-    mutate(contig_id = paste0(genome_id, "_", contig_id)) 
+    mutate(contig_id = paste0(genome_id, "_", contig_id))
 
 nrow(pa_c) # 284528
 
-# 
+#
 pa_ct <- pa_c %>%
     select(contig_id, gene) %>%
     mutate(value = 1) %>%

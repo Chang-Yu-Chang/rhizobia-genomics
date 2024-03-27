@@ -6,7 +6,7 @@ source 00-env_vars.sh
 mamba activate ncbi-datasets
 
 # Download the 18 Ensifer genomes
-table_file=$folder_data/raw/ensifer_ncbi.csv 
+table_file=$folder_data/raw/ensifer_ncbi.csv
 list_accessions=("${(@f)$(cat $table_file | cut -d ',' -f 1)}")
 list_species=("${(@f)$(cat $table_file | cut -d ',' -f 2)}")
 list_strains=("${(@f)$(cat $table_file | cut -d ',' -f 3)}")
@@ -44,10 +44,10 @@ mv ncbi_dataset/data ncbi_genomes
 rm -rf README.md ensifer_ncbi.zip ncbi_dataset
 
 # Move the genome files
-mkdir -p $folder_genomics/genomes
+mkdir -p $folder_genomics/fasta/genomes
 n_strains="${#list_strains}"
-for i in {1..$n_strains}; do    
-    cp $folder_genomics/ncbi_genomes/$list_accessions[$i]/*_genomic.fna $folder_genomics/genomes/$list_strains[$i].fasta
+for i in {1..$n_strains}; do
+    cp $folder_genomics/ncbi_genomes/$list_accessions[$i]/*_genomic.fna $folder_genomics/fasta/genomes/$list_strains[$i].fasta
 done
 
 # Remove the zip folder

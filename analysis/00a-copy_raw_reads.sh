@@ -10,8 +10,8 @@ batch_names=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 1)}")
 sample_names=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 2)}")
 genome_ids=("${(@f)$(tail -n +2 $table_file | cut -d ',' -f 3)}")
 
-for i in {1..38}
-do 
+for i in {1..32}
+do
     cp $folder_data/raw/$batch_names[$i]/$sample_names[$i]/reads/raw_reads.fastq.gz \
         $folder_genomics/raw_reads/$genome_ids[$i].fastq.gz
 done
