@@ -22,7 +22,6 @@ genes_g2 <- gpa %>%
     pivot_longer(cols = -genome_id) %>%
     filter(genome_id == "g2") %>%
     filter(value == 1)
-#
 #gff_g2 <- readGFF(paste0(folder_data, "genomics/gff/g2.gff")) %>% as_tibble %>% clean_names()
 gff_g2 %>% filter(name %in% genes_g2$name)
 

@@ -149,6 +149,12 @@ mamba create -n seqtk
 mamba activate seqtk
 mamba install --yes -c bioconda seqtk=1.4
 
+# Install iqtree v2.3.0
+# iqtree is an Efficient phylogenomic software by maximum likelihood.
+mamba create -n iqtree
+mamba activate iqtree
+mamba install --yes -c bioconda iqtree=2.3.0
+
 
 
 

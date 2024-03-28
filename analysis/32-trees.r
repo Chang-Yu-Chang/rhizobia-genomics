@@ -36,7 +36,7 @@ dists_species <- dists %>%
         species1 == "meliloti" & species2 == "meliloti" ~ "meliloti pair"
     ))
 
-# Make trees
+# Make NJ trees
 make_tree <- function(di, d_trait) {
     #' This functions creates a phylo object from a long-format distance matrix
     if (d_trait %in% paste0("d_", list_traits)) {
@@ -44,19 +44,19 @@ make_tree <- function(di, d_trait) {
         di <- bind_cols(select(di, genome_id1, genome_id2), tibble(dd = unlist(di[,d_trait]))) %>%
             filter(genome_id1 %in% list_avails, genome_id2 %in% list_avails)
     } else {
-        di <- bind_cols(select(di, genome_id1, genome_id2), tibble(dd = unlist(di[,d_trait]))) 
+        di <- bind_cols(select(di, genome_id1, genome_id2), tibble(dd = unlist(di[,d_trait])))
     }
     colnames(di)[3] <- "dd"
-    dist1 <- tibble(genome_id1 = di$genome_id1, genome_id2 = di$genome_id2, dd = di$dd) 
+    dist1 <- tibble(genome_id1 = di$genome_id1, genome_id2 = di$genome_id2, dd = di$dd)
     dist1_swapped <- tibble(genome_id1 = di$genome_id2, genome_id2 = di$genome_id1, dd = di$dd)
     dist1_swapped <- filter(dist1_swapped, genome_id1 != genome_id2)
     dist2 <- bind_rows(dist1, dist1_swapped) %>%
         drop_na(dd) %>%
         pivot_wider(names_from = genome_id2, values_from = dd) %>%
         select(-genome_id1) %>%
-        as.matrix() 
+        as.matrix()
     tree <- dist2 %>%
-        nj() 
+        nj()
     return(tree)
 }
 
@@ -69,19 +69,19 @@ for (i in 1:length(list_dists)) list_trees[[i]] <- dists %>% make_tree(paste0("d
 list_trees_meliloti <- rep(list(NA), length(list_dists))
 names(list_trees_meliloti) <- list_dists
 for (i in 1:length(list_dists)) {
-    list_trees_meliloti[[i]] <- dists_species %>% 
+    list_trees_meliloti[[i]] <- dists_species %>%
         filter(species_pair == "meliloti pair") %>%
         make_tree(paste0("d_", list_dists[i]))
-} 
+}
 
 # medicae
 list_trees_medicae <- rep(list(NA), length(list_dists))
 names(list_trees_medicae) <- list_dists
 for (i in 1:length(list_dists)) {
-    list_trees_medicae[[i]] <- dists_species %>% 
+    list_trees_medicae[[i]] <- dists_species %>%
         filter(species_pair == "medicae pair") %>%
         make_tree(paste0("d_", list_dists[i]))
-} 
+}
 
 
 # Make phylo object
@@ -93,23 +93,23 @@ dist_genetics_contigs <- read_csv(paste0(folder_data, 'temp/19-dist_genetics_con
 contigs <- read_csv(paste0(folder_data, 'temp/14-contigs.csv'))
 dist_genetics_contigs <- dist_genetics_contigs %>%
     left_join(rename(rename_all(contigs, ~ paste0(.x, "1")))) %>%
-    left_join(rename(rename_all(contigs, ~ paste0(.x, "2")))) 
+    left_join(rename(rename_all(contigs, ~ paste0(.x, "2"))))
 
 
 make_tree_c <- function(di, d_trait) {
     #' This functions creates a phylo object from a long-format distance matrix
-    di <- bind_cols(select(di, contig_id1, contig_id2), tibble(dd = unlist(di[,d_trait]))) 
+    di <- bind_cols(select(di, contig_id1, contig_id2), tibble(dd = unlist(di[,d_trait])))
     colnames(di)[3] <- "dd"
-    dist1 <- tibble(contig_id1 = di$contig_id1, contig_id2 = di$contig_id2, dd = di$dd) 
+    dist1 <- tibble(contig_id1 = di$contig_id1, contig_id2 = di$contig_id2, dd = di$dd)
     dist1_swapped <- tibble(contig_id1 = di$contig_id2, contig_id2 = di$contig_id1, dd = di$dd)
     dist1_swapped <- filter(dist1_swapped, contig_id1 != contig_id2)
     dist2 <- bind_rows(dist1, dist1_swapped) %>%
         drop_na(dd) %>%
         pivot_wider(names_from = contig_id2, values_from = dd) %>%
         select(-contig_id1) %>%
-        as.matrix() 
+        as.matrix()
     tree <- dist2 %>%
-        nj() 
+        nj()
     return(tree)
 }
 
@@ -124,7 +124,7 @@ list_trees_contigs <- list(
 )
 
 
-save(list_trees, list_trees_meliloti, list_trees_medicae, list_trees_contigs, 
+save(list_trees, list_trees_meliloti, list_trees_medicae, list_trees_contigs,
     file = paste0(folder_data, "temp/32-trees.RData"))
 
 if (FALSE) {
