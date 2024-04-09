@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
 
-# This extracts the rRNA sequences from the genome fasta and blast
+# This makes a custom blast database
 # $1: $folder_genomics
 # $2: list of genomes
 
