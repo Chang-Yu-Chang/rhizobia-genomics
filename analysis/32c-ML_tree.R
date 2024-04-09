@@ -8,10 +8,12 @@ library(phangorn)
 library(tidytree)
 source(here::here("analysis/00-metadata.R"))
 
-tr <- read.tree(paste0(folder_data, "genomics/mltree/aarA/aln.treefile"))
+#tr <- read.tree(paste0(folder_data, "genomics/mltree/aarA/aln.treefile"))
+tr <- read.tree(paste0(folder_data, "genomics/mltree/core/aln.treefile"))
 plot(tr)
-
-
+class(tr)
+tr$edge.length
+tr$tip.label
 
 
 if (FALSE) {

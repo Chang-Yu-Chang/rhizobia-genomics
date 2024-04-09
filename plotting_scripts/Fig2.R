@@ -101,7 +101,7 @@ p2 <- igcl %>%
     scale_fill_manual(values = site_group_colors) +
     scale_x_discrete(expand = c(0,0)) +
     scale_y_continuous(limits = c(0, bar_y*1.1)) +
-    facet_grid(.~population, scales = "free_x") +
+    facet_grid(.~population, scales = "free_x", labeller = labeller(population = c(VA = "mountain", PA = "city"))) +
     theme_classic() +
     theme(
         panel.spacing.x = unit(2, "mm"),
@@ -185,7 +185,7 @@ p3 <- pl %>%
     scale_fill_manual(values = site_group_colors) +
     scale_x_discrete(expand = c(0,0)) +
     scale_y_continuous(limits = c(0, bar_y*1.1)) +
-    facet_grid(.~population, scales = "free_x") +
+    facet_grid(.~population, scales = "free_x", labeller = labeller(population = c(VA = "mountain", PA = "city"))) +
     theme_classic() +
     theme(
         panel.spacing.x = unit(2, "mm"),
@@ -210,7 +210,7 @@ plot_pca <- function (isolates_i, eig1, eig2) {
         geom_hline(yintercept = 0, linetype = 2, color = "grey80") +
         geom_point(aes(x = PC1, y = PC2, color = site_group), shape = 21, size = 3, stroke = 1) +
         scale_color_manual(values = site_group_colors) +
-        facet_grid(.~population) +
+        facet_grid(.~population, labeller = labeller(population = c(VA = "mountain", PA = "city"))) +
         theme_classic() +
         theme(
             panel.border = element_rect(color = "black", fill = NA, linewidth = 1),

@@ -1,4 +1,4 @@
-#' This script assigns the taxonomy 
+#' This script assigns the taxonomy
 
 renv::load()
 library(tidyverse)
@@ -10,12 +10,12 @@ isolates <- isolates %>% drop_na(exp_id)
 names_blast <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
 # 1. Aggregate the 16s blast results
-# Read the reference 
+# Read the reference
 ref_16s_seq <- Biostrings::readDNAStringSet("~/bioinformatics/16s/refseq_16s.fasta")
-ref_16s <- tibble(accession = str_remove(names(ref_16s_seq), "\\s.+"), 
-    scomment = str_remove(names(ref_16s_seq), "^[A-Z]+_[\\d]+.\\d\\s")) 
+ref_16s <- tibble(accession = str_remove(names(ref_16s_seq), "\\s.+"),
+    scomment = str_remove(names(ref_16s_seq), "^[A-Z]+_[\\d]+.\\d\\s"))
 
-# Read the blast results 
+# Read the blast results
 list_b_16s <- rep(list(NA), nrow(isolates))
 for (i in 1:nrow(isolates)) {
     list_b_16s[[i]] <- read_table(paste0(folder_data, "genomics/taxonomy/", isolates$genome_id[i],"/16s/blast_16s.txt"), col_names = names_blast) %>%
@@ -38,8 +38,8 @@ write_csv(b_16s, paste0(folder_data, "temp/14-b_16s.csv"))
 
 # 2. Aggregate the genome blast results
 ref_genome_seq <- Biostrings::readDNAStringSet(paste0(folder_data, "genomics/blast_db/genomes.fasta"))
-ref_genome <- tibble(accession = str_remove(names(ref_genome_seq), "\\s.+"), 
-    scomment = str_remove(names(ref_genome_seq), "^[A-Z]+_[A-Z\\d]+.\\d\\s")) 
+ref_genome <- tibble(accession = str_remove(names(ref_genome_seq), "\\s.+"),
+    scomment = str_remove(names(ref_genome_seq), "^[A-Z]+_[A-Z\\d]+.\\d\\s"))
 ref_genome <- ref_genome %>%
     rowwise() %>%
     mutate(species = str_split(scomment, " ")[[1]] %>% `[`(2)) %>%
@@ -50,7 +50,7 @@ ref_genome <- ref_genome %>%
         str_detect(scomment, "ctg") ~ str_extract(scomment, "ctg\\d+"),
         #str_detect(scomment, "ctg") ~ str_replace(scomment, ".+ctg", "ctg", ) %>% str_replace("ctg\\d+ .+", "ctg\\d+"),
         str_detect(scomment, "plasmid") ~ str_extract(scomment, "plasmid [A-Z|0-9|a-z|_]+")
-    )) 
+    ))
 # Manually correct the comments
 # NC_003047.1 is 1021 chromsome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000006965.1/
 # NC_009636.1 is WSM419 chromosome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000017145.1/
@@ -72,7 +72,7 @@ b_genome <- b_genome %>%
     filter(pident > 90, bitscore > 10000) %>%
     group_by(genome_id, qseqid) %>%
     arrange(desc(bitscore)) %>%
-    #slice(1) %>%
+    slice(1) %>%
     mutate(accession = sseqid) %>%
     left_join(ref_genome) %>%
     select(genome_id, qseqid, scomment, everything()) %>%
@@ -82,8 +82,8 @@ b_genome <- b_genome %>%
 write_csv(ref_genome, paste0(folder_data, "temp/14-ref_genome.csv"))
 write_csv(b_genome, paste0(folder_data, "temp/14-b_genome.csv"))
 
-# Out put for each contig, the best alignment
-isolates_contigs <- read_csv(paste0(folder_data, 'temp/12-contigs.csv'))
+# Output for each contig, the best alignment
+contigs <- read_csv(paste0(folder_data, 'temp/12-contigs.csv'))
 
 contigs <- b_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
@@ -116,14 +116,17 @@ unique(contigs$replicon)
 write_csv(contigs, paste0(folder_data, "temp/14-contigs.csv"))
 
 # 3. Assign isolates to taxonomy
+b_genome <- read_csv(paste0(folder_data, "temp/14-b_genome.csv"))
 contigs <- read_csv(paste0(folder_data, "temp/12-contigs.csv"))
 isolates_contigs <- b_genome %>%
     rename(contig_id = qseqid) %>%
     left_join(contigs) %>%
-    filter(contig_length > 1000000) %>%
-    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    filter(replicon == "chromosome") %>%
+    group_by(genome_id) %>%
     arrange(genome_id, desc(contig_length)) %>%
-    ungroup() 
+    slice(1) %>%
+    select(genome_id, contig_id, scomment, species, strain, contig_length) %>%
+    ungroup()
 
 write_csv(isolates_contigs, paste0(folder_data, "temp/14-isolates_contigs.csv"))
 
