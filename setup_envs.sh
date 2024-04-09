@@ -155,11 +155,6 @@ mamba create -n iqtree
 mamba activate iqtree
 mamba install --yes -c bioconda iqtree=2.3.0
 
-
-
-
-
-
 # Install pyseer v1.3.11
 # Sequence Element Enrichment Analysis (SEER)
 # pyseer uses linear models with fixed or mixed effects to estimate the effect of genetic variation in a bacterial population on a phenotype of interest, while accounting for potentially very strong confounding population structure. This allows for genome-wide association studies (GWAS) to be performed in clonal organisms such as bacteria and viruses.
@@ -167,9 +162,8 @@ mamba create -n pyseer
 mamba activate pyseer
 mamba install --yes -c bioconda pyseer=1.3.11
 
-
-# # Install bwa v0.7.17
-# # BWA is a software package for mapping low-divergent sequences against a large reference genome,
-# mamba create -y -n bwa
-# mamba activate bwa
-# mamba install --yes -c bioconda bwa=0.7.17
+# Install bwa v0.7.17
+# BWA is a software package for mapping low-divergent sequences against a large reference genome,
+mamba create -y -n bwa
+mamba activate bwa
+mamba install --yes -c bioconda bwa=0.7.17

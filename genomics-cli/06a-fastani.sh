@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
 
-# This calculate the genomic ANI between a list of genomes
+# This calculates the genomic ANI between a list of genomes
 # $1: list of genomes for ani in txt
 # $2: fasani output in out
 

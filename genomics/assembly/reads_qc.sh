@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
-source 00-env_vars.sh
+source ../00-env_vars.sh
 
 # This script performs quality control on the raw nanapore whole-genome long reads
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
 
-# This blast the whole genome across the database
+# This blasts the whole genome across the database
 # $1: genome in fasta
 # $2: genomes_db
 # $3: output blast prediction in txt

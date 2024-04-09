@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
 
-# This extract the filtered reads into a txt file
+# This extracts the filtered reads into a txt file
 # $1: filtered_reads in fastq.gz
 # $2: filtered_reads in txt
 

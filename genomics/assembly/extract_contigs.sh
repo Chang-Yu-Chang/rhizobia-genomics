@@ -1,13 +1,13 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
-source 00-env_vars.sh
+source ../00-env_vars.sh
 
 # This script splits each genome into contigs
 
 mamba activate samtools
 mkdir -p $folder_genomics/fasta/contigs
 
-# Assembled genomes
+## Assembled genomes
 for i in {1..32}; do
     genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
     contig_names=($(grep -e "^>" $genome_fa | sed 's/^>//'))
@@ -23,7 +23,7 @@ for i in {1..32}; do
     done
 done
 
-# Reference genomes
+## Reference genomes
 mamba activate seqtk
 
 ## Undo soft wrap
