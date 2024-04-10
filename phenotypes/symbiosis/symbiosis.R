@@ -1,10 +1,10 @@
-#' This script tidy up the data of plant inoculation experiments
-#' This script analyses the hand measured phenotypes: dry weight, nodule count, root weight, nodule weight
+#' This script analyses the data from plant inoculation experiments
+#' including traits: dry weight, nodule count, root weight, nodule weight
 
 renv::load()
 library(tidyverse)
 library(janitor)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 treatments_ttb <- read_csv(paste0(folder_data, "raw/rhizobia/Terrence/corrected.csv")) %>% clean_names()

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 source ~/.zshrc
-source ../00-env_vars.sh
+source ../env_vars.sh
 
 # This script assembles the genomes from raw reads following the plasmidsaurus pipeline
 

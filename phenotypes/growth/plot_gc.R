@@ -14,8 +14,8 @@ gc_prm_summs <- read_csv(paste0(folder_phenotypes, 'growth/gc_prm_summs.csv'))
 
 
 # 0. clean up data
-factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id), temperature = factor(temperature, c("25c", "30c", "35c", "40c")))
-isolates_mapping <- isolates_mapping %>% mutate(exp_id = factor(exp_id, isolates_mapping$exp_id))
+factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates$exp_id), temperature = factor(temperature, c("25c", "30c", "35c", "40c")))
+isolates <- isolates %>% mutate(exp_id = factor(exp_id, isolates$exp_id))
 gc_summs <- factorize_vars(gc_summs)
 gc_prms <- factorize_vars(gc_prms)
 gc_summs <- factorize_vars(gc_summs)
@@ -28,7 +28,7 @@ isolates_gc <- gc_prm_summs %>%
 
 # 1. Plot all growth traits
 p <- gcs %>%
-    mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
+    mutate(exp_id = factor(exp_id, isolates$exp_id)) %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, group = well)) +
     facet_wrap(~temperature, nrow = 2) +
@@ -41,11 +41,11 @@ p <- gcs %>%
     guides() +
     labs(x = "time (hr)")
 
-ggsave(paste0(folder_data, "temp/21a-01-gc_raw.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_phenotypes, "growth/01-gc_raw.png"), p, width = 10, height = 8)
 
 # 2. Growth curves by well
 p <- gcs %>%
-    mutate(exp_id = factor(exp_id, isolates_mapping$exp_id)) %>%
+    mutate(exp_id = factor(exp_id, isolates$exp_id)) %>%
     ggplot() +
     geom_line(aes(x = t, y = abs, color = exp_id, alpha = temperature), linewidth = 1) +
     scale_x_continuous(breaks = seq(0, 48, 12)) +
@@ -61,7 +61,7 @@ p <- gcs %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "temp/21a-02-gc_raw_grid.png"), p, width = 20, height = 15)
+ggsave(paste0(folder_phenotypes, "growth/02-gc_raw_grid.png"), p, width = 20, height = 15)
 
 # 3. Plot the pairwise comparison of the r
 plot_dots <- function(tb_wide, trait1, trait2, axis_lower, axis_upper) {
@@ -92,7 +92,7 @@ p <- plot_grid(p1, p2, p3, NULL, p4, p5, NULL, NULL, p6,
     nrow = 3, align = "hv", axis = "tblr", scale = 0.95, labels = c("A", "B", "C", "", "D", "E", "", "", "F")
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 p
-ggsave(paste0(folder_data, "temp/21a-03-r_pairs.png"), p, width = 9, height = 9)
+ggsave(paste0(folder_phenotypes, "growth/03-r_pairs.png"), p, width = 9, height = 9)
 
 # 4. plot the lag pairs
 range(c(isolates_gc$lag_25c, isolates_gc$lag_30c, isolates_gc$lag_35c ,isolates_gc$lag_40c), na.rm = T)
@@ -107,7 +107,7 @@ p <- plot_grid(p1, p2, p3, NULL, p4, p5, NULL, NULL, p6,
     nrow = 3, align = "hv", axis = "tblr", scale = 0.95, labels = c("A", "B", "C", "", "D", "E", "", "", "F")
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(paste0(folder_data, "temp/21a-04-lag_pairs.png"), p, width = 9, height = 9)
+ggsave(paste0(folder_phenotypes, "growth/04-lag_pairs.png"), p, width = 9, height = 9)
 
 # 4. plot the lag pairs
 range(c(isolates_gc$maxOD_25c, isolates_gc$maxOD_30c, isolates_gc$maxOD_35c ,isolates_gc$maxOD_40c), na.rm = T)
@@ -122,142 +122,4 @@ p <- plot_grid(p1, p2, p3, NULL, p4, p5, NULL, NULL, p6,
     nrow = 3, align = "hv", axis = "tblr", scale = 0.95, labels = c("A", "B", "C", "", "D", "E", "", "", "F")
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(paste0(folder_data, "temp/21a-05-maxOD_pairs.png"), p, width = 9, height = 9)
-
-
-
-if (FALSE) {
-
-# 3. Average OD by exp_id
-p <- gc_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot() +
-    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, alpha = temperature)) +
-    scale_x_continuous(breaks = seq(0, 48, 12)) +
-    scale_alpha_manual(values = c("25c" = 0.1, "30c" = 0.4, "35c" = 0.7, "40c" = 1)) +
-    #geom_ribbon(aes(x = t, ymin = mean_abs - sd_abs, ymax = mean_abs + sd_abs, fill = rhizobia_site), alpha = 0.2) +
-    facet_wrap(~exp_id, ncol = 4) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    scale_fill_manual(values = rhizobia_site_colors) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA),
-        panel.grid.major.x = element_line(color = "grey90")
-    ) +
-    #guides(color = "none", fill = "none") +
-    labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/21a-03-gc_mean.png"), p, width = 8, height = 12)
-
-# 4. Average OD by exp_id, overlayed
-p <- gc_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot(aes(group = exp_id)) +
-    geom_line(aes(x = t, y = mean_abs, color = rhizobia_site, group = exp_id)) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    facet_grid(.~temperature) +
-    #scale_fill_manual(values = rhizobia_site_colors) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA),
-        panel.grid.major.x = element_line(color = "grey90"),
-        legend.position = "top"
-    ) +
-    labs(x = "time (hrs)", y = expression(OD[600]))
-ggsave(paste0(folder_data, "temp/21a-04-gc_mean_overlay.png"), p, width = 12, height = 4)
-
-
-# 5. plot all trait mean by strain_site_group
-p1 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot(aes(x = rhizobia_site, y = lag, fill = rhizobia_site)) +
-    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
-    geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    scale_fill_manual(values = rhizobia_site_colors) +
-    facet_grid(.~temperature) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank()
-    ) +
-    guides(fill = "none") +
-    labs(x = "", y = "lag time (hr)")
-
-p2 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot(aes(x = rhizobia_site, y = r, fill = rhizobia_site)) +
-    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
-    geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    scale_fill_manual(values = rhizobia_site_colors) +
-    facet_grid(.~temperature) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank()
-    ) +
-    guides(fill = "none") +
-    labs(x = "", y = expression(growth~rate(h^-1)))
-
-p3 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot(aes(x = rhizobia_site, y = maxOD, fill = rhizobia_site)) +
-    geom_boxplot(alpha = .6, outlier.size = 0, color = "black") +
-    geom_jitter(shape = 21, width = 0, height = 0, size = 2, stroke = 1) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    scale_fill_manual(values = rhizobia_site_colors) +
-    facet_grid(.~temperature) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        axis.text.x = element_blank(),
-        legend.position = "right"
-    ) +
-    guides() +
-    labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
-
-p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
-ggsave(paste0(folder_data, "temp/21a-05-gc_trait_site.png"), p, width = 8, height = 12)
-
-# 6. reaction norm
-p1 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot() +
-    geom_line(aes(x = temperature, y = lag, group = exp_id, color = rhizobia_site)) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        legend.position = "none"
-    ) +
-    guides() +
-    labs(x = "", y = "lag time (hr)")
-
-p2 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot() +
-    geom_line(aes(x = temperature, y = r, group = exp_id, color = rhizobia_site)) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1)
-    ) +
-    guides() +
-    labs(x = "", y = expression(growth~rate(h^-1)))
-
-p3 <- gc_prm_summs %>%
-    left_join(isolates_mapping) %>%
-    ggplot() +
-    geom_line(aes(x = temperature, y = maxOD, group = exp_id, color = rhizobia_site)) +
-    scale_color_manual(values = rhizobia_site_colors) +
-    theme_classic() +
-    theme(
-        panel.border = element_rect(color = 1, fill = NA, linewidth = 1),
-        legend.position = "none"
-    ) +
-    guides() +
-    labs(x = "", y = expression(paste("max", "[", OD[600], "]")))
-
-p <- plot_grid(p1, p2, p3, nrow = 3, axis = "tbrl", align = "v")
-ggsave(paste0(folder_data, "temp/21a-06-reaction_norm.png"), p, width = 6, height = 12)
-
+ggsave(paste0(folder_phenotypes, "growth/05-maxOD_pairs.png"), p, width = 9, height = 9)

@@ -1,5 +1,4 @@
-#' This script uses DAYMET https://daymet.ornl.gov/ database to extract the
-#' climate for our sampling sites given the coordinate
+#' This script uses DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
 
 renv::load()
 library(daymetr)
@@ -8,8 +7,7 @@ library(janitor)
 library(RColorBrewer)
 library(elevatr) # for getting elevation
 library(sf)
-source(here::here("analysis/00-metadata.R"))
-
+source(here::here("metadata.R"))
 
 dms2dec <- function(x) {
     #' convert degree-minute-second coordinate to decimal
@@ -21,13 +19,11 @@ dms2dec <- function(x) {
         }) %>%
         return
 }
-sites_mlbs <- readxl::read_excel(paste0(folder_data, "raw/High and low elevation sites_Sept 2022.xlsx"))
-sites_phila <- read_csv(paste0(folder_data, "raw/sites_phila.csv"), show_col_types = F) %>%
+sites_mlbs <- readxl::read_excel(paste0(folder_phenotypes, "raw/High and low elevation sites_Sept 2022.xlsx"))
+sites_phila <- read_csv(paste0(folder_phenotypes, "raw/sites_phila.csv"), show_col_types = F) %>%
     drop_na() %>%
     mutate(description = tolower(description) %>% str_remove("'")) %>%
     separate(col = coord, into = c("latitude_dec", "longitude_dec"), sep = ",\\s", convert = T)
-
-
 
 # 0. Clean up the site coordinates
 # mlbs
@@ -54,11 +50,11 @@ sites_phila <- sites_phila %>%
     select(site_group, site, latitude_dec, longitude_dec, elevation_m)
 
 # bind rows
-sites <- bind_rows(mutate(sites_mlbs, population = "VA"), 
-        mutate(sites_phila, population = "PA")) %>%
-    select(population, everything())
+sites <- bind_rows(mutate(sites_mlbs, population = "VA"), mutate(sites_phila, population = "PA")) %>%
+    select(population, everything()) %>%
+    mutate(across(c(latitude_dec, longitude_dec, elevation_m), function (x) {round(x, 2)}))
 
-write_csv(sites, paste0(folder_data, "temp/22-sites.csv"))
+write_csv(sites, paste0(folder_phenotypes, "sites/sites.csv"))
 
 # 1. Extract the climatology data from Daymet
 list_dm <- rep(list(NA), nrow(sites))
@@ -80,12 +76,10 @@ dml <- bind_rows(list_dm) %>%
     left_join(sites) %>%
     select(population, site_group, site, everything())
 
-write_csv(dml, paste0(folder_data, "temp/22-dml.csv"))
+write_csv(dml, paste0(folder_phenotypes, "sites/dml.csv"))
 
 
-
-
-# 2. Resample the temperature difference between paire sites
+# 2. Resample the temperature difference between paired sites
 tb <- crossing(population = c("VA", "PA"), variable = c("tmax_deg_c", "tmin_deg_c"), yday = 1:365)
 
 compute_diff <- function(dml, pop, y, variable) {
@@ -98,7 +92,7 @@ compute_diff <- function(dml, pop, y, variable) {
     }
     sample_var1 <- sample(var1, n_resample, replace = T)
     sample_var2 <- sample(var2, n_resample, replace = T)
-    return(tibble(resample = 1:n_resample, 
+    return(tibble(resample = 1:n_resample,
             sample_var1 = sample_var1,
             sample_var2 = sample_var2,
             diff_var = sample_var1 - sample_var2
@@ -107,8 +101,6 @@ compute_diff <- function(dml, pop, y, variable) {
 
 set.seed(1)
 n_resample <- 100
-# filter(dml, population == "PA", site_group == "suburban", yday == 1) %>% pull(tmax_deg_c)
-# filter(dml, population == "PA", site_group == "urban", yday == 1) %>% pull(tmax_deg_c)
 
 tbs <- tb %>%
     rowwise() %>%
@@ -118,46 +110,7 @@ diff_vars <- tbs %>%
     ungroup() %>%
     unnest(cols = samples)
 
-write_csv(diff_vars, paste0(folder_data, "temp/22-diff_vars.csv"))
-
-if(F) {
-
-## VA tmax
-set.seed(1)
-n_resample <- 100
-list_diff_tmax <- rep(list(tibble(resample = 1:n_resample)), 365)
-for (d in 1:365) {
-    tmax_H <- dml %>% filter(population == "VA", site_group == "high elevation", yday == d) %>% pull(tmax_deg_c)
-    tmax_L <- dml %>% filter(population == "VA", site_group == "low elevation", yday == d) %>% pull(tmax_deg_c)
-    sampled_tmax_H <- sample(tmax_H, n_resample, replace = T)
-    sampled_tmax_L <- sample(tmax_L, n_resample, replace = T)
-    list_diff_tmax[[d]]$yday <- d
-    list_diff_tmax[[d]]$diff_tmax <- sampled_tmax_L - sampled_tmax_H
-    cat("\t", d)
-}
-
-diff_tmax <- bind_rows(list_diff_tmax)
-#write_csv(diff_tmax, paste0(folder_data, "temp/22-diff_tmax.csv"))
-
-## VA tmin
-set.seed(1)
-n_resample <- 100
-list_diff_tmin <- rep(list(tibble(resample = 1:n_resample)), 365)
-for (d in 1:365) {
-    tmin_H <- dml %>% filter(population == "VA", site_group == "high elevation", yday == d) %>% pull(tmin_deg_c)
-    tmin_L <- dml %>% filter(population == "VA", site_group == "low elevation", yday == d) %>% pull(tmin_deg_c)
-    sampled_tmin_H <- sample(tmin_H, n_resample, replace = T)
-    sampled_tmin_L <- sample(tmin_L, n_resample, replace = T)
-    list_diff_tmin[[d]]$yday <- d
-    list_diff_tmin[[d]]$diff_tmin <- sampled_tmin_L - sampled_tmin_H
-    cat("\t", d)
-}
-
-diff_tmin <- bind_rows(list_diff_tmin)
-write_csv(diff_tmin, paste0(folder_data, "temp/22-diff_tmin.csv"))
-}
-
-
+write_csv(diff_vars, paste0(folder_phenotypes, "sites/diff_vars.csv"))
 
 # 3. Shade for month
 tb_season <- dml %>%
@@ -199,7 +152,7 @@ tb_month <- dml %>%
     mutate(ymonth = factor(ymonth)) %>%
     ungroup()
 
-write_csv(tb_summer, paste0(folder_data, "temp/22-tb_summer.csv"))
-write_csv(tb_season, paste0(folder_data, "temp/22-tb_season.csv"))
-write_csv(tb_month, paste0(folder_data, "temp/22-tb_month.csv"))
+write_csv(tb_summer, paste0(folder_phenotypes, "sites/tb_summer.csv"))
+write_csv(tb_season, paste0(folder_phenotypes, "sites/tb_season.csv"))
+write_csv(tb_month, paste0(folder_phenotypes, "sites/tb_month.csv"))
 
