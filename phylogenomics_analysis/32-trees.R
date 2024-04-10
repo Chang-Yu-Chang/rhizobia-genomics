@@ -5,7 +5,7 @@ library(tidyverse)
 library(janitor)
 library(ape)
 library(tidytree)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 #gd <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_data.csv"))
 dists <- read_csv(paste0(folder_data, 'temp/31-dists.csv'))
