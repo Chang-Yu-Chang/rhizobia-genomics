@@ -6,8 +6,8 @@ library(janitor)
 library(seqinr)
 source(here::here("analysis/00-metadata.R"))
 
-genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
-filtered_reads <- read_csv(paste0(folder_data, "temp/11-filtered_reads.csv"))
+genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
+filtered_reads <- read_csv(paste0(folder_data, "genomics_analysis/raw_reads/filtered_reads.csv"))
 
 # Remove reads that are too long
 sum(filtered_reads$length > 80000) # 9 reads with > 80kb length
@@ -42,9 +42,9 @@ p <- filtered_reads %>%
     guides() +
     labs(x = "read length (kb)", y = "mean Phred")
 
-ggsave(paste0(folder_data, "temp/11a-01-length_vs_q.png"), p, width = 10, height = 10)
+ggsave(paste0(folder_data, "genomics_analysis/raw_reads/01-length_vs_q.png"), p, width = 10, height = 10)
 
-# 2. histogram of read length 
+# 2. histogram of read length
 p <- filtered_reads %>%
     ggplot() +
     geom_histogram(aes(x = length/1000), color = "black", fill = "white", binwidth = 1) +
@@ -54,7 +54,7 @@ p <- filtered_reads %>%
     guides() +
     labs(x = "read length (kb)", y = "read count")
 
-ggsave(paste0(folder_data, "temp/11a-02-read_length.png"), p, width = 10, height = 10)
+ggsave(paste0(folder_data, "genomics_analysis/raw_reads/02-read_length.png"), p, width = 10, height = 10)
 
 #
 range(filtered_reads_median$median_length) # 2748 5367
@@ -69,7 +69,7 @@ p <- filtered_reads %>%
     guides() +
     labs(x = "read length (kb)", y = " # of bases (kb)")
 
-ggsave(paste0(folder_data, "temp/11a-03-weighted_read_length.png"), p, width = 10, height = 10)
+ggsave(paste0(folder_data, "genomics_analysis/raw_reads/03-weighted_read_length.png"), p, width = 10, height = 10)
 
 #
 range(filtered_reads_median$median_q_score) # 18.26 20.24

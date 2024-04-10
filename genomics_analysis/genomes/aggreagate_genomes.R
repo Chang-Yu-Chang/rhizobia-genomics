@@ -6,7 +6,7 @@ library(janitor)
 library(seqinr)
 source(here::here("analysis/00-metadata.R"))
 
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv")) 
+isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
 isolates <- isolates %>% drop_na(exp_id)
 
 # Aggregate the contig information in the assembled genomes
@@ -26,5 +26,5 @@ contigs <- bind_rows(list_g_contigs[!is.na(list_g_contigs)]) %>%
     group_by(genome_id) %>%
     filter(contig_length > 10000)
 
-write_csv(contigs, paste0(folder_data, "temp/12-contigs.csv"))
+write_csv(contigs, paste0(folder_data, "genomics_analysis/genomes/contigs.csv"))
 

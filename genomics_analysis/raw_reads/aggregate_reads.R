@@ -1,12 +1,12 @@
-#' This script aggregates raw read data
+#' This script aggregates filtered reads
 
 renv::load()
 library(tidyverse)
 library(janitor)
 library(seqinr)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
-genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv")) 
+genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
 
 # Join data
 compute_q <- function (asc) {
@@ -16,9 +16,9 @@ compute_q <- function (asc) {
     round(-10*log10(sum(10^(-phred/10))/nchar(asc)), 2)
 }
 
-list_filtered_reads <- rep(list(NA), nrow(genomes))
+list_filtered_reads <- rep(list(NA), 32)
 
-for (i in 1:nrow(genomes)) {
+for (i in 1:32) {
     list_filtered_reads[[i]] <- read_table(paste0(folder_genomics, "/assembly/", genomes$genome_id[i], "/filtered_reads.txt"), col_names = c("name", "asc", "length"), show_col_types = F) %>%
         rowwise() %>%
         mutate(q_score = compute_q(asc), .keep = "unused") %>%
@@ -29,4 +29,4 @@ for (i in 1:nrow(genomes)) {
 
 filtered_reads <- bind_rows(list_filtered_reads)
 
-write_csv(filtered_reads, paste0(folder_data, "temp/11-filtered_reads.csv"))
+write_csv(filtered_reads, paste0(folder_data, "genomics_analysis/raw_reads/filtered_reads.csv"))

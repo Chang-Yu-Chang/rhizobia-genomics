@@ -1,43 +1,40 @@
-#' This script cleans the tables of phenotypic distance and join them
+#' This script computes the pairwise distance in traits
 
 renv::load()
 library(tidyverse)
 library(janitor)
 library(geosphere) # For computing the geographic distance between two locations
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
-isolates_mapping <- read_csv(paste0(folder_data, "temp/00-isolates_mapping.csv"))
-sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"))
-gc_prm_summs <- read_csv(paste0(folder_data, "temp/21-gc_prm_summs.csv"))
-plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+sites <- read_csv(paste0(folder_phenotypes, "sites/sites.csv"))
+gts <- read_csv(paste0(folder_phenotypes, "growth/gts.csv"))
+plants_long <- read_csv(paste0(folder_phenotypes, "symbiosis/plants_long.csv"))
 
-# 0. clean up; basically one sample per row
+# 0. clean up; each row is an isolates
 # 0.1. growth traits
-isolates_gc <- gc_prm_summs %>%
+isolates_gt <- gts %>%
     select(exp_id, temperature, r, lag, maxOD) %>%
     pivot_wider(id_cols = exp_id, names_from = temperature, values_from = c(r, lag, maxOD))
 
 # 0.2. symbiosis traits
-isolates_sym <- plants_long %>%
+isolates_st <- plants_long %>%
     group_by(exp_id, trait) %>%
     summarize(value = mean(value, na.rm = T)) %>%
     pivot_wider(id_cols = exp_id, names_from = trait, values_from = value) %>%
     rename(exp_id = exp_id) %>%
     ungroup()
 
-# 0.3 coordinate of sites
-isolates_site <- isolates_mapping %>% left_join(sites)
 
 # 0.3 join the data
-isolates_traits <- isolates_mapping %>%
-    select(exp_id, genome_id) %>%
-    left_join(isolates_gc) %>%
-    left_join(isolates_sym) %>%
-    left_join(isolates_site)
+isolates_traits <- isolates %>%
+    select(exp_id, genome_id, site) %>%
+    left_join(select(sites, site, latitude_dec, longitude_dec)) %>%
+    left_join(isolates_gt) %>%
+    left_join(isolates_st)
 
-nrow(isolates_traits) # 32 strains with growth rate data 
-
-write_csv(isolates_traits, paste0(folder_data, "temp/29-isolates_traits.csv"))
+nrow(isolates_traits) # 32 strains with growth rate data
+write_csv(isolates_traits, paste0(folder_phenotypes, "isolates_traits.csv"))
 
 # 1. Calculate pairwise euclidean distance
 temp_mapping <- tibble(genome_id = isolates_traits$genome_id, item = factor(1:nrow(isolates_traits)))
@@ -54,7 +51,7 @@ compute_dist <- function (isolates_t, d_name) {
         left_join(rename(temp_mapping, genome_id2 = genome_id, item2 = item)) %>%
         select(genome_id1, genome_id2, distance) %>%
         # Normalize
-        mutate(distance = distance / max(distance, na.rm = T))    
+        mutate(distance = distance / max(distance, na.rm = T))
 
     colnames(dist_t)[3] <- d_name
     return(dist_t)
@@ -67,15 +64,16 @@ dist_gc <- isolates_traits %>%
 
 # For the 12 strains with both symbiosis and growth traits
 dist_sym <- isolates_traits %>%
-    select(dry_weight_mg, nodule_number, root_weight_mg) %>%
+    select(shoot_biomass_mg, root_biomass_mg, nodule_count) %>%
     compute_dist("d_symbiosis") %>%
     drop_na()
 
 # For all individual traits
-list_traits <- c("dry_weight_mg", "nodule_number", "root_weight_mg",
+list_traits <- c("shoot_biomass_mg", "root_biomass_mg", "nodule_count",
         str_subset(colnames(isolates_traits), "r_"),
         str_subset(colnames(isolates_traits), "lag_"),
         str_subset(colnames(isolates_traits), "maxOD_"))
+
 list_dists <- rep(list(NA), length(list_traits))
 for (i in 1:length(list_traits)) list_dists[[i]] <- isolates_traits[,list_traits[i]] %>% compute_dist(paste0("d_", list_traits[i]))
 
@@ -92,6 +90,8 @@ dist_traits <- dist_traits %>%
         ) / 1000 # convert from m to km
     ) %>%
     ungroup() %>%
-    select(genome_id1, genome_id2, d_growth, d_symbiosis, d_geo, everything())
+    select(genome_id1, genome_id2, d_growth, d_symbiosis, d_geo, everything()) %>%
+    filter(genome_id1 != genome_id2)
 
-write_csv(dist_traits, paste0(folder_data, "temp/29-dist_traits.csv"))
+nrow(dist_traits) # choose(32,2) = 496
+write_csv(dist_traits, paste0(folder_phenotypes, "dist_traits.csv"))

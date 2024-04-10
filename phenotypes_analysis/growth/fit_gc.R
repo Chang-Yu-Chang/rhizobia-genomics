@@ -211,7 +211,7 @@ gc_prms <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm")) %>% bind_rows(.id 
 gc_prm_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm_summ")) %>% bind_rows(.id = "temperature")
 
 
-write_csv(gcs, paste0(folder_phenotypes, 'growth/gcs.csv'))
-write_csv(gc_summs, paste0(folder_phenotypes, 'growth/gc_summs.csv'))
-write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gc_prms.csv'))
-write_csv(gc_prm_summs, paste0(folder_phenotypes, 'growth/gc_prm_summs.csv'))
+write_csv(gcs, paste0(folder_phenotypes, 'growth/gcs.csv')) # Raw growth curves
+#write_csv(gc_summs, paste0(folder_phenotypes, 'growth/gc_summs.csv')) # Raw growth curves averaged across replicates
+#write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gc_prms.csv')) # Growth traits per well
+write_csv(gc_prm_summs, paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
