@@ -4,8 +4,8 @@ renv::load()
 library(tidyverse)
 library(janitor)
 library(data.table)
-library(mgcv)
-source(here::here("analysis/00-metadata.R"))
+library(mgcv) # For smoothing
+source(here::here("metadata.R"))
 
 gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"))
 
@@ -205,15 +205,13 @@ list_gcs <- list_gcs %>% lapply(function(gc) {
         gc_summ <- gc_summ %>% filter(t <= 48)
         return(list(gc = gc, gc_blank = gc_blank, gc_summ = gc_summ, gc_prm = gc_prm, gc_prm_summ = gc_prm_summ))
     })
-# list_gcs$`40c`$gc_summ
-# list_gcs$`30c`$gc_summ
 gcs <- list_gcs %>% lapply(function(x) `[[`(x, "gc")) %>% bind_rows(.id = "temperature")
 gc_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_summ")) %>% bind_rows(.id = "temperature")
 gc_prms <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm")) %>% bind_rows(.id = "temperature")
 gc_prm_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm_summ")) %>% bind_rows(.id = "temperature")
 
 
-write_csv(gcs, paste0(folder_data, 'temp/21-gcs.csv'))
-write_csv(gc_summs, paste0(folder_data, 'temp/21-gc_summs.csv'))
-write_csv(gc_prms, paste0(folder_data, 'temp/21-gc_prms.csv'))
-write_csv(gc_prm_summs, paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
+write_csv(gcs, paste0(folder_phenotypes, 'growth/gcs.csv'))
+write_csv(gc_summs, paste0(folder_phenotypes, 'growth/gc_summs.csv'))
+write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gc_prms.csv'))
+write_csv(gc_prm_summs, paste0(folder_phenotypes, 'growth/gc_prm_summs.csv'))
