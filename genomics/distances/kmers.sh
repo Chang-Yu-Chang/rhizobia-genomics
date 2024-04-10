@@ -19,7 +19,7 @@ done
 for ref in em1021 em1022 usda1106 wsm419 casidaa
 do
     zsh 06b-genome_kmer.sh \
-        $folder_genomics/genomes/$ref.fasta \
+        $folder_genomics/fasta/genomes/$ref.fasta \
         $folder_genomics/kmer/genomes/$ref.sig
 done
 
