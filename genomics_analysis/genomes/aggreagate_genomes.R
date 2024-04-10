@@ -17,12 +17,13 @@ for (i in 1:length(list_g_contigs)) {
     cat(i)
 }
 
-contigs <- bind_rows(list_g_contigs) %>%
+genomes <- bind_rows(list_g_contigs) %>%
+    mutate(contig_id = paste0(genome_id, "_", contig_id)) %>%
     # Arrange contigs by length
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id, desc(contig_length)) %>%
     # Remove small contigs < 10kb
     filter(contig_length > 10000)
 
-write_csv(contigs, paste0(folder_data, "genomics_analysis/genomes/contigs.csv"))
+write_csv(genomes, paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 

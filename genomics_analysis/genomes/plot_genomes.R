@@ -1,4 +1,4 @@
-#' This script plots the contigs
+#' This script plots the the genomes by contigs
 
 renv::load()
 library(tidyverse)
@@ -7,13 +7,13 @@ library(janitor)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-contigs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/contigs.csv")) %>%
+genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv")) %>%
     left_join(isolates) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id))
 
 
 # 1. Number of contigs
-p <- contigs %>%
+p <- genomes %>%
     filter(genome_id != "g28") %>%
     group_by(genome_id) %>%
     count(name = "n_contigs") %>%
@@ -30,7 +30,7 @@ ggsave(paste0(folder_data, "genomics_analysis/genomes/01-n_contigs.png"), p, wid
 
 
 # 2. plot the genome size by contigs
-p <- contigs %>%
+p <- genomes %>%
     group_by(genome_id) %>%
     mutate(contig_ordered = factor(1:n())) %>%
     ggplot() +
@@ -48,7 +48,7 @@ p <- contigs %>%
 ggsave(paste0(folder_data, "genomics_analysis/genomes/02-genome_size.png"), p, width = 15, height = 6)
 
 # contigs
-c_size <- contigs %>%
+c_size <- genomes %>%
     left_join(isolates) %>%
     filter(population %in% c("VA", "PA")) %>%
     group_by(genome_id) %>%
