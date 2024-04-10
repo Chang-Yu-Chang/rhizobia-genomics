@@ -5,7 +5,8 @@ This folder contains the scripts for the following steps:
 3. Identify taxonomy
 4. Call variants (SNPs and SVs)
 5. Pangenome analysis
-6. Miscellaneous: download NCBI genomes
+6. Maximal likelihood trees
+7. Miscellaneous: download NCBI genomes
 
 
 `00-env_vars.sh` stores shell variables that specify directory.
