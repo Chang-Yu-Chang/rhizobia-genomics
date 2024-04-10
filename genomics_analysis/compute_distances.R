@@ -1,45 +1,28 @@
-#' This script clean the gene content data
+#' This script cleans the gene presence/absence and compute distance
 
 renv::load()
 library(tidyverse)
 library(janitor)
-source(here::here("analysis/00-metadata.R"))
+library(proxy) # for computing jaccard
+source(here::here("metadata.R"))
 
-genomes <- read_csv(paste0(folder_data, "temp/00-genomes.csv"))
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-pa <- read_delim(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.Rtab"))
-pa <- pa %>% clean_names()
-
-# Transpose the gene presence-absence table
-gpa <- pa %>%
-    pivot_longer(cols = -gene, names_to = "genome_id") %>%
-    pivot_wider(names_from = gene, values_from = value, values_fill = 0)
-
-write_csv(gpa, paste0(folder_data, "temp/13-gpa.csv"))
-
-#
-genes_g2 <- gpa %>%
-    pivot_longer(cols = -genome_id) %>%
-    filter(genome_id == "g2") %>%
-    filter(value == 1)
-#gff_g2 <- readGFF(paste0(folder_data, "genomics/gff/g2.gff")) %>% as_tibble %>% clean_names()
-gff_g2 %>% filter(name %in% genes_g2$name)
-
-
-
+genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
+gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 
 # 1. Compute jaccard distance in gene presence and absence
-pat <- t(as.matrix(pa[,-1]))
+pat <- as.matrix(gpat[,-1])
 dim(pat) # 41 x 31964
-rownames(pat) <- colnames(pa)[-1]
-jdm <- proxy::dist(pat, method = "Jaccard")
+rownames(pat) <- gpat$genome_id
+jdm <- dist(pat, method = "Jaccard")
 
 dist_jaccard <- jdm %>%
     as.matrix() %>% as_tibble() %>%
     mutate(genome_id1 = colnames(.)) %>%
     pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "d_jaccard")
 
-write_csv(dist_jaccard, paste0(folder_data, "temp/13-dist_jaccard.csv"))
+write_csv(dist_jaccard, paste0(folder_data, "genomics_analysis/gene_content/dist_jaccard.csv"))
 
 # 2. Compute genomic fluidity in pairs
 fluidity <- function (tb) {
@@ -56,22 +39,21 @@ dist_fluidity <- dist_jaccard %>%
     mutate(d_fluidity = NA)
 
 for (i in 1:nrow(dist_fluidity)) {
-    pa_i <- pa[,c(dist_fluidity$genome_id1[i], dist_fluidity$genome_id2[i])]
+    pa_i <- gpa[,c(dist_fluidity$genome_id1[i], dist_fluidity$genome_id2[i])]
     pa_i <- pa_i[pa_i[,dist_fluidity$genome_id1[i]] == 1 | pa_i[,dist_fluidity$genome_id2[i]] == 1,]
     dist_fluidity$d_fluidity[i] <- fluidity(pa_i)
 }
 
-write_csv(dist_fluidity, paste0(folder_data, "temp/13-dist_fluidity.csv"))
+write_csv(dist_fluidity, paste0(folder_data, "genomics_analysis/gene_content/dist_fluidity.csv"))
 
 
 # 3. Compute jaccard by contigs
 # List of all genes in all genomes
-pd <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_data.csv"))
+pd <- read_csv(paste0(folder_data, "genomics/pangenome/old/gene_data.csv"))
 pd <- clean_names(pd) %>%
     select(genome_id = gff_file, contig_id = scaffold_name, annotation_id, description) %>%
-    mutate(annotation_id = str_remove(annotation_id, ".+/genomes/"))
+    mutate(annotation_id = str_remove(annotation_id, ".+/old/"))
 
-gpa <- read_csv(paste0(folder_data, "genomics/pangenome/panaroo/gene_presence_absence.csv"))
 gpa <- gpa %>%
     clean_names() %>%
     select(starts_with("g"), em1021, em1022, usda1106, wsm419) %>%

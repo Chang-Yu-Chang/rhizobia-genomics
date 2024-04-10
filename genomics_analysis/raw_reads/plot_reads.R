@@ -4,7 +4,7 @@ renv::load()
 library(tidyverse)
 library(janitor)
 library(seqinr)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
 filtered_reads <- read_csv(paste0(folder_data, "genomics_analysis/raw_reads/filtered_reads.csv"))
@@ -21,7 +21,7 @@ n_reads <- filtered_reads %>%
     dplyr::count(name = "n_reads") %>%
     ungroup()
 range(n_reads$n_reads) # 47161 234638
-median(n_reads$n_reads) # 109573.5
+median(n_reads$n_reads) # 104054.5
 
 
 # 1. Read length vs. q score

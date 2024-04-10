@@ -4,18 +4,19 @@ renv::load()
 library(tidyverse)
 library(cowplot)
 library(janitor)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-contigs <- read_csv(paste0(folder_data, "temp/12-contigs.csv")) %>%
-    left_join(genomes) %>%
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+contigs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/contigs.csv")) %>%
+    left_join(isolates) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id))
 
 
 # 1. Number of contigs
 p <- contigs %>%
+    filter(genome_id != "g28") %>%
     group_by(genome_id) %>%
-    dplyr::count(name = "n_contigs") %>%
+    count(name = "n_contigs") %>%
     ggplot() +
     geom_histogram(aes(x = n_contigs), color = "black", fill = "white", binwidth = 1) +
     scale_x_continuous(breaks = seq(0, 12, 1)) +
@@ -25,7 +26,7 @@ p <- contigs %>%
     guides() +
     labs(x = "# of contigs", title = "contigs > 10kb")
 
-ggsave(paste0(folder_data, "temp/12a-01-n_contigs.png"), plot = p, width = 4, height = 4)
+ggsave(paste0(folder_data, "genomics_analysis/genomes/01-n_contigs.png"), p, width = 4, height = 4)
 
 
 # 2. plot the genome size by contigs
@@ -44,7 +45,7 @@ p <- contigs %>%
     guides(fill = guide_legend(title = "")) +
     labs(x = "genome", y = "genome size (Mbp)", title = "contigs > 10kb")
 
-ggsave(paste0(folder_data, "temp/12a-02-genome_size.png"), plot = p, width = 15, height = 6)
+ggsave(paste0(folder_data, "genomics_analysis/genomes/02-genome_size.png"), p, width = 15, height = 6)
 
 # contigs
 c_size <- contigs %>%
