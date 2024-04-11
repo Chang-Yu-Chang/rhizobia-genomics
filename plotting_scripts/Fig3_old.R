@@ -1,110 +1,51 @@
-#' This script plots the network based one distances
+#' This script generates figure 3
 
 renv::load()
 library(tidyverse)
 library(cowplot)
-# library(tidygraph)
-# library(ggraph)
-# library(ggforce)
-library(ape)
-library(tidytree)
-library(ggtree)
-library(proxy) # For computing jaccard distance
+library(janitor)
 library(vcfR) # for handling VCF
 library(poppr) # for pop gen analysis
 library(vegan) # for computing jaccard
 source(here::here("metadata.R"))
 
+# Read gene presence-absence data
 gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+
+#
+removed_st <- group_by(isolates_contigs, genome_id) %>% count() %>% filter(n !=1)
+isolates_sp <- select(isolates_contigs, genome_id, species) %>% filter(!genome_id %in% removed_st$genome_id)
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
-load(file = paste0(folder_data, "phylogenomics_analysis/networks/networks.rdata"))
-load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
-if (FALSE) {
+# Panel A. Cartoons
+p1 <- ggdraw() + draw_text("placeholder")
 
-# Panel A. kmer networks
-thr_kmer <- 0.85
-p1 <- g %>%
-    activate(edges) %>%
-    mutate(kmer_bin = ifelse(d_kmer < thr_kmer, paste0("d_kmer<", thr_kmer), "nope")) %>%
-    ggraph(layout = "linear", circular = T) +
-    #geom_mark_hull(aes(x, y, group = species, fill = species), concavity = 4, expand = unit(3, "mm"), alpha = 0.25) +
-    geom_edge_arc(aes(colour = kmer_bin), alpha = 0.1) +
-    geom_node_point(aes(fill = species), shape = 21, color = "black", size = 3) +
-    scale_edge_color_manual(values = c("black", "NA")) +
-    scale_fill_manual(values = species_colors) +
-    theme_void() +
-    theme(
-        plot.background = element_rect(color = NA, fill = "white"),
-        plot.margin = unit(c(1,1,1,1), "mm"),
-        legend.position = "right"
-    ) +
-    guides(edge_colour = "none") +
-    labs()
-}
+# Panel B. pangenome
+gpal <- gpat %>%
+    #gpa[1:10,c(1, 3:100, 30000:31000)] %>%
+    pivot_longer(-genome_id, names_to = "gene") %>%
+    mutate(gene = factor(gene, names(gpat))) %>%
+    mutate(value = factor(value)) %>%
+    filter(value == 1)
 
-# Panel A. PAP heatmap
-p1 <- gpatl %>%
+p2 <- gpal %>%
     ggplot() +
-    geom_tile(aes(x = gene, y = genome_id), fill = "grey10") +
-    scale_y_discrete(expand = c(0,0)) +
+    geom_tile(aes(x = gene, y = genome_id, fill = value)) +
+    scale_fill_manual(values = c(`1` = "black", `0` = "grey95"), labels = c(`1` = "presence", `0` = "absence")) +
+    coord_radial(start = 0.25 * pi, end = 1.75 * pi, inner.radius = 0.3, direction = -1) +
     theme_classic() +
     theme(
+        axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 5, color = "black"),
-        panel.border = element_rect(color = "black", fill = NA, linewidth = 1)
+        axis.line.x = element_blank(),
+        axis.text.r = element_text(color = "red", angle = 90),
+        legend.position.inside = c(0.5, 0.5)
     ) +
-    guides(fill = "none") +
-    labs(x = "gene cluster", y = "genome")
-
-
-# Panel B. matched tree
-# Plot core tree
-p2_1 <- tr %>%
-    as_tibble() %>%
-    left_join(rename(isolates_contigs, label = genome_id)) %>%
-    as.treedata() %>%
-    ggtree() +
-    scale_color_manual(values = species_colors) +
-    theme_tree() +
-    theme(
-        legend.position = "top",
-        plot.margin = unit(c(0,10,0,0), "mm")
-    ) +
-    labs()
-
-# Plot accessory tree
-p2_2 <- tr_acce %>%
-    as_tibble() %>%
-    left_join(rename(isolates_contigs, label = genome_id)) %>%
-    as.treedata() %>%
-    ggtree() +
-    geom_tiplab(aes(label = label, color = species), hjust = 0) +
-    scale_color_manual(values = species_colors)
-
-d1 <- p2_1$data
-d2 <- p2_2$data
-## reverse x-axis and set offset to make the tree on the right-hand side of the first tree
-d2$x <- max(d2$x) - d2$x + max(d1$x) + 1
-dd <- bind_rows(d1, d2) %>% filter(isTip)
-
-p2 <- p2_1 + geom_tree(data = d2) +
-    ggnewscale::new_scale_fill() +
-    geom_line(data = dd, aes(x, y, group = label), color = "grey90", linetype = 1, linewidth = .2) +
-    geom_tippoint(aes(color = species), size = 2) +
-    geom_tippoint(data = d2, aes(color = species), size = 2) +
-    scale_x_continuous(limits = c(-0.5, 3)) +
-    annotate("text", x = c(-0.3, 2.5), y = c(30,30), label = c("core genes", "gene content")) +
-    theme_tree() +
-    theme(
-        legend.position = "top"
-    )
-    #theme_classic() +
-    labs()
-
+    guides(fill = guide_legend(position = "bottom", title = NULL)) +
+    labs(y = "")
 
 
 # Panel C. SNPs
@@ -138,7 +79,7 @@ eigs2 <- round(pcoa2$eig / sum(pcoa2$eig)*100, 2)
 
 ## Plot the mds
 p3_1 <- isolates_i1 %>%
-    left_join(isolates_contigs) %>%
+    left_join(isolates_sp) %>%
     bind_cols(tibble(mds1 = pcoa1$points[,1], mds2 = pcoa1$points[,2])) %>%
     drop_na(species) %>%
     ggplot() +
@@ -157,7 +98,7 @@ p3_1 <- isolates_i1 %>%
     labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
 p3_2 <- isolates_i2 %>%
-    left_join(isolates_contigs) %>%
+    left_join(isolates_sp) %>%
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -175,8 +116,7 @@ p3_2 <- isolates_i2 %>%
     guides() +
     labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
-
-# Panel D. GCVs
+# Panel C. GCVs
 isolates_test <- isolates %>% filter(genome_id %in% gpat$genome_id, !is.na(site_group))
 gpa_test <- gpat %>% filter(genome_id %in% isolates_test$genome_id)
 dim(gpa_test) # 26887 gene clusters
@@ -207,7 +147,7 @@ eigs2 <- round(pcoa2$eig / sum(pcoa2$eig)*100, 2)
 
 ## Plot the mds
 p4_1 <- isolates_i1 %>%
-    left_join(isolates_contigs) %>%
+    left_join(isolates_sp) %>%
     bind_cols(tibble(mds1 = pcoa1$points[,1], mds2 = pcoa1$points[,2])) %>%
     drop_na(species) %>%
     ggplot() +
@@ -226,7 +166,7 @@ p4_1 <- isolates_i1 %>%
     labs(x = paste0("PCoA axis 1(", eigs1[1], "%)"), y = paste0("PCoA axis 1(", eigs1[2], "%)"))
 
 p4_2 <- isolates_i2 %>%
-    left_join(isolates_contigs) %>%
+    left_join(isolates_sp) %>%
     bind_cols(tibble(mds1 = pcoa2$points[,1], mds2 = pcoa2$points[,2])) %>%
     ggplot() +
     geom_vline(xintercept = 0, linetype = 2, color = "grey80") +
@@ -243,19 +183,25 @@ p4_2 <- isolates_i2 %>%
     labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
 
-p_left <- plot_grid(p1 + ggtitle("Gene presence/absence"), p2, nrow = 2, scale = 0.9, labels = c("A", "B"))
 leg1 <- cowplot::get_plot_component(p3_1 + theme(legend.background = element_rect(color = "black")), 'guide-box-top', return_all = TRUE)
 leg2 <- cowplot::get_plot_component(p3_2 + theme(legend.background = element_rect(color = "black")), 'guide-box-top', return_all = TRUE)
+#p_left <- plot_grid(p1, p2, nrow = 2)
 p_right <- plot_grid(
+    leg1, leg2,
     p3_1 + guides(color = "none"), p3_2 + guides(color = "none"),
-    p4_1, p4_2, nrow = 2, rel_heights = c(1, 1), scale = 0.95,
-    align = "v", axis = "lr", labels = c("C", "", "D", ""))
+    p4_1, p4_2, nrow = 3, rel_heights = c(0.2, 1, 1), scale = 0.95,
+    align = "v", axis = "lr", labels = c("", "", "B", "", "C", ""))
 
+p <- plot_grid(p2, p_right, rel_widths = c(1,1), labels = c("A", "")) +
+    theme(plot.background = element_rect(fill = "white", color = NA))
 
-#p_top <- plot_grid(p1 + ggtitle("Jaccard distance"), p2 + ggtitle("Gene presence/absence"), nrow = 1, labels = c("A", "B"), scale = 0.8)
-p <- plot_grid(p_left, p_right, nrow = 1, labels = c("", ""), scale = c(1, 0.9), rel_heights = c(1, 1.2)) + theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 6)
 
 
-
-
+# Number of genes
+gpat %>%
+    rename(genome_id = name) %>%
+    pivot_longer(-genome_id) %>%
+    group_by(name) %>%
+    summarize(n_genomes = sum(value)) %>%
+    filter(n_genomes < 41)
