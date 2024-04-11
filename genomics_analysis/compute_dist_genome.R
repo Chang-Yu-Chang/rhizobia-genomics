@@ -22,9 +22,7 @@ dist_ani <- dist_ani %>%
     mutate(genome_id2 = str_remove(genome_id2, ".+/genomes/") %>% str_remove(".fasta")) %>%
     mutate(genome_id1 = ordered(genome_id1, genomes$genome_id), genome_id2 = ordered(genome_id2, genomes$genome_id)) %>%
     arrange(genome_id1, genome_id2) %>%
-    filter(genome_id1 <= genome_id2) %>%
     select(genome_id1, genome_id2, d_ani)
-#write_csv(dist_ani, paste0(folder_data, "temp/19-dist_ani.csv"))
 
 # 2. k-mers
 dist_kmer <- read_delim(paste0(folder_data, "genomics/kmer/genomes/kmer.txt"))
@@ -36,10 +34,7 @@ dist_kmer <- dist_kmer %>%
     mutate(genome_id1 = str_remove(genome_id1, ".+/genomes/") %>% str_remove(".fasta")) %>%
     mutate(genome_id2 = str_remove(genome_id2, ".+/genomes/") %>% str_remove(".fasta")) %>%
     mutate(genome_id1 = ordered(genome_id1, genomes$genome_id), genome_id2 = ordered(genome_id2, genomes$genome_id)) %>%
-    arrange(genome_id1, genome_id2) %>%
-    filter(genome_id1 <= genome_id2)
-
-#write_csv(dist_kmer, paste0(folder_data, "temp/19-dist_kmer.csv"))
+    arrange(genome_id1, genome_id2)
 
 # 3. gene content
 ## jaccard distance in gene presence and absence
@@ -52,8 +47,6 @@ dist_jaccard <- jdm %>%
     as.matrix() %>% as_tibble() %>%
     mutate(genome_id1 = colnames(.)) %>%
     pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "d_jaccard")
-
-#write_csv(dist_jaccard, paste0(folder_data, "genomics_analysis/gene_content/dist_jaccard.csv"))
 
 # 2. Compute genomic fluidity in pairs
 fluidity <- function (tb) {
@@ -80,10 +73,9 @@ for (i in 1:nrow(dist_fluidity)) {
 dist_genetics <- dist_ani %>%
     left_join(dist_kmer) %>%
     left_join(dist_jaccard) %>%
-    left_join(dist_fluidity) %>%
-    filter(genome_id1 != genome_id2)
+    left_join(dist_fluidity)
 
-nrow(dist_genetics) # choose(32,2)=496
+nrow(dist_genetics) # 32^2=0.24
 
 write_csv(dist_genetics, paste0(folder_data, "genomics_analysis/dist_genetics.csv"))
 

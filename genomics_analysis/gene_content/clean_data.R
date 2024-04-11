@@ -5,7 +5,7 @@ library(tidyverse)
 library(janitor)
 source(here::here("metadata.R"))
 
-gpa <- read_delim(paste0(folder_data, "genomics/pangenome/old/gene_presence_absence.Rtab"))
+gpa <- read_delim(paste0(folder_data, "genomics/pangenome/isolates/gene_presence_absence.Rtab"))
 gpa <- clean_names(gpa)
 write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
 

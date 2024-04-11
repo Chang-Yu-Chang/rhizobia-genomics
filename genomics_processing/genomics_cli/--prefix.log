@@ -1,0 +1,11 @@
+IQ-TREE multicore version 2.3.0 COVID-edition for Mac OS X 64-bit built Mar 14 2024
+Developed by Bui Quang Minh, James Barbetti, Nguyen Lam Tung,
+Olga Chernomor, Heiko Schmidt, Dominik Schrempf, Michael Woodhams, Ly Trong Nhan.
+
+Host:    dept-dynamic-host-222-130.bio.upenn.edu (SSE4.2, 16 GB RAM)
+Command: iqtree -nt AUTO -B 1000 -s --prefix /Users/cychang/Dropbox/lab/local-adaptation/data/genomics/mltree/isolates_core_b/aln
+Seed:    99755 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Thu Apr 11 11:46:08 2024
+Kernel:  SSE2 - auto-detect threads (8 CPU cores detected)
+
+Reading alignment file --prefix ... ERROR: File not found --prefix

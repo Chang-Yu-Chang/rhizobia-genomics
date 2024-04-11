@@ -143,6 +143,12 @@ mamba create -n panaroo
 mamba activate panaroo
 mamba install --yes -c bioconda panaroo=1.3.4
 
+# Install catfasta2phyml v1.2.0
+# catfasta2phyml Concatenates FASTA formatted files to one "phyml" (PHYLIP) formatted file
+mamba create -n catfasta2phyml
+mamba activate catfasta2phyml
+mamba install --yes -c bioconda catfasta2phyml=1.2.0
+
 # Install seqtk v1.4
 # seqtk is a fast and lightweight tool for processing sequences in the FASTA or FASTQ format.
 mamba create -n seqtk

@@ -26,7 +26,7 @@ paln <- pal %>%
 
 # 1. Heatmap
 p <- pal %>%
-    mutate(gene = factor(gene, pal_n$gene)) %>%
+    mutate(gene = factor(gene, paln$gene)) %>%
     ggplot() +
     geom_tile(aes(x = gene, y = genome_id, fill = value)) +
     scale_fill_manual(values = c(`1` = "maroon", `0` = "white")) +
@@ -40,7 +40,7 @@ p <- pal %>%
 
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/01-heatmap.png"), p, width = 15, height = 6)
 
-nrow(pal_n) # 31964 genes in the pangenome
+nrow(paln) # 26886 genes in the pangenome
 
 # 2. gene frequency spectrum
 p <- paln %>%

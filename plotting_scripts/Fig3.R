@@ -7,32 +7,32 @@ library(janitor)
 library(vcfR) # for handling VCF
 library(poppr) # for pop gen analysis
 library(vegan) # for computing jaccard
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 # Read gene presence-absence data
-gpa <- read_csv(paste0(folder_data, "temp/13-gpa.csv"))
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
+gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 
 #
-removed_st <- group_by(isolates_contigs, genome_id) %>% count() %>% filter(n !=1)
-isolates_sp <- select(isolates_contigs, genome_id, species) %>% filter(!genome_id %in% removed_st$genome_id)
-species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
+# removed_st <- group_by(isolates_contigs, genome_id) %>% count() %>% filter(n !=1)
+# isolates_sp <- select(isolates_contigs, genome_id, species) %>% filter(!genome_id %in% removed_st$genome_id)
+#species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
 
 # Panel A. Cartoons
 p1 <- ggdraw() + draw_text("placeholder")
 
-
 # Panel B. pangenome
-gpal <- gpa %>%
+gpal <- gpat %>%
     #gpa[1:10,c(1, 3:100, 30000:31000)] %>%
-    pivot_longer(-name, names_to = "gene") %>%
-    mutate(gene = factor(gene, names(gpa))) %>%
-    mutate(value = factor(value))
+    pivot_longer(-genome_id, names_to = "gene") %>%
+    mutate(gene = factor(gene, names(gpat))) %>%
+    mutate(value = factor(value)) %>%
+    filter(value == 1)
 
 p2 <- gpal %>%
     ggplot() +
-    geom_tile(aes(x = gene, y = name, fill = value)) +
+    geom_tile(aes(x = gene, y = genome_id, fill = value)) +
     scale_fill_manual(values = c(`1` = "black", `0` = "grey95"), labels = c(`1` = "presence", `0` = "absence")) +
     coord_radial(start = 0.25 * pi, end = 1.75 * pi, inner.radius = 0.3, direction = -1) +
     theme_classic() +
@@ -49,9 +49,9 @@ p2 <- gpal %>%
 
 
 # Panel C. SNPs
-snp <- read_table(paste0(folder_data, "genomics/variants/em1021_snippy/core.tab"))
-gs <- read_table(paste0(folder_data, "genomics/variants/em1021_snippy/core.txt"))
-vcf <- read.vcfR(paste0(folder_data, "genomics/variants/em1021_snippy/core.vcf"))
+snp <- read_table(paste0(folder_data, "genomics/variants/em1021/core.tab"))
+gs <- read_table(paste0(folder_data, "genomics/variants/em1021/core.txt"))
+vcf <- read.vcfR(paste0(folder_data, "genomics/variants/em1021/core.vcf"))
 
 vcfR::getCHROM(vcf) %>% table() # SNPs on chromosome
 gl <- vcfR2genlight(vcf) # VCF to genlight
@@ -116,21 +116,15 @@ p3_2 <- isolates_i2 %>%
     guides() +
     labs(x = paste0("PCoA axis 1(", eigs2[1], "%)"), y = paste0("PCoA axis 1(", eigs2[2], "%)"))
 
-
-
-
-
-
-
 # Panel C. GCVs
-isolates_test <- isolates %>% filter(genome_id %in% gpa$name, !is.na(site_group))
-gpa_test <- gpa %>% filter(name %in% isolates_test$genome_id)
-dim(gpa_test) # 31965 gene clusters
+isolates_test <- isolates %>% filter(genome_id %in% gpat$genome_id, !is.na(site_group))
+gpa_test <- gpat %>% filter(genome_id %in% isolates_test$genome_id)
+dim(gpa_test) # 26887 gene clusters
 
 ## Test VA populations: high vs low elevation
 isolates_i1 <- isolates_test %>% filter(population == "VA")
 labels <- isolates_i1$site_group; labels <- as.factor(labels)
-gpa_i <- gpa_test %>% filter(name %in% isolates_i1$genome_id)
+gpa_i <- gpa_test %>% filter(genome_id %in% isolates_i1$genome_id)
 m <- as.matrix(gpa_i[,-1]); dim(m)
 m <- m[,apply(m, 2, sum) != 0]; dim(m) # 23575 genes
 dist_m1 <- vegdist(m, "jaccard")
@@ -142,7 +136,7 @@ eigs1 <- round(pcoa1$eig / sum(pcoa1$eig)*100, 2)
 ## Test PA populations: urban vs suburban elevation
 isolates_i2 <- isolates_test %>% filter(population == "PA")
 labels <- isolates_i2$site_group; labels <- as.factor(labels)
-gpa_i <- gpa_test %>% filter(name %in% isolates_i2$genome_id)
+gpa_i <- gpa_test %>% filter(genome_id %in% isolates_i2$genome_id)
 m <- as.matrix(gpa_i[,-1]); dim(m)
 m <- m[,apply(m, 2, sum) != 0]; dim(m) # 12946 genes
 dist_m2 <- vegdist(m, "jaccard")
@@ -205,7 +199,7 @@ ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 6)
 
 
 # Number of genes
-gpa %>%
+gpat %>%
     rename(genome_id = name) %>%
     pivot_longer(-genome_id) %>%
     group_by(name) %>%
