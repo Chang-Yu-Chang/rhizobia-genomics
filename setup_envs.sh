@@ -39,6 +39,12 @@ mamba create -n medaka
 mamba activate medaka
 mamba install --yes -c bioconda medaka=1.8.0
 
+# Install quast v5.2.0
+# quast evaluates genome/metagenome assemblies by computing various metrics.
+mamba create -n quast
+mamba activate quast
+mamba install --yes -c bioconda quast=5.2.0
+
 # Install prokka v1.14.5
 # prokka is for rapid prokaryotic genome annotation
 mamba create -n prokka
@@ -56,16 +62,6 @@ mamba install --yes -c bioconda ncbi-datasets=15.27.1
 mamba create -n blast
 mamba activate blast
 mamba install --yes -c bioconda blast=2.14.1
-
-# Install mash v2.3
-# Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
-mamba create -n mash
-mamba activate mash
-mamba install --yes -c bioconda mash=2.3
-# Download the RefSeq database. It includes both genomes and plasmids
-mkdir -p ~/bioinformatics/mash
-cd ~/bioinformatics/mash/
-wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O refseq.genomes%2Bplasmid.k21.s1000.msh
 
 # Install sourmash v4.8.4
 # Sourmash is a quickly search, compare, and analyze genomic and metagenomic data sets
@@ -94,18 +90,6 @@ mamba create -y -n minimap2
 mamba activate minimap2
 mamba install --yes -c bioconda minimap2=2.26
 
-# Install samtools v1.18
-# samtools are Tools for dealing with SAM, BAM and CRAM files
-mamba create -y -n samtools
-mamba activate samtools
-mamba install --yes -c bioconda samtools=1.18
-
-# Install bcftools 1.18
-# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
-mamba create -y -n bcftools
-mamba activate bcftools
-mamba install --yes -c bioconda bcftools=1.18
-
 # Install vcftools 0.1.16
 # vcftools is A set of tools written in Perl and C++ for working with VCF files.
 mamba create -y -n vcftools
@@ -119,23 +103,11 @@ mamba activate snippy
 mamba install --yes -c bioconda snippy=4.6.0
 mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
 
-# Install sniffles2 v2.2
-# sniffles is a fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
-mamba create -y -n sniffles
-mamba activate sniffles
-mamba install --yes -c bioconda sniffles=2.2
-
 # Install fastANI v1.31
 # fastANI is developed for fast alignment-free computation of whole-genome Average Nucleotide Identity (ANI)
 mamba create -n fastani
 mamba activate fastani
 mamba install --yes -c bioconda fastani=1.31
-
-# Install roary v3.13.0
-# roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
-mamba create -n roary
-mamba activate roary
-mamba install --yes -c bioconda roary=3.13.0
 
 # Install panaroo v1.3.4
 # panaroo is A Bacterial Pangenome Analysis Pipeline that can call large structural variants
@@ -143,11 +115,67 @@ mamba create -n panaroo
 mamba activate panaroo
 mamba install --yes -c bioconda panaroo=1.3.4
 
-# Install catfasta2phyml v1.2.0
-# catfasta2phyml Concatenates FASTA formatted files to one "phyml" (PHYLIP) formatted file
-mamba create -n catfasta2phyml
-mamba activate catfasta2phyml
-mamba install --yes -c bioconda catfasta2phyml=1.2.0
+# Install iqtree v2.3.0
+# iqtree is an Efficient phylogenomic software by maximum likelihood.
+mamba create -n iqtree
+mamba activate iqtree
+mamba install --yes -c bioconda iqtree=2.3.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install mash v2.3
+# Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.
+mamba create -n mash
+mamba activate mash
+mamba install --yes -c bioconda mash=2.3
+# Download the RefSeq database. It includes both genomes and plasmids
+mkdir -p ~/bioinformatics/mash
+cd ~/bioinformatics/mash/
+wget https://gembox.cbcb.umd.edu/mash/refseq.genomes%2Bplasmid.k21s1000.msh -O refseq.genomes%2Bplasmid.k21.s1000.msh
+
+
+
+# Install samtools v1.18
+# samtools are Tools for dealing with SAM, BAM and CRAM files
+mamba create -y -n samtools
+mamba activate samtools
+mamba install --yes -c bioconda samtools=1.18
+
+# Install bcftools 1.18
+# BCFtools is a set of utilities that manipulate variant calls in the Variant Call Format (VCF) and its binary counterpart BCF
+mamba create -y -n bcftools
+mamba activate bcftools
+mamba install --yes -c bioconda bcftools=1.18
+
+
+# Install sniffles2 v2.2
+# sniffles is a fast structural variant caller for long-read sequencing, Sniffles2 accurately detect SVs on germline, somatic and population-level for PacBio and Oxford Nanopore read data.
+mamba create -y -n sniffles
+mamba activate sniffles
+mamba install --yes -c bioconda sniffles=2.2
+
+
+# Install roary v3.13.0
+# roary is a tool designed to quickly build large-scale pan genomes for prokaryote populations
+mamba create -n roary
+mamba activate roary
+mamba install --yes -c bioconda roary=3.13.0
+
+
 
 # Install seqtk v1.4
 # seqtk is a fast and lightweight tool for processing sequences in the FASTA or FASTQ format.
@@ -155,11 +183,7 @@ mamba create -n seqtk
 mamba activate seqtk
 mamba install --yes -c bioconda seqtk=1.4
 
-# Install iqtree v2.3.0
-# iqtree is an Efficient phylogenomic software by maximum likelihood.
-mamba create -n iqtree
-mamba activate iqtree
-mamba install --yes -c bioconda iqtree=2.3.0
+
 
 # Install pyseer v1.3.11
 # Sequence Element Enrichment Analysis (SEER)
@@ -173,3 +197,9 @@ mamba install --yes -c bioconda pyseer=1.3.11
 mamba create -y -n bwa
 mamba activate bwa
 mamba install --yes -c bioconda bwa=0.7.17
+
+# Install DAGchainer vr120920-3
+# DAGchainer identifies syntenic regions.
+mamba create -y -n dagchainer
+mamba activate dagchainer
+mamba install --yes -c bioconda dagchainer=r120920-3
