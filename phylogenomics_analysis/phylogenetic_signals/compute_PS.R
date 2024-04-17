@@ -3,47 +3,88 @@
 renv::load()
 library(tidyverse)
 library(janitor)
-library(cowplot)
-library(ape)
 library(phytools)
-library(geiger)
 library(phangorn) # For rooting the tree
-library(nlme) # For PGLS
-source(here::here("analysis/00-metadata.R"))
+library(ggtree)
+library(tidytree)
+#library(cowplot)
+library(geiger) # For checking names
+#library(nlme) # For PGLS
+source(here::here("metadata.R"))
 
-tree_jaccard <- read.tree(paste0(folder_data, "temp/32-jaccard.tre"))
-isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
-isolates_contigs <- read_csv(paste0(folder_data, "temp/14-isolates_contigs.csv"))
+# Traits
+isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates <- read_csv(paste0(folder_data, "phenotypes_analysis/isolates.csv"))
+isolates <- isolates %>%
+    left_join(isolates_contigs) %>%
+    left_join(isolates) %>%
+    filter(!genome_id %in% c("g20", "g28"))
 
-# Use the 12 strains that has symbiosis data
-isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
-isolates_traits <- isolates_traits %>% drop_na(dry_weight_mg)
+# Tree
+load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+#tr, tr_acce, gpatl
+# tr <- read.tree(paste0(folder_data, "genomics/mltree/isolates_core_b/aln.treefile"))
+# list_others <- c(paste0("g", c(20, 28, 38:43)), "em1022", "usda1106", "em1021", "wsm419")
+# tr <- tr %>% drop.tip(list_others)
+
+## Compute phylogenetic signals
+list_traits <- str_subset(names(isolates), "0c$|5c$|nodule|biomass|contig_length")
+compute_ps <- function(tree, genome_id, trait_value) {
+    set.seed(1)
+    temp <- setNames(trait_value, genome_id)
+    ps1 <- phylosig(tree, temp, test = T, nsim = 1000, method = "K")
+    ps2 <- phylosig(tree, temp, test = T, nsim = 1000, method = "lambda")
+    return(tibble(k = ps1$K, p_k = ps1$P, lambda = ps2$lambda, p_lambda = ps2$P))
+}
+
+tb1 <- tibble(trait = list_traits) %>%
+    rowwise() %>%
+    mutate(result = list(compute_ps(tr, isolates$genome_id, isolates[[trait]]))) %>%
+    unnest(result)
+
+tb2 <- tibble(trait = list_traits) %>%
+    rowwise() %>%
+    mutate(result = list(compute_ps(tr_acce, isolates$genome_id, isolates[[trait]]))) %>%
+    unnest(result)
+
+bind_rows(mutate(tb1, tree = "core"), mutate(tb2, tree = "gcv")) %>%
+    filter(p_k < 0.05, p_lambda < 0.05)
+
+
+
+
+
+
+if (FALSE) {
 
 # Root the tree
-class(tree_jaccard)
-tree_jaccard <- midpoint(tree_jaccard)
+class(tr)
+tr <- midpoint(tr)
 
-names(tree_jaccard)
-tree_jaccard$tip.label
-
-tb <- isolates_traits %>%
-    filter(genome_id %in% tree_jaccard$tip.label) %>%
-    mutate(genome_id = factor(genome_id,  tree_jaccard$tip.label)) %>%
+names(tr)
+tr$tip.label
+plot(tr)
+tb <- isolates %>%
+    mutate(genome_id = factor(genome_id,  tr$tip.label)) %>%
     arrange(genome_id) %>%
     left_join(distinct(isolates_contigs, genome_id, species) %>% select(genome_id, species))
 
+
 # Plot
-png(filename = paste0(folder_data, "temp/32c-01-tree_jaccard.png"), width = 20, height = 20, units = "cm", res = 1000)
-plotTree(tree_jaccard, fsize = 1, lwd = 2, split.vertical = TRUE)
-nodelabels(bg = "white", cex = 0.5, frame = "circle")
-#cladelabels(tree_jaccard, c("clade 1","clade 2","clade 3"), c(47,41,29),wing.length=0,offset=0.5)
-dev.off()
+tr %>%
+    as_tibble() %>%
+    left_join(rename(isolates, label = genome_id)) %>%
+    as.treedata() %>%
+    ggtree() +
+    geom_tiplab(aes(label = label))
+
 
 # Check names for 11 strains with both growth and symbiosis data
-rownames(isolates_traits) <- isolates_traits$genome_id
-chk <- name.check(tree_jaccard, isolates_traits)
-tr <- drop.tip(tree_jaccard, chk$tree_not_data)
-tb <- isolates_traits[tr$tip.label,]
+rownames(isolates) <- isolates$genome_id
+chk <- name.check(tr, isolates)
+tr <- drop.tip(tr, chk$tree_not_data)
+tb <- isolates[tr$tip.label,]
 rwn <- tb$genome_id
 tb <- select(tb, starts_with("r_"), starts_with("lag_"), starts_with("maxOD_"), dry_weight_mg, root_weight_mg, nodule_number)
 tb[is.na(tb)] <- 0
@@ -58,9 +99,9 @@ pic_t1 <- pic(t1, tr)
 pic_t2 <- pic(t2, tr)
 
 # Fit a LM to PICs
-lm_traits <- lm(dry_weight_mg ~ r_30c, data = tb) 
+lm_traits <- lm(dry_weight_mg ~ r_30c, data = tb)
 summary(lm_traits)
-lm_pics <- lm(pic_t2 ~ pic_t1 + 0) 
+lm_pics <- lm(pic_t2 ~ pic_t1 + 0)
 summary(lm_pics)
 
 # PGLS
@@ -121,11 +162,11 @@ ggsave(paste0(folder_data, "temp/32c-02-lm_vs_pic.png"), p, width = 6, height = 
 
 # Use all 31 strains with growth data
 # Check names for all strains
-isolates_traits <- read_csv(paste0(folder_data, "temp/29-isolates_traits.csv"))
-rownames(isolates_traits) <- isolates_traits$genome_id
-chk <- name.check(tree_jaccard, isolates_traits)
-tr <- drop.tip(tree_jaccard, chk$tree_not_data)
-tb <- isolates_traits[tr$tip.label,]
+isolates <- read_csv(paste0(folder_data, "temp/29-isolates.csv"))
+rownames(isolates) <- isolates$genome_id
+chk <- name.check(tr, isolates)
+tr <- drop.tip(tr, chk$tree_not_data)
+tb <- isolates[tr$tip.label,]
 rwn <- tb$genome_id
 tb <- select(tb, starts_with("r_"), starts_with("lag_"), starts_with("maxOD_"))
 tb[is.na(tb)] <- 0
@@ -147,3 +188,4 @@ summary(pgls_lambda)
 # PGLS with multiple traits
 pgls_ano <- gls(lag_30c ~ r_30c + r_25c, data = tb, correlation = cor_lambda)
 anova(pgls_ano)
+}

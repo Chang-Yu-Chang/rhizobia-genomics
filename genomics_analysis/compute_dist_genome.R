@@ -71,11 +71,12 @@ for (i in 1:nrow(dist_fluidity)) {
 
 # Join the distance tables
 dist_genetics <- dist_ani %>%
+    filter(genome_id1 %in% isolates$genome_id, genome_id2 %in% isolates$genome_id) %>%
     left_join(dist_kmer) %>%
     left_join(dist_jaccard) %>%
     left_join(dist_fluidity)
 
-nrow(dist_genetics) # 32^2=0.24
+nrow(dist_genetics) # 32^2=1024
 
 write_csv(dist_genetics, paste0(folder_data, "genomics_analysis/dist_genetics.csv"))
 

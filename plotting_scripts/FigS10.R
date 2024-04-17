@@ -1,4 +1,4 @@
-#' This script plots the network based one distances
+#' This script plots the kmer networks
 
 renv::load()
 library(tidyverse)
@@ -6,28 +6,13 @@ library(cowplot)
 library(tidygraph)
 library(ggraph)
 library(ggforce)
-library(graphlayouts) # for some graph layout algorithms that are not available in igraph.
 source(here::here("metadata.R"))
 
-isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 dist_genetics <- read_csv(paste0(folder_data, "genomics_analysis/dist_genetics.csv"))
+load(file = paste0(folder_data, "phylogenomics_analysis/networks/networks.rdata"))
 
-# Create networks
-nodes <- isolates_contigs %>% select(genome_id, everything()) %>%
-    filter(genome_id %in% isolates$genome_id) %>%
-    mutate(species = factor(species, unique(species))) %>%
-    arrange(species) %>%
-    filter(!genome_id %in% c("g20", "g28"))
-edges <- dist_genetics %>%
-    filter(genome_id1 %in% isolates$genome_id, genome_id2 %in% isolates$genome_id) %>%
-    rename(from = genome_id1, to = genome_id2) %>%
-    filter(!from %in% c("g20", "g28"), !to %in% c("g20", "g28"))
-g <- tbl_graph(nodes, edges, directed = F)
-
-save(nodes, edges, g, file = paste0(folder_data, "phylogenomics_analysis/networks/networks.rdata"))
-
-# 1. Plot kmer ranges ----
-p <- dist_genetics %>%
+# Panel A. Plot kmer histogram
+p1 <- dist_genetics %>%
     filter(genome_id1 != genome_id2) %>%
     mutate(across(starts_with("genome_id"), ordered)) %>%
     filter(genome_id1 < genome_id2) %>%
@@ -38,9 +23,7 @@ p <- dist_genetics %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/01-kmers_hist.png"), p, width = 4, height = 3)
-
-# 2. Plot kmer networks ----
+# Panel B. Plot kmer heatmap ----
 thr_kmer <- 0.85
 sort_pairs <- function (edges, upper = T) {
     tt <- edges %>%
@@ -56,7 +39,7 @@ sort_pairs <- function (edges, upper = T) {
     return(pivot_wider(tt, names_from = name, values_from = value))
 
 }
-p <- edges %>%
+p2 <- edges %>%
     mutate(to = factor(to, nodes$genome_id)) %>%
     mutate(from = factor(from, rev(nodes$genome_id))) %>%
     ggplot() +
@@ -73,10 +56,8 @@ p <- edges %>%
     ) +
     labs(title = "Jaccard distance")
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/02-kmers_heatmap.png"), p, width = 4, height = 3)
-
-# 3. Plot kmer networks ----
-p <- g %>%
+# Panel C. Plot kmer networks ----
+p3 <- g %>%
     activate(edges) %>%
     mutate(kmer_bin = ifelse(d_kmer < thr_kmer, paste0("d_kmer<", thr_kmer), "nope")) %>%
     ggraph(layout = "linear", circular = T) +
@@ -93,11 +74,9 @@ p <- g %>%
     ) +
     guides(edge_colour = "none") +
     labs()
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/03-kmer_network.png"), p, width = 4, height = 3)
 
-
-# 4. plot ani histogram ----
-p <- dist_genetics %>%
+# Panel D. plot ani histogram ----
+p4 <- dist_genetics %>%
     filter(genome_id1 != genome_id2) %>%
     mutate(across(starts_with("genome_id"), ordered)) %>%
     filter(genome_id1 < genome_id2) %>%
@@ -107,10 +86,9 @@ p <- dist_genetics %>%
     theme() +
     guides() +
     labs()
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/04-ani_hist.png"), p, width = 4, height = 3)
 
-# 5. Plot ani heatmap ----
-p <- edges %>%
+# Panel E. Plot ani heatmap ----
+p5 <- edges %>%
     mutate(to = factor(to, nodes$genome_id)) %>%
     mutate(from = factor(from, rev(nodes$genome_id))) %>%
     ggplot() +
@@ -127,12 +105,9 @@ p <- edges %>%
     ) +
     labs(title = "ANI")
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/05-ani_heatmap.png"), p, width = 4, height = 3)
-
-
-# 6. Plot ani networks ----
+# Panel F. Plot ani networks ----
 thr_ani <- 0.1
-p <- g %>%
+p6 <- g %>%
     activate(edges) %>%
     mutate(ani_bin = ifelse(d_ani < thr_ani, paste0("d_ani<", thr_ani), "nope")) %>%
     ggraph(layout = "linear", circular = T) +
@@ -149,25 +124,10 @@ p <- g %>%
     ) +
     guides(edge_colour = "none") +
     labs()
-ggsave(paste0(folder_data, "phylogenomics_analysis/networks/06-ani_network.png"), p, width = 4, height = 3)
 
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, labels = LETTERS[c(1,3,5,2,4,6)], scale = 0.9) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ggsave(here::here("plots/FigS10.png"), p, width = 10, height = 5)
 
 
