@@ -20,6 +20,9 @@ isolates <- isolates %>%
     left_join(isolates_traits) %>%
     filter(!genome_id %in% c("g20", "g28"))
 
+list_traits <- c(paste0(rep(c("r", "lag", "maxOD"), each = 4), "_", rep(c(25, 30, 35, 40), 3), "c"),
+                 "root_biomass_mg", "shoot_biomass_mg", "nodule_count")
+
 # Tree
 load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 #tr, tr_acce, gpatl
@@ -52,6 +55,9 @@ write_csv(traits_ps, paste0(folder_data, "phylogenomics_analysis/phylogenetic_si
 
 # 1. Plot tree with traits ----
 traits_ps <- read_csv(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/traits_ps.csv"))
+traits_ps <- traits_ps %>%
+    mutate(across(c(k, p_k, lambda, p_lambda), function(x) round(x, 3)))
+
 
 p1 <- tr %>%
     as_tibble() %>%
@@ -95,9 +101,9 @@ p_ps <- tmp %>%
 
 
 p <- plot_grid(p1, p2, axis = "tb", align = "h")
-ggsave(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/01-trait_ps.png"), p, width = 10, height = 6)
+ggsave(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/01-trait_ps_core.png"), p, width = 10, height = 6)
 
-# 2. ----
+# 2. plot the GCV tree ----
 traits_ps <- read_csv(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/traits_ps.csv"))
 
 p1 <- tr_acce %>%
@@ -120,7 +126,7 @@ ordered_tips <- p1$data %>%
 p2 <- isolates %>%
     mutate(genome_id = factor(genome_id, ordered_tips)) %>%
     ggplot() +
-    geom_col(aes(x = genome_id, y = r_30c)) +
+    geom_col(aes(x = genome_id, y = r_25c)) +
     coord_flip() +
     scale_y_continuous(expand = c(0,0)) +
     theme_classic() +
@@ -133,150 +139,119 @@ p2 <- isolates %>%
 
 tmp <- traits_ps %>%
     mutate(across(c(k, p_k, lambda, p_lambda), function(x) round(x, 3))) %>%
-    filter(trait == "r_30c", tree == "core")
+    filter(trait == "r_25c", tree == "gcv")
 
 p_ps <- tmp %>%
     ggplot() +
     geom_text(x = 0.5, y = 0.5, aes(label = paste("K = ", k, ", P = ", p_k, "\n\u03bb = ", lambda, ", P = ", p_lambda)), hjust = 0) +
     theme_classic()
 
-
 p <- plot_grid(p1, p2, axis = "tb", align = "h")
-ggsave(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/01-trait_ps.png"), p, width = 10, height = 6)
+ggsave(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/02-trait_ps_gcv.png"), p, width = 10, height = 6)
 
-
-
-
-if (FALSE) {
-
-# Root the tree
-class(tr)
-tr <- midpoint(tr)
-
-names(tr)
-tr$tip.label
-plot(tr)
-tb <- isolates %>%
-    mutate(genome_id = factor(genome_id,  tr$tip.label)) %>%
-    arrange(genome_id) %>%
-    left_join(distinct(isolates_contigs, genome_id, species) %>% select(genome_id, species))
-
-
-# Plot
-tr %>%
+# 3. Plot the the core and GCV trees with heatmap  ----
+## GCV tree
+p1 <- tr %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label))
+    geom_tiplab(align = T) +
+    geom_nodelab(aes(label = label)) +
+    #geom_nodelab(aes(label = node)) +
+    #geom_highlight(node = 38, fill = species_colors["medicae"]) +
+    #geom_tippoint(aes(color = species)) +
+    #scale_color_manual(values = species_colors) +
+    scale_x_continuous(limits = c(0, 0.65)) +
+    #theme_classic() +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,0,0,0), "mm")
+    ) +
+    guides() +
+    labs()
 
 
-# Check names for 11 strains with both growth and symbiosis data
-rownames(isolates) <- isolates$genome_id
-chk <- name.check(tr, isolates)
-tr <- drop.tip(tr, chk$tree_not_data)
-tb <- isolates[tr$tip.label,]
-rwn <- tb$genome_id
-tb <- select(tb, starts_with("r_"), starts_with("lag_"), starts_with("maxOD_"), dry_weight_mg, root_weight_mg, nodule_number)
-tb[is.na(tb)] <- 0
-rownames(tb) <- rwn
-name.check(tr, tb)
+## traits heatmap
+ordered_tips <- p1$data %>%
+    filter(isTip) %>%
+    arrange(y) %>%
+    pull(label)
 
-# PICs
-# Compute PICs
-t1 <- setNames(tb$r_30c, rownames(tb))
-t2 <- setNames(tb$dry_weight_mg, rownames(tb))
-pic_t1 <- pic(t1, tr)
-pic_t2 <- pic(t2, tr)
-
-# Fit a LM to PICs
-lm_traits <- lm(dry_weight_mg ~ r_30c, data = tb)
-summary(lm_traits)
-lm_pics <- lm(pic_t2 ~ pic_t1 + 0)
-summary(lm_pics)
-
-# PGLS
-gen <- rownames(tb)
-cor_bm <- corBrownian(phy = tr, form = ~gen)
-# for one trait
-pgls_bm <- gls(dry_weight_mg ~ r_30c, data = tb, correlation = cor_bm)
-summary(pgls_bm)
-
-lm_pics$coefficients[1] # slope of PIC test -8.714665
-pgls_bm$coefficients[2] # slope of PGLS -8.805389
-abs(lm_pics$coefficients[1] -pgls_bm$coefficients[2])
-
-tr
-tb
-
-# PGLS
-cor_lambda <- corPagel(value = 1, phy = tr, form = ~gen)
-# For one trait
-pgls_lambda <- gls(dry_weight_mg ~ r_30c, data = tb, correlation = cor_lambda)
-summary(pgls_lambda)
-# For multiple traits
-pgls_lambda <- gls(dry_weight_mg ~ r_30c + lag_30c + maxOD_30c, data = tb, correlation = cor_lambda)
-anova(pgls_lambda)
-pgls_lambda <- gls(dry_weight_mg ~ r_30c + r_25c + r_35c, data = tb, correlation = cor_lambda)
-anova(pgls_lambda)
-
-
-
-# Plot
-## Orginial trait
-p1 <- tb %>%
+p2 <- isolates %>%
+    mutate(genome_id = factor(genome_id, ordered_tips)) %>%
+    select(genome_id, starts_with("r"), starts_with("lag"), starts_with("maxOD"), shoot_biomass_mg, root_biomass_mg, nodule_count) %>%
+    pivot_longer(-genome_id, names_to = "trait") %>%
+    mutate(trait = factor(trait, list_traits)) %>%
+    # Scale
+    group_by(trait) %>%
+    mutate(value = (value - min(value, na.rm = T)) / (max(value, na.rm = T) - min(value, na.rm = T))) %>%
     ggplot() +
-    geom_point(aes(x = r_30c, y = dry_weight_mg)) +
-    geom_abline(intercept = lm_traits$coefficients[1], slope = lm_traits$coefficients[2]) +
-    # geom_abline(intercept = 0, slope = lm_pics$coefficients[1], color = "maroon") +
-    # geom_vline(xintercept = 0, linetype = 3) +
-    # geom_hline(yintercept = 0, linetype = 3) +
-    theme_classic()
+    geom_tile(aes(x = trait, y = genome_id, fill = value)) +
+    scale_fill_gradient2(low = "steelblue", mid = "snow", high = "maroon", na.value = "black", midpoint = 0.5, name = "scaled") +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    theme_classic() +
+    theme(
+        axis.title = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 0),
+        axis.text.y = element_blank(),
+        panel.grid.major.y = element_line(linetype = 2),
+        strip.background = element_blank(),
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.spacing = unit(0, "mm"),
+        legend.key.height = unit(3, units = "lines"),
+        plot.margin = unit(c(0,0,0,0), "mm")
+    ) +
+    #guides(fill = guide_legend(title = "scaled value")) +
+    labs()
 
-## PICs
-p2 <- tibble(pic1 = pic_t1, pic2 = pic_t2) %>%
+## phylogenetic signals
+tmp <- traits_ps %>%
+    filter(tree == "gcv") %>%
+    mutate(trait = factor(trait, list_traits)) %>%
+    drop_na(trait)
+temp_p <- tmp %>%
+    select(trait, k = p_k, lambda = p_lambda) %>%
+    pivot_longer(cols = -trait) %>%
+    mutate(name = ifelse(name == "k", "K", "\u03bb")) %>%
+    mutate(value = case_when(
+        value < 0.001 ~ "***",
+        value < 0.01 ~ "**",
+        value < 0.05 ~ "*",
+        value >= 0.05 ~ "n.s.",
+    ))
+
+p3 <- tmp %>%
+    select(trait, k, lambda) %>%
+    pivot_longer(cols = c(k, lambda)) %>%
+    mutate(name = ifelse(name == "k", "K", "\u03bb")) %>%
     ggplot() +
-    geom_point(aes(x = pic1, y = pic2)) +
-    geom_abline(intercept = 0, slope = lm_pics$coefficients[1], color = "maroon") +
-    geom_vline(xintercept = 0, linetype = 3) +
-    geom_hline(yintercept = 0, linetype = 3) +
-    theme_classic()
-p <- plot_grid(p1, p2, nrow = 1, scale = 0.9, align = "hv", axis = "tblr") + theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(paste0(folder_data, "temp/32c-02-lm_vs_pic.png"), p, width = 6, height = 3)
+    geom_tile(aes(x = trait, y = name, fill = value)) +
+    geom_text(data = temp_p, aes(x = trait, y = name, label = value)) +
+    scale_x_discrete(expand = c(0,0)) +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_gradient2(low = "steelblue", mid = "snow", high = "maroon", na.value = "black", midpoint = 0.5, name = "scaled") +
+    theme_classic() +
+    theme(
+        axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        #axis.text.x = element_text(angle = 45, hjust = 1),
+        #axis.text.y = element_blank(),
+        panel.grid.major.y = element_line(linetype = 2),
+        strip.background = element_blank(),
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.spacing = unit(0, "mm"),
+        plot.margin = unit(c(0,0,0,0), "mm"),
+        legend.key.height = unit(3, units = "lines")
+    ) +
+    guides(fill = "none") +
+    labs()
+
+p <- plot_grid(p1, p2, NULL, p3, nrow = 2, axis = "", align = "vh", rel_heights = c(1, 0.3), scale =0.9) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(paste0(folder_data, "phylogenomics_analysis/phylogenetic_signals/03-traits_ps_core.png"), p, width = 10, height = 8)
 
 
 
-
-
-
-
-
-# Use all 31 strains with growth data
-# Check names for all strains
-isolates <- read_csv(paste0(folder_data, "temp/29-isolates.csv"))
-rownames(isolates) <- isolates$genome_id
-chk <- name.check(tr, isolates)
-tr <- drop.tip(tr, chk$tree_not_data)
-tb <- isolates[tr$tip.label,]
-rwn <- tb$genome_id
-tb <- select(tb, starts_with("r_"), starts_with("lag_"), starts_with("maxOD_"))
-tb[is.na(tb)] <- 0
-rownames(tb) <- rwn
-name.check(tr, tb)
-
-# PGLS
-rownames(tb)
-gen <- rownames(tb)
-cor_bm <- corBrownian(phy = tr, form = ~gen)
-pgls_bm <- gls(lag_30c ~ r_30c, data = tb, correlation = cor_bm)
-summary(pgls_bm)
-
-# PGLS with lambda
-cor_lambda <- corPagel(value = 1, phy = tr, form = ~gen)
-pgls_lambda <- gls(lag_30c ~ r_30c, data = tb, correlation = cor_lambda)
-summary(pgls_lambda)
-
-# PGLS with multiple traits
-pgls_ano <- gls(lag_30c ~ r_30c + r_25c, data = tb, correlation = cor_lambda)
-anova(pgls_ano)
-}
