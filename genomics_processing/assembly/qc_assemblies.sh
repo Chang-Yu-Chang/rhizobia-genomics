@@ -11,16 +11,26 @@ do
     echo $genome_ids[$i]
     dir=$folder_genomics/assembly/$genome_ids[$i]
 
-    # Quality control the assemblies
-    mamba activate quast
-    quast \
-        $dir/medaka/consensus.fasta \
-        -t 10 \
-        -o $folder_genomics/assembly/$genome_ids[$i]/quast
+    # Quast
+    # mamba activate quast
+    # quast \
+    #     $dir/medaka/consensus.fasta \
+    #     -t 10 \
+    #     -o $folder_genomics/assembly/$genome_ids[$i]/quast
 
+    # Checkm
+    mamba activate checkm
+    checkm lineage_wf \
+        -x fasta \
+        -t 10 \
+        $dir/medaka/ \
+        $folder_genomics/assembly/$genome_ids[$i]/checkm
 done
 
-
-
-
-
+# Checkm
+# mamba activate checkm
+# checkm lineage_wf \
+#     -t 10 \
+#     -x fasta \
+#     $folder_genomics/fasta/genomes/ \
+#     $folder_genomics/fasta/genomes/checkm
