@@ -117,7 +117,7 @@ p5 <- plot_snps(isolates1, pcoa1, eigs1)
 p6 <- plot_snps(isolates2, pcoa2, eigs2)
 
 
-p <- plot_grid(p1, p3, p5, p2, p4, p6, nrow = 2, labels = LETTERS[c(1,3,5,2,4,6)],
+p <- plot_grid(p1, p3, p5, p2, p4, p6, nrow = 2, labels = LETTERS[1:3],
                align = "h", axis = "lr",
                scale = 0.9, rel_widths = c(1, 1.5, 1)) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
