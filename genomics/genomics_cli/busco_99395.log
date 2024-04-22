@@ -1,0 +1,27 @@
+2024-04-22 12:12:26 DEBUG:busco.run_BUSCO	Command line: /Users/cychang/miniconda3/envs/intel_env/envs/busco/bin/busco -i /Users/cychang/Dropbox/lab/local-adaptation/data/genomics/assembly/g3/medaka/consensus.fasta -m genome -l alphaproteobacteria_odb10
+2024-04-22 12:12:26 INFO:busco.run_BUSCO	***** Start a BUSCO v5.7.1 analysis, current time: 04/22/2024 12:12:26 *****
+2024-04-22 12:12:26 DEBUG:busco.ConfigManager	Getting config file
+2024-04-22 12:12:26 INFO:busco.ConfigManager	Configuring BUSCO with local environment
+2024-04-22 12:12:26 INFO:busco.BuscoConfig	Running genome mode
+2024-04-22 12:12:26 ERROR:busco.BuscoRunner	A run with the name /Users/cychang/Desktop/lab/local-adaptation/genomics_processing/genomics_cli/BUSCO_consensus.fasta already exists...
+	If you are sure you wish to overwrite existing files, please use the -f (force) option
+2024-04-22 12:12:26 DEBUG:busco.BuscoRunner	A run with the name /Users/cychang/Desktop/lab/local-adaptation/genomics_processing/genomics_cli/BUSCO_consensus.fasta already exists...
+	If you are sure you wish to overwrite existing files, please use the -f (force) option
+Traceback (most recent call last):
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/run_BUSCO.py", line 68, in run
+    self.load_config()
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/run_BUSCO.py", line 60, in load_config
+    self.config_manager.load_busco_config_main()
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/BuscoLogger.py", line 62, in wrapped_func
+    self.retval = func(*args, **kwargs)
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/ConfigManager.py", line 63, in load_busco_config_main
+    self.config_main.validate()
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/BuscoConfig.py", line 634, in validate
+    self._check_no_previous_run()
+  File "/Users/cychang/miniconda3/envs/intel_env/envs/busco/lib/python3.7/site-packages/busco/BuscoConfig.py", line 849, in _check_no_previous_run
+    "please use the -f (force) option".format(self.main_out)
+busco.Exceptions.BatchFatalError: A run with the name /Users/cychang/Desktop/lab/local-adaptation/genomics_processing/genomics_cli/BUSCO_consensus.fasta already exists...
+	If you are sure you wish to overwrite existing files, please use the -f (force) option
+2024-04-22 12:12:26 ERROR:busco.BuscoRunner	BUSCO analysis failed!
+2024-04-22 12:12:26 ERROR:busco.BuscoRunner	Check the logs, read the user guide (https://busco.ezlab.org/busco_userguide.html), and check the BUSCO issue board on https://gitlab.com/ezlab/busco/issues
+

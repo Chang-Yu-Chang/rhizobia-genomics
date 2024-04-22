@@ -45,21 +45,13 @@ mamba create -n quast
 mamba activate quast
 mamba install --yes -c bioconda quast=5.2.0
 
-# Install checkm v1.2.2
-# checkm assess the quality of microbial genomes recovered from isolates, single cells, and metagenomes.
-mamba create -n checkm --yes python=3.9
-mamba activate checkm
-mamba install --yes -c bioconda numpy matplotlib pysam hmmer prodigal
-pip3 install checkm-genome==1.2.2
-# Download checkm reference data at https://data.ace.uq.edu.au/public/CheckM_databases
-# Uncompress the download zip
-mv ~/Downloads/checkm_data_2015_01_16 ~/bioinformatics/checkm
-checkm data setRoot ~/bioinformatics/checkm/checkm_data_2015_01_16
-# Install pplacer binary files from https://github.com/matsen/pplacer/releases/tag/v1.1.alpha17
-# Move the pplacer bin to system path
-mv Downloads/pplacer-Darwin-v1.1.alpha17-6-g5cecf99/* ~/miniconda3/envs/intel_env/envs/checkm/bin/
-# Check installation
-#checkm test ~/checkm_test_result
+# Install BUSCO v5.7.1
+# BUSCO: Assessment of assembly completeness using Universal Single Copy Orthologs
+mamba create -n busco
+mamba activate busco
+mamba install --yes -c bioconda busco=5.7.1
+
+
 
 # Install prokka v1.14.5
 # prokka is for rapid prokaryotic genome annotation
@@ -219,3 +211,20 @@ mamba install --yes -c bioconda bwa=0.7.17
 mamba create -y -n dagchainer
 mamba activate dagchainer
 mamba install --yes -c bioconda dagchainer=r120920-3
+
+
+# Install checkm v1.2.2
+# checkm assess the quality of microbial genomes recovered from isolates, single cells, and metagenomes.
+mamba create -n checkm --yes python=3.9
+mamba activate checkm
+mamba install --yes -c bioconda numpy matplotlib pysam hmmer prodigal
+pip3 install checkm-genome==1.2.2
+# Download checkm reference data at https://data.ace.uq.edu.au/public/CheckM_databases
+# Uncompress the download zip
+mv ~/Downloads/checkm_data_2015_01_16 ~/bioinformatics/checkm
+checkm data setRoot ~/bioinformatics/checkm/checkm_data_2015_01_16
+# Install pplacer binary files from https://github.com/matsen/pplacer/releases/tag/v1.1.alpha17
+# Move the pplacer bin to system path
+mv Downloads/pplacer-Darwin-v1.1.alpha17-6-g5cecf99/* ~/miniconda3/envs/intel_env/envs/checkm/bin/
+# Check installation
+#checkm test ~/checkm_test_result

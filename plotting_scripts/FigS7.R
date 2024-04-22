@@ -1,201 +1,133 @@
-#' This script generates phenotypic comparison for PA populations
+#' This script plots the kmer networks
 
 renv::load()
 library(tidyverse)
 library(cowplot)
-library(janitor)
-library(lme4) # for linear mixed-effect models
-library(car) # companion to Applied Regression
-library(vegan) # for computing jaccard
-source(here::here("analysis/00-metadata.R"))
+library(tidygraph)
+library(ggraph)
+library(ggforce)
+source(here::here("metadata.R"))
 
+dist_genetics <- read_csv(paste0(folder_data, "genomics_analysis/dist_genetics.csv"))
+load(file = paste0(folder_data, "phylogenomics_analysis/networks/networks.rdata"))
 
-# Read plant data
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
-plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
+# Panel A. Plot kmer histogram
+p1 <- dist_genetics %>%
+    filter(genome_id1 != genome_id2) %>%
+    mutate(across(starts_with("genome_id"), ordered)) %>%
+    filter(genome_id1 < genome_id2) %>%
+    ggplot() +
+    geom_histogram(aes(x = d_kmer), fill = "white", color = "black") +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
 
-# Read growth rate data
-gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
-isolates_gc <- gc_prm_summs %>%
-    select(exp_id, temperature, r, lag, maxOD) %>%
-    pivot_longer(cols = -c(exp_id, temperature), names_to = "trait") %>%
-    unite(trait, trait, temperature) %>%
-    left_join(isolates)
+# Panel B. Plot kmer heatmap ----
+thr_kmer <- 0.85
+sort_pairs <- function (edges, upper = T) {
+    tt <- edges %>%
+        mutate(pair = 1:n()) %>%
+        pivot_longer(cols = c(from, to)) %>%
+        group_by(pair) %>%
+        mutate(value = factor(value, nodes$genome_id)) %>%
+        arrange(value)
 
+    if (upper) {
+        tt <- mutate(tt, name = c("from", "to"))
+    } else tt <- mutate(tt, name = c("to", "from"))
+    return(pivot_wider(tt, names_from = name, values_from = value))
 
-# Panel A. Plot he growth trait
-compute_trait_mean <- function (isolates_gc, tra = "r_30c", pop = "PA") {
-    igcl <- isolates_gc %>%
-        filter(trait == tra) %>%
-        filter(population == pop)
-    igcm <- igcl %>%
-        group_by(population, site_group, trait) %>%
-        summarize(mean = mean(value, na.rm = T), sem = sd(value, na.rm = T) / sqrt(n()), .groups = "keep")
-    return(list(igcl = igcl, igcm = igcm))
 }
-plot_dots <- function (igcl, igcm) {
-    set.seed(1)
-    igcl %>%
-        ggplot() +
-        geom_rect(data = distinct(igcm, site_group), aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
-        geom_point(data = igcm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
-        geom_errorbar(data = igcm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.5) +
-        scale_fill_manual(values = site_group_colors) +
-        facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-        theme_classic() +
-        theme(
-            panel.spacing.x = unit(0, "mm"),
-            strip.background = element_blank(),
-            axis.text.x = element_blank()
-        ) +
-        guides(fill = "none") +
-        labs(x = " ", y = unique(igcm$trait))
-}
-test_sign <- function (p) {
-    if (p < 0.001) {
-        x <- "***"
-    } else if (p < 0.01) {
-        x <- "**"
-    } else if (p < 0.05) {
-        x <- "*"
-    } else {
-        x <- "n.s."
-    }
-    return(x)
-}
-plot_pair <- function (tra = "r_30c", pop = "PA", y_axis = expression(r~at~30*degree*C~(1/hr))) {
-    t2_1 <- compute_trait_mean(isolates_gc, tra, pop)
-    igcl <- t2_1$igcl
-    igcm <- t2_1$igcm
-    isolates_test <- filter(isolates_gc, trait == tra, population == pop)
-    names(isolates_test)[names(isolates_test) == tra] <- "value"
-    mod <- lmer(value ~ site_group + (1|site), data = isolates_test)
-    mod2_1 <- Anova(mod, type = 3) # no
-    sigs <- tibble(population = factor(pop), sig = test_sign(mod2_1[2,3]))
-    min_value <- min(igcl$value, na.rm = T)
-    max_value <- max(igcl$value, na.rm = T)
-    p2 <- igcl %>%
-        ggplot() +
-        geom_tile(data = igcm, aes(x = site_group, y = mean, fill = site_group), alpha = 0.2, height = Inf, width = 1) +
-        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", width = 0.1, height = 0) +
-        geom_point(data = igcm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
-        geom_errorbar(data = igcm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.3) +
-        # Significance bars
-        annotate("segment", x = 1, xend = 2, y = max_value*1.05, yend = max_value*1.05) +
-        geom_text(data = sigs, aes(label = sig), x = 1.5, y = max_value*1.05, vjust = -1) +
-        scale_fill_manual(values = site_group_colors) +
-        scale_x_discrete(expand = c(0,0)) +
-        scale_y_continuous(limits = c(min_value, max_value*1.1)) +
-        theme_classic() +
-        theme(
-            panel.spacing.x = unit(2, "mm"),
-            panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-            panel.grid.major.y = element_line(color = "grey90", linetype = 1, linewidth = .5),
-            panel.grid.minor.y = element_line(color = "grey90", linetype = 2, linewidth = .2),
-            strip.background = element_blank(),
-            axis.text.x = element_blank()
-        ) +
-        guides(fill = "none") +
-        labs(x = " ", y = y_axis)
-    return(p2)
-}
+p2 <- edges %>%
+    mutate(to = factor(to, nodes$genome_id)) %>%
+    mutate(from = factor(from, rev(nodes$genome_id))) %>%
+    ggplot() +
+    geom_tile(aes(x = to, y = from, fill = d_kmer)) +
+    #scale_fill_viridis(alpha = 0.8, direction = -1, begin = 0, end = 1, breaks = seq(0,1,0.25)) +
+    scale_fill_gradient2(low = "gold", mid = "palegreen4", high = "steelblue", midpoint = 0.8) +
+    scale_x_discrete(position = "top", drop = F) +
+    scale_y_discrete(drop = F) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text = element_blank()
+    ) +
+    labs(title = "Jaccard distance")
 
-unique(isolates_gc$trait)
-list_va <- rep(list(NA), 12)
-list_va[[1]] <- plot_pair(tra = "r_25c", pop = "PA", y_axis = expression(r~at~25*degree*C~(1/hr)))
-list_va[[2]] <- plot_pair(tra = "lag_25c", pop = "PA", y_axis = expression(lag~at~25*degree*C~(hr)))
-list_va[[3]] <- plot_pair(tra = "maxOD_25c", pop = "PA", y_axis = expression(maxOD~at~25*degree*C))
-list_va[[4]] <- plot_pair(tra = "r_30c", pop = "PA", y_axis = expression(r~at~30*degree*C~(1/hr)))
-list_va[[5]] <- plot_pair(tra = "lag_30c", pop = "PA", y_axis = expression(lag~at~30*degree*C~(hr)))
-list_va[[6]] <- plot_pair(tra = "maxOD_30c", pop = "PA", y_axis = expression(maxOD~at~30*degree*C))
-list_va[[7]] <- plot_pair(tra = "r_35c", pop = "PA", y_axis = expression(r~at~35*degree*C~(1/hr)))
-list_va[[8]] <- plot_pair(tra = "lag_35c", pop = "PA", y_axis = expression(lag~at~35*degree*C~(hr)))
-list_va[[9]] <- plot_pair(tra = "maxOD_35c", pop = "PA", y_axis = expression(maxOD~at~35*degree*C))
+# Panel C. Plot kmer networks ----
+p3 <- g %>%
+    activate(edges) %>%
+    mutate(kmer_bin = ifelse(d_kmer < thr_kmer, paste0("d_kmer<", thr_kmer), "nope")) %>%
+    ggraph(layout = "linear", circular = T) +
+    #geom_mark_hull(aes(x, y, group = species, fill = species), concavity = 4, expand = unit(3, "mm"), alpha = 0.25) +
+    geom_edge_arc(aes(colour = kmer_bin), alpha = 0.1) +
+    geom_node_point(aes(fill = species), shape = 21, color = "black", size = 5) +
+    scale_edge_color_manual(values = c("black", "NA")) +
+    scale_fill_manual(values = species_colors) +
+    theme_void() +
+    theme(
+        plot.background = element_rect(color = NA, fill = "white"),
+        plot.margin = unit(c(1,1,1,1), "mm"),
+        legend.position = "right"
+    ) +
+    guides(edge_colour = "none") +
+    labs()
 
+# Panel D. plot ani histogram ----
+p4 <- dist_genetics %>%
+    filter(genome_id1 != genome_id2) %>%
+    mutate(across(starts_with("genome_id"), ordered)) %>%
+    filter(genome_id1 < genome_id2) %>%
+    ggplot() +
+    geom_histogram(aes(x = d_ani), fill = "white", color = "black") +
+    theme_classic() +
+    theme() +
+    guides() +
+    labs()
 
-# Plot the symbiosis traits comparing the two populations
-compute_trait_mean2 <- function (plants_long, tra = "dry_weight_mg", pop = "PA") {
-    pl <- plants_long %>%
-        filter(trait == tra) %>%
-        filter(exp_id != "control") %>%
-        filter(population == pop)
+# Panel E. Plot ani heatmap ----
+p5 <- edges %>%
+    mutate(to = factor(to, nodes$genome_id)) %>%
+    mutate(from = factor(from, rev(nodes$genome_id))) %>%
+    ggplot() +
+    geom_tile(aes(x = to, y = from, fill = d_ani)) +
+    scale_fill_gradient2(low = "gold", mid = "palegreen4", high = "steelblue", midpoint = 0.1) +
+    #scale_fill_viridis(alpha = 0.8, direction = -1, begin = 0, end = 0.3, breaks = seq(0,1,0.25)) +
+    scale_x_discrete(position = "top", drop = F) +
+    scale_y_discrete(drop = F) +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text = element_blank()
+    ) +
+    labs(title = "ANI")
 
-    plm <- pl %>%
-        group_by(population, site_group, trait) %>%
-        summarize(mean = mean(value), sem = sd(value)/sqrt(n()))
-    return(list(pl = pl, plm = plm))
-}
-plot_dots2 <- function (pl, plm) {
-    set.seed(1)
-    pl %>%
-        ggplot() +
-        geom_rect(data = distinct(plm, site_group), aes(fill = site_group), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.3) +
-        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", height = 0, width = 0.1) +
-        geom_point(data = plm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
-        geom_errorbar(data = plm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.2) +
-        scale_fill_manual(values = site_group_colors) +
-        facet_wrap(.~site_group, scales = "free_x", nrow = 1) +
-        theme_classic() +
-        theme(
-            panel.spacing.x = unit(0, "mm"),
-            strip.background = element_blank(),
-            axis.text.x = element_blank()
-        ) +
-        guides(fill = "none") +
-        labs(x = " ", y = "shoot biomass (mg)")
-}
-plot_pair2 <- function (tra = "dry_weight_mg", pop = "PA", y_axis = "dry_weight_mg") {
-    t3_1 <- compute_trait_mean2(plants_long, tra = tra, pop = pop)
-    pl <- t3_1$pl
-    plm <- t3_1$plm
-    plants_test <- filter(plants, population == pop, exp_id != "control")
-    names(plants_test)[names(plants_test) == tra] <- "value"
-    plants_test <- drop_na(plants_test, value)
-    mod <- lmer(value ~ site_group + (1|site), data = plants_test)
-    mod2_1 <- Anova(mod, type = 3) # no
-    sigs <- tibble(population = factor(pop), sig = test_sign(mod2_1[2,3]))
-    min_value <- min(pl$value, na.rm = T)
-    max_value <- max(pl$value, na.rm = T)
+# Panel F. Plot ani networks ----
+thr_ani <- 0.1
+p6 <- g %>%
+    activate(edges) %>%
+    mutate(ani_bin = ifelse(d_ani < thr_ani, paste0("d_ani<", thr_ani), "nope")) %>%
+    ggraph(layout = "linear", circular = T) +
+    #geom_mark_hull(aes(x, y, group = species, fill = species), concavity = 4, expand = unit(3, "mm"), alpha = 0.25) +
+    geom_edge_arc(aes(colour = ani_bin), alpha = 0.1) +
+    geom_node_point(aes(fill = species), shape = 21, color = "black", size = 5) +
+    scale_edge_color_manual(values = c("black", "NA")) +
+    scale_fill_manual(values = species_colors) +
+    theme_void() +
+    theme(
+        plot.background = element_rect(color = NA, fill = "white"),
+        plot.margin = unit(c(1,1,1,1), "mm"),
+        legend.position = "right"
+    ) +
+    guides(edge_colour = "none") +
+    labs()
 
-    bar_y=55
-    p3 <- pl %>%
-        ggplot() +
-        geom_tile(data = plm, aes(x = site_group, y = mean, fill = site_group), alpha = 0.2, height = Inf, width = 1) +
-        geom_jitter(aes(x = site_group, y = value), alpha = 0.3, shape = 16, color = "black", width = 0.1, height = 0) +
-        geom_point(data = plm, aes(x = site_group, y = mean), size = 2, shape = 21, fill = NA, color = "black") +
-        geom_errorbar(data = plm, aes(x = site_group, ymin = mean-sem, ymax = mean+sem), width = 0.3) +
-        # Significance bars
-        annotate("segment", x = 1, xend = 2, y = max_value*1.05, yend = max_value*1.05) +
-        geom_text(data = sigs, aes(label = sig), x = 1.5, y = max_value*1.05, vjust = -1) +
-        scale_fill_manual(values = site_group_colors) +
-        scale_x_discrete(expand = c(0,0)) +
-        scale_y_continuous(limits = c(min_value, max_value*1.1)) +
-        theme_classic() +
-        theme(
-            panel.spacing.x = unit(2, "mm"),
-            panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-            panel.grid.major.y = element_line(color = "grey90", linetype = 1, linewidth = .5),
-            panel.grid.minor.y = element_line(color = "grey90", linetype = 2, linewidth = .2),
-            strip.background = element_blank(),
-            axis.text.x = element_blank()
-        ) +
-        guides(fill = "none") +
-        labs(x = " ", y = y_axis)
-    return(p3)
-}
+p <- plot_grid(p1, p2, p3, p4, p5, p6, nrow = 2, labels = LETTERS[c(1,3,5,2,4,6)], scale = 0.9) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
-
-list_va[[10]] <- plot_pair2(tra = "dry_weight_mg", pop = "PA", y_axis = "shoot biomass (mg)")
-list_va[[11]] <- plot_pair2(tra = "nodule_number", pop = "PA", y_axis = "# of nodules")
-list_va[[12]] <- plot_pair2(tra = "root_weight_mg", pop = "PA", y_axis = "root biomass (mg)")
-
-p <- plot_grid(plotlist = list_va[1:12], nrow = 4, align = "vh", axis = "lrbt", labels = c("A", rep("", 8), "B", "", ""))
-ggsave(here::here("plots/FigS7.png"), p, width = 10, height = 12)
-
-
-
-
+ggsave(here::here("plots/FigS10.png"), p, width = 10, height = 5)
 
 
