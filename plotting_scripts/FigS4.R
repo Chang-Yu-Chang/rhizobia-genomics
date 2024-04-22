@@ -9,15 +9,14 @@ library(car) # companion to Applied Regression
 library(vegan) # for computing jaccard
 source(here::here("metadata.R"))
 
-
 # Read plant data
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
-plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+plants <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants.csv"))
+plants_long <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants_long.csv"))
 
 # Read growth rate data
-gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
-isolates_gc <- gc_prm_summs %>%
+gts <- read_csv(paste0(folder_data, 'phenotypes_analysis/growth/gts.csv'))
+isolates_gc <- gts %>%
     select(exp_id, temperature, r, lag, maxOD) %>%
     pivot_longer(cols = -c(exp_id, temperature), names_to = "trait") %>%
     unite(trait, trait, temperature) %>%
@@ -104,15 +103,15 @@ plot_pair <- function (tra = "r_30c", pop = "PA", y_axis = expression(r~at~30*de
 
 unique(isolates_gc$trait)
 list_va <- rep(list(NA), 12)
-list_va[[1]] <- plot_pair(tra = "r_25c", pop = "PA", y_axis = expression(r~at~25*degree*C~(1/hr)))
-list_va[[2]] <- plot_pair(tra = "lag_25c", pop = "PA", y_axis = expression(lag~at~25*degree*C~(hr)))
-list_va[[3]] <- plot_pair(tra = "maxOD_25c", pop = "PA", y_axis = expression(maxOD~at~25*degree*C))
-list_va[[4]] <- plot_pair(tra = "r_30c", pop = "PA", y_axis = expression(r~at~30*degree*C~(1/hr)))
-list_va[[5]] <- plot_pair(tra = "lag_30c", pop = "PA", y_axis = expression(lag~at~30*degree*C~(hr)))
-list_va[[6]] <- plot_pair(tra = "maxOD_30c", pop = "PA", y_axis = expression(maxOD~at~30*degree*C))
-list_va[[7]] <- plot_pair(tra = "r_35c", pop = "PA", y_axis = expression(r~at~35*degree*C~(1/hr)))
-list_va[[8]] <- plot_pair(tra = "lag_35c", pop = "PA", y_axis = expression(lag~at~35*degree*C~(hr)))
-list_va[[9]] <- plot_pair(tra = "maxOD_35c", pop = "PA", y_axis = expression(maxOD~at~35*degree*C))
+list_va[[1]] <- plot_pair(tra = "r_25c", pop = "PA", y_axis = expression(r[T==25](1/hr)))
+list_va[[2]] <- plot_pair(tra = "lag_25c", pop = "PA", y_axis = expression(t[T==25](hr)))
+list_va[[3]] <- plot_pair(tra = "maxOD_25c", pop = "PA", y_axis = expression(x[T==25]))
+list_va[[4]] <- plot_pair(tra = "r_30c", pop = "PA", y_axis = expression(r[T==30](1/hr)))
+list_va[[5]] <- plot_pair(tra = "lag_30c", pop = "PA", y_axis = expression(t[T==30](hr)))
+list_va[[6]] <- plot_pair(tra = "maxOD_30c", pop = "PA", y_axis = expression(x[T==30]))
+list_va[[7]] <- plot_pair(tra = "r_35c", pop = "PA", y_axis = expression(r[T==35](1/hr)))
+list_va[[8]] <- plot_pair(tra = "lag_35c", pop = "PA", y_axis = expression(t[T==35](hr)))
+list_va[[9]] <- plot_pair(tra = "maxOD_35c", pop = "PA", y_axis = expression(x[T==35]))
 
 
 # Plot the symbiosis traits comparing the two populations
@@ -186,13 +185,12 @@ plot_pair2 <- function (tra = "dry_weight_mg", pop = "PA", y_axis = "dry_weight_
     return(p3)
 }
 
-
-list_va[[10]] <- plot_pair2(tra = "dry_weight_mg", pop = "PA", y_axis = "shoot biomass (mg)")
-list_va[[11]] <- plot_pair2(tra = "nodule_number", pop = "PA", y_axis = "# of nodules")
-list_va[[12]] <- plot_pair2(tra = "root_weight_mg", pop = "PA", y_axis = "root biomass (mg)")
+list_va[[10]] <- plot_pair2(tra = "shoot_biomass_mg", pop = "PA", y_axis = "shoot biomass (mg)")
+list_va[[11]] <- plot_pair2(tra = "nodule_count", pop = "PA", y_axis = "# of nodules")
+list_va[[12]] <- plot_pair2(tra = "root_biomass_mg", pop = "PA", y_axis = "root biomass (mg)")
 
 p <- plot_grid(plotlist = list_va[1:12], nrow = 4, align = "vh", axis = "lrbt", labels = c("A", rep("", 8), "B", "", ""))
-ggsave(here::here("plots/FigS7.png"), p, width = 10, height = 12)
+ggsave(here::here("plots/FigS4.png"), p, width = 10, height = 12)
 
 
 
