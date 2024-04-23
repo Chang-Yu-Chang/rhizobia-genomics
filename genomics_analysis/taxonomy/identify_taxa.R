@@ -12,6 +12,7 @@ b_16s <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_16s.csv'))
 # 16S blast
 rrnas <- b_16s %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    group_by(genome_id) %>%
     mutate(species = paste0("E. ", str_split(scomment, " ")[[1]] %>% `[`(2))) %>%
     select(genome_id, species, sseqid, pident, length) %>%
     ungroup()

@@ -7,19 +7,23 @@ source(here::here("metadata.R"))
 
 # Table
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-b_16s <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/b_16s.csv"))
-isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
 
-isolates %>%
-    select(population, site_group, site, genome_id)
-
-colnames(en) <- c("Accession", "Species", "Strain")
-en <- en %>%
-    mutate(Species = str_replace(Species, "E.", "Ensifer"))
+iso <- isolates %>%
+    left_join(isolates_tax) %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    arrange(genome_id) %>%
+    select(population, site_group, genome_id, starts_with("rrna"), starts_with("contig")) %>%
+    mutate(hit_rrna = paste0(rrna_species, " (", rrna_sseqid, ") ", round(rrna_pident, 1), "%, ", rrna_length)) %>%
+    mutate(hit_contig = paste0(contig_species, " (", contig_sseqid, ") ", round(contig_pident, 1), "%, ", contig_length)) %>%
+    mutate(` ` = 1:n()) %>%
+    select(` `, everything(), -starts_with("rrna"), -starts_with("contig"))
 
 # Flextable
-ft <- flextable(en) %>%
+ft <- flextable(iso) %>%
     autofit() %>%
-    style(j = 2, pr_t = fp_text_default(italic = T))
+    merge_v(j = c("population", "site_group")) %>%
+    valign(j = c("population", "site_group"), valign = "top")
+    #style(j = 2, pr_t = fp_text_default(italic = T))
 
-save_as_image(ft, path = here::here("plots/TabS1.png"))
+save_as_image(ft, path = here::here("plots/TabS2.png"))
