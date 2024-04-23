@@ -8,14 +8,11 @@ library(car) # companion to Applied Regression
 library(vegan) # for computing jaccard and adonis2
 source("metadata.R")
 
-# Read plant data
-isolates <- read_csv(paste0(folder_data, "temp/00-isolates.csv"))
-plants <- read_csv(paste0(folder_data, "temp/23-plants.csv"))
-plants_long <- read_csv(paste0(folder_data, "temp/23-plants_long.csv"))
-
-# Read growth rate data
-gc_prm_summs <- read_csv(paste0(folder_data, 'temp/21-gc_prm_summs.csv'))
-isolates_gc <- gc_prm_summs %>%
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+plants <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants.csv"))
+plants_long <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants_long.csv"))
+gts <- read_csv(paste0(folder_data, 'phenotypes_analysis/growth/gts.csv'))
+isolates_gc <- gts %>%
     select(exp_id, temperature, r, lag, maxOD) %>%
     pivot_longer(cols = -c(exp_id, temperature), names_to = "trait") %>%
     unite(trait, trait, temperature) %>%
@@ -163,8 +160,8 @@ p2_1 <- bind_cols(isolates_i1, pca1$x[,1:2]) %>% plot_pca(eigs1[1], eigs1[2])
 p2_2 <- bind_cols(isolates_i2, pca2$x[,1:2]) %>% plot_pca(eigs2[1], eigs2[2])
 
 
-# Panel C. Plot the symbiosis traits comparing the two populations
-compute_trait_mean2 <- function (plants_long, tra = "dry_weight_mg", pop = "VA") {
+# Panel C. Plot the symbiosis traits comparing the two populations ----
+compute_trait_mean2 <- function (plants_long, tra = "shoot_biomass_mg", pop = "VA") {
     pl <- plants_long %>%
         filter(trait == tra) %>%
         filter(exp_id != "control") %>%
@@ -195,29 +192,29 @@ plot_dots2 <- function (pl, plm) {
         labs(x = " ", y = "shoot biomass (mg)")
 }
 
-t3_1 <- compute_trait_mean2(plants_long,tra = "dry_weight_mg", pop = "VA")
-t3_2 <- compute_trait_mean2(plants_long,tra = "dry_weight_mg", pop = "PA")
+t3_1 <- compute_trait_mean2(plants_long,tra = "shoot_biomass_mg", pop = "VA")
+t3_2 <- compute_trait_mean2(plants_long,tra = "shoot_biomass_mg", pop = "PA")
 pl <- bind_rows(t3_1$pl, t3_2$pl) %>% mutate(population = factor(population, c("VA", "PA")))
 plm <- bind_rows(t3_1$plm, t3_2$plm) %>% mutate(population = factor(population, c("VA", "PA")))
 
 # Does rhizobia sites have effect on shoot biomass in VA?
 plants_test <- filter(plants, population == "VA", exp_id != "control")
-mod <- lmer(dry_weight_mg ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
+mod <- lmer(shoot_biomass_mg ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
 mod3_1 <- Anova(mod, type = 3) # no
 mod3_1
-# mod <- lmer(nodule_number ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
+# mod <- lmer(nodule_count ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
 # Anova(mod, type = 3) # no
-# mod <- lmer(root_weight_mg ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
+# mod <- lmer(root_biomass_mg ~ site_group + (1|plant) + (1|exp_id) + (1|waterblock), data = plants_test)
 # Anova(mod, type = 3) # no
 
 # Does rhizobia sites have effect on shoot biomass in PA?
 plants_test <- filter(plants, population == "PA", exp_id != "control")
-mod <- lmer(dry_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+mod <- lmer(shoot_biomass_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
 mod3_2 <- Anova(mod, type = 3) # no
 mod3_2
-# mod <- lmer(nodule_number ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+# mod <- lmer(nodule_count ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
 # Anova(mod, type = 3) # yes
-# mod <- lmer(root_weight_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
+# mod <- lmer(root_biomass_mg ~ site_group + (1|exp_id) + (1|waterblock), data = plants_test)
 # Anova(mod, type = 3) # no
 
 sigs <- tibble(population = factor(c("VA", "PA")), sig = c(test_sign(mod3_1[2,3]), test_sign(mod3_2[2,3])))
@@ -262,8 +259,8 @@ p3_2 <- plot_dots2(pl, plm, sigs, "PA")
 # Panel D. Symbiosis traits ----
 ## Test VA populations: high vs low elevation
 plants_i1 <- filter(plants, population == "VA", exp_id != "control") %>%
-    drop_na(dry_weight_mg, nodule_number, root_weight_mg)
-m <- as.matrix(select(plants_i1, dry_weight_mg, nodule_number, root_weight_mg)); dim(m)
+    drop_na(shoot_biomass_mg, nodule_count, root_biomass_mg)
+m <- as.matrix(select(plants_i1, shoot_biomass_mg, nodule_count, root_biomass_mg)); dim(m)
 m <- scale(m)
 permanova1 <- adonis2(m ~ site_group, data = plants_i1, method = "euclidean", na.rm = T)
 permanova1 # no
@@ -272,8 +269,8 @@ eigs1 <- round(pca1$sdev^2 / sum(pca1$sdev^2)*100, 2)
 
 ## Test PA populaitons
 plants_i2 <- filter(plants, population == "PA", exp_id != "control") %>%
-    drop_na(dry_weight_mg, nodule_number, root_weight_mg)
-m <- as.matrix(select(plants_i2, dry_weight_mg, nodule_number, root_weight_mg)); dim(m)
+    drop_na(shoot_biomass_mg, nodule_count, root_biomass_mg)
+m <- as.matrix(select(plants_i2, shoot_biomass_mg, nodule_count, root_biomass_mg)); dim(m)
 m <- scale(m)
 permanova2 <- adonis2(m ~ site_group, data = plants_i2, method = "euclidean", na.rm = T)
 permanova2 # no
@@ -287,7 +284,7 @@ p4_2 <- bind_cols(plants_i2, pca2$x[,1:2]) %>% plot_pca(eigs2[1], eigs2[2])
 #
 p <- plot_grid(
     p1_1, p2_1, p3_1, p4_1, p1_2, p2_2, p3_2, p4_2,
-    nrow = 2, rel_heights = c(1,1,1,1), axis = "tb", align = "h", labels = LETTERS[1:4], scale = 0.9
+    nrow = 2, rel_heights = c(1,1,1,1), axis = "tb", align = "h", labels = LETTERS[1:4], scale = 0.95
 ) + theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 12, height = 7)
