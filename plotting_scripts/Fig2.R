@@ -21,9 +21,6 @@ isolates_gc <- gc_prm_summs %>%
     unite(trait, trait, temperature) %>%
     left_join(isolates)
 
-# Panel Cartoons
-#p1 <- ggdraw() + draw_text("placeholder")
-
 # Panel A. Plot the 30C ----
 compute_trait_mean <- function (isolates_gc, tra = "r_30c", pop = "VA") {
 igcl <- isolates_gc %>%
