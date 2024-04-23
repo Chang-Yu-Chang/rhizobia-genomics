@@ -70,7 +70,8 @@ b_genome <- bind_rows(list_b_genome) %>%
     slice(1) %>%
     mutate(accession = sseqid) %>%
     left_join(ref_genome) %>%
-    select(genome_id, qseqid, scomment, everything()) %>%
+    ungroup() %>%
+    select(genome_id, species, strain, replicon, qseqid, scomment, sseqid, pident, length, bitscore) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id)
 

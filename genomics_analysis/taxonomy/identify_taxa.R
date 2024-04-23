@@ -7,12 +7,22 @@ source(here::here("metadata.R"))
 
 genomes <- read_csv(paste0(folder_data, 'genomics_analysis/genomes/genomes.csv'))
 b_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_genome.csv'))
+b_16s <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_16s.csv'))
 
-# Clean the replicon name
+# 16S blast
+rrnas <- b_16s %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    mutate(species = paste0("E. ", str_split(scomment, " ")[[1]] %>% `[`(2))) %>%
+    select(genome_id, species, sseqid, pident, length) %>%
+    ungroup()
+write_csv(rrnas, paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
+
+# Genome blast. Clean the replicon name
 contigs <- b_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     mutate(contig_id = paste0(genome_id, "_", qseqid)) %>%
-    select(genome_id, contig_id, species, strain, replicon, bitscore) %>%
+    mutate(species = paste0("E. ", species)) %>%
+    #select(genome_id, contig_id, species, strain, replicon, bitscore) %>%
     mutate(replicon = case_when(
         str_detect(replicon, "chromosome") ~ "chromosome",
         str_detect(replicon, "psymA") ~ str_replace(replicon, "psymA", "pSymA"),
@@ -39,16 +49,29 @@ write_csv(contigs, paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv")
 
 # Assign isolates to taxonomy
 genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
+rrnas <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv"))
-isolates_contigs <- contigs %>%
-    filter(replicon == "chromosome") %>%
-    left_join(genomes) %>%
+
+rrnas <- rrnas %>%
     group_by(genome_id) %>%
+    arrange(desc(pident)) %>%
+    slice(1) %>%
+    ungroup()
+contigs <- contigs %>%
+    group_by(genome_id) %>%
+    left_join(genomes) %>%
+    filter(replicon == "chromosome") %>%
     arrange(genome_id, desc(contig_length)) %>%
     slice(1) %>%
-    select(genome_id, species, strain, contig_id, contig_length) %>%
+    select(genome_id, species, sseqid, pident, length) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id) %>%
     ungroup()
 
-write_csv(isolates_contigs, paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+colnames(rrnas)[2:5] <- paste0("rrna_", colnames(rrnas)[2:5])
+colnames(contigs)[2:5] <- paste0("contig_", colnames(contigs)[2:5])
+
+isolates_tax <- rrnas %>%
+    left_join(contigs)
+
+write_csv(isolates_tax, paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))

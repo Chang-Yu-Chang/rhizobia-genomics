@@ -8,7 +8,7 @@ library(ggmap)
 #library(ggsn) # add scale to map
 library(ggsci)
 library(RColorBrewer)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
 diff_vars <- read_csv(paste0(folder_data, "temp/22-diff_vars.csv"), show_col_types = F)
