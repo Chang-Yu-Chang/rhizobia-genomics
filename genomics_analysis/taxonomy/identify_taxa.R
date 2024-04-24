@@ -5,20 +5,21 @@ library(tidyverse)
 library(janitor)
 source(here::here("metadata.R"))
 
+isolates <- read_csv(paste0(folder_data, 'mapping/isolates.csv'))
 genomes <- read_csv(paste0(folder_data, 'genomics_analysis/genomes/genomes.csv'))
-b_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_genome.csv'))
-b_16s <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_16s.csv'))
 
-# 16S blast
-rrnas <- b_16s %>%
+# 1. sourmash ----
+sm_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/sm_genome.csv'))
+sms <- sm_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     group_by(genome_id) %>%
-    mutate(species = paste0("E. ", str_split(scomment, " ")[[1]] %>% `[`(2))) %>%
-    select(genome_id, species, sseqid, pident, length) %>%
-    ungroup()
-write_csv(rrnas, paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
+    mutate(species = str_split(name, " ") %>% `[[`(1) %>% `[`(c(2,3)) %>% paste(collapse = " ")) %>%
+    mutate(species = str_replace(species, "Sinorhizobium", "Ensifer")) %>%
+    select(genome_id, species, query_containment_ani, name)
+write_csv(sms, paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
 
-# Genome blast. Clean the replicon name
+# 2. Genome blast. Clean the replicon name ----
+b_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_genome.csv'))
 contigs <- b_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     mutate(contig_id = paste0(genome_id, "_", qseqid)) %>%
@@ -48,16 +49,27 @@ contigs <- b_genome %>%
 
 write_csv(contigs, paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv"))
 
+# 3. 16S blast ----
+b_16s <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_16s.csv'))
+rrnas <- b_16s %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    group_by(genome_id) %>%
+    mutate(species = paste0("E. ", str_split(scomment, " ")[[1]] %>% `[`(2))) %>%
+    select(genome_id, species, sseqid, pident, length) %>%
+    ungroup()
+write_csv(rrnas, paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
+
 # Assign isolates to taxonomy
 genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
-rrnas <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
+sms <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv"))
+rrnas <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
 
-rrnas <- rrnas %>%
+sms <- sms %>%
     group_by(genome_id) %>%
-    arrange(desc(pident)) %>%
+    arrange(desc(query_containment_ani)) %>%
     slice(1) %>%
-    ungroup()
+    select(-name)
 contigs <- contigs %>%
     group_by(genome_id) %>%
     left_join(genomes) %>%
@@ -68,9 +80,15 @@ contigs <- contigs %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id) %>%
     ungroup()
+rrnas <- rrnas %>%
+    group_by(genome_id) %>%
+    arrange(desc(pident)) %>%
+    slice(1) %>%
+    ungroup()
 
-colnames(rrnas)[2:5] <- paste0("rrna_", colnames(rrnas)[2:5])
+colnames(sms)[2:3] <- paste0("sm_", colnames(sms)[2:3])
 colnames(contigs)[2:5] <- paste0("contig_", colnames(contigs)[2:5])
+colnames(rrnas)[2:5] <- paste0("rrna_", colnames(rrnas)[2:5])
 
 isolates_tax <- rrnas %>%
     left_join(contigs)

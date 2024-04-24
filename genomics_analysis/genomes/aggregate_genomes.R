@@ -27,3 +27,45 @@ genomes <- bind_rows(list_g_contigs) %>%
 
 write_csv(genomes, paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 
+# Extract QC values
+## quast
+list_g <- rep(list(NA), nrow(isolates))
+for (i in 1:length(list_g)) {
+    rp <- read_delim(paste0(folder_genomics, "assembly/", isolates$genome_id[i],"/quast/report.tsv")) %>%
+        set_names(c("name", "value"))
+
+    list_g[[i]] <- tibble(
+        genome_id = isolates$genome_id[i],
+        name = c("GC (%)", "Largest contig", "Total length (>= 10000 bp)", "# contigs (>= 10000 bp)", "N50", "N90", "L50", "L90")
+    ) %>%
+        left_join(rp)
+}
+
+quast <- bind_rows(list_g) %>%
+    group_by(genome_id) %>%
+    pivot_wider(names_from = name, values_from = value) %>%
+    clean_names()
+
+## busco
+list_b <- rep(list(NA), nrow(isolates))
+for (i in 1:length(list_b)) {
+    file_name <- paste0(folder_genomics, "assembly/", isolates$genome_id[i],"/busco/run_alphaproteobacteria_odb10/short_summary.txt")
+    rls <- readLines(file_name)
+    tmp <- rls[10:15] %>% str_split("\t", simplify = T) %>% `[`(,2) %>% as.numeric()
+    list_b[[i]] <- tibble(genome_id = isolates$genome_id[i], name = c("C", "S", "D", "F", "M", "T"), value = tmp)
+}
+
+busco <- bind_rows(list_b) %>%
+    group_by(genome_id) %>%
+    pivot_wider(names_from = name, values_from = value) %>%
+    mutate(completeness = C/T)
+
+qcs <- left_join(quast, busco)
+write_csv(qcs, paste0(folder_data, "genomics_analysis/genomes/qcs.csv"))
+
+
+
+
+
+
+

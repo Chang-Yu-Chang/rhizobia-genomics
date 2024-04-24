@@ -52,14 +52,14 @@ p1 <- tr_acce %>%
     theme_tree() +
     #theme_classic() +
     theme(
-        legend.position = c(0.2, 0.85),
+        legend.position = c(0.3, 1),
         legend.background = element_rect(color = "black", fill = "white"),
         axis.line.y = element_blank(),
         axis.ticks.length = unit(0, "mm"),
         axis.text.y = element_text(size = 10)
     ) +
     guides(color = guide_legend(title = NULL))
-p1
+
 ordered_tips <- p1$data %>%
     filter(isTip) %>%
     arrange(y) %>%
@@ -185,24 +185,4 @@ p <- plot_grid(pp[[1]], pp[[2]], NULL, p3, axis = "l", align = "v", labels = c("
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig4.png"), p, width = 10, height = 6)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

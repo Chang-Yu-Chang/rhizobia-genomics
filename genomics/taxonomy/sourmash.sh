@@ -11,7 +11,7 @@ mkdir -p $folder_genomics/taxonomy
 
 # Compare strains to database via sourmash
 
-for i in {30..32}
+for i in {1..32}
 do
     echo $genome_ids[$i]
     genome_fa=$folder_genomics/fasta/genomes/$genome_ids[$i].fasta
