@@ -15,6 +15,7 @@ sms <- sm_genome %>%
     group_by(genome_id) %>%
     mutate(species = str_split(name, " ") %>% `[[`(1) %>% `[`(c(2,3)) %>% paste(collapse = " ")) %>%
     mutate(species = str_replace(species, "Sinorhizobium", "Ensifer")) %>%
+    mutate(species = str_replace(species, "Ensifer", "E.")) %>%
     select(genome_id, species, query_containment_ani, name)
 write_csv(sms, paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
 
@@ -90,7 +91,8 @@ colnames(sms)[2:3] <- paste0("sm_", colnames(sms)[2:3])
 colnames(contigs)[2:5] <- paste0("contig_", colnames(contigs)[2:5])
 colnames(rrnas)[2:5] <- paste0("rrna_", colnames(rrnas)[2:5])
 
-isolates_tax <- rrnas %>%
-    left_join(contigs)
+isolates_tax <- sms %>%
+    left_join(contigs) %>%
+    left_join(rrnas)
 
 write_csv(isolates_tax, paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))

@@ -16,7 +16,7 @@ for (i in 1:length(list_sm)) {
         mutate(genome_id = isolates$genome_id[i])
     # ANI estimated from the query containment in the match.
 }
-sm_genome <- bind_rows(list_sm[-c(29:32)]) %>%
+sm_genome <- bind_rows(list_sm) %>%
     select(genome_id, everything())
 write_csv(sm_genome, paste0(folder_data, "genomics_analysis/taxonomy/sm_genome.csv"))
 
