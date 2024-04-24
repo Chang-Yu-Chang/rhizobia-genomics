@@ -9,19 +9,17 @@ library(ggtree)
 library(proxy) # For computing jaccard distance
 library(vcfR) # for handling VCF
 library(poppr) # for pop gen analysis
-#library(vegan) # for computing jaccard
 source(here::here("metadata.R"))
 
 gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
-# Panel A-B. PAP heatmaps
+# Panel A-B. PAP heatmaps ----
 ii <- isolates %>%
     left_join(isolates_contigs) %>%
-    filter(!genome_id %in% c("g20", "g28")) %>%
+    filter(!genome_id %in% c( "g28")) %>%
     select(genome_id, site_group, population, species)
-
 plot_heatmap <- function (pop = "VA", sgc = site_group_colors[1:2]) {
     gpatl %>%
         left_join(ii) %>%
@@ -46,10 +44,8 @@ plot_heatmap <- function (pop = "VA", sgc = site_group_colors[1:2]) {
         labs(x = "gene cluster", y = "genome", title = "Gene presence/absence")
 }
 
-p1 <- plot_heatmap()
-p2 <- plot_heatmap("PA", site_group_colors[3:4])
 
-# Panel C-D. matched trees
+# Panel C-D. matched trees ----
 plot_matchedtree <- function (pop = "VA") {
     pop <- ifelse(pop == "VA", "PA", "VA")
 
@@ -89,12 +85,8 @@ plot_matchedtree <- function (pop = "VA") {
 
 }
 
-p3 <- plot_matchedtree()
-p4 <- plot_matchedtree("PA")
-
-# Panel E-F. SNPs
+# Panel E-F. SNPs ----
 load(file = paste0(folder_data, "genomics_analysis/variants/snps.rdata"))
-
 plot_snps <- function (isolates_i, pcoa_i, eigs_i) {
     isolates_i %>%
         bind_cols(tibble(mds1 = pcoa_i$points[,1], mds2 = pcoa_i$points[,2])) %>%
@@ -113,13 +105,22 @@ plot_snps <- function (isolates_i, pcoa_i, eigs_i) {
         labs(x = paste0("PCoA axis 1(", eigs_i[1], "%)"), y = paste0("PCoA axis 1(", eigs_i[2], "%)"))
 
 }
-p5 <- plot_snps(isolates1, pcoa1, eigs1)
-p6 <- plot_snps(isolates2, pcoa2, eigs2)
 
 
-p <- plot_grid(p1, p3, p5, p2, p4, p6, nrow = 2, labels = LETTERS[1:3],
+#
+plist <- list(
+    plot_matchedtree(),
+    plot_heatmap(),
+    plot_snps(isolates1, pcoa1, eigs1),
+    plot_matchedtree("PA"),
+    plot_heatmap("PA", site_group_colors[3:4]),
+    plot_snps(isolates2, pcoa2, eigs2)
+)
+
+
+p <- plot_grid(plotlist = plist, nrow = 2, labels = LETTERS[1:3],
                align = "h", axis = "lr",
-               scale = 0.9, rel_widths = c(1, 1.5, 1)) +
+               scale = 0.9, rel_widths = c(1.5, 1, 1)) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 6)

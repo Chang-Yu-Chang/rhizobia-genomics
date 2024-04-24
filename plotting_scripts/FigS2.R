@@ -5,11 +5,10 @@ library(tidyverse)
 library(cowplot)
 library(janitor)
 library(RColorBrewer)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
-sites <- read_csv(paste0(folder_data, "temp/22-sites.csv"), show_col_types = F)
-diff_vars <- read_csv(paste0(folder_data, "temp/22-diff_vars.csv"), show_col_types = F)
-
+sites <- read_csv(paste0(folder_data, "phenotypes_analysis/sites/sites.csv"))
+diff_vars <- read_csv(paste0(folder_data, "phenotypes_analysis/sites/diff_vars.csv"))
 
 # Barplots for temperature contrast between populations
 compute_mean <- function(diff_vars, pop) {
@@ -50,11 +49,11 @@ set.seed(1)
 p1 <- plot_box(diff_var1) +
     scale_y_continuous(limits = c(-2, 7), breaks = -2:7, expand = c(0,.1)) +
     ylab(expression(mean ~ "[" ~ t ~ "("~L~")" - t~ "("~H~")" ~ "]")) +
-    ggtitle("VA populations")
+    ggtitle("Mountain sites")
 p2 <- plot_box(diff_var2) +
     scale_y_continuous(limits = c(-2, 3), breaks = -2:7, expand = c(0,.1)) +
     ylab(expression(mean ~ "[" ~ t ~ "("~U~")" - t~ "("~S~")" ~ "]")) +
-    ggtitle("PA populations")
+    ggtitle("City sites")
 
 ## STATS
 t.test(diff_var1[diff_var1$variable == "tmax_deg_c",]$diff_var)
@@ -66,4 +65,4 @@ t.test(diff_var2[diff_var2$variable == "tmin_deg_c",]$diff_var)
 #
 p <- plot_grid(p1, p2, nrow = 1, align = "hv", axis = "lrbt", labels = c("A", "B"), scale = 0.9) + theme(plot.background = element_rect(fill = "white", color = NA))
 
-ggsave(here::here("plots/FigS5.png"), p, width = 6, height = 3)
+ggsave(here::here("plots/FigS2.png"), p, width = 6, height = 3)
