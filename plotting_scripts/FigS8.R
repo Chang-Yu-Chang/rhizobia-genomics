@@ -26,7 +26,7 @@ p <- plants_test %>%
     guides() +
     labs(x = "", y = "number of nodules")
 
-ggsave(here::here("plots/FigS10.png"), p, width = 3, height = 3)
+ggsave(here::here("plots/FigS8.png"), p, width = 3, height = 3)
 
 #
 mod <- lmer(nodule_count ~ inoculation + (1|waterblock), data = plants_test)
