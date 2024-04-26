@@ -2,31 +2,37 @@
 
 renv::load()
 library(tidyverse)
-library(seqinr)
 library(gggenomes)
 source(here::here("metadata.R"))
 
+# Bind gff into one table
+list_seqs <- rep(list(NA), nrow(isolates))
+list_genes <- rep(list(NA), nrow(isolates))
 
-list_p <- rep(list(NA), nrow(isolates))
-
-for (i in 1:nrow(isolates)) {
+for (i in c(1:22, 24:32)) {
     print(i)
     # Fasta
     m_seqs <- read_seq_len(paste0(folder_genomics, "fasta/genomes/", isolates$genome_id[i],".fasta")) %>%arrange(desc(length))
-    m_seqs_sub <- m_seqs %>%
-        filter(length > 1000000)
+    #m_seqs_sub <- m_seqs %>% filter(length > 1000000)
+
     # GFF
     m_genes <- read_gff3(paste0(folder_genomics, "gff/genomes/", isolates$genome_id[i],".gff"))
-    m_genes_sub <- m_genes %>%
-        filter(str_detect(gene, "nod|fix|nif")) %>%
-        mutate(gene_type = str_sub(gene, 1, 3)) %>%
-        {.}
+    # m_genes_sub <- m_genes %>%
+    #     filter(str_detect(gene, "nod|fix|nif")) %>%
+    #     mutate(gene_type = str_sub(gene, 1, 3)) %>%
+    #     {.}
 
-    list_p[[i]] <- gggenomes(seqs = m_seqs_sub, genes = m_genes_sub) +
-        geom_seq() + geom_bin_label() +
-        geom_gene(aes(color = gene_type, fill = gene_type)) +
-        theme()
+    #
+    list_seqs[[i]] <- mutate(m_seqs, genome_id = isolates$genome_id[i]) %>% select(genome_id, everything())
+    list_genes[[i]] <- mutate(m_genes, genome_id = isolates$genome_id[i]) %>% select(genome_id, everything())
+
+    # list_p[[i]] <- gggenomes(seqs = m_seqs_sub, genes = m_genes_sub) +
+    #     geom_seq() + geom_bin_label() +
+    #     geom_gene(aes(color = gene_type, fill = gene_type)) +
+    #     theme()
 }
+
+bind_rows(list_seqs[!is.na(list_seqs)])
 
 
 

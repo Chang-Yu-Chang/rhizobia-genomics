@@ -13,4 +13,3 @@ done
 for ref in em1021 em1022 usda1106 wsm419 casidaa; do
     cp $folder_genomics/annotation/genomes/$ref/annotated.gff $folder_genomics/gff/genomes/$ref.gff
 done
-

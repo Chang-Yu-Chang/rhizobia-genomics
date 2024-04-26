@@ -51,8 +51,6 @@ mamba create -n busco
 mamba activate busco
 mamba install --yes -c bioconda busco=5.7.1
 
-
-
 # Install prokka v1.14.5
 # prokka is for rapid prokaryotic genome annotation
 mamba create -n prokka
@@ -228,3 +226,9 @@ checkm data setRoot ~/bioinformatics/checkm/checkm_data_2015_01_16
 mv Downloads/pplacer-Darwin-v1.1.alpha17-6-g5cecf99/* ~/miniconda3/envs/intel_env/envs/checkm/bin/
 # Check installation
 #checkm test ~/checkm_test_result
+
+# # Install gffcompare v0.12.6
+# # gffcompare collapse (merge) duplicate transcripts from multiple GTF/GFF3 files (e.g. resulted from assembly of different samples)
+# mamba create -n gffcompare
+# mamba activate gffcompare
+# mamba install --yes -c bioconda gffcompare=0.12.6
