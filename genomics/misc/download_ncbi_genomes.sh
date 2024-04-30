@@ -20,7 +20,6 @@ datasets download genome accession \
 # GCF_000006965.1 E. meliloti em1021
 # GCF_013315775.1 E. meliloti em1022
 # GCF_002197445.1 E. meliloti usda1021
-# GCF_004004435.1 E. meliloti usda1022
 # GCF_000017145.1 E. medicae wsm419
 # GCF_021052565.1 E. medicae wsm1115
 # GCF_025200695.1 E. medicae su277
