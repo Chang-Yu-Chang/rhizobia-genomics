@@ -287,7 +287,7 @@ ggsave(paste0(folder_data, "phylogenomics_analysis/trees/07-matched_tree_sites.p
 # 8. Plot the
 
 # 4. Plot gene content trees ----
-tr_gpa %>%
+p <- tr_gpa %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     as.treedata() %>%
@@ -300,4 +300,5 @@ tr_gpa %>%
     #theme_classic() +
     labs()
 
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/08-gpa_mltree.png"), p, width = 7, height = 5)
 
