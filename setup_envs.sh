@@ -96,19 +96,6 @@ mamba create -y -n minimap2
 mamba activate minimap2
 mamba install --yes -c bioconda minimap2=2.26
 
-# Install vcftools 0.1.16
-# vcftools is A set of tools written in Perl and C++ for working with VCF files.
-mamba create -y -n vcftools
-mamba activate vcftools
-mamba install --yes -c bioconda vcftools=0.1.16
-
-# Install snippy v4.6.0
-# snippy is Rapid haploid variant calling and core genome alignment
-mamba create -y -n snippy
-mamba activate snippy
-mamba install --yes -c bioconda snippy=4.6.0
-mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
-
 # Install fastANI v1.31
 # fastANI is developed for fast alignment-free computation of whole-genome Average Nucleotide Identity (ANI)
 mamba create -n fastani
@@ -137,6 +124,19 @@ mamba install --yes -c bioconda iqtree=2.3.0
 
 
 
+
+# Install vcftools 0.1.16
+# vcftools is A set of tools written in Perl and C++ for working with VCF files.
+mamba create -y -n vcftools
+mamba activate vcftools
+mamba install --yes -c bioconda vcftools=0.1.16
+
+# Install snippy v4.6.0
+# snippy is Rapid haploid variant calling and core genome alignment
+mamba create -y -n snippy
+mamba activate snippy
+mamba install --yes -c bioconda snippy=4.6.0
+mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
 
 
 

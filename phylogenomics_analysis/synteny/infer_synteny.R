@@ -2,7 +2,18 @@
 
 renv::load()
 library(tidyverse)
+library(syntenet) # for detecting synteny
 source(here::here("metadata.R"))
+
+
+
+
+
+
+
+
+
+if (F) {
 
 genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 
@@ -27,3 +38,4 @@ db %>%
     view
 
 
+}
