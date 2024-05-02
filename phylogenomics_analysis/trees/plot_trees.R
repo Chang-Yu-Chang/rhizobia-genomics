@@ -22,6 +22,12 @@ tr <- read.tree(paste0(folder_data, "genomics/mltree/isolates_core_b/aln.treefil
 list_others <- c(paste0("g", c(20, 28, 38:43)), "em1022", "usda1106", "em1021", "wsm419")
 tr <- tr %>% drop.tip(list_others)
 
+## gpa tree
+tr_gpa <- read.tree(paste0(folder_data, "genomics/mltree/isolates_gpa/aln.treefile"))
+gpa <- read_delim(paste0(folder_genomics, "pangenome/isolates/gene_presence_absence.Rtab"))
+tr_gpa$tip.label <- colnames(gpa)[-1][as.numeric(str_remove(tr_gpa$tip.label, "Seq"))]
+
+if (F) {
 ## Compute gene content tree
 gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 gpat <- filter(gpat, !genome_id %in% list_others)
@@ -48,8 +54,9 @@ gpatl <- gpatl %>%
     mutate(genome_id = factor(genome_id, rev(isolates$genome_id))) %>%
     mutate(gene = factor(gene, gene_order))
 
-save(tr, tr_acce, gpatl, file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+}
 
+#save(tr, tr_acce, gpatl, file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
 
 # 1. Plot core gene tree ----
@@ -276,4 +283,21 @@ p <- p1 + geom_tree(data = d2) +
     labs()
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/07-matched_tree_sites.png"), p, width = 7, height = 3)
+
+# 8. Plot the
+
+# 4. Plot gene content trees ----
+tr_gpa %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    as.treedata() %>%
+    ggtree() +
+    geom_tiplab(aes(label = label, color = species), hjust = 0) +
+    #geom_nodelab(aes(label = label)) +
+    scale_color_manual(values = species_colors) +
+    #scale_x_continuous(limits = c(0, 1)) +
+    theme_tree() +
+    #theme_classic() +
+    labs()
+
 
