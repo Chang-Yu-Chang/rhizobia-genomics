@@ -1,21 +1,18 @@
-#' This script plots
+#' This script plots the core and gene content trees
 
 renv::load()
 library(tidyverse)
 library(cowplot)
-library(ape)
 library(tidytree)
 library(ggtree)
-library(proxy) # For computing jaccard distance
-library(vcfR) # for handling VCF
-library(poppr) # for pop gen analysis
 source(here::here("metadata.R"))
 
-gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+load(file = paste0(folder_data, "genomics_analysis/variants/snps.rdata"))
 
-# Panel A-B. PAP heatmaps ----
+# PAP heatmaps ----
 ii <- isolates %>%
     left_join(isolates_contigs) %>%
     filter(!genome_id %in% c( "g28")) %>%
@@ -45,7 +42,7 @@ plot_heatmap <- function (pop = "VA", sgc = site_group_colors[1:2]) {
 }
 
 
-# Panel C-D. matched trees ----
+# matched trees ----
 plot_matchedtree <- function (pop = "VA") {
     pop <- ifelse(pop == "VA", "PA", "VA")
 
@@ -57,7 +54,7 @@ plot_matchedtree <- function (pop = "VA") {
         ggtree()
 
     # Plot accessory tree
-    pt2 <- tr_acce %>%
+    pt2 <- tr_gpa %>%
         drop.tip(isolates$genome_id[isolates$population == pop]) %>%
         as_tibble() %>%
         left_join(rename(ii, label = genome_id)) %>%
@@ -85,8 +82,7 @@ plot_matchedtree <- function (pop = "VA") {
 
 }
 
-# Panel E-F. SNPs ----
-load(file = paste0(folder_data, "genomics_analysis/variants/snps.rdata"))
+# SNPs ----
 plot_snps <- function (isolates_i, pcoa_i, eigs_i) {
     isolates_i %>%
         bind_cols(tibble(mds1 = pcoa_i$points[,1], mds2 = pcoa_i$points[,2])) %>%
@@ -107,7 +103,7 @@ plot_snps <- function (isolates_i, pcoa_i, eigs_i) {
 }
 
 
-#
+# Plotlist
 plist <- list(
     plot_matchedtree(),
     plot_heatmap(),

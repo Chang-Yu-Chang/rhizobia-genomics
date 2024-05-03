@@ -9,6 +9,41 @@ library(ggtree)
 library(ggh4x) # for nested strips
 source(here::here("metadata.R"))
 
+#
+list_scaled_branches <- c(37:39, 14:16, 50)
+p1 <- tr %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
+    mutate(scaled_branch = ifelse(node %in% list_scaled_branches, T, F)) %>%
+    mutate(highlight_boot = ifelse(label > 95, T, F)) %>%
+    as.treedata() %>%
+    ggtree(aes(linetype = scaled_branch)) +
+    geom_nodepoint(aes(label = highlight_boot), shape = 16, color = 1, size = 3, alpha = 0.3) +
+    #geom_tiplab(align = T, hjust = -0.1, size = 3) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("Ensifer spp.", "Ensifer meliloti", "Ensifer medicae"), label.size = 0, fill = NA, nudge_x = c(20, -5, 0) *1e-4, nudge_y = c(1, 1, -1), hjust = 1, fontface = "italic") +
+    geom_treescale(x = 0, y = 28, width = 0.001) +
+    scale_linetype_manual(values = c(1,5)) +
+    scale_x_continuous(expand = c(0,0.001)) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides(linetype = "none") +
+    labs()
+
+
+
+
+
+
+
+
+
+
+#
 load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))

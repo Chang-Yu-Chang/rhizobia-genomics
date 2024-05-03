@@ -16,48 +16,32 @@ isolates <- isolates %>%
     filter(!genome_id %in% c("g20", "g28"))
 
 # Compute trees ----
-
 ## Core gene tree
 tr <- read.tree(paste0(folder_data, "genomics/mltree/isolates_core_b/aln.treefile"))
 list_others <- c(paste0("g", c(20, 28, 38:43)), "em1022", "usda1106", "em1021", "wsm419")
 tr <- tr %>% drop.tip(list_others)
+tr <- root(tr, outgroup = "g15", resolve.root = TRUE)
 
 ## gpa tree
 tr_gpa <- read.tree(paste0(folder_data, "genomics/mltree/isolates_gpa/aln.treefile"))
-gpa <- read_delim(paste0(folder_genomics, "pangenome/isolates/gene_presence_absence.Rtab"))
 tr_gpa$tip.label <- colnames(gpa)[-1][as.numeric(str_remove(tr_gpa$tip.label, "Seq"))]
+tr_gpa <- root(tr_gpa, outgroup = "g15", resolve.root = TRUE)
 
-if (F) {
-## Compute gene content tree
+## Compute gene counts
 gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
-gpat <- filter(gpat, !genome_id %in% list_others)
-m <- as.matrix(gpat[,-1]); dim(m)
-rownames(m) <- gpat$genome_id
-# Compute ward.D2 distance
-d <- dist(m, method = "jaccard")
-fit2 <- hclust(d, method = "ward.D2")
-tr_acce <- as.phylo(fit2)
-
-# Compute gene counts
 gpatl <- gpat %>%
     pivot_longer(cols = -genome_id, names_to = "gene") %>%
     filter(value == 1) %>%
     filter(genome_id %in% tr$tip.label)
-
 gene_order <- gpatl %>%
     group_by(gene) %>%
     dplyr::count() %>%
     arrange(desc(n)) %>%
     pull(gene)
-
 gpatl <- gpatl %>%
     mutate(genome_id = factor(genome_id, rev(isolates$genome_id))) %>%
     mutate(gene = factor(gene, gene_order))
-
-}
-
-#save(tr, tr_acce, gpatl, file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
-
+save(tr, tr_gpa, gpatl, file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
 # 1. Plot core gene tree ----
 ## Full tree
@@ -286,7 +270,7 @@ ggsave(paste0(folder_data, "phylogenomics_analysis/trees/07-matched_tree_sites.p
 
 # 8. Plot the
 
-# 4. Plot gene content trees ----
+# 8. Plot gene content trees ----
 p <- tr_gpa %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
@@ -301,4 +285,186 @@ p <- tr_gpa %>%
     labs()
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/08-gpa_mltree.png"), p, width = 7, height = 5)
+
+
+# 9. Plot core gene tree with scaled branch length
+list_scaled_branches <- c(37:39, 14:16, 50)
+p <- tr %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
+    mutate(scaled_branch = ifelse(node %in% list_scaled_branches, T, F)) %>%
+    mutate(highlight_boot = ifelse(label > 95, T, F)) %>%
+    as.treedata() %>%
+    #ggtree(branch.length = "none") +
+    ggtree(aes(linetype = scaled_branch)) +
+    geom_nodepoint(aes(label = highlight_boot), shape = 16, color = 1, size = 3, alpha = 0.3) +
+    geom_tiplab(align = T, hjust = -0.1, size = 3) +
+    #geom_nodelab(aes(label = node)) +
+    #geom_tippoint(aes(color = species)) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("Ensifer spp.", "Ensifer meliloti", "Ensifer medicae"), label.size = 0, fill = NA, nudge_x = c(20, -5, 0) *1e-4, nudge_y = c(1, 1, -1), hjust = 1, fontface = "italic") +
+    geom_treescale(x = 0, y = 28, width = 0.001) +
+    #scale_color_manual(values = species_colors) +
+    scale_linetype_manual(values = c(1,5)) +
+    #scale_color_manual(values=c("black", "firebrick", "steelblue", 1,2,3))
+    scale_x_continuous(expand = c(0,0.001)) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides(linetype = "none") +
+    labs()
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/09-core_mltree_scaled.png"), p, width = 6, height = 4)
+
+# 10. Plot scaled gpa tree with scaled branch length ----
+list_scaled_branches <- c(1,2,31,33,34,35,46)
+p <- tr_gpa %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
+    mutate(scaled_branch = ifelse(node %in% list_scaled_branches, T, F)) %>%
+    mutate(highlight_boot = ifelse(label > 95, T, F)) %>%
+    as.treedata() %>%
+    #ggtree() +
+    #ggtree(branch.length = "none") +
+    ggtree(aes(linetype = scaled_branch)) +
+    geom_nodepoint(aes(label = highlight_boot), shape = 16, color = 1, size = 3, alpha = 0.3) +
+    geom_tiplab(align = T, size = 3) +
+    #geom_tippoint(aes(color = species)) +
+    #geom_label(aes(x = branch, label = node)) +
+    #geom_nodelab(aes(label = node)) +
+    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("Ensifer spp.", "Ensifer medicae", "Ensifer meliloti"), label.size = 0, fill = NA, nudge_x = c(60, -10, -10)*1e-3, nudge_y = c(1, 1, 1), hjust = 1, fontface = "italic") +
+    geom_treescale(x = 0, y = 28, width = 0.01) +
+    scale_color_manual(values = species_colors) +
+    scale_linetype_manual(values = c(1,5)) +
+    #scale_color_manual(values=c("black", "firebrick", "steelblue", 1,2,3))
+    #scale_x_continuous(expand = c(0,0.001)) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides(linetype = "none") +
+    labs()
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/10-gpa_mltree_scaled.png"), p, width = 6, height = 4)
+
+# 11. plot matched scaled trees ----
+list_scaled_branches <- c(37:39, 14:16, 50)
+scaling_factor = 20
+pt1 <- tr %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
+    mutate(scaled_branch = ifelse(node %in% list_scaled_branches, T, F)) %>%
+    # scaling factor for matching tree x scales
+    mutate(branch.length = branch.length * scaling_factor) %>%
+    mutate(highlight_boot = ifelse(label > 95, T, F)) %>%
+    as.treedata() %>%
+    ggtree(aes(linetype = scaled_branch)) +
+    geom_nodepoint(aes(label = highlight_boot), shape = 18, color = 1, size = 3, alpha = 0.3) +
+    #geom_tiplab(align = T, hjust = -0.1, size = 3) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("Ensifer spp.", "Ensifer meliloti", "Ensifer medicae"), label.size = 0, fill = NA, nudge_x = c(-5, -5, 0) *1e-4*scaling_factor, nudge_y = c(1, 1, -1), hjust = 1, fontface = "italic") +
+    #geom_treescale(x = 0, y = 25, width = 0.01) +
+    scale_linetype_manual(values = c(1,5)) +
+    scale_x_continuous(expand = c(0,0.001)) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides(linetype = "none") +
+    labs()
+
+# Plot accessory tree
+list_scaled_branches <- c(1,2,31,33,34,35,46)
+pt2 <- tr_gpa %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
+    mutate(scaled_branch = ifelse(node %in% list_scaled_branches, T, F)) %>%
+    mutate(highlight_boot = ifelse(label > 95, T, F)) %>%
+    as.treedata() %>%
+    ggtree(aes(linetype = scaled_branch)) +
+    geom_nodepoint(aes(label = highlight_boot), shape = 18, color = 1, size = 3, alpha = 0.3) +
+    #geom_tiplab(align = T, size = 3) +
+    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("Ensifer spp.", "Ensifer medicae", "Ensifer meliloti"), label.size = 0, fill = NA, nudge_x = c(60, -10, -10)*1e-3, nudge_y = c(1, 1, 1), hjust = 1, fontface = "italic") +
+    geom_treescale(x = 0, y = 28, width = 0.01) +
+    scale_color_manual(values = species_colors) +
+    scale_linetype_manual(values = c(1,5)) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides(linetype = "none", color = "none") +
+    labs()
+
+d1 <- pt1$data
+d2 <- pt2$data
+## reverse x-axis and set offset to make the tree on the right-hand side of the first tree
+d2$x <- max(d2$x) - d2$x + max(d1$x) + 0.05
+dd <- bind_rows(d1, d2) %>% filter(isTip)
+
+scale_width = 0.01
+p <- pt1 +
+    geom_tree(data = d2, aes(linetype = scaled_branch)) +
+    ggnewscale::new_scale_fill() +
+    geom_line(data = dd, aes(x, y, group = label), color = "grey90", linetype = 1, linewidth = .2) +
+    # left tree
+    geom_tippoint(aes(color = species), size = 2) +
+    annotate("segment", x = -0.05, xend = -0.05 + scale_width, y = 25, yend = 25) +
+    annotate("text", x = -0.05+scale_width/2, y = 25, label = format(scale_width / scaling_factor, scientific = F), vjust = -1, hjust = 0.5) +
+    # right tree
+    geom_tippoint(data = d2, aes(color = species), size = 2) +
+    geom_nodepoint(data = d2, aes(label = highlight_boot), shape = 18, color = 1, size = 3, alpha = 0.3) +
+    geom_label2(data = d2, aes(subset=(node %in% c(32,35,46))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(data = d2, aes(subset=(node %in% c(32,35,46))), label = c("Ensifer spp.", "Ensifer medicae", "Ensifer meliloti"), label.size = 0, fill = NA, nudge_x = c(-10, 90, 80)*1e-3, nudge_y = c(1, 1, 1), hjust = 1, fontface = "italic") +
+    scale_color_manual(values = species_colors) +
+    annotate("segment", x = 0.5, xend = 0.5+scale_width, y = 25, yend = 25) +
+    annotate("text", x = 0.5+scale_width/2, y = 25, label = scale_width, vjust = -1, hjust = 0.5) +
+    scale_x_continuous(limits = c(-0.1, 0.55), expand = c(0,0)) +
+    # Label
+    annotate("text", x = c(-0.05, 0.5), y = c(30,30), label = c("core genes", "gene content")) +
+    theme_tree() +
+    theme(
+        legend.background = element_rect(color = "black", linewidth = .5)
+    ) +
+    guides(color = "none") +
+    labs()
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/11-matched_mltree_scaled.png"), p, width = 10, height = 4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
