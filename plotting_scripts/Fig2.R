@@ -280,11 +280,10 @@ eigs2 <- round(pca2$sdev^2 / sum(pca2$sdev^2)*100, 2)
 p4_1 <- bind_cols(plants_i1, pca1$x[,1:2]) %>% plot_pca(eigs1[1], eigs1[2])
 p4_2 <- bind_cols(plants_i2, pca2$x[,1:2]) %>% plot_pca(eigs2[1], eigs2[2])
 
-
-#
+# Plotlist ----
 p <- plot_grid(
     p1_1, p2_1, p3_1, p4_1, p1_2, p2_2, p3_2, p4_2,
-    nrow = 2, rel_heights = c(1,1,1,1), axis = "tb", align = "h", labels = LETTERS[1:4], scale = 0.95
+    nrow = 2, rel_heights = c(1,1,1,1), axis = "tb", align = "h", labels = LETTERS[c(1,3,5,7,2,4,6,8)], scale = 0.95
 ) + theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 12, height = 7)
