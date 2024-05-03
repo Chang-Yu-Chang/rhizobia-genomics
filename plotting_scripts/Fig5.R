@@ -1,4 +1,4 @@
-#' This script plots the gene content tree
+#' This script plots the tree
 
 renv::load()
 library(tidyverse)
@@ -18,13 +18,13 @@ traits_ps <- traits_ps %>% mutate(across(c(k, p_k, lambda, p_lambda), function(x
 isolates <- isolates %>%
     left_join(isolates_contigs) %>%
     left_join(isolates_traits) %>%
-    filter(!genome_id %in% c("g28"))
+    filter(!genome_id %in% c("g20", "g28"))
 list_traits <- c(paste0(rep(c("r", "lag", "maxOD"), each = 4), "_", rep(c(25, 30, 35, 40), 3), "c"),
                  "root_biomass_mg", "shoot_biomass_mg", "nodule_count")
 
 # Core gene tree
-list_scaled_branches <- c(1,2,31,33,34,35,46)
-p1 <- tr_gpa %>%
+list_scaled_branches <- c(37:39, 14:16, 50)
+p1 <- tr %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
@@ -36,20 +36,20 @@ p1 <- tr_gpa %>%
     geom_nodepoint(aes(label = highlight_boot), shape = 18, color = 1, size = 3, alpha = 0.3) +
     geom_tiplab(align = T, hjust = -0.1, size = 3) +
     geom_tippoint(aes(color = site_group)) +
-    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
-    geom_label2(aes(subset=(node %in% c(32,35,46))), label = c("Ensifer spp.", "Ensifer medicae", "Ensifer meliloti"), label.size = 0, fill = NA, nudge_x = c(100, -10, -10)*1e-3, nudge_y = c(0, 1, 1), hjust = 1, fontface = "italic") +
-    geom_treescale(x = 0, y = 28, width = 0.01) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+    geom_label2(aes(subset=(node %in% c(31,37,39))), label = c("Ensifer spp.", "Ensifer meliloti", "Ensifer medicae"), label.size = 0, fill = NA, nudge_x = c(40, -5, 0) *1e-4, nudge_y = c(0, 1, -1), hjust = 1, fontface = "italic") +
+    geom_treescale(x = 0, y = 28, width = 0.001) +
     scale_linetype_manual(values = c(1,5)) +
     scale_color_manual(values = site_group_colors) +
-    scale_x_continuous(expand = c(0,0.02)) +
+    scale_x_continuous(expand = c(0,0.001)) +
     theme_tree() +
     theme(
         legend.position = "top",
         legend.key.spacing.y = unit(1, "mm")
     ) +
     guides(linetype = "none", color = guide_legend(title = NULL, nrow = 2)) +
-    labs(title = "gene presence/absence")
-p1
+    labs(title = "core gene")
+
 # trait heatmap
 ordered_tips <- p1$data %>%
     filter(isTip) %>%
@@ -104,7 +104,7 @@ p2 <- ii %>%
 
 # Phylogenetic signals
 tmp <- traits_ps %>%
-    filter(tree == "gpa") %>%
+    filter(tree == "core") %>%
     mutate(trait = factor(trait, list_traits)) %>%
     mutate(trait_type = case_when(
         str_detect(trait, "r_") ~ "r",
@@ -172,3 +172,44 @@ p <- p + draw_plot(p4, scale = 0, x = 0.2, y = 0.1, halign = 0, valign = 0)
 
 ggsave(here::here("plots/Fig5.png"), p, width = 10, height = 6)
 
+
+
+
+if (F) {
+    nol <- tibble(node = c(32, 34, 35), node_sp = c("Ensifer meliloti", "Ensifer medicae", "Ensifer spp."))
+    # Tree
+    p1 <- tr_acce %>%
+        as_tibble() %>%
+        left_join(rename(isolates, label = genome_id)) %>%
+        as.treedata() %>%
+        ggtree() +
+        geom_tiplab(hjust = 1, offset = 0.001, as_ylab = T) +
+        geom_tippoint(aes(color = site_group)) +
+        #geom_label_repel(aes(label = node)) +
+        geom_label2(aes(subset=(node %in% c(32,34,35))), label = c("     ","     ","     "), label.r = unit(0.3, "lines"), label.size = 0, fill = c("#96BBBB", "#96BBBB", "#96BBBB"), alpha = 0.7) +
+        geom_label2(aes(subset=(node %in% c(32,34,35))), label = c("Ensifer meliloti", "Ensifer medicae", "Ensifer spp."), label.size = 0, fill = NA, nudge_x = -.02, nudge_y = 1, hjust = 1) +
+        annotate("segment", x = 0.1, xend = 0.2, y = 3, yend = 3, arrow = arrow(angle = 90, ends = "both", length = unit(1, "mm"))) +
+        annotate("text", x = 0.15, y = 2, label = "0.1") +
+        # geom_label2(aes(subset=(node %in% c(32,34,35))), label = c("Ensifer meliloti", "Ensifer medicae", "Ensifer spp."),
+        #             label.r = unit(0.3, "lines"), label.size = 0, fill = c("maroon", "steelblue", "grey"), alpha = 0.5) +
+        #geom_hilight(data = nol, aes(node = node, fill = node_sp), inherit.aes = F) +
+        #geom_label(data = nol, aes(x = node, fill = node_sp), inherit.aes = F) +
+        #geom_point2(aes(subset=(node %in% c(32,34,35))), label = c(1,2,3), shape = 23, size = 5, fill='red') +
+        #geom_nodepoint(aes(x = node)) +
+        #geom_nodepoint(data = nol, aes(x = node, fill = node_sp), inherit.aes = F) +
+        #geom_nodelab(aes(label = node)) +
+        #scale_color_manual(values = species_colors) +
+        #scale_fill_manual(values = species_colors) +
+        scale_x_continuous(expand = c(0,.001)) +
+        #scale_x_continuous(limits = c(0, 1)) +
+        theme_tree() +
+        #theme_classic() +
+        theme(
+            legend.position = c(0.3, 1),
+            legend.background = element_rect(color = "black", fill = "white"),
+            axis.line.y = element_blank(),
+            axis.ticks.length = unit(0, "mm"),
+            axis.text.y = element_text(size = 10)
+        ) +
+        guides(color = guide_legend(title = NULL))
+}

@@ -254,7 +254,7 @@ p <- tr_gpa %>%
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/08-gpa_mltree.png"), p, width = 7, height = 5)
 
 
-# 9. Plot core gene tree with scaled branch length
+# 9. Plot core gene tree with scaled branch length ----
 list_scaled_branches <- c(37:39, 14:16, 50)
 p <- tr %>%
     as_tibble() %>%
