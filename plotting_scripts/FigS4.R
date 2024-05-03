@@ -6,7 +6,7 @@ library(cowplot)
 library(janitor)
 library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
-library(vegan) # for computing jaccard
+#library(vegan) # for computing jaccard
 source(here::here("metadata.R"))
 
 # Read plant data
