@@ -11,45 +11,53 @@ library(tidyverse)
 library(syntenet)
 source(here::here("metadata.R"))
 
-read_csd
-gff <- read_delim(paste0(folder_data, "genomics/gff/genomes/g2.gff"), skip = 4, col_names = c("seq"))
-gff <- read_gff3(paste0(folder_data, "genomics/gff/genomes/g2.gff"))
-paste0(folder_data, "genomics/gff/genomes/g2.gff")
-Biostrings::readAAStringSet()
+# Read the data ----
+aa <- fasta2AAStringSetlist(paste0(folder_data, "genomics/faa/genomes"))
+gr <- gff2GRangesList(paste0(folder_data, "genomics/gff/genomes"))
+length(aa)
+length(gr)
 
+## Subset the list
+aa <- aa[names(aa) %in% isolates$genome_id[-23]]
+length(aa)
+names(aa)
+gr <- gr[names(gr) %in% isolates$genome_id[-23]]
+length(gr)
+names(gr)
 
-
-
-if (F) {
-
-gpa <- read_delim(paste0(folder_genomics, "pangenome/isolates/gene_presence_absence.Rtab"))
-colnames(gpa)[-1]
-m <- t(as.matrix(gpa[,-1]))
-colnames(m) <- NULL
-rownames(m) <- NULL
-
-write_phylip <- function(binary_matrix, output_file) {
-    # Open the output file for writing
-    con <- file(output_file, "w")
-
-    # Get the number of sequences and sequence length
-    num_sequences <- nrow(binary_matrix)
-    seq_length <- ncol(binary_matrix)
-
-    # Write the header
-    cat(num_sequences, seq_length, "\n", file = con)
-
-    # Write each sequence in PHYLIP format
-    for (i in 1:num_sequences) {
-        # PHYLIP sequence names are limited to 10 characters
-        sequence_name <- paste0("Seq", i)
-        cat(sequence_name, " ", paste(binary_matrix[i, ], collapse = ""), "\n", file = con)
-    }
-
-    # Close the output file
-    close(con)
+## Clean the gene ids
+clean_aa_names <- function (aastrings) {
+    names(aastrings) <- names(aastrings) %>%
+        str_remove(".+/genomes/") %>%
+        str_remove(" .+")
+    return(aastrings)
 }
-dir.create(paste0(folder_genomics, "mltree/isolates_gpa"), showWarnings = F)
-write_phylip(m, paste0(folder_genomics, "mltree/isolates_gpa/gpa_binary.phy"))
+clean_gr_ids <- function (granges) {
+    granges$ID <- granges$ID %>% str_remove(".+/genomes/")
+    granges$Name <- granges$ID
+    granges$gene_id <- granges$ID
+
+    genome_id <- str_remove(granges$ID[1], "\\..+")
+    new_seqnames <- paste0(genome_id, "_", seqnames(granges))
+    seqlevels(gr) <- levels(new_seqnames)
+    seqnames(granges) <- new_seqnames
+    return(granges[granges$type == "CDS",c("source", "type", "score", "phase", "ID", "Name", "gene_id")])
 }
+
+aa <- lapply(aa, clean_aa_names)
+gr <- lapply(gr, clean_gr_ids)
+
+##
+
+names(aa)
+names(gr)
+aa$g10
+gr$g10
+sapply(aa, length)
+sapply(gr, length)
+
+check_input(aa, gr)
+process_input(aa, gr)
+length(aa$g10)
+length(gr$g10)
 
