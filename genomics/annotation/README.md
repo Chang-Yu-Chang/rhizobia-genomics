@@ -2,4 +2,4 @@
 
 1. `annotate_genomes.sh` 
 2. `annotate_contigs.sh` 
-3. `consolidate_gff.sh` consolidates genome gff into one folder
+3. `consolidate_annotations.sh` consolidates annotation files into one folder depending on the file types (gff and faa) 
