@@ -96,3 +96,25 @@ isolates_tax <- sms %>%
     left_join(rrnas)
 
 write_csv(isolates_tax, paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
+
+# Clean create a master isolate table
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
+
+iso <- isolates %>%
+    left_join(isolates_tax) %>%
+    mutate(population = ifelse(population == "VA", "mountain", "city")) %>%
+    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+    arrange(genome_id) %>%
+    select(population, site_group, exp_id, genome_id, starts_with("sm"), starts_with("rrna"), starts_with("contig")) %>%
+    rename(site = site_group, genome = genome_id) %>%
+    mutate(contig_length = round(contig_length/1000, 2),
+           sm_query_containment_ani = round(sm_query_containment_ani*100, 1),
+           contig_pident = round(contig_pident, 1),
+           rrna_pident = round(rrna_pident, 1)) %>%
+    mutate(` ` = 1:n()) %>%
+    select(` `, everything()) %>%
+    select(` `, population, site, exp_id, genome, sm_species, sm_query_containment_ani, rrna_species, rrna_pident, contig_species, contig_pident)
+
+write_csv(iso, paste0(folder_data, "output/iso.csv"))
+

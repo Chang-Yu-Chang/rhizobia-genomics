@@ -6,6 +6,7 @@ library(cowplot)
 library(ape)
 library(tidytree)
 library(ggtree)
+library(scales)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
@@ -121,9 +122,9 @@ p2 <- tbb %>%
     ggplot() +
     geom_histogram(aes(x = value), breaks = seq(0, 1, 0.05), color = "black", fill = "white") +
     geom_vline(xintercept = obs, color = "maroon", linetype = 2) +
-    scale_y_log10() +
     coord_fixed(ratio = 1/8) +
     scale_x_continuous(limits = c(0,1)) +
+    scale_y_log10(breaks = breaks_log(n = 5), labels = label_log()) +
     theme_classic() +
     theme(
         plot.margin = unit(c(0,0,0,0), "mm")
