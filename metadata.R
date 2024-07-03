@@ -1,8 +1,8 @@
 #' This script stores the metadata shared by all scripts
 
 # This main folder depends on your home directory and user name
-folder_script <- "~/Desktop/lab/local-adaptation/analysis/" # Enter the directory of analysis scripts
-folder_data <- "~/Dropbox/lab/local-adaptation/data/" # Enter the directory of data
+folder_script <- "~/Desktop/lab/rhizobia-genomics/analysis/" # Enter the directory of analysis scripts
+folder_data <- "~/Dropbox/lab/rhizobia-genomics/data/" # Enter the directory of data
 folder_genomics <- paste0(folder_data, "genomics/")
 
 # Table for genomics workflow
