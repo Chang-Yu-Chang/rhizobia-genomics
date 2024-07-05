@@ -4,57 +4,68 @@ renv::load()
 library(tidyverse)
 library(janitor)
 library(ggsci)
+library(ggh4x) # for nested facets
 library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
 library(emmeans) # estimate marginal means
 library(effectsize) # companion to Applied Regression
 source(here::here("metadata.R"))
 
+plant_color = c(sativa = "#62216d", lupulina = "#fde900")
 
-# Clean data
+# Clean data ----
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    select(genome_id = genome, species = sm_species)
-
-
-# gts <- read_csv(paste0(folder_data, "phenotypes_analysis/growth/gts.csv")) %>%
-#     left_join(isolates) %>%
-#     clean_names() %>%
-#     mutate(temperature = factor(temperature, paste0(c(25, 30, 35, 40), "c"))) %>%
-#     arrange(temperature, exp_id) %>%
-#     mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
-#     mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
-#     arrange(genome_id) %>%
-#     select(genome_id, site_group, everything())
+    select(genome_id = genome, species = sm_species, exp_id) %>%
+    bind_rows(tibble(genome_id = c("g_src1", "g_bg1"), species = NA, exp_id = c("src-1", "bg-1")))
 
 lupulinas <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants.csv")) %>%
     left_join(isolates) %>%
     clean_names() %>%
+    rename(nodule_number = nodule_count) %>%
+    drop_na(nodule_number) %>%
     mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
     mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
     filter(genome_id != "control") %>%
-    filter(population == "VA") %>%
-    drop_na(nodule_count) %>%
+    # Remove nonsymbiontic strains
+    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
     arrange(genome_id) %>%
     mutate(nitrogen_treatment = "without nitrogen") %>%
-    rename(nodule_number = nodule_count) %>%
-    mutate(site_group = factor(site_group, c("low elevation", "high elevation"))) %>%
-    select(genome_id, site_group, everything())
+    mutate(site_group = factor(site_group, c("low elevation", "high elevation", "urban", "suburban"))) %>%
+    select(population, genome_id, site_group, nitrogen_treatment, everything())
 
-sativas <- read_csv(paste0(folder_data, "raw/SymbiosisInSoilData_S24.csv")) %>%
+sativas_va <- read_csv(paste0(folder_data, "raw/SymbiosisInSoilData_S24.csv")) %>%
     clean_names() %>%
     rename(genome_id = rhizobia_strain, site_group = elevation) %>%
     mutate(genome_id = tolower(genome_id)) %>%
     left_join(select(isolates, exp_id, genome_id, site)) %>%
     left_join(iso) %>%
+    rename(shoot_height = stem_height) %>%
+    # Remove nonsymbiotic strains
+    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
+    mutate(population = "VA") %>%
     mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
     mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
     filter(genome_id != "control") %>%
-    mutate(site_group = factor(site_group, c("low elevation", "high elevation"))) %>%
     arrange(genome_id) %>%
-    select(genome_id, site_group, nitrogen_treatment, everything())
+    select(population, genome_id, site_group, nitrogen_treatment, everything(), -notes)
 
+sativas_pa <- read_csv(paste0(folder_data, "raw/BIOL1102_PooledData.csv")) %>%
+    clean_names() %>%
+    rename(exp_id = rhizobia_strain, site_group = location, leaf_color = new_leaf_color) %>%
+    mutate(exp_id = tolower(exp_id) %>% str_remove(" ")) %>%
+    mutate(site_group = tolower(site_group)) %>%
+    left_join(iso) %>% # We dont have WGS for bg-1 and src-1
+    mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
+    filter(exp_id != "control") %>%
+    mutate(population = "PA") %>%
+    arrange(genome_id) %>%
+    mutate(nitrogen_treatment = "without nitrogen") %>%
+    select(population, genome_id, site_group, nitrogen_treatment, everything(), -notes, -tube_number)
 
-# Compute effect sizes
+sativas <- bind_rows(sativas_va, sativas_pa) %>%
+    mutate(site_group = factor(site_group, c("low elevation", "high elevation", "urban", "suburban")))
+
+# Compute effect sizes ----
 # Cohen's d
 compute_cohensd <- function (tb, response) {
     formu <- paste0(response, " ~ site_group + (1|genome_id)")
@@ -81,7 +92,6 @@ compute_hedgesg <- function (tb, response) {
                upper.CL = upper.CL * J)
     return(hg)
 }
-
 # partial eta squared
 compute_partialetasquared <- function (tb, response) {
     formu <- paste0(response, " ~ site_group + (1|genome_id)")
@@ -91,20 +101,23 @@ compute_partialetasquared <- function (tb, response) {
         return()
 }
 
-
 #
 list_treatments <- tibble(
-    plant = c(rep("lupulina", 3), rep("sativa", 10)),
-    nt = c(rep("without nitrogen", 3+5), rep("with nitrogen", 5)),
-    response = c("nodule_number", "shoot_biomass_mg", "root_biomass_mg",
-                 rep(c("nodule_number", "stem_height", "longest_petiole_length", "leaf_number", "leaf_color"), 2))
+    pop = c(rep("VA", 3), rep("PA", 3), rep("VA", 10), rep("PA", 4)),
+    plant = c(rep("lupulina", 6), rep("sativa", 14)),
+    nt = c(rep("without nitrogen", 6+5), rep("with nitrogen", 5), rep("without nitrogen", 4)),
+    response = c(rep(c("nodule_number", "shoot_biomass_mg", "root_biomass_mg"), 2),
+                 rep(c("nodule_number", "shoot_height", "longest_petiole_length", "leaf_number", "leaf_color"), 2),
+                 "nodule_number", "shoot_height", "leaf_number", "leaf_color")
 )
+
 list_treatments <- list_treatments %>%
     rowwise() %>%
+    mutate(tb = list(get(paste0(plant, "s")) %>% filter(nitrogen_treatment == nt, population == pop))) %>%
     mutate(
-        cohensd = list(compute_cohensd(get(paste0(plant, "s")) %>% filter(nitrogen_treatment == nt), response)),
-        hedgesg = list(compute_hedgesg(get(paste0(plant, "s")) %>% filter(nitrogen_treatment == nt), response)),
-        partialetasquared = list(compute_partialetasquared(get(paste0(plant, "s")) %>% filter(nitrogen_treatment == nt), response))
+        cohensd = list(compute_cohensd(tb, response)),
+        hedgesg = list(compute_hedgesg(tb, response)),
+        partialetasquared = list(compute_partialetasquared(tb, response))
     )
 
 # 1. Plot cohen's d ----
@@ -116,26 +129,47 @@ ess <- list_treatments %>%
         nt == "without nitrogen" ~ "w/o N",
         nt == "with nitrogen" ~ "w/ N"
     )) %>%
-    mutate(study_name = paste(nt, response, sep = ", "))
+    mutate(pop = case_when(
+        pop == "PA" ~ "urbanization",
+        pop == "VA" ~ "elevation"
+    )) %>%
+    mutate(study_name = paste0(" ", response))
+
+background_df <- tibble(pop = rep(c("urbanization", "elevation"), each = 2), plant = rep(c("sativa", "lupulina"), 2))
+strip <- strip_nested(background_y = list(
+    NULL, NULL,
+    element_rect(fill = alpha(plant_color[2], 0.2), color = NA),
+    element_rect(fill = alpha(plant_color[1], 0.2), color = NA),
+    element_rect(fill = alpha(plant_color[2], 0.2), color = NA),
+    element_rect(fill = alpha(plant_color[1], 0.2), color = NA)
+))
 
 p <- ess %>%
     ggplot() +
+    geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
     geom_hline(yintercept = 0, linetype = 2) +
-    geom_point(aes(x = id, y = effect_size, color = plant), size = 3) +
-    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl, color = plant), linewidth = 1) +
-    scale_x_reverse(breaks = 1:13, labels = ess$study_name, expand = c(0,.7)) +
-    scale_color_aaas() +
+    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
+    geom_point(aes(x = id, y = effect_size, shape = nt), size = 3, stroke = 1) +
+    scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
+    scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
+    scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
+    scale_fill_manual(values = plant_color) +
     coord_flip() +
-    facet_grid(plant ~., scale = "free_y", space = "free_y") +
-    theme_light() +
+    facet_nested(pop + plant ~., scale = "free_y", space = "free_y", switch = "y", strip = strip) +
+    theme_minimal() +
     theme(
         axis.title.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey90", linetype = 2, linewidth = 0.3),
         panel.grid.minor.y = element_blank(),
-        strip.text = element_text(size = 15)
+        panel.spacing.y = unit(0, "mm"),
+        strip.text = element_text(size = 10),
+        plot.background = element_rect(color = NA, fill = "white"),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.background = element_rect(color = "black", fill = "white")
     ) +
-    guides(color = "none") +
+    guides(color = "none", fill = "none") +
     labs(y = "standardized mean difference (Cohen's d)")
 
 ggsave(paste0(folder_data, "phenotypes_analysis/effectsize/01-cohensd.png"), p, width = 8, height = 6)
@@ -149,26 +183,38 @@ ess <- list_treatments %>%
         nt == "without nitrogen" ~ "w/o N",
         nt == "with nitrogen" ~ "w/ N"
     )) %>%
-    mutate(study_name = paste(nt, response, sep = ", "))
+    mutate(pop = case_when(
+        pop == "PA" ~ "urbanization",
+        pop == "VA" ~ "elevation"
+    )) %>%
+    mutate(study_name = paste0(" ", response))
 
 p <- ess %>%
     ggplot() +
+    geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
     geom_hline(yintercept = 0, linetype = 2) +
-    geom_point(aes(x = id, y = effect_size, color = plant), size = 3) +
-    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl, color = plant), linewidth = 1) +
-    scale_x_reverse(breaks = 1:13, labels = ess$study_name, expand = c(0,.7)) +
-    scale_color_aaas() +
+    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
+    geom_point(aes(x = id, y = effect_size, shape = nt), size = 3, stroke = 1) +
+    scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
+    scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
+    scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
+    scale_fill_manual(values = plant_color) +
     coord_flip() +
-    facet_grid(plant ~., scale = "free_y", space = "free_y") +
-    theme_light() +
+    facet_nested(pop + plant ~., scale = "free_y", space = "free_y", switch = "y", strip = strip) +
+    theme_minimal() +
     theme(
         axis.title.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey90", linetype = 2, linewidth = 0.3),
         panel.grid.minor.y = element_blank(),
-        strip.text = element_text(size = 15)
+        panel.spacing.y = unit(0, "mm"),
+        strip.text = element_text(size = 10),
+        plot.background = element_rect(color = NA, fill = "white"),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.background = element_rect(color = "black", fill = "white")
     ) +
-    guides(color = "none") +
+    guides(color = "none", fill = "none") +
     labs(y = "standardized mean difference (Hedge's g)")
 
 ggsave(paste0(folder_data, "phenotypes_analysis/effectsize/02-hedgesg.png"), p, width = 8, height = 6)
