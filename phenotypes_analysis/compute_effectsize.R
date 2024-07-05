@@ -9,9 +9,11 @@ library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
 library(emmeans) # estimate marginal means
 library(effectsize) # companion to Applied Regression
+library(vcd) # for computing effect sizes of categorical response
+library(boot)
 source(here::here("metadata.R"))
 
-plant_color = c(sativa = "#62216d", lupulina = "#fde900")
+plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 
 # Clean data ----
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
@@ -65,7 +67,7 @@ sativas_pa <- read_csv(paste0(folder_data, "raw/BIOL1102_PooledData.csv")) %>%
 sativas <- bind_rows(sativas_va, sativas_pa) %>%
     mutate(site_group = factor(site_group, c("low elevation", "high elevation", "urban", "suburban")))
 
-# Compute effect sizes ----
+# Compute effect sizes of continuous responses/traits ----
 # Cohen's d
 compute_cohensd <- function (tb, response) {
     formu <- paste0(response, " ~ site_group + (1|genome_id)")
@@ -138,10 +140,10 @@ ess <- list_treatments %>%
 background_df <- tibble(pop = rep(c("urbanization", "elevation"), each = 2), plant = rep(c("sativa", "lupulina"), 2))
 strip <- strip_nested(background_y = list(
     NULL, NULL,
-    element_rect(fill = alpha(plant_color[2], 0.2), color = NA),
-    element_rect(fill = alpha(plant_color[1], 0.2), color = NA),
-    element_rect(fill = alpha(plant_color[2], 0.2), color = NA),
-    element_rect(fill = alpha(plant_color[1], 0.2), color = NA)
+    element_rect(fill = alpha(plant_colors[2], 0.2), color = NA),
+    element_rect(fill = alpha(plant_colors[1], 0.2), color = NA),
+    element_rect(fill = alpha(plant_colors[2], 0.2), color = NA),
+    element_rect(fill = alpha(plant_colors[1], 0.2), color = NA)
 ))
 
 p <- ess %>%
@@ -153,7 +155,7 @@ p <- ess %>%
     scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
     scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
     scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
-    scale_fill_manual(values = plant_color) +
+    scale_fill_manual(values = plant_colors) +
     coord_flip() +
     facet_nested(pop + plant ~., scale = "free_y", space = "free_y", switch = "y", strip = strip) +
     theme_minimal() +
@@ -198,7 +200,7 @@ p <- ess %>%
     scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
     scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
     scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
-    scale_fill_manual(values = plant_color) +
+    scale_fill_manual(values = plant_colors) +
     coord_flip() +
     facet_nested(pop + plant ~., scale = "free_y", space = "free_y", switch = "y", strip = strip) +
     theme_minimal() +
@@ -219,7 +221,7 @@ p <- ess %>%
 
 ggsave(paste0(folder_data, "phenotypes_analysis/effectsize/02-hedgesg.png"), p, width = 8, height = 6)
 
-# 3. Plot eta squared partial
+# 3. Plot eta squared partial ----
 ess <- list_treatments %>%
     unnest(partialetasquared) %>%
     clean_names() %>%
@@ -373,6 +375,78 @@ eta_squared(model, partial = TRUE)
 
 
 }
+
+
+
+
+# Compute effect sizes of categorical responses/traits ----
+
+# Clean the data set
+sativas_va_cat <- sativas_va %>%
+    select(population, genome_id, site_group, nitrogen_treatment, starts_with("nodule")) %>%
+    drop_na(nodule_shape)
+
+# Function to compute Cramér's V
+compute_cramersv <- function(tb, response = "nodule_shape", indices) {
+    d <- tb[indices, ] # allows boot to select sample
+    table_data <- table(d$site_group, d[[response]])
+    cramers_v <- assocstats(table_data)$cramer
+    return(cramers_v)
+}
+compute_cramersv_boot <- function (tb, response) {
+    boot_results <- boot(tb, function(tb, indices) compute_cramersv(tb, indices, response = response), R = 1000)
+    bci <- boot.ci(boot_results, type = "perc")
+    cv <- tibble(estimate = bci$t0, lower_cl = bci$percent[4], upper_cl = bci$percent[5])
+    return(cv)
+}
+
+set.seed(123)
+list_responses <- tibble(
+        response = rep(c("nodule_shape", "nodule_size", "nodule_color"), 2),
+        nt = c(rep("without nitrogen", each = 3), rep("with nitrogen", each = 3))
+    ) %>%
+    rowwise() %>%
+    mutate(tb = list(filter(sativas_va_cat, nitrogen_treatment == nt))) %>%
+    mutate(cv = list(compute_cramersv_boot(tb, response))) %>%
+    unnest(cv)
+
+# 4. Plot Cramer's V ----
+ess <- list_responses %>%
+    mutate(id = 1:n()) %>%
+    mutate(nt = case_when(
+        nt == "without nitrogen" ~ "w/o N",
+        nt == "with nitrogen" ~ "w/ N"
+    )) %>%
+    mutate(study_name = paste0(" ", response))
+
+p <- ess %>%
+    ggplot() +
+    #geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_hline(yintercept = c(0,1), linetype = 2) +
+    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
+    geom_point(aes(x = id, y = estimate, shape = nt), size = 3, stroke = 1) +
+    #scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
+    #scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
+    scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
+    scale_x_reverse(breaks = 1:6, labels = ess$study_name, expand = c(0,.8), position = "top") +
+    scale_y_continuous(limits = c(0,1), expand = c(0,.03)) +
+    #scale_fill_manual(values = plant_colors) +
+    coord_flip() +
+    theme_minimal() +
+    theme(
+        axis.title.y = element_blank(),
+        panel.background = element_rect(color = NA, fill = "grey95"),
+        plot.background = element_rect(color = NA, fill = "white"),
+        panel.grid.minor = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.background = element_rect(color = NA, fill = "white"),
+        legend.box.spacing = unit(0, "mm")
+    ) +
+    guides() +
+    labs(y = "Cramer's V", title = "Elevation strains with sativa")
+
+ggsave(paste0(folder_data, "phenotypes_analysis/effectsize/04-cramersv.png"), p, width = 4, height = 3)
 
 
 
