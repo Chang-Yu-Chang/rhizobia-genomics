@@ -421,16 +421,12 @@ ess <- list_responses %>%
 
 p <- ess %>%
     ggplot() +
-    #geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
     geom_hline(yintercept = c(0,1), linetype = 2) +
     geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
     geom_point(aes(x = id, y = estimate, shape = nt), size = 3, stroke = 1) +
-    #scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
-    #scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
     scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
     scale_x_reverse(breaks = 1:6, labels = ess$study_name, expand = c(0,.8), position = "top") +
     scale_y_continuous(limits = c(0,1), expand = c(0,.03)) +
-    #scale_fill_manual(values = plant_colors) +
     coord_flip() +
     theme_minimal() +
     theme(
