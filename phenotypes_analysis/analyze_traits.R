@@ -39,57 +39,6 @@ gts %>%
     filter(genome_id %in% c("g4", "g13")) %>%
     drop_na(max_od)
 
-# Plot the two strains shared in mine and Linda's experiment
-p <- gcs %>%
-    filter(genome_id %in% c("g4", "g13")) %>%
-    #filter(genome_id %in% paste0("g", c(4,5,6,9,11,13,16))) %>%
-    mutate(group = paste0(temperature, well, genome_id)) %>%
-    ggplot() +
-    geom_line(aes(x = t, y = abs, color = genome_id, group = group)) +
-    #scale_color_manual(values = site_group_colors) +
-    scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
-    facet_grid(.~temperature) +
-    theme_bw() +
-    theme() +
-    guides() +
-    labs()
-ggsave(paste0(folder_data, "phenotypes_analysis/growth/06-gc_two_strains.png"), p, width = 10, height = 3)
-
-# Plot all strains used in Linda's experiment
-p <- gcs %>%
-    #filter(genome_id %in% c("g4", "g13")) %>%
-    filter(genome_id %in% paste0("g", c(4,5,6,9,11,13,16))) %>%
-    mutate(group = paste0(temperature, well, genome_id)) %>%
-    ggplot() +
-    geom_line(aes(x = t, y = abs, color = site_group, group = group)) +
-    scale_color_manual(values = site_group_colors) +
-    #scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
-    facet_grid(.~temperature) +
-    theme_bw() +
-    theme() +
-    guides() +
-    labs()
-ggsave(paste0(folder_data, "phenotypes_analysis/growth/07-gc_lindas_strain.png"), p, width = 10, height = 3)
-
-# All symbiontic strain's gc
-p <- gcs %>%
-    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
-    filter(population == "VA") %>%
-    #filter(genome_id %in% c("g4", "g13")) %>%
-    mutate(group = paste0(temperature, well)) %>%
-    ggplot() +
-    geom_line(aes(x = t, y = abs, color = site_group, group = group)) +
-    scale_color_manual(values = site_group_colors) +
-    #scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
-    facet_grid(.~temperature) +
-    theme_bw() +
-    theme() +
-    guides() +
-    labs()
-ggsave(paste0(folder_data, "phenotypes_analysis/growth/08-gc_symbiotic.png"), p, width = 10, height = 3)
-
-
-
 
 
 

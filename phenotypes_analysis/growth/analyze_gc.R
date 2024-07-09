@@ -1,4 +1,4 @@
-#' This script plots the growth curve data
+#' This script analyzes the growth curve data
 
 renv::load()
 library(tidyverse)
@@ -13,7 +13,7 @@ gc_prms <- read_csv(paste0(folder_phenotypes, 'growth/gc_prms.csv'))
 gc_prm_summs <- read_csv(paste0(folder_phenotypes, 'growth/gc_prm_summs.csv'))
 
 
-# 0. clean up data
+# 0. clean up data ----
 factorize_vars <- function (tb) tb %>% mutate(exp_id = factor(exp_id, isolates$exp_id), temperature = factor(temperature, c("25c", "30c", "35c", "40c")))
 isolates <- isolates %>% mutate(exp_id = factor(exp_id, isolates$exp_id))
 gc_summs <- factorize_vars(gc_summs)
@@ -23,7 +23,6 @@ gc_summs <- factorize_vars(gc_summs)
 isolates_gc <- gc_prm_summs %>%
     select(exp_id, temperature, r, lag, maxOD) %>%
     pivot_wider(id_cols = exp_id, names_from = temperature, values_from = c(r, lag, maxOD))
-
 
 
 # 1. Plot all growth traits
@@ -123,3 +122,55 @@ p <- plot_grid(p1, p2, p3, NULL, p4, p5, NULL, NULL, p6,
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(paste0(folder_phenotypes, "growth/05-maxOD_pairs.png"), p, width = 9, height = 9)
+
+# Plot the two strains shared in mine and Linda's experiment
+p <- gcs %>%
+    filter(genome_id %in% c("g4", "g13")) %>%
+    #filter(genome_id %in% paste0("g", c(4,5,6,9,11,13,16))) %>%
+    mutate(group = paste0(temperature, well, genome_id)) %>%
+    ggplot() +
+    geom_line(aes(x = t, y = abs, color = genome_id, group = group)) +
+    #scale_color_manual(values = site_group_colors) +
+    scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
+    facet_grid(.~temperature) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "phenotypes_analysis/growth/06-gc_two_strains.png"), p, width = 10, height = 3)
+
+# Plot all strains used in Linda's experiment
+p <- gcs %>%
+    #filter(genome_id %in% c("g4", "g13")) %>%
+    filter(genome_id %in% paste0("g", c(4,5,6,9,11,13,16))) %>%
+    mutate(group = paste0(temperature, well, genome_id)) %>%
+    ggplot() +
+    geom_line(aes(x = t, y = abs, color = site_group, group = group)) +
+    scale_color_manual(values = site_group_colors) +
+    #scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
+    facet_grid(.~temperature) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "phenotypes_analysis/growth/07-gc_lindas_strain.png"), p, width = 10, height = 3)
+
+# All symbiontic strain's gc
+p <- gcs %>%
+    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
+    filter(population == "VA") %>%
+    #filter(genome_id %in% c("g4", "g13")) %>%
+    mutate(group = paste0(temperature, well)) %>%
+    ggplot() +
+    geom_line(aes(x = t, y = abs, color = site_group, group = group)) +
+    scale_color_manual(values = site_group_colors) +
+    #scale_color_manual(values = c(g4="#0C6291", g13="#BF4342")) +
+    facet_grid(.~temperature) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
+ggsave(paste0(folder_data, "phenotypes_analysis/growth/08-gc_symbiotic.png"), p, width = 10, height = 3)
+
+
+

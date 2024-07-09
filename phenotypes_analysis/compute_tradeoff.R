@@ -1,10 +1,11 @@
+#' This script computes the tradeoff between rhizobia growth vs. symbiosis traits
 renv::load()
 library(tidyverse)
 library(janitor)
 source(here::here("metadata.R"))
 
 
-# Clean data
+# Clean data ----
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
     select(genome_id = genome, species = sm_species)
 
@@ -19,12 +20,14 @@ gts <- read_csv(paste0(folder_data, "phenotypes_analysis/growth/gts.csv")) %>%
     select(genome_id, site_group, everything())
 
 lupulinas <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants.csv")) %>%
+    view
     left_join(isolates) %>%
     clean_names() %>%
     mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
     mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
     filter(genome_id != "control") %>%
-    filter(population == "VA") %>%
+    view
+    #filter(population == "VA") %>%
     drop_na(nodule_count) %>%
     arrange(genome_id) %>%
     mutate(nitrogen_treatment = "without nitrogen") %>%
