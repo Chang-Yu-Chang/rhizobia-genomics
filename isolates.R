@@ -58,3 +58,15 @@ read_csv(paste0(folder_data, "raw/BIOL1102_PooledData.csv")) %>%
     view
 
 
+# All
+tb <- read_csv(paste0(folder_data, "mapping/isolates_all.csv"))
+tb %>%
+    filter(exp_id != 50) %>%
+    filter(!is.na(exp_lup) | !is.na(exp_sativa)) %>%
+    group_by(site_group) %>%
+    count()
+
+table(tb$exp_lup, tb$exp_sativa)
+
+
+

@@ -4,6 +4,7 @@
 folder_script <- "~/Desktop/lab/rhizobia-genomics/analysis/" # Enter the directory of analysis scripts
 folder_data <- "~/Dropbox/lab/rhizobia-genomics/data/" # Enter the directory of data
 folder_genomics <- paste0(folder_data, "genomics/")
+folder_phenotypes <- paste0(folder_data, "phenotypes/")
 
 # Table for genomics workflow
 genomes <- tibble(
