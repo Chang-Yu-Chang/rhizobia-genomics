@@ -367,70 +367,6 @@
       ],
       "Hash": "0776bf7526869e0286b0463cb72fb211"
     },
-    "PlotTools": {
-      "Package": "PlotTools",
-      "Version": "0.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "b33b8c81fac3b64ebef1c78c90c40d29"
-    },
-    "R.cache": {
-      "Package": "R.cache",
-      "Version": "0.16.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R.methodsS3",
-        "R.oo",
-        "R.utils",
-        "digest",
-        "utils"
-      ],
-      "Hash": "fe539ca3f8efb7410c3ae2cf5fe6c0f8"
-    },
-    "R.methodsS3": {
-      "Package": "R.methodsS3",
-      "Version": "1.8.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "utils"
-      ],
-      "Hash": "278c286fd6e9e75d0c2e8f731ea445c8"
-    },
-    "R.oo": {
-      "Package": "R.oo",
-      "Version": "1.26.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R.methodsS3",
-        "methods",
-        "utils"
-      ],
-      "Hash": "4fed809e53ddb5407b3da3d0f572e591"
-    },
-    "R.utils": {
-      "Package": "R.utils",
-      "Version": "2.12.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R.methodsS3",
-        "R.oo",
-        "methods",
-        "tools",
-        "utils"
-      ],
-      "Hash": "3dc2829b790254bfba21e60965787651"
-    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -500,20 +436,6 @@
         "utils"
       ],
       "Hash": "df49e3306f232ec28f1604e36a202847"
-    },
-    "Rdpack": {
-      "Package": "Rdpack",
-      "Version": "2.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods",
-        "rbibutils",
-        "tools",
-        "utils"
-      ],
-      "Hash": "3e1384ada5d3948b392e98b11434d972"
     },
     "Rhtslib": {
       "Package": "Rhtslib",
@@ -598,48 +520,6 @@
         "utils"
       ],
       "Hash": "ae913ff30bce222686e66e45448fcfb6"
-    },
-    "TreeDist": {
-      "Package": "TreeDist",
-      "Version": "2.7.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "Rdpack",
-        "TreeTools",
-        "ape",
-        "cli",
-        "colorspace",
-        "memoise",
-        "phangorn",
-        "shiny",
-        "shinyjs",
-        "stats"
-      ],
-      "Hash": "88fea789523cfedf1558845e0a2cf36a"
-    },
-    "TreeTools": {
-      "Package": "TreeTools",
-      "Version": "1.11.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "PlotTools",
-        "R",
-        "R.cache",
-        "RCurl",
-        "Rcpp",
-        "Rdpack",
-        "ape",
-        "bit64",
-        "colorspace",
-        "fastmatch",
-        "lifecycle",
-        "methods"
-      ],
-      "Hash": "f8b3dab6394f2725650363cb492b9e18"
     },
     "XML": {
       "Package": "XML",
@@ -1038,7 +918,7 @@
     },
     "cluster": {
       "Package": "cluster",
-      "Version": "2.1.6",
+      "Version": "2.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1048,7 +928,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "0aaa05204035dc43ea0004b9c76611dd"
+      "Hash": "5edbbabab6ce0bf7900a74fd4358628e"
     },
     "clusterGeneration": {
       "Package": "clusterGeneration",
@@ -3560,18 +3440,6 @@
       ],
       "Hash": "7d6eda494f34a644420ac1bfd2a8023a"
     },
-    "rbibutils": {
-      "Package": "rbibutils",
-      "Version": "2.2.16",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "tools",
-        "utils"
-      ],
-      "Hash": "8c06968e0a5b0209c5f34239b1302336"
-    },
     "readr": {
       "Package": "readr",
       "Version": "2.1.5",
@@ -3967,19 +3835,6 @@
         "xtable"
       ],
       "Hash": "54b26646816af9960a4c64d8ceec75d6"
-    },
-    "shinyjs": {
-      "Package": "shinyjs",
-      "Version": "2.1.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "digest",
-        "jsonlite",
-        "shiny"
-      ],
-      "Hash": "802e4786b353a4bb27116957558548d5"
     },
     "sjPlot": {
       "Package": "sjPlot",
