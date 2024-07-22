@@ -119,7 +119,7 @@ mamba install --yes -c bioconda iqtree=2.3.0
 mamba create -n orthofinder
 mamba activate orthofinder
 mamba install --yes -c bioconda orthofinder=2.5.5
-
+# pip install scipy or brew install scipy to make scipy universal
 
 
 

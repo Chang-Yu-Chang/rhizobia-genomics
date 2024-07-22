@@ -7,15 +7,21 @@ library(tidytree)
 library(ape)
 source(here::here("metadata.R"))
 
-load(file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv")) %>%
+    left_join(isolates) %>%
+    select(genome_id, contig_id, species, replicon, replicon_type, population, site, site_group)
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 
 # Functions
-get_group <- function (dm) {
+get_group <- function (dm, by_what = "species") {
     #' Get the group labels from dm
     tibble(genome_id = colnames(dm)) %>%
+        mutate(genome_id = str_remove(genome_id, "_contig_\\d+")) %>%
+        left_join(isolates_contigs) %>%
         left_join(isolates) %>%
-        pull(site_group)
+        `[`(by_what) %>%
+        unlist
 }
 
 calculate_distances <- function(dist_matrix, groups) {
@@ -57,79 +63,58 @@ permute_dist <- function (dm, groups, np = 1000) {
     return(perm_diffs)
 }
 
-
-if (FALSE) {
-
-# Example
-set.seed(2)
-tr <- rtree(10)
-tr <- tr_gpa
-plot(tr)
-dm <- cophenetic(tr)
-groups <- c(rep(c(1,2), 16))
-obs <- calculate_distances(dm, groups) %>% calculate_dist_mean()
-obs
-pm <- permute_dist(dm, groups)
-hist(pm)
-}
-
-# Master table
-tb <- tibble(
-    id = factor(1:4),
-    feature = rep(c("core", "gene presence/absence"), each = 2),
-    population = rep(c("VA", "PA"), 2),
-    tree = list(
-        drop.tip(tr, isolates$genome_id[isolates$population != "VA"]),
-        drop.tip(tr, isolates$genome_id[isolates$population != "PA"]),
-        drop.tip(tr_gpa, isolates$genome_id[isolates$population != "VA"]),
-        drop.tip(tr_gpa, isolates$genome_id[isolates$population != "PA"])
-    )
-)
-
-tb <- tb %>%
-    rowwise() %>%
-    mutate(
-        dm = list(cophenetic(tree)),
-        groups = list(get_group(dm)),
-        distances_obs = list(calculate_distances(dm, groups) %>% calculate_dist_mean),
-        distances_pm = list(permute_dist(dm, groups))
-    )
-
-tb_obs <- tb %>% unnest(distances_obs)
-
-tb %>%
-    #unnest(distances_obs) %>%
-    unnest(distances_pm) %>%
-    ggplot() +
-    geom_histogram(aes(x = distances_pm), color = "black", fill = "white") +
-    geom_vline(data = tb_obs, aes(xintercept = distances_obs), color = 2) +
-    facet_grid(feature ~ population, scales = "free_x") +
-    theme_bw() +
-    theme() +
-    guides() +
-    labs()
-
-
 compute_percentiles <- function(tb) {
     tb %>%
         group_by(id, feature, population) %>%
         arrange(distances_pm) %>%
         summarize(p05 = quantile(distances_pm, 0.05), p50 = quantile(distances_pm, 0.5), p95 = quantile(distances_pm, 0.95))
-        #pivot_longer(-c(id, feature, population), names_to = "percentile")
 }
 
+# Master table
+tb <- tibble(
+    id = factor(1:12),
+    feature = rep(c("core", rep("gene presence/absence", 4), "structural variants"), each = 2),
+    replicon_type = rep(c("core", "genome", "chromosome", "psyma", "psymb", "structural variants"), each = 2),
+    population = rep(c("VA", "PA"), 6),
+    tree = list(
+        drop.tip(tr_seq_core, isolates$genome_id[isolates$population != "VA"]),
+        drop.tip(tr_seq_core, isolates$genome_id[isolates$population != "PA"]),
+        drop.tip(tr_gpa_genomes, isolates$genome_id[isolates$population != "VA"]),
+        drop.tip(tr_gpa_genomes, isolates$genome_id[isolates$population != "PA"]),
+        drop.tip(tr_gpa_chrom, contigs$contig_id[contigs$population != "VA"]),
+        drop.tip(tr_gpa_chrom, contigs$contig_id[contigs$population != "PA"]),
+        drop.tip(tr_gpa_psyma, contigs$contig_id[contigs$population != "VA"]),
+        drop.tip(tr_gpa_psyma, contigs$contig_id[contigs$population != "PA"]),
+        drop.tip(tr_gpa_psymb, contigs$contig_id[contigs$population != "VA"]),
+        drop.tip(tr_gpa_psymb, contigs$contig_id[contigs$population != "PA"]),
+        drop.tip(tr_spa_genomes, isolates$genome_id[isolates$population != "VA"]),
+        drop.tip(tr_spa_genomes, isolates$genome_id[isolates$population != "PA"])
+    )
+)
 
-p <- tb %>%
-    #select(id, distances_pm) %>%
+
+# 1. grouping by species
+tb1 <- tb %>%
+    rowwise() %>%
+    mutate(
+        dm = list(cophenetic(tree)),
+        groups = list(get_group(dm, by_what = "species")),
+        distances_obs = list(calculate_distances(dm, groups) %>% calculate_dist_mean),
+        distances_pm = list(permute_dist(dm, groups))
+    )
+
+tb_obs <- tb1 %>% unnest(distances_obs)
+
+p <- tb1 %>%
+    mutate(id = factor(id, 12:1)) %>%
     unnest(distances_pm) %>%
     compute_percentiles() %>%
     ggplot() +
     geom_hline(yintercept = c(0, 1), color = "grey80", linetype = 2, linewidth = 1) +
     geom_segment(aes(x = id, xend = id, y = p05, yend = p95), linewidth = 1,  arrow = arrow(length = unit(3, "mm"), angle = 90, ends = "both")) +
-    geom_point(aes(x = id, y = p50, color = "median"), shape = 21, stroke = 2, size = 2) +
+    geom_point(aes(x = id, y = p50, color = "median"), shape = 3, stroke = 1, size = 2) +
     geom_point(data = tb_obs, aes(x = id, y = distances_obs, color = "obs"), shape = 21, stroke = 2, size = 2) +
-    scale_x_discrete(breaks = 1:4, labels = tb$feature, position = "top") +
-    scale_y_continuous(limits = c(0, 1.2)) +
+    scale_x_discrete(breaks = 1:12, labels = tb$replicon_type, position = "top") +
     scale_color_manual(values = c("obs" = "maroon", "median" = "black"), name = NULL) +
     facet_grid(population~., switch = "y", scales = "free_y") +
     coord_flip() +
@@ -138,9 +123,43 @@ p <- tb %>%
         legend.position = "top",
     ) +
     guides() +
-    labs(x = "", y = "")
+    labs(x = "", y = "meliloti vs medicae")
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/cophenetic/01-cophenetic.png"), p, width = 6, height = 4)
+ggsave(paste0(folder_data, "phylogenomics_analysis/cophenetic/01-cophenetic_species.png"), p, width = 6, height = 4)
+
+# 2. grouping by population
+tb2 <- tb %>%
+    rowwise() %>%
+    mutate(
+        dm = list(cophenetic(tree)),
+        groups = list(get_group(dm, by_what = "species")),
+        distances_obs = list(calculate_distances(dm, groups) %>% calculate_dist_mean),
+        distances_pm = list(permute_dist(dm, groups))
+    )
+
+tb_obs <- tb2 %>% unnest(distances_obs)
+
+p <- tb2 %>%
+    mutate(id = factor(id, 12:1)) %>%
+    unnest(distances_pm) %>%
+    compute_percentiles() %>%
+    ggplot() +
+    geom_hline(yintercept = c(0, 1), color = "grey80", linetype = 2, linewidth = 1) +
+    geom_segment(aes(x = id, xend = id, y = p05, yend = p95), linewidth = 1,  arrow = arrow(length = unit(3, "mm"), angle = 90, ends = "both")) +
+    geom_point(aes(x = id, y = p50, color = "median"), shape = 3, stroke = 1, size = 2) +
+    geom_point(data = tb_obs, aes(x = id, y = distances_obs, color = "obs"), shape = 21, stroke = 2, size = 2) +
+    scale_x_discrete(breaks = 1:12, labels = tb$replicon_type, position = "top") +
+    scale_color_manual(values = c("obs" = "maroon", "median" = "black"), name = NULL) +
+    facet_grid(population~., switch = "y", scales = "free_y") +
+    coord_flip() +
+    theme_bw() +
+    theme(
+        legend.position = "top",
+    ) +
+    guides() +
+    labs(x = "", y = "high vs low or urban vs suburban")
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/cophenetic/02-cophenetic_population.png"), p, width = 6, height = 4)
 
 
 
