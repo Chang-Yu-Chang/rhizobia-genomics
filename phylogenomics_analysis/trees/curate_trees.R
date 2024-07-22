@@ -11,7 +11,7 @@ isolates <- isolates %>%
     filter(!genome_id %in% c("g20", "g28"))
 
 # Core gene tree
-tr_seq_core <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/mltree/isolates_core_b/aln.treefile"))
+tr_seq_core <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/mltree/seq_core/seq_core.treefile"))
 list_others <- c(paste0("g", c(20, 28, 38:43)), "em1022", "usda1106", "em1021", "wsm419")
 tr_seq_core <- tr_seq_core %>% drop.tip(list_others)
 tr_seq_core <- root(tr_seq_core, outgroup = "g15", resolve.root = TRUE)

@@ -114,6 +114,11 @@ mamba create -n iqtree
 mamba activate iqtree
 mamba install --yes -c bioconda iqtree=2.3.0
 
+# Install orthofinder v2.5.5
+# Accurate inference of orthogroups, orthologues, gene trees and rooted species tree made easy!
+mamba create -n orthofinder
+mamba activate orthofinder
+mamba install --yes -c bioconda orthofinder=2.5.5
 
 
 
