@@ -5,7 +5,7 @@ source ../../genomics/env_vars.sh
 # This script constructs ML trees using iqtree
 mamba activate iqtree
 
-for phy in gpa_genomes gpa_chrom gpa_psyma gpa_psymb; do;
+for phy in gpa_genomes gpa_chrom gpa_psyma gpa_psymb spa_genomes; do;
     iqtree \
         -nt AUTO \
         -bb 1000 -nt AUTO -m MK+R+FO -redo -st MORPH \

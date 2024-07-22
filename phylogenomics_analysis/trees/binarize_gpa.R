@@ -4,48 +4,11 @@ renv::load()
 library(tidyverse)
 source(here::here("metadata.R"))
 
-# Clean the gpaf names
-gpaf <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpaf.csv"))
-dim(gpaf) # 26886 x 34
-gpafl <- gpaf %>%
-    select(-non_unique_gene_name) %>%
-    pivot_longer(-c(gene, annotation), names_to = "genome_id", values_to = "annotation_id", values_drop_na = T) %>%
-    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-    arrange(genome_id) %>%
-    mutate(annotation_id = str_remove(annotation_id, "_stop"))
-dim(gpafl) # 213135
-
-## Unpack genes with multiple copies in one genome
-split_colons <- function(string) unlist(str_split(string, ";"))
-gpafl_multi <- gpafl %>%
-    filter(str_detect(annotation_id, ";")) %>%
-    rowwise() %>%
-    mutate(annotation_id = list(split_colons(annotation_id))) %>%
-    unnest(annotation_id)
-gpafl <- gpafl %>%
-    filter(!str_detect(annotation_id, ";")) %>%
-    bind_rows(gpafl_multi)
-dim(gpafl) # 221,882
-
-
-
-# Clean the gd names
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv")) %>% select(contig_id, replicon_type) %>% drop_na
-gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
-dim(gd) # 225019 (gene x genome x contig) x 8 rows
-gd <- gd %>% select(genome_id, contig_id, annotation_id)
+gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpacl.csv")) %>%
+    filter(contig_id %in% contigs$contig_id)
+dim(gpacl)
 
-# Join the two tables
-gpacl <- gpafl %>%
-    arrange(genome_id, annotation_id) %>%
-    left_join(gd) %>%
-    # Remove duplicate of multi-copy genes on one contig
-    distinct(gene, contig_id) %>%
-    # Filter for chromosome and two plasmids
-    left_join(contigs)
-
-length(unique(gpacl$genome_id))
-length(unique(gpacl$contig_id))
 
 # Matrix of contig genes
 ## chromosome
@@ -115,6 +78,12 @@ wrapper_phylip(m, "gpa_psyma")
 m <- t(as.matrix(gpac_psymb[,c(-1,-2)]))
 dim(m)
 wrapper_phylip(m, "gpa_psymb")
+
+# Structural variants
+spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/spa.csv"))
+m <- t(as.matrix(spa[,-1]))
+dim(m)
+wrapper_phylip(m, "spa_genomes")
 
 
 
