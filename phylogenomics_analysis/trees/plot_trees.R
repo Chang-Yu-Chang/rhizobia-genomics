@@ -9,18 +9,17 @@ source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
 # 1. Plot core gene tree ----
 ## Full tree
-p <- tr %>%
+p <- tr_seq_core %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     as.treedata() %>%
-    #ggtree(branch.length = "none") +
     ggtree() +
     geom_tiplab(aes(label = label, color = species), hjust = 0, align = TRUE) +
     geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
-    #geom_nodelab(aes(label = node), color = "maroon", hjust = 0, size = 2) +
     geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
     geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
     geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
@@ -37,12 +36,14 @@ p <- tr %>%
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-core_mltrees.png"), p, width = 6, height = 4)
 
+if (F) {
+
 # 2. Plot Ensifer species tree ----
 ## meliloti tree
 list_non_medicae <- isolates_contigs %>% filter(species != "medicae") %>% pull(genome_id)
 list_non_meliloti <- isolates_contigs %>% filter(species != "meliloti") %>% pull(genome_id)
 
-p1 <- tr %>%
+p1 <- tr_seq_core %>%
     drop.tip(list_non_meliloti) %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
@@ -63,7 +64,7 @@ p1 <- tr %>%
     labs(title = "E. meliloti")
 
 ## medicae tree
-p2 <- tr %>%
+p2 <- tr_seq_core %>%
     drop.tip(list_non_medicae) %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
@@ -86,44 +87,25 @@ p2 <- tr %>%
 p <- plot_grid(p1, p2, scale = 0.9) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/02-core_mltrees_mm.png"), p, width = 8, height = 4)
-
-
-# 3. Plot the PAP heatmap ----
-p <- gpatl %>%
-    ggplot() +
-    geom_tile(aes(x = gene, y = genome_id), fill = "grey10") +
-    scale_y_discrete(expand = c(0,0)) +
-    theme_classic() +
-    theme(
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 5, color = "black"),
-        panel.border = element_rect(color = "black", fill = NA, linewidth = 1)
-    ) +
-    guides(fill = "none") +
-    labs(x = "gene cluster", y = "genome")
-
-ggsave(paste0(folder_data, "phylogenomics_analysis/trees/03-pap_heatmap.png"), p, width = 6, height = 3)
+}
 
 # 4. Plot gene content trees ----
-p <- tr_gpa %>%
+p <- tr_gpa_genomes %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
     geom_tiplab(aes(label = label, color = species), hjust = 0) +
     scale_color_manual(values = species_colors) +
-    scale_x_continuous(limits = c(0, 1)) +
+    #scale_x_continuous(limits = c(0, 1)) +
     theme_tree() +
     #theme_classic() +
     labs()
-
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/04-pap_tree.png"), p, width = 6, height = 4)
 
 # 5. Plot core and gene content trees ----
 # Plot core tree
-p1 <- tr %>%
+p1 <- tr_seq_core %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     as.treedata() %>%
@@ -190,7 +172,7 @@ p <- gpatl %>%
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/06-pap_heatmap_sites.png"), p, width = 7, height = 5)
 
 # 7. Plot the core and gene content trees, color by sites ----
-p1 <- tr %>%
+p1 <- tr_seq_core %>%
     as_tibble() %>%
     left_join(rename(ii, label = genome_id)) %>%
     as.treedata() %>%
@@ -235,8 +217,6 @@ p <- p1 + geom_tree(data = d2) +
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/07-matched_tree_sites.png"), p, width = 7, height = 3)
 
-# 8. Plot the
-
 # 8. Plot gene content trees ----
 p <- tr_gpa %>%
     as_tibble() %>%
@@ -256,7 +236,7 @@ ggsave(paste0(folder_data, "phylogenomics_analysis/trees/08-gpa_mltree.png"), p,
 
 # 9. Plot core gene tree with scaled branch length ----
 list_scaled_branches <- c(37:39, 14:16, 50)
-p <- tr %>%
+p <- tr_seq_core %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
@@ -323,7 +303,7 @@ ggsave(paste0(folder_data, "phylogenomics_analysis/trees/10-gpa_mltree_scaled.pn
 # 11. plot matched scaled trees ----
 list_scaled_branches <- c(37:39, 14:16, 50)
 scaling_factor = 20
-pt1 <- tr %>%
+pt1 <- tr_seq_core %>%
     as_tibble() %>%
     left_join(rename(isolates_contigs, label = genome_id)) %>%
     mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
@@ -408,6 +388,47 @@ p <- pt1 +
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/11-matched_mltree_scaled.png"), p, width = 10, height = 4)
 
+# 12. plot the gene content tree by replicon ----
+
+plot_gpa_tree <- function (tr_gpa, replicon_type) {
+    tr_gpa %>%
+        as_tibble() %>%
+        left_join(rename(contigs, label = contig_id)) %>%
+        as.treedata() %>%
+        ggtree() +
+        geom_tiplab(aes(label = label, color = species), hjust = 0) +
+        coord_cartesian(clip = "off") +
+        scale_color_manual(values = species_colors) +
+        theme_tree() +
+        theme(
+            legend.position = "top",
+            plot.margin = margin(10, 50, 10, 10, unit = "mm")
+        ) +
+        labs(title = replicon_type)
+
+}
+
+p1 <- tr_gpa_genomes %>%
+    drop.tip(c("g2", "g3", "g15")) %>%
+    as_tibble() %>%
+    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    as.treedata() %>%
+    ggtree() +
+    geom_tiplab(aes(label = label, color = species), hjust = 0) +
+    scale_color_manual(values = species_colors) +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = margin(10, 50, 10, 10, unit = "mm")
+    ) +
+    labs(title = "genome")
+
+p2 <- plot_gpa_tree(tr_gpa_chrom %>% drop.tip(c("g2_contig_1", "g3_contig_2", "g15_contig_5")) , "chromosome")
+p3 <- plot_gpa_tree(tr_gpa_psyma, "pSymA like")
+p4 <- plot_gpa_tree(tr_gpa_psymb, "pSymB like")
+p <- plot_grid(p1, p2, p3, p4, nrow = 2)
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/12-gpa_mltrees.png"), p, width = 15, height = 10)
 
 
 

@@ -11,7 +11,6 @@ gpa <- read_delim(paste0(folder_data, "genomics/pangenome/isolates/gene_presence
 dim(gpa) # 26886 genes in union x 32-1 genomes
 write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
 
-
 # Transpose the gene presence-absence table
 gpat <- gpa %>%
     pivot_longer(cols = -gene, names_to = "genome_id") %>%
@@ -47,7 +46,8 @@ write_csv(gpaf, paste0(folder_data, "genomics_analysis/gene_content/gpaf.csv"))
 gd <- read_csv(paste0(folder_data, "genomics/pangenome/isolates/gene_data.csv")) %>%
     clean_names() %>%
     mutate(annotation_id = str_remove_all(annotation_id, "/Users/cychang/Dropbox/lab/local-adaptation/data/genomics/genomes/")) %>%
-    rename(genome_id = gff_file, contig_id = scaffold_name)
+    rename(genome_id = gff_file, contig_id = scaffold_name) %>%
+    mutate(contig_id = paste0(genome_id, "_", contig_id))
 dim(gd) # 225019 (gene x genome x contig) x 8 rows
 write_csv(gd, paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
 
