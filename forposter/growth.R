@@ -6,7 +6,7 @@ library(cowplot)
 library(janitor)
 source(here::here("metadata.R"))
 
-
+set.seed(1)
 gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv")) %>%
     clean_names() %>%
     filter(temperature != "40c") %>%
@@ -29,7 +29,6 @@ p1 <- tt1 %>%
     scale_fill_manual(values = alpha(site_group_colors, 0.5)) +
     scale_color_manual(values = alpha(site_group_colors, 1)) +
     scale_y_continuous(limits = c(0, 1.5), breaks = seq(0, 1.5, 0.5)) +
-    facet_wrap(population ~., scale = "free_x", nrow = 2) +
     theme_minimal() +
     theme(
         axis.title.x = element_blank(),
@@ -56,7 +55,6 @@ p2 <- gts %>%
     scale_fill_manual(values = alpha(site_group_colors, 0.5)) +
     scale_color_manual(values = alpha(site_group_colors, 1)) +
     scale_y_continuous(limits = c(0, 1.5), breaks = seq(0, 1.5, 0.5)) +
-    facet_wrap(population ~., scale = "free_x", nrow = 2) +
     theme_minimal() +
     theme(
         axis.title.x = element_blank(),
@@ -84,12 +82,13 @@ p3 <- pcs %>%
     filter(population == "VA") %>%
     ggplot() +
     geom_point(aes(x = PC1, y = PC2, color = site_group), shape = 21, stroke = 1, size = 2) +
+    stat_ellipse(aes(x = PC1, y = PC2, fill = site_group), geom = "polygon", type = "norm", level = 0.95, alpha = .2) +
     geom_vline(xintercept = 0, color = "grey10", linetype = 2) +
     geom_hline(yintercept = 0, color = "grey10", linetype = 2) +
     scale_color_manual(values = site_group_colors) +
-    scale_x_continuous(breaks = seq(-4,4,2)) +
-    scale_y_continuous(breaks = seq(-2,2,2)) +
-    facet_wrap(population ~., nrow = 2, scales = "free_x") +
+    scale_fill_manual(values = site_group_colors) +
+    scale_x_continuous(breaks = seq(-8,8,2)) +
+    scale_y_continuous(breaks = seq(-8,8,2)) +
     theme_minimal() +
     theme(
         panel.grid.minor = element_blank(),
@@ -97,7 +96,7 @@ p3 <- pcs %>%
         legend.position = "inside",
         legend.position.inside = c(0.9,0.1)
     ) +
-    guides(color = "none") +
+    guides(color = "none", fill = "none") +
     labs(x = paste0("PC1 (", get_pcvar(pca_results1)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results1)[2], "%)"))
 
 p4 <-  pcs %>%
@@ -105,12 +104,13 @@ p4 <-  pcs %>%
     filter(population == "PA") %>%
     ggplot() +
     geom_point(aes(x = PC1, y = PC2, color = site_group), shape = 21, stroke = 1, size = 2) +
+    stat_ellipse(aes(x = PC1, y = PC2, fill = site_group), geom = "polygon", type = "norm", level = 0.95, alpha = .2) +
     geom_vline(xintercept = 0, color = "grey10", linetype = 2) +
     geom_hline(yintercept = 0, color = "grey10", linetype = 2) +
     scale_color_manual(values = site_group_colors) +
-    scale_x_continuous(breaks = seq(-4,4,2)) +
-    scale_y_continuous(breaks = seq(-2,2,2)) +
-    facet_wrap(population ~., nrow = 2, scales = "free_x") +
+    scale_fill_manual(values = site_group_colors) +
+    scale_x_continuous(breaks = seq(-8,8,2)) +
+    scale_y_continuous(breaks = seq(-6,6,2)) +
     theme_minimal() +
     theme(
         panel.grid.minor = element_blank(),
@@ -118,10 +118,36 @@ p4 <-  pcs %>%
         legend.position = "inside",
         legend.position.inside = c(0.9,0.1)
     ) +
-    guides(color = "none") +
+    guides(color = "none", fill = "none") +
     labs(x = paste0("PC1 (", get_pcvar(pca_results2)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results2)[2], "%)"))
 
 
 p <- plot_grid(p1, p3, p2, p4, align = T, axis = "tb", scale = 0.95, rel_widths = c(1, 2))
-
 ggsave(here::here("forposter/growth.pdf"), p, width = 4, height = 6)
+
+#
+p <- gts %>%
+    left_join(isolates) %>%
+    mutate(population = factor(population, c("VA", "PA"))) %>%
+    ggplot() +
+    geom_boxplot(aes(x = site_group, y = r_30c, fill = site_group)) +
+    geom_jitter(aes(x = site_group, y = r_30c, color = site_group), size = 2, width = .1, shape = 21, stroke = 1) +
+    scale_fill_manual(values = alpha(site_group_colors, 0.5)) +
+    scale_color_manual(values = alpha(site_group_colors, 1)) +
+    scale_y_continuous(limits = c(0, 1.5), breaks = seq(0, 1.5, 0.5)) +
+    facet_grid(.~population, scales = "free_x") +
+    theme_bw() +
+    theme(
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 1, size = 15),
+        axis.title.y = element_text(size = 15),
+        panel.border = element_rect(color = "grey10", fill = NA),
+        strip.text = element_blank(),
+        plot.background = element_blank()
+    ) +
+    guides(fill = "none", color = "none") +
+    labs(y = "growth rate at 30C (1/hr)")
+
+#p <- plot_grid(p1, p2, nrow = 1, align = T, axis = "tb", scale = 0.95, rel_widths = c(1, 1))
+ggsave(here::here("forposter/growth.pdf"), p, width = 4, height = 4)
+

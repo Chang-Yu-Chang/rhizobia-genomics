@@ -104,6 +104,7 @@ sativas_va <- read_csv(paste0(folder_data, "raw/SymbiosisInSoilData_S24.csv")) %
         genome_name = ifelse(genome_id == "control", "control", genome_name),
         genome_id = factor(genome_id, c(isolates$genome_id, "control")),
         #site_group = factor(site_group, c("high elevation", "low elevation", "urban", "suburban", "control")),
+        shoot_height = shoot_height/10,
         population = "VA",
         exp_plant = "sativa"
     ) %>%
