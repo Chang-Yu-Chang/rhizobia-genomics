@@ -1,4 +1,4 @@
-#' This script plots the NJ trees at the contig level
+#' cophenetic distance
 
 renv::load()
 library(tidyverse)
@@ -93,7 +93,19 @@ tb <- tibble(
 )
 
 
-# 1. grouping by species
+# grouping by site group
+tt <- tibble(
+    replicon_type = rep(c("core", "genome", "chromosome", "psyma", "psymb", "structural variants"), each = 1),
+    full_name = c(
+        "1008 core genes",
+        "gene content (genome)",
+        "gene content (chromosome)",
+        "gene content (pSymA like)",
+        "gene content (pSymB like)",
+        "structural variants"
+    )
+)
+
 tb1 <- tb %>%
     rowwise() %>%
     mutate(
@@ -101,68 +113,47 @@ tb1 <- tb %>%
         groups = list(get_group(dm, by_what = "site_group")),
         distances_obs = list(calculate_distances(dm, groups) %>% calculate_dist_mean),
         distances_pm = list(permute_dist(dm, groups))
-    )
+    ) %>%
+    left_join(tt) %>%
+    mutate(population = factor(population, c("VA", "PA")))
 
 tb_obs <- tb1 %>% unnest(distances_obs)
 
 p <- tb1 %>%
-    mutate(id = factor(id, 12:1)) %>%
+    mutate(id = factor(id, 1:12)) %>%
     unnest(distances_pm) %>%
     compute_percentiles() %>%
     ggplot() +
-    geom_hline(yintercept = c(0, 1), color = "grey80", linetype = 2, linewidth = 1) +
+    #geom_hline(yintercept = c(0, 1), color = "grey30", linetype = 2, linewidth = 1) +
+    annotate("rect", xmin = -Inf, xmax = Inf, ymin = 0, ymax = 1, fill = alpha("gold", .2)) +
     geom_segment(aes(x = id, xend = id, y = p05, yend = p95), linewidth = 1,  arrow = arrow(length = unit(3, "mm"), angle = 90, ends = "both")) +
     geom_point(aes(x = id, y = p50, color = "median"), shape = 3, stroke = 1, size = 2) +
     geom_point(data = tb_obs, aes(x = id, y = distances_obs, color = "obs"), shape = 21, stroke = 2, size = 2) +
-    scale_x_discrete(breaks = 1:12, labels = tb$replicon_type, position = "top") +
+    scale_x_discrete(breaks = 1:12, labels = tb1$full_name) +
+    scale_y_continuous(breaks = seq(0,2,0.2)) +
     scale_color_manual(values = c("obs" = "maroon", "median" = "black"), name = NULL) +
-    facet_grid(population~., switch = "y", scales = "free_y") +
-    coord_flip() +
+    facet_grid(.~population, switch = "y", scales = "free_x") +
+    #coord_flip() +
     theme_bw() +
     theme(
         legend.position = "top",
+        # legend.position = "inside",
+        # legend.position.inside = c(0.2, 0.9),
+        # legend.background = element_rect(color = NA, fill = NA),
+        legend.box.background = element_rect(color = NA, fill = NA),
+        legend.key = element_rect(color = NA, fill = NA),
+        legend.spacing.y = unit(-3,"mm"),
+        legend.text = element_text(size = 15),
+        strip.background = element_blank(),
+        #strip.text = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(size = 12, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15),
+        plot.margin = unit(c(0,10,5,5), "mm"),
+        plot.background = element_blank()
     ) +
     guides() +
-    labs(x = "", y = "meliloti vs medicae")
+    labs(x = "", y = expression(bar(d)["within"]/bar(d)["between"]))
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/cophenetic/01-cophenetic_species.png"), p, width = 6, height = 4)
-
-# 2. grouping by population
-tb2 <- tb %>%
-    rowwise() %>%
-    mutate(
-        dm = list(cophenetic(tree)),
-        groups = list(get_group(dm, by_what = "species")),
-        distances_obs = list(calculate_distances(dm, groups) %>% calculate_dist_mean),
-        distances_pm = list(permute_dist(dm, groups))
-    )
-
-tb_obs <- tb2 %>% unnest(distances_obs)
-
-p <- tb2 %>%
-    mutate(id = factor(id, 12:1)) %>%
-    unnest(distances_pm) %>%
-    compute_percentiles() %>%
-    ggplot() +
-    geom_hline(yintercept = c(0, 1), color = "grey80", linetype = 2, linewidth = 1) +
-    geom_segment(aes(x = id, xend = id, y = p05, yend = p95), linewidth = 1,  arrow = arrow(length = unit(3, "mm"), angle = 90, ends = "both")) +
-    geom_point(aes(x = id, y = p50, color = "median"), shape = 3, stroke = 1, size = 2) +
-    geom_point(data = tb_obs, aes(x = id, y = distances_obs, color = "obs"), shape = 21, stroke = 2, size = 2) +
-    scale_x_discrete(breaks = 1:12, labels = tb$replicon_type, position = "top") +
-    scale_color_manual(values = c("obs" = "maroon", "median" = "black"), name = NULL) +
-    facet_grid(population~., switch = "y", scales = "free_y") +
-    coord_flip() +
-    theme_bw() +
-    theme(
-        legend.position = "top",
-    ) +
-    guides() +
-    labs(x = "", y = "high vs low or urban vs suburban")
-
-ggsave(paste0(folder_data, "phylogenomics_analysis/cophenetic/02-cophenetic_population.png"), p, width = 6, height = 4)
-
-
-
-
-
-
+ggsave(here::here("forposter/cophenetic.pdf"), p, width = 8, height = 6)

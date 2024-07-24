@@ -15,7 +15,7 @@ p1 <- plants %>%
     # group_by(exp_plant, population, site_group, exp_id, exp_nitrogen) %>%
     # summarize(shoot_biomass_mg = mean(shoot_biomass_mg, na.rm = T))
     filter(exp_plant == "sativa") %>%
-    filter(exp_id != "control") %>%
+    filter(exp_id != "control", exp_nitrogen == "with nitrogen") %>%
     filter(population == "VA") %>%
     drop_na(shoot_height) %>%
     ggplot() +
@@ -37,6 +37,7 @@ p1 <- plants %>%
 p2 <- plants %>%
     filter(exp_plant == "sativa") %>%
     filter(exp_id != "control") %>%
+    filter(exp_id != "control", exp_nitrogen == "with nitrogen") %>%
     filter(population == "PA") %>%
     drop_na(shoot_height) %>%
     ggplot() +
@@ -130,7 +131,7 @@ ggsave(here::here("forposter/plants_sat.pdf"), p, width = 4, height = 6)
 #
 sativa <- plants %>%
     filter(exp_plant == "sativa") %>%
-    filter(exp_id != "control") %>%
+    filter(exp_id != "control", exp_nitrogen == "without nitrogen") %>%
     mutate(population = factor(population, c("VA", "PA"))) %>%
     drop_na(shoot_height)
 
@@ -160,3 +161,5 @@ p <- sativa %>%
     labs(y = "shoot height (cm)")
 
  ggsave(here::here("forposter/plants_sat.pdf"), p, width = 4, height = 4)
+
+
