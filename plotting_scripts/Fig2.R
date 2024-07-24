@@ -424,7 +424,7 @@ p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 
 
 
 
-# Combine the figure ----
+# Combine figures ----
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig2.png"), scale = 1) +
