@@ -7,7 +7,7 @@ source ../env_vars.sh
 cd $folder_shell
 mkdir -p $folder_genomics/assembly
 
-for i in {1..32}
+for i in {33..38}
 do
     echo $genome_ids[$i]
     raw_reads=$folder_genomics/raw_reads/$genome_ids[$i].fastq.gz
