@@ -5,7 +5,7 @@
 library(tidyverse)
 library(janitor)
 library(cowplot)
-source(here::here("analysis/00-metadata.R"))
+source(here::here("metadata.R"))
 
 compute_q <- function (asc) {
     #' Compute the mean phred (Quality score) of a raw read

@@ -1,6 +1,6 @@
 # De novo assembly
 
-1. `assess_reads.sh` performs quality control on the raw nanopore long reads
+1. `assess_reads.sh` performs quality control on the raw nanopore long reads. Also filter out bad quality reads
 2. `denovo_assembly.sh` assembles the genomes from raw reads following the plasmidsaurus pipeline
 3. `assess_assemblies.sh` performs quality control on the raw nanopore long reads
 4. `consolidate_genomes.sh` consolidates genome fasta files into one folder

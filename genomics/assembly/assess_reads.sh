@@ -24,8 +24,8 @@ do
         $filtered_reads \
         $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt
 
-    # Plot the filtered reads
-    Rscript 01c-plot_reads.R \
-        $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt \
-        $folder_genomics/assembly/$genome_ids[$i]/filtered_reads_qc.png
+    # # Plot the filtered reads
+    # Rscript 01c-plot_reads.R \
+    #     $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt \
+    #     $folder_genomics/assembly/$genome_ids[$i]/filtered_reads_qc.png
 done
