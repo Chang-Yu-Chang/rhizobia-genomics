@@ -8,8 +8,8 @@ mamba activate samtools
 mkdir -p $folder_genomics/fasta/contigs
 
 ## Assembled genomes
-for i in {1..32}; do
-    genome_fa=$folder_genomics/genomes/$genome_ids[$i].fasta
+for i in {33..38}; do
+    genome_fa=$folder_genomics/fasta/genomes/$genome_ids[$i].fasta
     contig_names=($(grep -e "^>" $genome_fa | sed 's/^>//'))
 
     # Use samtools faidx to extract each contig and save it to a separate file

@@ -14,7 +14,7 @@ for (i in 1:length(list_g_contigs)) {
     fa <- read.fasta(paste0(folder_genomics, "fasta/genomes/", isolates$genome_id[i], ".fasta"))
     fa_len <- sapply(fa, length)
     list_g_contigs[[i]] <- tibble(genome_id = isolates$genome_id[i], contig_id = names(fa_len), contig_length = fa_len)
-    cat(i)
+    cat("\t", i)
 }
 
 genomes <- bind_rows(list_g_contigs) %>%
