@@ -6,7 +6,7 @@ source ../env_vars.sh
 
 cd $folder_shell
 
-for i in {33..38}
+for i in 33 34 36 38
 do
     echo $genome_ids[$i]
     dir=$folder_genomics/assembly/$genome_ids[$i]
@@ -19,12 +19,12 @@ do
         -o $folder_genomics/assembly/$genome_ids[$i]/quast
 
     # BUSCO
-    mamba activate busco
-    busco \
-        -i $dir/medaka/consensus.fasta \
-        -m genome \
-        -l alphaproteobacteria_odb10 \
-        -o "" \
-        --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
+    # mamba activate busco
+    # busco \
+    #     -i $dir/medaka/consensus.fasta \
+    #     -m genome \
+    #     -l alphaproteobacteria_odb10 \
+    #     -o "" \
+    #     --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
 
 done

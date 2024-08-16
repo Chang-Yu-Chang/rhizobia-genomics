@@ -8,7 +8,7 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
-# Aggregate the contig information in the assembled genomes
+# Aggregate the contig information in the assembled genomes ----
 list_g_contigs <- rep(list(NA), nrow(isolates))
 for (i in 1:length(list_g_contigs)) {
     fa <- read.fasta(paste0(folder_genomics, "fasta/genomes/", isolates$genome_id[i], ".fasta"))
@@ -22,12 +22,12 @@ genomes <- bind_rows(list_g_contigs) %>%
     # Arrange contigs by length
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id, desc(contig_length)) %>%
-    # Remove small contigs < 10kb
-    filter(contig_length > 10000)
+    # Remove small contigs < 100kb
+    filter(contig_length > 100000)
 
 write_csv(genomes, paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 
-# Extract QC values
+# Extract QC values ----
 ## quast
 list_g <- rep(list(NA), nrow(isolates))
 for (i in 1:length(list_g)) {

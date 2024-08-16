@@ -8,6 +8,8 @@ library(lme4) # for linear mixed-effect models
 library(car) # companion to Applied Regression
 library(vegan) # for permanova
 source(here::here("metadata.R"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
+    slice(1:32)
 
 set.seed(1)
 detect_sig <- function (pv) {

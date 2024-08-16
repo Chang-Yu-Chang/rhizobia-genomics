@@ -60,12 +60,9 @@ ref_genome <- ref_genome %>%
     ))
 
 # Manually correct the comments
-# NC_003047.1 is 1021 chromsome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000006965.1/
-# NC_009636.1 is WSM419 chromosome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000017145.1/
-# NC_012587.1 is NGR234 chromosome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000018545.1/
-ref_genome$replicon[ref_genome$accession == "NC_003047.1"] <- "chromosome"
-ref_genome$replicon[ref_genome$accession == "NC_009636.1"] <- "chromosome"
-ref_genome$replicon[ref_genome$accession == "NC_012587.1"] <- "chromosome"
+ref_genome$replicon[ref_genome$accession == "NC_003047.1"] <- "chromosome" # NC_003047.1 is 1021 chromsome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000006965.1/
+ref_genome$replicon[ref_genome$accession == "NC_009636.1"] <- "chromosome" # NC_009636.1 is WSM419 chromosome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000017145.1/
+ref_genome$replicon[ref_genome$accession == "NC_012587.1"] <- "chromosome" # NC_012587.1 is NGR234 chromosome https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000018545.1/
 
 # Read the blast results
 list_b_genome <- rep(list(NA), nrow(isolates))
@@ -73,9 +70,11 @@ for (i in 1:nrow(isolates)) {
     list_b_genome[[i]] <- read_table(paste0(folder_data, "genomics/taxonomy/", isolates$genome_id[i],"/blast_genome/blast_genome.txt"), col_names = names_blast) %>%
         mutate(genome_id = isolates$genome_id[i])
 }
+list_b_genome <- list_b_genome[!is.na(list_b_genome)]
 
 b_genome <- bind_rows(list_b_genome) %>%
-    filter(pident > 90, bitscore > 10000, length > 10000) %>%
+    #filter(pident > 90, bitscore > 10000, length > 10000) %>%
+    filter(pident > 90, bitscore > 10000) %>%
     group_by(genome_id, qseqid) %>%
     arrange(desc(bitscore)) %>%
     # Find the top hit

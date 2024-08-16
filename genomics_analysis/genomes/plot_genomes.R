@@ -16,7 +16,7 @@ genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv")
 p <- genomes %>%
     #filter(genome_id != "g28") %>%
     group_by(genome_id) %>%
-    count(name = "n_contigs") %>%
+    summarize(n_contigs = n()) %>%
     ggplot() +
     geom_histogram(aes(x = n_contigs), color = "black", fill = "white", binwidth = 1) +
     scale_x_continuous(breaks = seq(0, 12, 1)) +
