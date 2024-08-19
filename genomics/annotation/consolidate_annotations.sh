@@ -5,23 +5,23 @@ source ../env_vars.sh
 # This script consolidates annotation files into one folder depending on the file type
 
 ## gff
-mkdir -p $folder_genomics/gff/genomes
+mkdir -p $folder_genomics/gff
 
 for i in {1..32}; do
-    cp $folder_genomics/annotation/genomes/$genome_ids[$i]/annotated.gff $folder_genomics/gff/genomes/$genome_ids[$i].gff
+    cp $folder_genomics/annotation/$genome_ids[$i]/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
 done
 
 for ref in em1021 em1022 usda1106 wsm419 casidaa; do
-    cp $folder_genomics/annotation/genomes/$ref/annotated.gff $folder_genomics/gff/genomes/$ref.gff
+    cp $folder_genomics/annotation/$ref/annotated.gff $folder_genomics/gff/$ref.gff
 done
 
 ## faa
-mkdir -p $folder_genomics/faa/genomes
+mkdir -p $folder_genomics/faa
 
 for i in {1..32}; do
-    cp $folder_genomics/annotation/genomes/$genome_ids[$i]/annotated.faa $folder_genomics/faa/genomes/$genome_ids[$i].faa
+    cp $folder_genomics/annotation/$genome_ids[$i]/annotated.faa $folder_genomics/faa/$genome_ids[$i].faa
 done
 
 for ref in em1021 em1022 usda1106 wsm419 casidaa; do
-    cp $folder_genomics/annotation/genomes/$ref/annotated.faa $folder_genomics/faa/genomes/$ref.faa
+    cp $folder_genomics/annotation/$ref/annotated.faa $folder_genomics/faa/$ref.faa
 done

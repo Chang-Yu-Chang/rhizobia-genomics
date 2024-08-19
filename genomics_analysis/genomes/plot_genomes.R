@@ -10,7 +10,7 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv")) %>%
     left_join(isolates) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id))
-#qcs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/qcs.csv"))
+qcs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/qcs.csv"))
 
 # 1. Number of contigs
 p <- genomes %>%
@@ -47,6 +47,8 @@ p <- genomes %>%
 
 ggsave(paste0(folder_data, "genomics_analysis/genomes/02-genome_size.png"), p, width = 15, height = 6)
 
+if (F) {
+
 # contigs
 c_size <- genomes %>%
     left_join(isolates) %>%
@@ -71,17 +73,4 @@ nrow(g_size) # 32 genomes
 g_size <- g_size %>% filter(genome_size < 14)
 round(range(g_size$genome_size), 2) #   6.79 8.02
 round(median(g_size$genome_size), 2) # 7.25
-
-
-#
-apply(qcs, 2, range) %>% t()
-
-
-
-
-
-
-
-
-
-
+}

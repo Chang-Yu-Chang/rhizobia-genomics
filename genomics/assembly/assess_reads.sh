@@ -7,7 +7,7 @@ source ../env_vars.sh
 cd $folder_shell
 mkdir -p $folder_genomics/assembly
 
-for i in {33..38}
+for i in {1..38}
 do
     echo $genome_ids[$i]
     raw_reads=$folder_genomics/raw_reads/$genome_ids[$i].fastq.gz
@@ -19,10 +19,10 @@ do
         $raw_reads \
         $filtered_reads
 
-    # Extract the filtered reads to a txt file for plotting
-    zsh 01b-extract_reads.sh \
-        $filtered_reads \
-        $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt
+    # # Extract the filtered reads to a txt file for plotting
+    # zsh 01b-extract_reads.sh \
+    #     $filtered_reads \
+    #     $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt
 
     # # Plot the filtered reads
     # Rscript 01c-plot_reads.R \

@@ -7,7 +7,7 @@ source ~/.zshrc
 
 mamba activate flye
 
-flye --nano-raw $1 --out-dir $2 --threads 20 --genome-size '7m'
+flye --meta --nano-corr $1 --out-dir $2 --threads 20
 # `--meta` metagenome / uneven coverage mode
 # --nano-raw path [path ...] ONT regular reads, pre-Guppy5 (<20% error)
 # `--nano-corr "$downsampled_reads2"` ONT reads that were corrected with other methods (<3% error)
