@@ -6,7 +6,7 @@ source ../env_vars.sh
 
 cd $folder_shell
 
-mkdir -p $folder_genomics/annotation/genomes
+mkdir -p $folder_genomics/annotation
 
 ## Assembled genomes
 for i in {1..38}

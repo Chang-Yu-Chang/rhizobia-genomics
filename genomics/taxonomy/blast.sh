@@ -12,7 +12,7 @@ blast_genomes_db=$folder_genomics/blast_db/genomes
 
 mkdir -p $folder_genomics/taxonomy
 
-for i in 33 34 36 38 #19 23 35 37 #{1..38}
+for i in {1..38}
 do
     echo $genome_ids[$i]
     genome_fa=$folder_genomics/fasta/genomes/$genome_ids[$i].fasta
@@ -26,14 +26,14 @@ do
     #     $dir/sourmash \
     #     $gtdb_db
     #
-    # # Extract 16S rRNA from genome and blast
-    # mkdir -p $dir/16s
-    # zsh 04d-blast_16s.sh \
-    #     $genome_fa \
-    #     $dir/16s/rrna.fasta \
-    #     $dir/16s/rrna.txt \
-    #     $refseq_16s_db \
-    #     $dir/16s/blast_16s.txt
+    # Extract 16S rRNA from genome and blast
+    mkdir -p $dir/16s
+    zsh 04d-blast_16s.sh \
+        $genome_fa \
+        $dir/16s/rrna.fasta \
+        $dir/16s/rrna.txt \
+        $refseq_16s_db \
+        $dir/16s/blast_16s.txt
 
     # Blast genomes to a customized database of ensifer strains
     mkdir -p $dir/blast_genome

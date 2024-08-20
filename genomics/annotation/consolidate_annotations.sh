@@ -7,21 +7,21 @@ source ../env_vars.sh
 ## gff
 mkdir -p $folder_genomics/gff
 
-for i in {1..32}; do
+for i in {1..38}; do
     cp $folder_genomics/annotation/$genome_ids[$i]/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
 done
 
-for ref in em1021 em1022 usda1106 wsm419 casidaa; do
-    cp $folder_genomics/annotation/$ref/annotated.gff $folder_genomics/gff/$ref.gff
-done
+# for ref in em1021 em1022 usda1106 wsm419 casidaa; do
+#     cp $folder_genomics/annotation/$ref/annotated.gff $folder_genomics/gff/$ref.gff
+# done
 
 ## faa
 mkdir -p $folder_genomics/faa
 
-for i in {1..32}; do
+for i in {1..38}; do
     cp $folder_genomics/annotation/$genome_ids[$i]/annotated.faa $folder_genomics/faa/$genome_ids[$i].faa
 done
-
-for ref in em1021 em1022 usda1106 wsm419 casidaa; do
-    cp $folder_genomics/annotation/$ref/annotated.faa $folder_genomics/faa/$ref.faa
-done
+#
+# for ref in em1021 em1022 usda1106 wsm419 casidaa; do
+#     cp $folder_genomics/annotation/$ref/annotated.faa $folder_genomics/faa/$ref.faa
+# done
