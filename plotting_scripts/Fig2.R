@@ -164,7 +164,7 @@ p4 <- pcsi %>%
     guides(color = "none", fill = "none") +
     labs(x = paste0("PC1 (", get_pcvar(pca_results2)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results2)[2], "%)"))
 
-p_growth <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.95, rel_widths = c(1, 2), labels = c("A", "", "B", ""))
+p_growth <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.85, rel_widths = c(1, 2), labels = c("A", "", "B", ""))
 
 # Lupulina experiment ----
 plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
@@ -293,7 +293,7 @@ p4 <- pcsi %>%
     guides(color = "none", fill = "none") +
     labs(x = paste0("PC1 (", get_pcvar(pca_results2)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results2)[2], "%)"))
 
-p_lupulina <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.95, rel_widths = c(1, 2), labels = c("C", "", "D", ""))
+p_lupulina <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.85, rel_widths = c(1, 2), labels = c("C", "", "D", ""))
 
 
 # Sativa experiment ----
@@ -422,7 +422,7 @@ p4 <- pcsi %>%
     labs(x = paste0("PC1 (", get_pcvar(pca_results2)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results2)[2], "%)"))
 
 
-p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.95, rel_widths = c(1, 2), labels = c("E", "", "F", ""))
+p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 0.85, rel_widths = c(1, 2), labels = c("E", "", "F", ""))
 
 
 
@@ -430,10 +430,10 @@ p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig2.png"), scale = 1) +
-    draw_plot(p_growth, width = .5, height = .32, x = .4, y = .63) +
-    draw_plot(p_lupulina, width = .5, height = .32, x = .4, y = .31) +
-    draw_plot(p_sativa, width = .5, height = .32, x = .4, y = -0.01) +
+    draw_plot(p_growth, width = .6, height = .32, x = .38, y = .63) +
+    draw_plot(p_lupulina, width = .6, height = .32, x = .38, y = .31) +
+    draw_plot(p_sativa, width = .6, height = .32, x = .38, y = -0.01) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig2.png"), p, width = 15, height = 8)
+ggsave(here::here("plots/Fig2.png"), p, width = 14, height = 8)
 
