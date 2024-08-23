@@ -28,7 +28,7 @@ detect_sig <- function (pv) {
 gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv")) %>%
     clean_names() %>%
     filter(temperature != "40c") %>%
-    left_join(isolates) %>%
+    #left_join(isolates) %>%
     select(exp_id, r, lag, max_od, temperature) %>%
     pivot_wider(id_cols = exp_id, names_from = temperature, values_from = c(r, lag, max_od)) %>%
     drop_na %>%
@@ -40,6 +40,7 @@ tb <- gts %>%
     mutate(population = factor(population, c("VA", "PA"))) %>%
     filter(population == "VA")
 mod <- lmer(r_30c ~ site_group + (1|site), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$r_30c)*.95
 
 p1 <- tb %>%
@@ -69,6 +70,7 @@ tb <- gts %>%
     mutate(population = factor(population, c("VA", "PA"))) %>%
     filter(population == "PA")
 mod <- lmer(r_30c ~ site_group + (1|site), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$r_30c)*.95
 
 p2 <- tb %>%
@@ -114,6 +116,7 @@ pcs <- bind_rows(
 pcsi <- pcs %>% filter(population == "VA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p3 <- pcsi %>%
     ggplot() +
@@ -141,6 +144,7 @@ p3 <- pcsi %>%
 pcsi <- pcs %>% filter(population == "PA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p4 <- pcsi %>%
     ggplot() +
@@ -174,6 +178,7 @@ tb <- plants %>%
     filter(exp_plant == "lupulina", exp_id != "control", population == "VA") %>%
     drop_na(shoot_biomass_mg)
 mod <- lmer(shoot_biomass_mg ~ site_group + (1|genome_id), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$shoot_biomass_mg)*.95
 
 p1 <- tb %>%
@@ -199,6 +204,7 @@ tb <- plants %>%
     filter(exp_plant == "lupulina", exp_id != "control", population == "PA") %>%
     drop_na(shoot_biomass_mg)
 mod <- lmer(shoot_biomass_mg ~ site_group + (1|genome_id), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$shoot_biomass_mg)*.95
 
 p2 <- tb %>%
@@ -243,6 +249,7 @@ pcs <- bind_rows(
 pcsi <- pcs %>% filter(population == "VA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p3 <- pcsi %>%
     ggplot() +
@@ -270,6 +277,7 @@ p3 <- pcsi %>%
 pcsi <- pcs %>% filter(population == "PA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p4 <- pcsi %>%
     ggplot() +
@@ -302,6 +310,7 @@ tb <- plants %>%
     filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", population == "VA") %>%
     drop_na(shoot_height)
 mod <- lmer(shoot_height ~ site_group + (1|genome_id), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$shoot_height)*.95/10
 
 p1 <- tb %>%
@@ -328,6 +337,7 @@ tb <- plants %>%
     filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", population == "PA") %>%
     drop_na(shoot_height)
 mod <- lmer(shoot_height ~ site_group + (1|genome_id), data = tb)
+Anova(mod, type = 3)
 vmax <- max(tb$shoot_height)*.95
 
 p2 <- tb %>%
@@ -369,6 +379,7 @@ pcsi <- as_tibble(pca_results1$x) %>%
     left_join(distinct(isolates, population, site_group))
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p3 <- pcsi %>%
     ggplot() +
@@ -398,6 +409,7 @@ pcsi <- as_tibble(pca_results2$x) %>%
     left_join(distinct(isolates, population, site_group))
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
 mod <- adonis2(dm ~ site_group, data = pcsi)
+mod
 
 p4 <- pcsi %>%
     ggplot() +
@@ -430,9 +442,9 @@ p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig2.png"), scale = 1) +
-    draw_plot(p_growth, width = .6, height = .32, x = .38, y = .63) +
-    draw_plot(p_lupulina, width = .6, height = .32, x = .38, y = .31) +
-    draw_plot(p_sativa, width = .6, height = .32, x = .38, y = -0.01) +
+    draw_plot(p_growth, width = .6, height = .32, x = .35, y = .59) +
+    draw_plot(p_lupulina, width = .6, height = .32, x = .35, y = .29) +
+    draw_plot(p_sativa, width = .6, height = .32, x = .35, y = -0.01) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 14, height = 8)
