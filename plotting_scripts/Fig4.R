@@ -51,8 +51,26 @@ p_gpam <- gpacl %>%
     guides(fill = "none") +
     labs(x = "gene cluster", y = "genome")
 
-p_gpam
 nrow(gene_order) # 26504 genes in the pangenome
+
+## How many genes are shared in chrome, pA and pB
+gpacl %>%
+    drop_na(replicon_type) %>%
+    group_by(replicon_type, gene) %>%
+    count() %>%
+    mutate(is_core = n == 36) %>%
+    group_by(replicon_type, is_core) %>%
+    count
+
+gpacl %>%
+    #drop_na(replicon_type) %>%
+    group_by(gene) %>%
+    count() %>%
+    mutate(is_core = n == 36) %>%
+    group_by(is_core) %>%
+    count
+
+
 
 # Core gene tree ----
 plot_tree <- function (tr, color_breaks = c("suburban", "urban", "bootstrap>95%")) {

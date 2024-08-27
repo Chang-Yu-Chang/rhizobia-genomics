@@ -1,5 +1,15 @@
 #' This script
 
+renv::load()
+library(tidyverse)
+library(cowplot)
+source(here::here("metadata.R"))
+
+load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+#contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
+
 
 # Cophenetic permutation test ----
 source(here::here("forposter/cophenetic.R"))
@@ -21,20 +31,20 @@ plot_cophenetic <- function (tbp, tb_obs) {
         theme_bw() +
         theme(
             legend.position = "inside",
-            legend.position.inside = c(0.8, 0.2),
+            legend.position.inside = c(0.7, 0.2),
             legend.background = element_rect(color = "black", fill = "white"),
             legend.box.background = element_rect(color = NA, fill = NA),
             legend.key = element_rect(color = NA, fill = NA),
             legend.spacing.y = unit(10,"mm"),
-            legend.text = element_text(size = 8),
+            legend.text = element_text(size = 12),
             legend.key.size = unit(5, "mm"),
             strip.background = element_blank(),
-            strip.text = element_text(angle = 0, hjust = 0, vjust = 0, size = 8),
+            strip.text = element_text(angle = 0, hjust = 0.5, vjust = 0, size = 12),
             strip.clip = "off",
             panel.spacing.x = unit(1, "mm"),
             panel.grid.minor.x = element_blank(),
-            axis.text.x = element_text(size = 8, angle = 20, hjust = 1),
-            axis.text.y = element_text(size = 8),
+            axis.text.x = element_text(angle = 20, hjust = 1, size = 12),
+            axis.text.y = element_text(size = 12),
             axis.title.y = element_text(size = 15),
             plot.margin = unit(c(10,10,5,5), "mm"),
             plot.background = element_blank()
@@ -43,20 +53,24 @@ plot_cophenetic <- function (tbp, tb_obs) {
         labs(x = "", y = expression(bar(d)["within"]/bar(d)["between"]))
 }
 
+tbp <- tbp %>% filter(feature != "structural variants")
+tb_obs <- tb_obs %>% filter(feature != "structural variants")
 p1 <- tbp %>%
     filter(population == "VA") %>%
     plot_cophenetic(filter(tb_obs, population == "VA")) +
-    guides(color = "none") +
-    labs(title = "Elevation gradient")
+    guides(color = "none")
 p2 <- tbp %>%
     filter(population == "PA") %>%
-    plot_cophenetic(filter(tb_obs, population == "PA")) +
-    labs(title = "Urbanization gradient")
-
-p_coph <- plot_grid(p1, p2, nrow = 1, scale = .95, align = "h", axis = "tb", label_y = .9, labels = c("C", "D"))
+    plot_cophenetic(filter(tb_obs, population == "PA"))
 
 # Combine ----
-p <- plot_grid(p_cong, p_coph, ncol = 1) + theme(plot.background = element_rect(color = NA, fill = "white"))
+#p <- plot_grid(p_cong, p_coph, ncol = 1) + theme(plot.background = element_rect(color = NA, fill = "white"))
+p_coph <- plot_grid(p1, p2, nrow = 1, scale = .95, align = "h", axis = "tb", label_y = .9)
 
-ggsave(here::here("plots/Fig5.png"), p, width = 10, height = 8)
+p <- ggdraw() +
+    draw_image(here::here("plots/cartoons/Fig5.png"), scale = 1) +
+    draw_plot(p_coph, x = 0.35, y = 0.01, width = .65, height = 1) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
+
+ggsave(here::here("plots/Fig5.png"), p, width = 14, height = 5)
 
