@@ -71,6 +71,7 @@ p1 <- ess %>%
     filter(pop == "VA") %>%
     ggplot() +
     geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = background_df, aes(label = paste("M.", plant)), x = Inf, y = -Inf, hjust = -0.1, vjust = 1.5, fontface = "italic") +
     geom_hline(yintercept = 0, linetype = 2) +
     geom_linerange(aes(x = response, ymin = lower_cl, ymax = upper_cl, shape = nt), color = "grey10", linewidth = 1, position = position_dodge2(width = .8)) +
     geom_point(aes(x = response, y = effect_size, shape = nt), size = 3, stroke = 1, fill = "white", position = position_dodge2(width = .8)) +
@@ -88,11 +89,12 @@ p1 <- ess %>%
         axis.title.y = element_blank(),
         strip.text = element_blank(),
         legend.title = element_blank(),
-        legend.position = "top",
+        legend.position = "inside",
+        legend.position.inside = c(0.13,0.45),
         legend.margin = margin(0,0,0,0),
         legend.key = element_blank(),
-        legend.key.spacing = unit(0, "mm"),
-        legend.background = element_rect(color = NA, fill = "white"),
+        legend.key.spacing = unit(-1, "mm"),
+        legend.background = element_rect(color = "grey90", fill = "white"),
         plot.margin = margin(0,0,0,5, "mm"),
         plot.background = element_rect(color = NA, fill = "white")
     ) +
@@ -104,6 +106,7 @@ p2 <- ess %>%
     filter(pop == "PA") %>%
     ggplot() +
     geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = background_df, aes(label = paste("M.", plant)), x = Inf, y = -Inf, hjust = -0.1, vjust = 1.5, fontface = "italic") +
     geom_hline(yintercept = 0, linetype = 2) +
     geom_linerange(aes(x = response, ymin = lower_cl, ymax = upper_cl, shape = nt), color = "grey10", linewidth = 1, position = position_dodge2(width = .8)) +
     geom_point(aes(x = response, y = effect_size, shape = nt), size = 3, stroke = 1, fill = "white", position = position_dodge2(width = .8)) +
@@ -126,6 +129,6 @@ p2 <- ess %>%
     guides(color = "none", fill = "none", shape = "none") +
     labs(y = "standardized mean difference (Cohen's d)", title = "Urbanization gradient")
 
-p <- plot_grid(p1, p2, ncol = 1, scale = .95, align = "v", axis = "rl", labels = c("A", "B"), rel_heights = c(1.2,1)) + theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(here::here("plots/Fig3.png"), p, width = 5, height = 8)
+p <- plot_grid(p1, p2, ncol = 2, scale = .95, align = "vh", axis = "tblr", labels = c("A", "B"), rel_heights = c(1.2,1)) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(here::here("plots/Fig3.png"), p, width = 14, height = 4)
 
