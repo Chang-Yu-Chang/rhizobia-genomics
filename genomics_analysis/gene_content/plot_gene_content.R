@@ -27,7 +27,7 @@ p <- gpatl %>%
     labs(x = "gene cluster", y = "genome")
 
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/01-gpa_heatmap.png"), p, width = 6, height = 3)
-nrow(gene_order) # 26886 genes in the pangenome
+nrow(gene_order) # 26504 genes in the pangenome
 
 # 2. gene frequency spectrum
 gfs <- gpa %>%

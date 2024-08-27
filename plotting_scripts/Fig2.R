@@ -442,9 +442,9 @@ p_sativa <- plot_grid(p1, p3, p2, p4, nrow = 1, align = T, axis = "tb", scale = 
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig2.png"), scale = 1) +
-    draw_plot(p_growth, width = .6, height = .32, x = .35, y = .59) +
-    draw_plot(p_lupulina, width = .6, height = .32, x = .35, y = .29) +
-    draw_plot(p_sativa, width = .6, height = .32, x = .35, y = -0.01) +
+    draw_plot(p_growth, x = .35, y = .59 , width = .6, height = .32) +
+    draw_plot(p_lupulina, x = .35, y = .29, width = .6, height = .32) +
+    draw_plot(p_sativa, x = .35, y = -0.01, width = .6, height = .32) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 14, height = 8)

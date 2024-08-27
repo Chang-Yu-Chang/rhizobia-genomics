@@ -8,6 +8,8 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 names_blast <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
+if (F) {
+
 # 1. Aggregate sourmash ----
 list_sm <- rep(list(NA), nrow(isolates))
 for (i in 1:length(list_sm)) {
@@ -19,6 +21,7 @@ for (i in 1:length(list_sm)) {
 sm_genome <- bind_rows(list_sm) %>%
     select(genome_id, everything())
 write_csv(sm_genome, paste0(folder_data, "genomics_analysis/taxonomy/sm_genome.csv"))
+}
 
 # 2. Aggregate the 16s blast results ----
 # Read the reference

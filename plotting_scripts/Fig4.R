@@ -10,54 +10,55 @@ source(here::here("metadata.R"))
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
-contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
+#contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
 # Gene content matrix ----
 gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
 gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gene_order.csv"))
 gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpacl.csv")) %>%
     separate(contig_id, into = c("genome_id", "temp1", "temp2"), remove = F) %>%
-    select(-temp1, -temp2) %>%
-    mutate(gene = factor(gene, rev(gene_order$gene))) %>%
-    mutate(genome_id = factor(genome_id, isolates$genome_id))
-
+    select(-temp1, -temp2)
 background_df <- tibble(site_group = c("high elevation", "low elevation", "suburban", "urban"))
 
 p_gpam <- gpacl %>%
+    filter(genome_id != "g42") %>%
     drop_na(replicon_type) %>%
     left_join(isolates) %>%
+    mutate(gene = factor(gene, gene_order$gene)) %>%
+    mutate(genome_id = factor(genome_id, rev(isolates$genome_id))) %>%
     ggplot() +
     geom_rect(data = background_df, aes(fill = site_group), alpha = 0.2, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) +
-    geom_tile(aes(x = genome_id, y = gene), fill = "grey10") +
+    geom_tile(aes(x = gene, y = genome_id), fill = "grey10") +
     scale_fill_manual(values = site_group_colors) +
     scale_x_discrete(expand = c(0,0)) +
-    scale_y_discrete(expand = c(0,0)) +
-    facet_grid(replicon_type~site_group, scales = "free", space = "free") +
+    scale_y_discrete(expand = c(0,0), position = "right") +
+    facet_grid(site_group ~ replicon_type, scales = "free", space = "free", switch = "y" ) +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
         axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_text(size = 15),
         panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
         strip.background = element_blank(),
-        panel.spacing.x = unit(0, "mm"),
-        strip.text.x = element_text(angle = 15, hjust = 0, vjust = 0),
-        strip.text.y = element_text(angle = -60, hjust = 0, vjust = 0),
+        panel.spacing.y = unit(c(0,3,0), "mm"),
+        strip.text.x = element_text(angle = 15, hjust = 0, vjust = 0, size = 15),
+        #strip.text.y = element_text(angle = 0, hjust = 0.5, vjust = 0),
+        strip.text.y.left = element_text(angle = 75, hjust = .8, vjust = .5, size = 15),
         strip.clip = "off",
         plot.background = element_blank()
     ) +
     guides(fill = "none") +
-    labs(x = "genome", y = "gene cluster")
+    labs(x = "gene cluster", y = "genome")
 
-nrow(gene_order) # 26886 genes in the pangenome
-
+p_gpam
+nrow(gene_order) # 26504 genes in the pangenome
 
 # Core gene tree ----
 plot_tree <- function (tr, color_breaks = c("suburban", "urban", "bootstrap>95%")) {
     tr %>%
         as_tibble() %>%
-        left_join(rename(isolates_contigs, label = genome_id)) %>%
+        #left_join(rename(isolates_contigs, label = genome_id)) %>%
         left_join(rename(isolates, label = genome_id)) %>%
         mutate(branch.length = ifelse(node %in% list_scaled_branches, branch.length * 0.01, branch.length)) %>%
         mutate(scaled_branch = ifelse(node %in% list_scaled_branches, "scaled to 1%", "not scaled")) %>%
@@ -106,8 +107,6 @@ p1 <- tr_gpa_genomes %>%
     drop.tip(isolates$genome_id[isolates$population == "PA"]) %>%
     plot_tree(c("high elevation", "low elevation")) +
     guides(color = "none")
-    # geom_nodelab(aes(label = node)) +
-    # geom_tiplab(aes(label = node))
 
 list_scaled_branches <- c(18)
 p2 <- tr_gpa_genomes %>%
@@ -117,12 +116,14 @@ p2 <- tr_gpa_genomes %>%
 
 p_gpa <- plot_grid(p1, p2, nrow = 1, scale = .95, align = "h", axis = "tb")
 
+
 #  ----
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig4.png"), scale = 1) +
-    draw_plot(p_gpam, width = .25, height = .65, x = 0.05, y = .05) +
-    draw_plot(p_core, width = .6, height = .38, x = .35, y = .5) +
-    draw_plot(p_gpa, width = .6, height = .38, x = .35, y = .05) +
+    # draw_plot(p_gpam, width = .65, height = .3, x = 0.3, y = .05) +
+    draw_plot(p_gpam, x = 0.05, y = .02, width = .35, height = .54) +
+    draw_plot(p_core, x = .48, y = .5, width = .5, height = .38) +
+    draw_plot(p_gpa, x = .48, y = .05, width = .5, height = .38) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig4.png"), p, width = 15, height = 8)

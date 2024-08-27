@@ -8,24 +8,12 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, 'mapping/isolates.csv'))
 genomes <- read_csv(paste0(folder_data, 'genomics_analysis/genomes/genomes.csv'))
 
-# 1. sourmash ----
-sm_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/sm_genome.csv'))
-sms <- sm_genome %>%
-    mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-    group_by(genome_id) %>%
-    mutate(species = str_split(name, " ") %>% `[[`(1) %>% `[`(c(2,3)) %>% paste(collapse = " ")) %>%
-    mutate(species = str_replace(species, "Sinorhizobium", "Ensifer")) %>%
-    mutate(species = str_replace(species, "Ensifer", "E.")) %>%
-    select(genome_id, species, query_containment_ani, name)
-write_csv(sms, paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
-
 # 2. Genome blast. Clean the replicon name ----
 b_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_genome.csv'))
 contigs <- b_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     mutate(contig_id = paste0(genome_id, "_", qseqid)) %>%
     mutate(species = paste0("E. ", species)) %>%
-    #select(genome_id, contig_id, species, strain, replicon, bitscore) %>%
     mutate(replicon = case_when(
         str_detect(replicon, "chromosome") ~ "chromosome",
         str_detect(replicon, "psymA") ~ str_replace(replicon, "psymA", "pSymA"),
@@ -118,3 +106,19 @@ iso <- isolates %>%
 
 write_csv(iso, paste0(folder_data, "output/iso.csv"))
 
+
+
+
+if (F) {
+
+    # 1. sourmash ----
+    sm_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/sm_genome.csv'))
+    sms <- sm_genome %>%
+        mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+        group_by(genome_id) %>%
+        mutate(species = str_split(name, " ") %>% `[[`(1) %>% `[`(c(2,3)) %>% paste(collapse = " ")) %>%
+        mutate(species = str_replace(species, "Sinorhizobium", "Ensifer")) %>%
+        mutate(species = str_replace(species, "Ensifer", "E.")) %>%
+        select(genome_id, species, query_containment_ani, name)
+    write_csv(sms, paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
+}
