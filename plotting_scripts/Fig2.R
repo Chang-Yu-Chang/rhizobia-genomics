@@ -31,7 +31,6 @@ gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv")) %>%
     #left_join(isolates) %>%
     select(exp_id, r, lag, max_od, temperature) %>%
     pivot_wider(id_cols = exp_id, names_from = temperature, values_from = c(r, lag, max_od)) %>%
-    drop_na %>%
     left_join(isolates)
 
 # r_30c ~ elevation w/ N
@@ -115,7 +114,7 @@ pcs <- bind_rows(
 # traits ~ elevation
 pcsi <- pcs %>% filter(population == "VA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p3 <- pcsi %>%
@@ -143,7 +142,7 @@ p3 <- pcsi %>%
 # traits ~ elevation
 pcsi <- pcs %>% filter(population == "PA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p4 <- pcsi %>%
@@ -248,7 +247,7 @@ pcs <- bind_rows(
 # traits ~ site_group
 pcsi <- pcs %>% filter(population == "VA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p3 <- pcsi %>%
@@ -274,9 +273,10 @@ p3 <- pcsi %>%
     labs(x = paste0("PC1 (", get_pcvar(pca_results1)[1], "%)"), y = paste0("PC2 (", get_pcvar(pca_results1)[2], "%)"))
 
 # traits ~ site_group
+set.seed(1)
 pcsi <- pcs %>% filter(population == "PA")
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p4 <- pcsi %>%
@@ -378,7 +378,7 @@ pcsi <- as_tibble(pca_results1$x) %>%
     mutate(site_group = plants1$site_group) %>%
     left_join(distinct(isolates, population, site_group))
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p3 <- pcsi %>%
@@ -386,7 +386,7 @@ p3 <- pcsi %>%
     geom_point(aes(x = PC1, y = PC2, color = site_group), shape = 21, stroke = 1, size = 2, alpha = .5) +
     stat_ellipse(aes(x = PC1, y = PC2, fill = site_group), geom = "polygon", type = "norm", level = 0.95, alpha = .2) +
     annotate("text", x = Inf, y = Inf, label = paste0("N=", nrow(plants1)), hjust = 1.1, vjust = 1.1) +
-    annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.6, label = paste0("p=", round(mod[1,5], 3))) +
+    #annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.6, label = paste0("p=", round(mod[1,5], 3))) +
     geom_vline(xintercept = 0, color = "grey10", linetype = 2) +
     geom_hline(yintercept = 0, color = "grey10", linetype = 2) +
     scale_color_manual(values = site_group_colors) +
@@ -408,7 +408,7 @@ pcsi <- as_tibble(pca_results2$x) %>%
     mutate(site_group = plants2$site_group) %>%
     left_join(distinct(isolates, population, site_group))
 dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
-mod <- adonis2(dm ~ site_group, data = pcsi)
+mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
 mod
 
 p4 <- pcsi %>%
