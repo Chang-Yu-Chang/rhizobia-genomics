@@ -626,6 +626,23 @@
       ],
       "Hash": "16b5ff4dff0ead9ea955f62f794b1535"
     },
+    "apex": {
+      "Package": "apex",
+      "Version": "1.0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "adegenet",
+        "ape",
+        "graphics",
+        "methods",
+        "phangorn",
+        "stats",
+        "utils"
+      ],
+      "Hash": "1b27c0244383f526dba88f439760fc35"
+    },
     "aplot": {
       "Package": "aplot",
       "Version": "0.2.3",
@@ -2625,18 +2642,6 @@
       ],
       "Hash": "e2817ccf4a065c5d9d7f2cfbe7c1d78c"
     },
-    "memuse": {
-      "Package": "memuse",
-      "Version": "4.2-3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods",
-        "utils"
-      ],
-      "Hash": "5cfd074e79d5443c523360bbe203d904"
-    },
     "mgcv": {
       "Package": "mgcv",
       "Version": "1.9-1",
@@ -2673,6 +2678,19 @@
         "Rcpp"
       ],
       "Hash": "aba060ef3c097b26a4d304ea39d87f32"
+    },
+    "mmod": {
+      "Package": "mmod",
+      "Version": "1.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "adegenet",
+        "pegas",
+        "stats"
+      ],
+      "Hash": "a55427db4d44fe8029b66b84674ff1e3"
     },
     "mnormt": {
       "Package": "mnormt",
@@ -3057,16 +3075,6 @@
         "vctrs"
       ],
       "Hash": "15da5a8412f317beeee6175fbc76f4bb"
-    },
-    "pinfsc50": {
-      "Package": "pinfsc50",
-      "Version": "1.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "8368d95a7bb029e43cf5ef8971c17dd9"
     },
     "pixmap": {
       "Package": "pixmap",
@@ -4314,31 +4322,6 @@
         "utils"
       ],
       "Hash": "f02d066892ab61a82753a84b2d007af6"
-    },
-    "vcfR": {
-      "Package": "vcfR",
-      "Version": "1.15.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "ape",
-        "dplyr",
-        "grDevices",
-        "graphics",
-        "magrittr",
-        "memuse",
-        "methods",
-        "pinfsc50",
-        "stats",
-        "stringr",
-        "tibble",
-        "utils",
-        "vegan",
-        "viridisLite"
-      ],
-      "Hash": "b78b5dd40cd173149e47200b74486a71"
     },
     "vctrs": {
       "Package": "vctrs",
