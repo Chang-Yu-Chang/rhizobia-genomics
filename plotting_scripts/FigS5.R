@@ -1,64 +1,122 @@
-#' This script plots the reaction norm
+#' This script plots the nonsymbiotic strains
 
 renv::load()
 library(tidyverse)
 library(cowplot)
 library(janitor)
-library(lme4) # for linear mixed-effect models
-library(car) # companion to Applied Regression
 source(here::here("metadata.R"))
-
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-gts <- read_csv(paste0(folder_data, 'phenotypes_analysis/growth/gts.csv'))
-isolates_gc <- gts %>%
-    select(exp_id, temperature, r, lag, maxOD) %>%
-    pivot_longer(cols = -c(exp_id, temperature), names_to = "trait") %>%
-    #unite(trait, trait, temperature) %>%
-    left_join(isolates) %>%
-    filter(temperature != "40c") %>%
-    mutate(temperature = str_remove(temperature, "c")) %>%
-    mutate(population = ifelse(population == "VA", "mountain", "city")) %>%
-    mutate(population = factor(population, c("mountain", "city")))
+plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
+iso <- read_csv(paste0(folder_data, "output/iso.csv"))
 
-# Growth rate
-plot_traits <- function (tra = "r", y_axis) {
-    isolates_gc %>%
-        filter(trait == tra) %>%
-        ggplot() +
-        geom_point(aes(x = temperature, y = value, color = site_group, group = exp_id), shape = 21, size = 2, stroke = 1) +
-        geom_line(aes(x = temperature, y = value, color = site_group, group = exp_id), alpha = 0.5) +
-        scale_y_continuous(breaks = scales::pretty_breaks(n = 3)) +
-        scale_color_manual(values = site_group_colors, name = "") +
-        facet_grid(. ~ population, scales = "free_y") +
-        theme_classic() +
-        theme(
-            strip.background = element_rect(color = NA, fill = NA),
-            panel.border = element_rect(color = "black", fill = NA),
-        ) +
-        guides() +
-        labs(x = expression(temperature~(degree*C)), y = y_axis)
-}
-p1 <- plot_traits(tra = "r", y_axis = expression(r~(1/hr))) + theme(axis.title.x = element_blank()) + guides(color = "none")
-p2 <- plot_traits(tra = "lag", y_axis = expression(t~(hr))) + theme(axis.title.x = element_blank())
-p3 <- plot_traits(tra = "maxOD", y_axis = expression(x)) + guides(color = "none")
+set.seed(1)
+background_df <- tibble(exp_plant = rep(c("sativa", "lupulina"), each = 3), symbiovar = rep(c("control", "symbiotic", "nonsymbiotic"), 2))
 
-p <- plot_grid(p1, p2, p3, align = "vh", axis = "tb", ncol = 1)
-ggsave(here::here("plots/FigS5.png"), p, width = 6, height = 6)
+#
+plants_iso <- plants %>%
+    left_join(select(iso, genome_id = genome, contig_species)) %>%
+    mutate(genome_id = factor(genome_id, c(isolates$genome_id, "control"))) %>%
+    mutate(symbiovar = case_when(
+        contig_species %in% c("E. meliloti", "E. medicae") ~ "symbiotic",
+        genome_id == "control" ~ "control",
+        T ~ "nonsymbiotic"
+    )) %>%
+    drop_na(genome_id)
+
+# lupulina nodule number
+p1 <- plants_iso %>%
+    filter(exp_nitrogen == "without nitrogen") %>%
+    filter(exp_plant == "lupulina") %>%
+    ggplot() +
+    geom_rect(data = filter(background_df, exp_plant == "lupulina"), aes(fill = exp_plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = filter(background_df, exp_plant == "lupulina", symbiovar == "symbiotic"), aes(label = paste("M.", exp_plant)), x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, fontface = "italic") +
+    geom_boxplot(aes(x = genome_id, y = nodule_number), outlier.size = -1, fill = NA) +
+    geom_jitter(aes(x = genome_id, y = nodule_number), width = 0.05, shape = 21, alpha = 0.8) +
+    scale_fill_manual(values = plant_colors) +
+    facet_grid(.~symbiovar, scale = "free", space = "free_x") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.text.x = element_text(angle = 15, size = 10, hjust = 0, vjust = 0 ),
+        strip.text.y = element_blank(),
+        strip.background = element_blank(),
+        strip.clip = "off",
+        axis.title.x = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs(x = "genome", y = "nodule number")
 
 
-# Test thermal response
-## Mountain
-isolates_test <- isolates_gc %>%
-    filter(population == "VA") %>%
-    filter(trait == "r")
+# lupulina biomass
+p2 <- plants_iso %>%
+    filter(exp_nitrogen == "without nitrogen") %>%
+    filter(exp_plant == "lupulina") %>%
+    ggplot() +
+    geom_rect(data = filter(background_df, exp_plant == "lupulina"), aes(fill = exp_plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = filter(background_df, exp_plant == "lupulina", symbiovar == "symbiotic"), aes(label = paste("M.", exp_plant)), x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, fontface = "italic") +
+    geom_boxplot(aes(x = genome_id, y = shoot_biomass_mg), outlier.size = -1, fill = NA) +
+    geom_jitter(aes(x = genome_id, y = shoot_biomass_mg), width = 0.05, shape = 21, alpha = 0.8) +
+    scale_fill_manual(values = plant_colors) +
+    facet_grid(.~symbiovar, scales = "free_x", space = "free_x") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        strip.clip = "off",
+        axis.title.x = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs(x = "genome", y = "shoot biomass (mg)")
 
-mod <- lmer(value ~ temperature + site_group + temperature * site_group + (1|exp_id), data = isolates_test)
-Anova(mod, type = 3)
+# sativa nodule number
+p3 <- plants_iso %>%
+    filter(exp_nitrogen == "without nitrogen") %>%
+    filter(exp_plant == "sativa") %>%
+    ggplot() +
+    geom_rect(data = filter(background_df, exp_plant == "sativa"), aes(fill = exp_plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = filter(background_df, exp_plant == "sativa", symbiovar == "symbiotic"), aes(label = paste("M.", exp_plant)), x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, fontface = "italic") +
+    geom_boxplot(aes(x = genome_id, y = nodule_number), outlier.size = -1, fill = NA) +
+    geom_jitter(aes(x = genome_id, y = nodule_number), width = 0.05, shape = 21, alpha = 0.8) +
+    scale_fill_manual(values = plant_colors) +
+    facet_grid(.~symbiovar, scale = "free", space = "free_x") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.text.x = element_text(angle = 15, size = 10, hjust = 0, vjust = 0 ),
+        strip.text.y = element_blank(),
+        strip.background = element_blank(),
+        strip.clip = "off",
+        axis.title.x = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs(x = "genome", y = "nodule number")
 
-## City
-isolates_test <- isolates_gc %>%
-    filter(population == "PA") %>%
-    filter(trait == "r")
+# sativa height
+p4 <- plants_iso %>%
+    filter(exp_nitrogen == "without nitrogen") %>%
+    filter(exp_plant == "sativa") %>%
+    ggplot() +
+    geom_rect(data = filter(background_df, exp_plant == "sativa"), aes(fill = exp_plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
+    geom_text(data = filter(background_df, exp_plant == "sativa", symbiovar == "symbiotic"), aes(label = paste("M.", exp_plant)), x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, fontface = "italic") +
+    geom_boxplot(aes(x = genome_id, y = shoot_height), outlier.size = -1, fill = NA) +
+    geom_jitter(aes(x = genome_id, y = shoot_height), width = 0.05, shape = 21, alpha = 0.8) +
+    scale_fill_manual(values = plant_colors) +
+    facet_grid(.~symbiovar, scales = "free_x", space = "free_x") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        panel.spacing.x = unit(0, "mm"),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        strip.clip = "off"
+    ) +
+    guides(fill = "none") +
+    labs(x = "genome", y = "shoot biomass (mm)")
 
-mod <- lmer(value ~ temperature + site_group + temperature * site_group + (1|exp_id), data = isolates_test)
-Anova(mod, type = 3)
+p <- plot_grid(p1, p2, p3, p4, ncol = 1, axis = "lr", align = "v", scale = .95, labels = c("A", "", "B", ""), rel_heights = c(1.2,1,1.2,1)) + theme(plot.background = element_rect(color = NA, fill = "white"))
+
+ggsave(here::here("plots/FigS5.png"), p, width = 8, height = 8)

@@ -8,7 +8,7 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, 'mapping/isolates.csv'))
 genomes <- read_csv(paste0(folder_data, 'genomics_analysis/genomes/genomes.csv'))
 
-# 2. Genome blast. Clean the replicon name ----
+# 1. Genome blast. Clean the replicon name ----
 b_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_genome.csv'))
 contigs <- b_genome %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
@@ -38,7 +38,7 @@ contigs <- b_genome %>%
 
 write_csv(contigs, paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv"))
 
-# 3. 16S blast ----
+# 2. 16S blast ----
 b_16s <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/b_16s.csv'))
 rrnas <- b_16s %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
@@ -50,15 +50,9 @@ write_csv(rrnas, paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
 
 # Assign isolates to taxonomy
 genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
-sms <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/contigs.csv"))
 rrnas <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/rrnas.csv"))
 
-sms <- sms %>%
-    group_by(genome_id) %>%
-    arrange(desc(query_containment_ani)) %>%
-    slice(1) %>%
-    select(-name)
 contigs <- contigs %>%
     group_by(genome_id) %>%
     left_join(genomes) %>%
@@ -75,34 +69,29 @@ rrnas <- rrnas %>%
     slice(1) %>%
     ungroup()
 
-colnames(sms)[2:3] <- paste0("sm_", colnames(sms)[2:3])
 colnames(contigs)[2:5] <- paste0("contig_", colnames(contigs)[2:5])
 colnames(rrnas)[2:5] <- paste0("rrna_", colnames(rrnas)[2:5])
-
-isolates_tax <- sms %>%
-    left_join(contigs) %>%
-    left_join(rrnas)
+isolates_tax <- left_join(contigs, rrnas)
 
 write_csv(isolates_tax, paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
 
-# Clean create a master isolate table
+# Clean create a master isolate table ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
 
 iso <- isolates %>%
     left_join(isolates_tax) %>%
-    mutate(population = ifelse(population == "VA", "mountain", "city")) %>%
+    mutate(population = ifelse(population == "VA", "elevation", "urbanization")) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id) %>%
-    select(population, site_group, exp_id, genome_id, starts_with("sm"), starts_with("rrna"), starts_with("contig")) %>%
+    select(population, site_group, exp_id, genome_id, starts_with("rrna"), starts_with("contig")) %>%
     rename(site = site_group, genome = genome_id) %>%
     mutate(contig_length = round(contig_length/1000, 2),
-           sm_query_containment_ani = round(sm_query_containment_ani*100, 1),
            contig_pident = round(contig_pident, 1),
            rrna_pident = round(rrna_pident, 1)) %>%
     mutate(` ` = 1:n()) %>%
     select(` `, everything()) %>%
-    select(` `, population, site, exp_id, genome, sm_species, sm_query_containment_ani, rrna_species, rrna_pident, contig_species, contig_pident)
+    select(` `, population, site, exp_id, genome, rrna_species, rrna_pident, contig_species, contig_pident)
 
 write_csv(iso, paste0(folder_data, "output/iso.csv"))
 

@@ -8,22 +8,8 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 names_blast <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
-if (F) {
 
-# 1. Aggregate sourmash ----
-list_sm <- rep(list(NA), nrow(isolates))
-for (i in 1:length(list_sm)) {
-    tb <- read_csv(paste0(folder_genomics, "taxonomy/", isolates$genome_id[i], "/sourmash/gathered.csv"))
-    list_sm[[i]] <- tb %>% select(name, query_containment_ani) %>%
-        mutate(genome_id = isolates$genome_id[i])
-    # ANI estimated from the query containment in the match.
-}
-sm_genome <- bind_rows(list_sm) %>%
-    select(genome_id, everything())
-write_csv(sm_genome, paste0(folder_data, "genomics_analysis/taxonomy/sm_genome.csv"))
-}
-
-# 2. Aggregate the 16s blast results ----
+# 1. Aggregate the 16s blast results ----
 # Read the reference
 ref_16s_seq <- Biostrings::readDNAStringSet("~/bioinformatics/16s/refseq_16s.fasta")
 ref_16s <- tibble(accession = str_remove(names(ref_16s_seq), "\\s.+"), scomment = str_remove(names(ref_16s_seq), "^[A-Z]+_[\\d]+.\\d\\s"))
@@ -48,7 +34,7 @@ b_16s <- bind_rows(list_b_16s) %>%
 
 write_csv(b_16s, paste0(folder_data, "genomics_analysis/taxonomy/b_16s.csv"))
 
-# 3. Aggregate the genome blast results ----
+# 2. Aggregate the genome blast results ----
 ref_genome_seq <- Biostrings::readDNAStringSet(paste0(folder_data, "genomics/blast_db/genomes.fasta"))
 ref_genome <- tibble(accession = str_remove(names(ref_genome_seq), "\\s.+"), scomment = str_remove(names(ref_genome_seq), "^[A-Z]+_[A-Z\\d]+.\\d\\s"))
 ref_genome <- ref_genome %>%
@@ -92,3 +78,19 @@ b_genome <- bind_rows(list_b_genome) %>%
 write_csv(ref_genome, paste0(folder_data, "genomics_analysis/taxonomy/ref_genome.csv"))
 write_csv(b_genome, paste0(folder_data, "genomics_analysis/taxonomy/b_genome.csv"))
 
+
+
+if (F) {
+
+    # 1. Aggregate sourmash ----
+    list_sm <- rep(list(NA), nrow(isolates))
+    for (i in 1:length(list_sm)) {
+        tb <- read_csv(paste0(folder_genomics, "taxonomy/", isolates$genome_id[i], "/sourmash/gathered.csv"))
+        list_sm[[i]] <- tb %>% select(name, query_containment_ani) %>%
+            mutate(genome_id = isolates$genome_id[i])
+        # ANI estimated from the query containment in the match.
+    }
+    sm_genome <- bind_rows(list_sm) %>%
+        select(genome_id, everything())
+    write_csv(sm_genome, paste0(folder_data, "genomics_analysis/taxonomy/sm_genome.csv"))
+}
