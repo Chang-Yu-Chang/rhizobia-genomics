@@ -1,4 +1,4 @@
-#' This script plots the temperature data
+#' This script plots the temperature data at the field sites
 
 renv::load()
 library(tidyverse)

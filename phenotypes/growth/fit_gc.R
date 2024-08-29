@@ -7,13 +7,13 @@ library(data.table)
 library(mgcv) # For smoothing
 source(here::here("metadata.R"))
 
-gc_plate <- read_csv(paste0(folder_data, "raw/growth_curve2/gc_plate.csv"))
+gc_plate <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve2/gc_plate.csv"))
 
 list_gcs <- rep(list(NA), 4)
-list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curve2/rhizobia_growth_curve.csv")) # 30C
-list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curve3/rhizobia_growth_curve.csv")) # 35C
-list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curve4/rhizobia_growth_curve.csv")) # 25C
-list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curve5/rhizobia_growth_curve.csv")) # 40C
+list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve2/rhizobia_growth_curve.csv")) # 30C
+list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve3/rhizobia_growth_curve.csv")) # 35C
+list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve4/rhizobia_growth_curve.csv")) # 25C
+list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve5/rhizobia_growth_curve.csv")) # 40C
 names(list_gcs) <- c("30c", "35c", "25c", "40c")
 
 # Tidy up time series
@@ -213,5 +213,5 @@ gc_prm_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm_summ")) %>% bind
 
 write_csv(gcs, paste0(folder_phenotypes, 'growth/gcs.csv')) # Raw growth curves
 #write_csv(gc_summs, paste0(folder_phenotypes, 'growth/gc_summs.csv')) # Raw growth curves averaged across replicates
-#write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gc_prms.csv')) # Growth traits per well
+write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gtw.csv')) # Growth traits per well
 write_csv(gc_prm_summs, paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
