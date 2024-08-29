@@ -1,4 +1,4 @@
-#' This script computes Fst for each SNP
+#' This script computes Fst for each core gene
 
 renv::load()
 library(tidyverse)
@@ -30,6 +30,7 @@ for (i in 1:length(list_sccg)) {
     cat("\televation")
     gid1 <- popsub(gid, c("high elevation", "low elevation"))
     vi1 <- diff_stats(gid1)$global
+    #pairwise_Gst_Nei(gid1)
     cat("\turbanization")
     gid2 <- popsub(gid, c("suburban", "urban"))
     vi2 <- diff_stats(gid2)$global
@@ -39,34 +40,6 @@ for (i in 1:length(list_sccg)) {
 }
 
 sccg_fst <- tb_sccg_fst %>%
-    #slice(1:2) %>%
     unnest(cols = fst)
 
 write_csv(sccg_fst, paste0(folder_data, "genomics_analysis/variants/sccg_fst.csv"))
-
-if (F) {
-fasta_data <- read.multiFASTA(paste0(folder_data,
-                                     "genomics/pangenome/isolates/aligned_gene_sequences/",
-                                     "aarA", ".aln.fas"))
-#plot(fasta_data)
-
-# Correct index names
-gid <- multidna2genind(fasta_data)
-indNames(gid) <- str_remove(indNames(gid), ";\\w+")
-# Assign populations
-isolates_pop <- tibble(genome_id = indNames(gid)) %>% left_join(isolates)
-strata(gid) <- isolates_pop
-setPop(gid) <- ~site_group
-
-# Subset by pop
-gid_i <- popsub(gid, c("high elevation", "low elevation"))
-xx <- diff_stats(gid_i)$global
-
-a
-
-gid_i <- popsub(gid, c("suburban", "urban"))
-diff_stats(gid_i)
-pairwise_Gst_Nei(gid_i, linearized = FALSE)
-
-}
-
