@@ -9,11 +9,6 @@ source(here::here("metadata.R"))
 
 gpat <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpat.csv"))
 gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpatl.csv"))
-#isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
-# gpat <- gpat %>% filter(!genome_id %in% c("g20", "g28"))
-# gpatl <- gpat %>%
-#     pivot_longer(-genome_id, names_to = "gene") %>%
-#     filter(value == 1)
 m <- as.matrix(gpat[,-1])
 colnames(m) <- NULL; dim(m)
 
@@ -66,12 +61,12 @@ for (i in 1:nrow(tb)) {
 tbp <- tb %>%
     unnest(cols = c(pan)) %>%
     group_by(ngenome) %>%
-    reframe(enframe(quantile(core, c(0.05, 0.5, 0.95), na.rm = T), "quantile", "core"),
-            enframe(quantile(total, c(0.05, 0.5, 0.95)), "quantile", "total")) %>%
+    reframe(enframe(quantile(core, c(0, 0.05, 0.5, 0.95, 1), na.rm = T), "quantile", "core"),
+            enframe(quantile(total, c(0, 0.05, 0.5, 0.95, 1)), "quantile", "total")) %>%
     mutate(core = core/1000, total = total / 1000)
 
 tbpr <- tbp %>%
-    filter(quantile %in% c("5%", "95%")) %>%
+    filter(quantile %in% c("0%", "100%")) %>%
     pivot_longer(cols = c(core, total)) %>%
     pivot_wider(names_from = quantile, values_from = value)
 
@@ -81,8 +76,8 @@ p2 <- tbp %>%
     pivot_longer(cols = c(-ngenome, -quantile)) %>%
     ggplot(aes(x = ngenome, y = value, color = name, linetype = quantile)) +
     geom_line() +
-    geom_ribbon(data = tbpr, aes(x = ngenome, ymin = `5%`, ymax = `95%`, fill = name), inherit.aes = FALSE, alpha = 0.3) +
-    scale_linetype_manual(values = c("95%" = 1, "50%" = 2, "5%" = 1)) +
+    geom_ribbon(data = tbpr, aes(x = ngenome, ymin = `0%`, ymax = `100%`, fill = name), inherit.aes = FALSE, alpha = 0.3) +
+    scale_linetype_manual(values = c("0%" = 1, "5%" = 2, "50%" = 3, "95%" = 2, "100%" = 1)) +
     scale_x_continuous(breaks = c(1, seq(5, 36, 5))) +
     scale_y_continuous(breaks = seq(0, 25, 5)) +
     scale_color_aaas() +

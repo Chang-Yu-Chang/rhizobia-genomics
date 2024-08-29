@@ -9,16 +9,16 @@ cd $folder_shell
 mkdir -p $folder_genomics/ani
 
 ## Create a list of genome fasta files
-for i in {1..32}
+for i in {1..36}
 do
     echo -e $folder_genomics/fasta/genomes/$genome_ids[$i].fasta
 done >| $folder_genomics/ani/list_genomes.txt
 
-echo $folder_genomics/fasta/genomes/em1021.fasta >> $folder_genomics/ani/list_genomes.txt
-echo $folder_genomics/fasta/genomes/em1022.fasta >> $folder_genomics/ani/list_genomes.txt
-echo $folder_genomics/fasta/genomes/usda1106.fasta >> $folder_genomics/ani/list_genomes.txt
-echo $folder_genomics/fasta/genomes/wsm419.fasta >> $folder_genomics/ani/list_genomes.txt
-echo $folder_genomics/fasta/genomes/casidaa.fasta >> $folder_genomics/ani/list_genomes.txt
+# echo $folder_genomics/fasta/genomes/em1021.fasta >> $folder_genomics/ani/list_genomes.txt
+# echo $folder_genomics/fasta/genomes/em1022.fasta >> $folder_genomics/ani/list_genomes.txt
+# echo $folder_genomics/fasta/genomes/usda1106.fasta >> $folder_genomics/ani/list_genomes.txt
+# echo $folder_genomics/fasta/genomes/wsm419.fasta >> $folder_genomics/ani/list_genomes.txt
+# echo $folder_genomics/fasta/genomes/casidaa.fasta >> $folder_genomics/ani/list_genomes.txt
 
 ## Compute ani
 zsh 06a-fastani.sh \
