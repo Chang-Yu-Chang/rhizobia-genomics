@@ -13,7 +13,7 @@ gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv"))
 
 #
 gtwl <- gtw %>%
-    #filter(temperature %in% c("25c", "30c", "35c")) %>%
+    replace_na(list(maxOD = 0)) %>%
     mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
     select(-t.r, -startOD) %>%
     pivot_longer(-c(temperature, well, exp_id), names_to = "trait") %>%
@@ -27,6 +27,7 @@ gtwl <- gtw %>%
         trait == "lag" ~ "lag time (hr)",
         trait == "maxOD" ~ "yield [OD]"
     ))
+
 
 # Compute the mean
 gtwlm <- gtwl %>%
