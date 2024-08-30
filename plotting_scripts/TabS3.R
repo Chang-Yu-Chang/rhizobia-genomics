@@ -13,25 +13,25 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>% slice(1:32)
 set.seed(1)
 
-gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv")) %>%
+gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv")) %>%
     clean_names() %>%
-    filter(temperature != "40c") %>%
-    select(exp_id, r, lag, max_od, temperature) %>%
+    #filter(temperature != "40c") %>%
+    select(exp_id, r, lag, max_od, temperature, well) %>%
     left_join(isolates)
 
 tb <- tibble(
     pop = rep(c("VA", "PA"), each = 3),
     res = rep(c("r", "lag", "yield"), 2),
     ff = rep(
-        c("r ~ site_group*temperature + (1|site)",
-          "lag ~ site_group*temperature + (1|site)",
-          "max_od ~ site_group*temperature + (1|site)"
+        c("r ~ site_group*temperature + (1|site) + (1|genome_id)",
+          "lag ~ site_group*temperature + (1|site) + (1|genome_id)",
+          "max_od ~ site_group*temperature + (1|site) + (1|genome_id)"
         ), 2
     )
 ) %>%
     rowwise() %>%
     mutate(
-        dat = list(filter(gts, population == pop)),
+        dat = list(filter(gtw, population == pop)),
         mod = list(lmer(as.formula(ff), data = dat)),
         mod_tided = list(tidy(Anova(mod, type = 3)))
     ) %>%
