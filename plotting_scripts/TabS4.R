@@ -97,7 +97,7 @@ ft <- bind_rows(tb1, tb2) %>%
     flextable() %>%
     valign(valign = "top") %>%
     valign(j = 1:2, valign = "center") %>%
-    hline(i = c(3,6,9,12)) %>%
+    hline(i = c(3,7,10)) %>%
     autofit() %>%
     bg(bg = "grey90", i = seq(1,13,2), j = 3:8) %>%
     merge_v(j = c("Gradient", "Host", "Response")) %>%
