@@ -14,44 +14,45 @@ library(boot)
 source(here::here("metadata.R"))
 
 set.seed(1)
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
 
+# Correct the naming ----
 plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv")) %>%
-    mutate(population = case_when(
+    mutate(gradient = case_when(
         population == "VA" ~ "elevation",
         population == "PA" ~ "urbanization"
-    ))
-isolates <- isolates %>%
-    mutate(population = case_when(
+    ), .keep = "unused") %>%
+    rename(population = site_group)
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
+    mutate(gradient = case_when(
         population == "VA" ~ "elevation",
         population == "PA" ~ "urbanization"
-    ))
+    ), .keep = "unused") %>%
+    rename(population = site_group)
 
 
 # PCA plots ----
 plants_subset <- list(
-    # Lupulinas
+    # Lupulinas. First plant exp
     plants1 = plants %>%
-        filter(exp_plant == "lupulina", exp_id != "control", population == "elevation") %>%
-        select(site_group, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
+        filter(exp_plant == "lupulina", exp_id != "control", gradient == "elevation") %>%
+        select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
         drop_na(),
     plants2 =  plants %>%
-        filter(exp_plant == "lupulina", exp_id != "control", population == "urbanization") %>%
-        select(site_group, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
+        filter(exp_plant == "lupulina", exp_id != "control", gradient == "urbanization") %>%
+        select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
         drop_na(),
-    # sativas
+    # sativas. Second plant exp
     plants3 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", population == "elevation") %>%
-        select(site_group, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
+        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "elevation") %>%
+        select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
         drop_na(),
     plants4 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", population == "urbanization") %>%
-        select(site_group, exp_id, shoot_height, nodule_number, leaf_number, leaf_color, lateral_root_number, longest_lateral_root_length) %>%
+        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "urbanization") %>%
+        select(population, exp_id, shoot_height, nodule_number, leaf_number, leaf_color, lateral_root_number, longest_lateral_root_length) %>%
         drop_na(),
     plants5 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "with nitrogen", population == "elevation") %>%
-        select(site_group, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
+        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "with nitrogen", gradient == "elevation") %>%
+        select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
         drop_na()
 )
 
@@ -60,19 +61,19 @@ get_pcvar <- function (pca_result) summary(pca_result)$importance[2, ] %>% round
 pcs <- rep(list(NA), 5)
 for (i in 1:5) {
     pcs[[i]] <- as_tibble(pca_results[[i]]$x) %>%
-        mutate(site_group = plants_subset[[i]]$site_group, exp_id = plants_subset[[i]]$exp_id) %>%
-        left_join(distinct(isolates, population, site_group))
+        mutate(population = plants_subset[[i]]$population, exp_id = plants_subset[[i]]$exp_id) %>%
+        left_join(distinct(isolates, gradient, population))
 }
 
 plot_pca <- function (pcsi, pca_result) {
     dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
     # strata by exp_id
-    #mod <- with(pcsi, adonis2(dm ~ site_group, data = pcsi, permutations = 10000, strata = exp_id))
-    mod <- adonis2(dm ~ site_group, data = pcsi, permutations = 10000)
+    #mod <- with(pcsi, adonis2(dm ~ population, data = pcsi, permutations = 10000, strata = exp_id))
+    mod <- adonis2(dm ~ population, data = pcsi, permutations = 10000)
     pcsi %>%
         ggplot() +
-        geom_point(aes(x = PC1, y = PC2, color = site_group), shape = 21, stroke = 1, size = 2) +
-        stat_ellipse(aes(x = PC1, y = PC2, fill = site_group), geom = "polygon", type = "norm", level = 0.95, alpha = .2) +
+        geom_point(aes(x = PC1, y = PC2, color = population), shape = 21, stroke = 1, size = 2) +
+        stat_ellipse(aes(x = PC1, y = PC2, fill = population), geom = "polygon", type = "norm", level = 0.95, alpha = .2) +
         annotate("text", x = Inf, y = Inf, label = paste0("N=", nrow(pcsi)), hjust = 1.1, vjust = 1.1) +
         annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.6, label = paste0("p=", round(mod[1,5], 3))) +
         geom_vline(xintercept = 0, color = "grey10", linetype = 2) +
@@ -116,9 +117,9 @@ iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
 
 compute_cohensd <- function (tb, response) {
     #' Compute Cohen's d
-    formu <- paste0(response, " ~ site_group + (1|genome_id)")
+    formu <- paste0(response, " ~ population + (1|genome_id)")
     mod <- lmer(as.formula(formu), data = tb)
-    emm.mod <- emmeans(mod, specs = "site_group")
+    emm.mod <- emmeans(mod, specs = "population")
     es <- eff_size(emm.mod, sigma = sigma(mod), edf = df.residual(mod))
     return(as_tibble(es))
 }
@@ -134,7 +135,7 @@ list_treatments <- tibble(
 
 list_treatments <- list_treatments %>%
     rowwise() %>%
-    mutate(tb = list(get(paste0(plant, "s")) %>% filter(exp_nitrogen == nt, population == pop))) %>%
+    mutate(tb = list(get(paste0(plant, "s")) %>% filter(exp_nitrogen == nt, gradient == pop))) %>%
     mutate(cohensd = list(compute_cohensd(tb, response)))
 
 ess <- list_treatments %>%
@@ -216,27 +217,31 @@ p_effs <- list(
 
 # Combine figures ----
 p_dat <- plot_grid(
-    NULL, NULL, NULL, NULL,
-    p_pcas[[1]], p_effs[[1]], p_pcas[[2]], p_effs[[2]],
-    p_pcas[[3]], p_effs[[3]], p_pcas[[4]], p_effs[[4]],
-    p_pcas[[5]], p_effs[[5]], NULL, NULL,
-    rel_widths = c(1,2,1,2), nrow = 4, axis = "tbl", align = "hv", scale = .85,
-    rel_heights = c(.1,1,1,1),
-    labels = c("", "", "", "", "A", "", "B", "", "C", "", "D", "", "E", "", "", "")
+    p_pcas[[1]], p_effs[[1]],
+    p_pcas[[2]], p_effs[[2]],
+    p_pcas[[3]], p_effs[[3]],
+    p_pcas[[4]], p_effs[[4]],
+    p_pcas[[5]], p_effs[[5]],
+    rel_widths = c(1,2), nrow = 5, scale = .85,
+    #rel_heights = c(.1,1,1,1),
+    labels = c("A", "", "B", "", "C", "", "D", "", "E", "")
 )
+
+# p_dat <- plot_grid(
+#     NULL, NULL, NULL, NULL,
+#     p_pcas[[1]], p_effs[[1]], p_pcas[[2]], p_effs[[2]],
+#     p_pcas[[3]], p_effs[[3]], p_pcas[[4]], p_effs[[4]],
+#     p_pcas[[5]], p_effs[[5]], NULL, NULL,
+#     rel_widths = c(1,2,1,2), nrow = 4, axis = "tbl", align = "hv", scale = .85,
+#     rel_heights = c(.1,1,1,1),
+#     labels = c("", "", "", "", "A", "", "B", "", "C", "", "D", "", "E", "", "", "")
+# )
+
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig3.png"), scale = 1) +
-    draw_plot(p_dat, x = .0, y = 0.05, width = .95, height = .91) +
+    draw_plot(p_dat, x = .15, y = 0.0, width = .85, height = .96) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig3.png"), p, width = 14, height = 7)
-
-
-
-
-
-
-
-
+ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 12)
 
