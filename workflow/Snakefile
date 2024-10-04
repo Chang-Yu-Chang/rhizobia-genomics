@@ -1,0 +1,19 @@
+# Main Snakefile and entry point of the workflow.
+# Please see the best practices:
+# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
+# in particular regarding the standardized folder structure mentioned there.
+
+# set config file where you can specify your inputs
+configfile: "../config/config.yaml"
+
+# Include the common rule, where the inputs for rule_all are defined
+include: "rules/common.smk"
+# Include the qc rule
+#include: "rules/qc_reads.smk"
+
+#include: "rules/test.smk"
+# Define the rule all, which is the default rule that Snakemake runs when no specific rule or target is specified
+# input files are defined in the common.smk file
+rule all:
+    input:
+         expand("{result_dir}/{sample}_processed.txt", sample=SAMPLES, result_dir=config['result_dir'])
