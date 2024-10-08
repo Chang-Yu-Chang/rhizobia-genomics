@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.2",
+    "Version": "4.3.3",
     "Repositories": [
       {
         "Name": "BioCsoft",
@@ -109,7 +109,6 @@
       "Package": "BiocVersion",
       "Version": "3.18.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "R"
       ],
@@ -340,7 +339,7 @@
       "Package": "MASS",
       "Version": "7.3-60.0.1",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/2024-04-26",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "grDevices",
@@ -355,7 +354,7 @@
       "Package": "Matrix",
       "Version": "1.6-5",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/2024-04-26",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "grDevices",
@@ -516,7 +515,6 @@
       "Package": "S4Vectors",
       "Version": "0.40.2",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -1243,6 +1241,20 @@
       ],
       "Hash": "39b2e002522bfd258039ee4e889e0fd1"
     },
+    "deSolve": {
+      "Package": "deSolve",
+      "Version": "1.40",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics",
+        "methods",
+        "stats"
+      ],
+      "Hash": "0a861334beb4eb8ca0d24a27b28b6679"
+    },
     "dendextend": {
       "Package": "dendextend",
       "Version": "1.17.1",
@@ -1781,6 +1793,28 @@
         "tools"
       ],
       "Hash": "e8e09897fee8d96f6bb02bf841177d20"
+    },
+    "geiger": {
+      "Package": "geiger",
+      "Version": "2.0.11",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "Rcpp",
+        "ape",
+        "coda",
+        "colorspace",
+        "deSolve",
+        "digest",
+        "methods",
+        "mvtnorm",
+        "ncbit",
+        "phytools",
+        "subplex"
+      ],
+      "Hash": "5c31df1565df2144c19f2601c479b8fd"
     },
     "generics": {
       "Package": "generics",
@@ -2769,6 +2803,16 @@
         "stats"
       ],
       "Hash": "77c61d51ce0f36e3c1a76e6b295aab31"
+    },
+    "ncbit": {
+      "Package": "ncbit",
+      "Version": "2013.03.29.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "45986d180221d87a741975bdd752f073"
     },
     "ncdf4": {
       "Package": "ncdf4",
@@ -3920,6 +3964,16 @@
         "vctrs"
       ],
       "Hash": "960e2ae9e09656611e0b8214ad543207"
+    },
+    "subplex": {
+      "Package": "subplex",
+      "Version": "1.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "1973b78fe875b8f268d431acaceae484"
     },
     "survival": {
       "Package": "survival",
