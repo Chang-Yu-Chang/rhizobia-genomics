@@ -121,8 +121,11 @@ mamba activate orthofinder
 mamba install --yes -c bioconda orthofinder=2.5.5
 # pip install scipy or brew install scipy to make scipy universal
 
-
-
+# Install biopython v1.84
+mamba create -n biopython
+mamba activate biopython
+mamba install --yes -c conda_forge biopython=1.84
+mamba install --yes -c conda_forge pandas
 
 
 
