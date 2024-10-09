@@ -35,12 +35,12 @@ folder_set <- paste0(folder_data, "genomics_analysis/fst/set1/")
 if (!dir.exists(folder_set)) dir.create(path = folder_set, showWarnings = T)
 
 
-
 for (i in 1:length(list_sccg)) {
     cat("\n",i , list_sccg[i])
     # Read alignment fasta
     aln_file <- paste0(folder_data, "genomics/pangenome/isolates/aligned_gene_sequences/", list_sccg[i], ".aln.fas")
     fasta_data <- read.multiFASTA(aln_file)
+    #pegas::nuc.div(fasta_data@dna$group_19086.aln.fas)
     # Correct index names
     gid <- multidna2genind(fasta_data)
     indNames(gid) <- str_remove(indNames(gid), ";\\w+") %>% str_remove("_R_")
