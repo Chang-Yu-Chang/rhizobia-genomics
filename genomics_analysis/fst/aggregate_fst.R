@@ -9,7 +9,9 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
 isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
 gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
+list_sccg <- gpa$gene[which(apply(gpa[,-1], 1, sum) == 36)]
 
+# Set 1. ----
 set1_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/set1_fst.csv"))
 
 set1_fst <- set1_fst %>%
