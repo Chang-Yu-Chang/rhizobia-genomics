@@ -23,6 +23,7 @@ clean_gpa <- function (gpa_file) {
     return(gpa)
 }
 get_sccg <- function (gpa_csv) {
+    #gpa_csv = paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpa.csv")
     xx <- read_csv(gpa_csv) %>%
         clean_names()
 

@@ -21,11 +21,11 @@ gene_wide_fst %>%
 per_locus_fst %>%
     filter(fst.Gst == 1) %>%
     view
-
-
-# Plot tree
-which(list_sccg$gene == "yhdY_3~~~yhdY_2")
-i=4643
-list_sccg$gene[i]
-tr <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/elev_med/seq_core/", list_sccg$gene[i], "/", list_sccg$gene[i], ".contree"))
-plot(tr)
+#
+#
+# # Plot tree
+# which(list_sccg$gene == "yhdY_3~~~yhdY_2")
+# i=4643
+# list_sccg$gene[i]
+# tr <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/elev_med/seq_core/", list_sccg$gene[i], "/", list_sccg$gene[i], ".contree"))
+# plot(tr)
