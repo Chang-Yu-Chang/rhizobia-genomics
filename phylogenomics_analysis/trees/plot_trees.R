@@ -8,33 +8,63 @@ library(ggtree)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
 # 1. Plot core gene tree ----
-## Full tree
-p <- tr_seq_core %>%
+p1 <- tr_elev_med_core %>%
     as_tibble() %>%
-    left_join(rename(isolates_contigs, label = genome_id)) %>%
+    left_join(rename(isolates, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label, color = species), hjust = 0, align = TRUE) +
+    geom_tiplab(aes(label = label, color = site_group), hjust = 0) +
     geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
-    geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
-    geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
-    geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
-    geom_treescale(x = 0, y = 28, width = 0.1) +
-    scale_color_manual(values = species_colors) +
-    scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
+    # geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
+    # geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
+    # geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
+    #geom_treescale(x = 0, y = 28, width = 0.1) +
+    scale_color_manual(values = site_group_colors) +
+    #scale_color_manual(values = species_colors) +
+    #scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
+    coord_cartesian(clip = "off") +
     theme_tree() +
     theme(
         legend.position = "top",
         plot.margin = unit(c(0,10,0,0), "mm")
     ) +
-    guides(color = "none") +
+    guides() +
+    labs()
+p2 <- tr_urbn_mel_core %>%
+    as_tibble() %>%
+    left_join(rename(isolates, label = genome_id)) %>%
+    as.treedata() %>%
+    ggtree() +
+    geom_tiplab(aes(label = label, color = site_group), hjust = 0) +
+    geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
+    # geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
+    # geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
+    # geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
+    #geom_treescale(x = 0, y = 28, width = 0.1) +
+    scale_color_manual(values = site_group_colors) +
+    #scale_color_manual(values = species_colors) +
+    #scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
+    coord_cartesian(clip = "off") +
+    theme_tree() +
+    theme(
+        legend.position = "top",
+        plot.margin = unit(c(0,10,0,0), "mm")
+    ) +
+    guides() +
     labs()
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-core_mltrees.png"), p, width = 6, height = 4)
+p <- plot_grid(p1, p2, nrow = 1)
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-combined_sccg.png"), p, width = 8, height = 4)
+
+
+
+
 
 if (F) {
 
@@ -88,6 +118,8 @@ p <- plot_grid(p1, p2, scale = 0.9) + theme(plot.background = element_rect(color
 
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/02-core_mltrees_mm.png"), p, width = 8, height = 4)
 }
+
+if (F) {
 
 # 4. Plot gene content trees ----
 p <- tr_gpa_genomes %>%
@@ -456,3 +488,4 @@ ggsave(paste0(folder_data, "phylogenomics_analysis/trees/12-gpa_mltrees.png"), p
 
 
 
+}

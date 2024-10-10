@@ -10,6 +10,7 @@
 
 library(tidyverse)
 library(janitor)
+library(vegan)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -28,15 +29,19 @@ get_sccg <- function (gpa_csv) {
     yy <- xx[,c(1, 4:ncol(xx))]
     zz <- yy %>%
         pivot_longer(cols = -gene, values_drop_na = T) %>%
-        mutate(is_paralog = str_detect(value, ";"))
+        mutate(value = str_replace_all(value, "/Users/cychang/Dropbox/lab/rhizobia-genomics/data/genomics/fasta/genomes/", ""))
+        #mutate(is_paralog = str_detect(value, ";") | str_detect(value, "refound"))
     aa <- zz %>%
-        pivot_wider(id_cols = gene, names_from = name, values_from = is_paralog) %>%
+        filter(!str_detect(value, "refound"), !str_detect(value, ";")) %>%
+        pivot_wider(id_cols = gene, names_from = name, values_from = value) %>%
         arrange(gene) %>%
         # Remove accessory genes
         drop_na()
 
     # Remove genes with paralogs
-    list_sccg <- aa$gene[apply(aa[,-1], 1, sum) == 0]
+    #list_sccg <- aa$gene[apply(aa[,-1], 1, sum) == 0]
+    list_sccg <- aa$gene
+    length(list_sccg)
     return(tibble(gene = list_sccg))
 }
 make_long_gpa <- function (gpa) {
@@ -109,6 +114,18 @@ make_long_gpac <- function (gpafl, contigs, gd) {
         left_join(contigs)
     return(gpacl)
 }
+compute_bc_dist <- function (gpa) {
+    gene_data_matrix <- t(as.matrix(gpa[,-1]))
+    bcs <- vegdist(gene_data_matrix, method = "bray")
+    similarity_matrix <- 1 - as.matrix(bcs)
+    sml <- similarity_matrix %>%
+        as_tibble() %>%
+        mutate(genome_id1 = names(gpa)[-1]) %>%
+        pivot_longer(cols = -genome_id1, names_to = "genome_id2", values_to = "bray_curtis_similarity")
+    return(sml)
+}
+
+
 
 clean_all <- function (set_name, contigs) {
     #' A wrapper function performing all functions above
@@ -123,7 +140,11 @@ clean_all <- function (set_name, contigs) {
     # Get the list of single-copy core genes
     list_sccg <- get_sccg(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.csv"))
     nrow(list_sccg)
-    write_csv(list_sccg, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/list_sccg.csv"))
+    write_csv(list_sccg, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/list_sccg.csv"), col_names = F)
+
+    # Compute the pairwise bray-curtis simularity based on gene presence absence
+    sml <- compute_bc_dist(gpa)
+    write_csv(sml, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/sml.csv"))
 
     # Structural variation
     spa <- clean_spa(paste0(folder_data, "genomics/pangenome/", set_name,"/struct_presence_absence.Rtab"))
