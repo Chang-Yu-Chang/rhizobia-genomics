@@ -2,30 +2,112 @@
 
 library(tidyverse)
 library(cowplot)
-library(ggsci)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
+read_gpas <- function (set_name) {
+    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
+    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
+    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
+    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
+    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
+    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
 
-#
-set_name
-gene_wide_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/elev_med/gene_wide_fst.csv"))
-hist(gene_wide_fst$Gst_est)
+    return(list(gpa = gpa, gene_order = gene_order, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
+}
+read_fsts <- function (set_name) {
+    gene_wide_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_wide_fst.csv"))
+    per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
+    gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
+    return(list(gene_wide_fst = gene_wide_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
+}
+make_gene_fst <- function (gene_lengths, gene_wide_fst, gpacl) {
+    # Use the first genome
+    gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
+        select(gene, replicon_type) %>%
+        replace_na(list(replicon_type = "others"))
+    gene_lengths %>%
+        filter(gene %in% gene_wide_fst$gene) %>%
+        left_join(gene_wide_fst) %>% # those genes without Fst do not have SNPs
+        left_join(gene_replicon) %>% # get the replicon where the gene is
+        group_by(replicon_type) %>%
+        mutate(loc_start = cumsum(sequence_length)) %>%
+        mutate(loc_start = lag(loc_start)) %>%
+        replace_na(list(loc_start = 0, Gst_est = 0)) %>%
+        mutate(replicon_type = factor(replicon_type, c("chromosome", "psymA like", "psymB like", "others")))
 
-range(gene_wide_fst$Gst_est, na.rm = T)
+}
+make_snp_fst <- function (gene_fst, per_locus_fst) {
+    gene_fst %>%
+        select(gene, replicon_type, loc_start) %>%
+        group_by(replicon_type) %>%
+        right_join(per_locus_fst) %>%
+        ungroup() %>%
+        arrange(replicon_type, loc_start) %>%
+        mutate(locus_id = 1:n()) %>%
+        mutate(loc_start = loc_start + location)
+}
+plot_gene_fst <- function (gene_fst) {
+    gene_fst %>%
+        mutate(loc_start = loc_start / 10^6) %>%
+        ggplot() +
+        geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01), alpha = 0.4) +
+        scale_x_continuous(breaks = seq(0, 4, 0.5)) +
+        scale_y_continuous(limits = c(-0.01, 1.01)) +
+        facet_grid(.~replicon_type, scales = "free_x", space = "free_x") +
+        theme_bw() +
+        theme() +
+        guides() +
+        labs(x = "core genome (Mbp)", y = "fst")
 
-gene_wide_fst %>%
-    filter(Gst_est >= 0.8)
+}
+plot_snps_fst <- function (snp_fst) {
+    snp_fst %>%
+        mutate(loc_start = loc_start / 10^6) %>%
+        ggplot() +
+        geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01), alpha = 0.4) +
+        scale_x_continuous(breaks = seq(0, 4, 0.5)) +
+        scale_y_continuous(limits = c(-0.01, 1.01)) +
+        facet_grid(.~replicon_type, scales = "free_x", space = "free_x") +
+        theme_bw() +
+        theme(
+            panel.grid.major =
+        ) +
+        guides() +
+        labs(x = "core genome (Mbp)", y = "fst")
+}
 
-per_locus_fst %>%
-    filter(fst.Gst == 1) %>%
-    view
-#
-#
-# # Plot tree
-# which(list_sccg$gene == "yhdY_3~~~yhdY_2")
-# i=4643
-# list_sccg$gene[i]
-# tr <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/elev_med/seq_core/", list_sccg$gene[i], "/", list_sccg$gene[i], ".contree"))
-# plot(tr)
+# 2. Elevation medicae  ----
+set_name = "elev_med"
+tt <- read_gpas(set_name)
+ff <- read_fsts(set_name)
+
+gene_fst <- make_gene_fst(ff$gene_lengths, ff$gene_wide_fst, tt$gpacl)
+snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
+nrow(gene_fst) # number of single copy core genes
+nrow(snp_fst) # number of snps
+
+p <- plot_gene_fst(gene_fst)
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-gene_fst.png"), p, width = 10, height = 6)
+p <- plot_snps_fst(snp_fst)
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 6)
+
+
+# 3. Urbanization meliloti  ----
+set_name = "urbn_mel"
+tt <- read_gpas(set_name)
+ff <- read_fsts(set_name)
+
+gene_fst <- make_gene_fst(ff$gene_lengths, ff$gene_wide_fst, tt$gpacl)
+snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
+nrow(gene_fst) # number of single copy core genes
+nrow(snp_fst) # number of snps
+
+p <- plot_gene_fst(gene_fst)
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-gene_fst.png"), p, width = 10, height = 6)
+p <- plot_snps_fst(snp_fst)
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 6)

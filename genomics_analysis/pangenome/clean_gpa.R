@@ -69,8 +69,8 @@ clean_gd <- function (gd_file) {
     gd <- read_csv(gd_file) %>%
         clean_names() %>%
         #mutate(annotation_id = str_replace(annotation_id, ".*/g","g")) %>%
-        rename(genome_id = gff_file, contig_id = scaffold_name) %>%
-        mutate(contig_id = paste0(genome_id, "_", contig_id))
+        rename(genome_id = gff_file, contig_id = scaffold_name, gene = gene_name) %>%
+        mutate(contig_id = paste0(genome_id, "_", contig_id)) %>%
     return(gd)
 }
 clean_gpaf <- function (gpaf_file) {
