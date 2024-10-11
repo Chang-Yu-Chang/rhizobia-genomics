@@ -80,6 +80,16 @@ plot_snps_fst <- function (snp_fst) {
         guides() +
         labs(x = "core genome (Mbp)", y = "fst")
 }
+slice_top_genes <- function (gene_fst, prop = 0.01) {
+    # Genes with top ORs
+    gene_fst %>%
+        ungroup() %>%
+        arrange(desc(fst)) %>%
+        slice_max(fst, prop = 0.01) %>%
+        # remove unknown genes
+        #filter(!str_detect(gene, "group")) %>%
+        arrange(replicon_type)
+}
 
 # 2. Elevation medicae  ----
 set_name = "elev_med"
@@ -88,6 +98,9 @@ ff <- read_fsts(set_name)
 
 gene_fst <- make_gene_fst(ff$gene_lengths, ff$gene_wide_fst, tt$gpacl)
 snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
+top_gene_fst <- slice_top_genes(gene_fst)
+write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
+
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
 
@@ -96,14 +109,7 @@ p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " S
 p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
 
-# List of genes
-gene_fst %>%
-    ungroup() %>%
-    arrange(desc(fst)) %>%
-    slice_max(fst, prop = 0.01) %>%
-    filter(!str_detect(gene, "group")) %>%
-    arrange(replicon_type) %>%
-    write_csv(paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
+
 
 
 # 3. Urbanization meliloti  ----
@@ -113,6 +119,9 @@ ff <- read_fsts(set_name)
 
 gene_fst <- make_gene_fst(ff$gene_lengths, ff$gene_wide_fst, tt$gpacl)
 snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
+top_gene_fst <- slice_top_genes(gene_fst)
+write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
+
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
 
@@ -121,11 +130,4 @@ p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " S
 p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
 
-# List of genes
-gene_fst %>%
-    ungroup() %>%
-    arrange(desc(fst)) %>%
-    slice_max(fst, prop = 0.01) %>%
-    filter(!str_detect(gene, "group")) %>%
-    arrange(replicon_type) %>%
-    write_csv(paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
+

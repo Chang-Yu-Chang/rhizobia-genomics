@@ -96,6 +96,7 @@ write_csv(gene_wide_fst, paste0(folder_data, "genomics_analysis/fst/", set_name,
 write_csv(per_locus_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/per_locus_fst.csv"))
 
 
+
 # Get the sequence length
 glen <- list()
 for (gene in gene_list) {
@@ -108,3 +109,6 @@ gene_lengths <- unlist(glen) %>% enframe(name = "gene", value = "sequence_length
 write_csv(gene_lengths, paste0(folder_data, "genomics_analysis/fst/", set_name, "/gene_lengths.csv"))
 
 }
+
+#
+
