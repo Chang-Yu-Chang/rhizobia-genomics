@@ -72,13 +72,23 @@ map_fisher_by_gene <- function (long_counts) {
         unnest(cols = tidied)
         #unnest(cols = tidied)
 }
+slice_top_genes <- function (tidied_fisher, prop = 0.01) {
+    # Genes with top ORs
+    tidied_fisher %>%
+        ungroup() %>%
+        arrange(desc(or)) %>%
+        slice_max(or, prop = prop) %>% # The top 1%
+        filter(!str_detect(gene, "group")) # Remove gene annotated as "group_XX"
+
+}
 
 set_name = "elev_med"
 tt <- read_gpas(set_name)
 long_counts <- make_long_count(tt$gpa)
 tidied_fisher <- map_fisher_by_gene(long_counts)
 write_csv(tidied_fisher, paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/tidied_fisher.csv"))
-
+top_gene_or <- slice_top_genes(tidied_fisher)
+write_csv(top_gene_or, paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/top_gene_or.csv"))
 
 
 set_name = "urbn_mel"
@@ -86,15 +96,17 @@ tt <- read_gpas(set_name)
 long_counts <- make_long_count(tt$gpa)
 tidied_fisher <- map_fisher_by_gene(long_counts)
 write_csv(tidied_fisher, paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/tidied_fisher.csv"))
+top_gene_or <- slice_top_genes(tidied_fisher)
+write_csv(top_gene_or, paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/top_gene_or.csv"))
 
 
 # Check
-tt$gpa %>%
-    filter(gene == "nylB")
-results %>%
-    filter(gene == "nylB") %>%
-    pull(tidied)
-fisher_results$contingency_table[fisher_results$gene == "nylB"]
+# tt$gpa %>%
+#     filter(gene == "nylB")
+# results %>%
+#     filter(gene == "nylB") %>%
+#     pull(tidied)
+# fisher_results$contingency_table[fisher_results$gene == "nylB"]
 
 
 if (F) {

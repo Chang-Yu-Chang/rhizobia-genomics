@@ -175,6 +175,7 @@ clean_all <- function (set_name, contigs) {
     gpacl <- make_long_gpac(gpafl, contigs, gd)
     length(unique(gpacl$contig_id)) # 161 contigs
     write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpacl.csv"))
+
 }
 
 # 1. All 36 genomes

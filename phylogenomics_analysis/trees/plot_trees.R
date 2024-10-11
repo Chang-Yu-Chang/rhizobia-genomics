@@ -12,7 +12,25 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
+read_gpas <- function (set_name) {
+    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
+    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
+    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
+    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
+    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
+    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
+
+    return(list(gpa = gpa, gene_order = gene_order, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
+}
+
 # 1. Plot core gene tree ----
+set_name = "elev_med"
+tt <- read_gpas(set_name)
+
 p1 <- tr_elev_med_core %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
@@ -24,7 +42,7 @@ p1 <- tr_elev_med_core %>%
     # geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
     # geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
     #geom_treescale(x = 0, y = 28, width = 0.1) +
-    scale_color_manual(values = site_group_colors) +
+    scale_color_manual(values = site_group_colors, name = "") +
     #scale_color_manual(values = species_colors) +
     #scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
     coord_cartesian(clip = "off") +
@@ -34,7 +52,11 @@ p1 <- tr_elev_med_core %>%
         plot.margin = unit(c(0,10,0,0), "mm")
     ) +
     guides() +
-    labs()
+    labs(title = paste0(nrow(tt$list_sccg), " single copy core genes: elevation medicae"))
+
+set_name = "urbn_mel"
+tt <- read_gpas(set_name)
+
 p2 <- tr_urbn_mel_core %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
@@ -56,11 +78,11 @@ p2 <- tr_urbn_mel_core %>%
         plot.margin = unit(c(0,10,0,0), "mm")
     ) +
     guides() +
-    labs()
+    labs(title = paste0(nrow(tt$list_sccg), " single copy core gene: urbanization meliloti"))
 
 p <- plot_grid(p1, p2, nrow = 1)
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-combined_sccg.png"), p, width = 8, height = 4)
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-combined_sccg.png"), p, width = 10, height = 5)
 
 
 

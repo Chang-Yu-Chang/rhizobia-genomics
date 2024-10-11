@@ -91,10 +91,19 @@ snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
 
-p <- plot_gene_fst(gene_fst)
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-gene_fst.png"), p, width = 10, height = 6)
-p <- plot_snps_fst(snp_fst)
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 6)
+p1 <- plot_gene_fst(gene_fst) + ggtitle(paste0(set_name, ": ", nrow(gene_fst), " single copy core genes"))
+p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " SNPs"))
+p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
+
+# List of genes
+gene_fst %>%
+    ungroup() %>%
+    arrange(desc(fst)) %>%
+    slice_max(fst, prop = 0.01) %>%
+    filter(!str_detect(gene, "group")) %>%
+    arrange(replicon_type) %>%
+    write_csv(paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
 
 
 # 3. Urbanization meliloti  ----
@@ -107,7 +116,16 @@ snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
 
-p <- plot_gene_fst(gene_fst)
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-gene_fst.png"), p, width = 10, height = 6)
-p <- plot_snps_fst(snp_fst)
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 6)
+p1 <- plot_gene_fst(gene_fst) + ggtitle(paste0(set_name, ": ", nrow(gene_fst), " single copy core genes"))
+p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " SNPs"))
+p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
+
+# List of genes
+gene_fst %>%
+    ungroup() %>%
+    arrange(desc(fst)) %>%
+    slice_max(fst, prop = 0.01) %>%
+    filter(!str_detect(gene, "group")) %>%
+    arrange(replicon_type) %>%
+    write_csv(paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))

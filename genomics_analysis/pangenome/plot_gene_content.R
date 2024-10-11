@@ -22,11 +22,13 @@ read_gpas <- function (set_name) {
 
     return(list(gpa = gpa, gene_order = gene_order, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
 }
-plot_heatmap <- function (gpa, gpatl) {
+plot_heatmap <- function (gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
     list_cg <- gpa$gene[apply(gpa[,-1], 1, sum) == ncol(gpa)-1]
-    gene_order <- unique(gpatl$gene)
-    gpatl %>%
+    gene_order <- unique(gpacl$gene)
+    p <- gpacl %>%
         filter(!gene %in% list_cg) %>%
+        # Exclude those genes that are assigned to different contigs in differnt genomes
+        #filter(!gene %in% list_wgpa$gene) %>%
         left_join(isolates) %>%
         mutate(genome_id = factor(genome_id, rev(isolates$genome_id))) %>%
         ggplot() +
@@ -45,6 +47,36 @@ plot_heatmap <- function (gpa, gpatl) {
         ) +
         guides() +
         labs(x = "accessory gene", y = "genome")
+
+    if (by_replicon) {
+        return(p + facet_grid(.~replicon_type, scales = "free_x", space = "free_x"))
+    } else return(p)
+
+}
+plot_fisher <- function (tidied_fisher, gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
+    list_cg <- gpa$gene[apply(gpa[,-1], 1, sum) == ncol(gpa)-1]
+    gene_order <- unique(gpatl$gene)
+    p <- tidied_fisher %>%
+        filter(!gene %in% list_cg) %>%
+        # Exclude those genes that are assigned to different contigs in differnt genomes
+        #filter(!gene %in% list_wgpa$gene) %>%
+        left_join(gpacl) %>%
+        mutate(gene = factor(gene, gene_order)) %>%
+        ggplot() +
+        geom_segment(aes(x = gene, xend = gene, y = or-0.01, yend = or+0.01), alpha = 0.4) +
+        theme_classic() +
+        theme(
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
+        ) +
+        guides() +
+        labs(x = "accessory gene", y = "log(ad/bc), if ad > bc")
+
+    if (by_replicon) {
+        return(p + facet_grid(.~replicon_type, scales = "free_x", space = "free_x"))
+    } else return(p)
+
 }
 plot_gfs <- function (gpa) {
     #' Plot the gene frequency spectrum
@@ -96,23 +128,6 @@ plot_bcsm <- function (sml) {
         theme() +
         labs()
 }
-plot_fisher <- function (tidied_fisher, gpa, gpatl) {
-    list_cg <- gpa$gene[apply(gpa[,-1], 1, sum) == ncol(gpa)-1]
-    gene_order <- unique(gpatl$gene)
-    tidied_fisher %>%
-        filter(!gene %in% list_cg) %>%
-        mutate(gene = factor(gene, gene_order)) %>%
-        ggplot() +
-        geom_segment(aes(x = gene, xend = gene, y = or-0.01, yend = or+0.01), alpha = 0.4) +
-        theme_classic() +
-        theme(
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
-        ) +
-        guides() +
-        labs(x = "accessory gene", y = "log(ad/bc), if ad > bc")
-}
 
 # 2. Elevation medicae  ----
 set_name = "elev_med"
@@ -120,11 +135,20 @@ tt <- read_gpas(set_name)
 n_all <- nrow(tt$gene_order) # number of all genes
 n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
 
-p1 <- plot_heatmap(tt$gpa, tt$gpatl) + ggtitle(paste0(n_accessory, " accessory genes"))
+# Genes that are assigned to diffeent contigs in different genomes
+list_wgpa <- tt$gpacl %>%
+    select(gene, genome_id, replicon_type) %>%
+    distinct(gene, genome_id, .keep_all = T) %>%
+    group_by(gene) %>%
+    summarize(is_all_same = length(unique(replicon_type[!is.na(replicon_type)])) %in% c(0,1)) %>%
+    filter(!is_all_same)
+
+p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle(paste0(n_accessory, " accessory genes"))
 tidied_fisher <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/tidied_fisher.csv"))
-p2 <- plot_fisher(tidied_fisher, tt$gpa, tt$gpatl) + ggtitle("Odds ratio")
+p2 <- plot_fisher(tidied_fisher, tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle("Odds ratio")
 p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
+
 p <- plot_gfs(tt$gpa)
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
 p <- plot_singleton(tt$gpa, tt$gpatl)
@@ -132,25 +156,42 @@ ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-03-sing
 p <- plot_bcsm(tt$sml)
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-04-gpa_sm.png"), p, width = 10, height = 8)
 
+# tt$gpacl %>%
+#     select(gene, genome_id, replicon_type) %>%
+#     distinct(gene, genome_id, .keep_all = T) %>%
+#     pivot_wider(names_from = genome_id, values_from = replicon_type, values_fill = NA) %>%
+#     filter(gene == "xerD_2~~~xerC_1") %>%
+#     view
+
 
 
 # 3. Urbanization meliloti  ----
 set_name = "urbn_mel"
 tt <- read_gpas(set_name)
-nrow(tt$gene_order)
+n_all <- nrow(tt$gene_order) # number of all genes
+n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
 
-p1 <- plot_heatmap(tt$gpa, tt$gpatl)
+
+p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl) + ggtitle(paste0(n_accessory, " accessory genes"))
 tidied_fisher <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/tidied_fisher.csv"))
-p2 <- plot_fisher(tidied_fisher, tt$gpa, tt$gpatl) + ggtitle("Odds ratio")
+p2 <- plot_fisher(tidied_fisher, tt$gpa, tt$gpatl, tt$gpacl) + ggtitle("Odds ratio")
 p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
 ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
 
+
 p <- plot_gfs(tt$gpa)
-ggsave(paste0(folder_data, "genomics_analysis/gene_content/urbn_mel-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
 p <- plot_singleton(tt$gpa, tt$gpatl)
-ggsave(paste0(folder_data, "genomics_analysis/gene_content/urbn_mel-03-singletons.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-03-singletons.png"), p, width = 10, height = 8)
 p <- plot_bcsm(tt$sml)
-ggsave(paste0(folder_data, "genomics_analysis/gene_content/urbn_mel-04-gpa_sm.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-04-gpa_sm.png"), p, width = 10, height = 8)
+
+tidied_fisher %>%
+    ungroup() %>%
+    arrange(desc(or)) %>%
+    slice_max(or, prop = 0.01) %>%
+    filter(!str_detect(gene, "group")) %>%
+    write_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/top_gene_or.csv"))
 
 
 
