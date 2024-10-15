@@ -32,8 +32,8 @@ folder_phenotypes <- paste0(folder_data, "phenotypes/")
 # write_csv(isolates, paste0(folder_data, "mapping/isolates.csv"))
 
 # Color
-population_colors <- c("PA" = "gold2", "VA" = "olivedrab")
-site_group_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
+gradient_colors <- c("PA" = "gold2", "VA" = "olivedrab")
+population_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
 species_colors <- c(adhaerens = "grey", canadensis = "grey", medicae = "steelblue", meliloti = "maroon")
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
 plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")

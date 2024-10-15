@@ -91,7 +91,7 @@ slice_top_genes <- function (gene_fst, prop = 0.01) {
         arrange(replicon_type)
 }
 
-# 2. Elevation medicae  ----
+# Elevation medicae  ----
 set_name = "elev_med"
 tt <- read_gpas(set_name)
 ff <- read_fsts(set_name)
@@ -112,7 +112,7 @@ ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p,
 
 
 
-# 3. Urbanization meliloti  ----
+# Urbanization meliloti  ----
 set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 ff <- read_fsts(set_name)
@@ -129,5 +129,42 @@ p1 <- plot_gene_fst(gene_fst) + ggtitle(paste0(set_name, ": ", nrow(gene_fst), "
 p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " SNPs"))
 p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
+
+
+nspg <- snp_fst %>%
+    group_by(gene, replicon_type) %>%
+    summarize(n_snp_per_gene = n())
+
+
+gene_fst %>%
+    group_by(gene, replicon_type) %>%
+    left_join(select(nspg, gene, n_snp_per_gene)) %>%
+    #filter(n_snp_per_gene >= 5) %>%
+    #filter(str_detect(gene, "nif|fix|nod")) %>%
+    #filter(str_detect(gene, "hna")) %>%
+    filter(!str_detect(gene, "group")) %>%
+    filter(replicon_type == "psymB like") %>%
+    arrange(desc(fst))
+
+
+tt$gpa %>%
+    filter(str_detect(gene, "nifH"))
+
+pat <- "glxR"
+tt$gpacl %>%
+    filter(str_detect(gene, pat) | str_detect(annotation, pat)) %>%
+    select(genome_id, replicon_type, gene, annotation) %>%
+    distinct(replicon_type, gene, annotation)
+
+gene_fst %>%
+    filter(gene == "abo_4")
+
+    # ggplot() +
+    # geom_histogram(aes(x = n_snp_per_gene), binwidth = 1) +
+    # theme_bw() +
+    # theme() +
+    # guides() +
+    # labs()
+
 
 

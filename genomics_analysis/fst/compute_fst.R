@@ -65,7 +65,8 @@ for (gene in gene_list) {
             ii = str_detect(colnames(genind_data_filtered@tab), as.character(snp))
             ss <- genind_data_filtered@tab[,ii]
             pp <- tibble(population = pop(genind_data_filtered), allele1 = ss[,1], allele2 = ss[,2]) %>%
-                group_by(population, allele1) %>%
+                mutate(allele1 = factor(allele1, c(0,1))) %>%
+                group_by(population, allele1, .drop = F) %>%
                 count() %>%
                 group_by(population) %>%
                 mutate(af = n/sum(n), n = sum(n)) %>%
