@@ -52,7 +52,20 @@ sites <- bind_rows(mutate(sites_mlbs, gradient = "elevation"), mutate(sites_phil
     select(gradient, everything()) %>%
     mutate(across(c(latitude_dec, longitude_dec, elevation_m), function (x) {round(x, 2)}))
 
+# Compute pairwise geo distance
+coords_sf <- st_as_sf(sites, coords = c("longitude_dec", "latitude_dec"), crs = 4326)  # WGS84
+m <- st_distance(coords_sf)
+colnames(m) <- sites$site
+
+sites_dist <- as_tibble(m) %>%
+    mutate(site1 = sites$site) %>%
+    pivot_longer(-site1, names_to = "site2", values_to = "dist_geo_m") %>%
+    left_join(select(sites, site1 = site, gradient1 = gradient)) %>%
+    left_join(select(sites, site2 = site, gradient2 = gradient)) %>%
+    select(site1, site2, dist_geo_m)
+
 write_csv(sites, paste0(folder_phenotypes, "sites/sites.csv"))
+write_csv(sites_dist, paste0(folder_phenotypes, "sites/sites_dist.csv"))
 
 # 1. Extract the climatology data from Daymet
 list_dm <- rep(list(NA), nrow(sites))
