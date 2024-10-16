@@ -1,12 +1,10 @@
 #' This script uses DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
 
-renv::load()
-library(daymetr)
 library(tidyverse)
 library(janitor)
-library(RColorBrewer)
+library(daymetr) # for extracting climate data
 library(elevatr) # for getting elevation
-library(sf)
+library(sf) # for handing simple features
 source(here::here("metadata.R"))
 
 dms2dec <- function(x) {
@@ -19,8 +17,8 @@ dms2dec <- function(x) {
         }) %>%
         return
 }
-sites_mlbs <- readxl::read_excel(paste0(folder_phenotypes, "raw/High and low elevation sites_Sept 2022.xlsx"))
-sites_phila <- read_csv(paste0(folder_phenotypes, "raw/sites_phila.csv"), show_col_types = F) %>%
+sites_mlbs <- readxl::read_excel(paste0(folder_data, "raw/plants/High and low elevation sites_Sept 2022.xlsx"))
+sites_phila <- read_csv(paste0(folder_data, "raw/plants/sites_phila.csv"), show_col_types = F) %>%
     drop_na() %>%
     mutate(description = tolower(description) %>% str_remove("'")) %>%
     separate(col = coord, into = c("latitude_dec", "longitude_dec"), sep = ",\\s", convert = T)
@@ -33,12 +31,12 @@ sites_mlbs <- sites_mlbs %>%
     mutate(longitude_dec = dms2dec(longitude_degrees_minutes_seconds)) %>%
     mutate(elevation_m = elevation_feet / 3.28084) %>%
     mutate(site = str_remove(site, "-")) %>%
-    mutate(site_group = case_when(
+    mutate(population = case_when(
         str_sub(site, 1 , 1) == "H" ~ "high elevation",
         str_sub(site, 1 , 1) == "L" ~ "low elevation",
         str_sub(site, 1 , 1) == "S" ~ "mid elevation"
     )) %>%
-    select(site_group, site, latitude_dec, longitude_dec, elevation_m)
+    select(population, site, latitude_dec, longitude_dec, elevation_m)
 
 # phila
 temp <- sites_phila %>%
@@ -47,11 +45,11 @@ temp <- sites_phila %>%
 
 sites_phila <- sites_phila %>%
     mutate(elevation_m = temp$elevation) %>%
-    select(site_group, site, latitude_dec, longitude_dec, elevation_m)
+    select(population, site, latitude_dec, longitude_dec, elevation_m)
 
 # bind rows
-sites <- bind_rows(mutate(sites_mlbs, population = "VA"), mutate(sites_phila, population = "PA")) %>%
-    select(population, everything()) %>%
+sites <- bind_rows(mutate(sites_mlbs, gradient = "elevation"), mutate(sites_phila, gradient = "urbanization")) %>%
+    select(gradient, everything()) %>%
     mutate(across(c(latitude_dec, longitude_dec, elevation_m), function (x) {round(x, 2)}))
 
 write_csv(sites, paste0(folder_phenotypes, "sites/sites.csv"))
@@ -65,7 +63,7 @@ for (i in 1:nrow(sites)) {
                           start = 2022,
                           end = 2022,
                           internal = TRUE)
-    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], population = sites$population[i])
+    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], gradient = sites$gradient[i])
 
 }
 
@@ -74,21 +72,21 @@ dml <- bind_rows(list_dm) %>%
     mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
     mutate(ymonth = month(ydate)) %>%
     left_join(sites) %>%
-    select(population, site_group, site, everything())
+    select(gradient, population, site, everything())
 
 write_csv(dml, paste0(folder_phenotypes, "sites/dml.csv"))
 
 
 # 2. Resample the temperature difference between paired sites
-tb <- crossing(population = c("VA", "PA"), variable = c("tmax_deg_c", "tmin_deg_c"), yday = 1:365)
+tb <- crossing(gradient = c("elevation", "urbanization"), variable = c("tmax_deg_c", "tmin_deg_c"), yday = 1:365)
 
-compute_diff <- function(dml, pop, y, variable) {
-    if (pop == "VA") {
-        var1 <- dml %>% filter(population == pop, site_group == "low elevation", yday == y) %>% pull({{variable}})
-        var2 <- dml %>% filter(population == pop, site_group == "high elevation", yday == y) %>% pull({{variable}})
-    } else if (pop == "PA") {
-        var1 <- dml %>% filter(population == pop, site_group == "urban", yday == y) %>% pull({{variable}})
-        var2 <- dml %>% filter(population == pop, site_group == "suburban", yday == y) %>% pull({{variable}})
+compute_diff <- function(dml, gra, y, variable) {
+    if (gra == "elevation") {
+        var1 <- dml %>% filter(gradient == gra, population == "low elevation", yday == y) %>% pull({{variable}})
+        var2 <- dml %>% filter(gradient == gra, population == "high elevation", yday == y) %>% pull({{variable}})
+    } else if (gra == "urbanization") {
+        var1 <- dml %>% filter(gradient == gra, population == "urban", yday == y) %>% pull({{variable}})
+        var2 <- dml %>% filter(gradient == gra, population == "suburban", yday == y) %>% pull({{variable}})
     }
     sample_var1 <- sample(var1, n_resample, replace = T)
     sample_var2 <- sample(var2, n_resample, replace = T)
@@ -104,7 +102,7 @@ n_resample <- 100
 
 tbs <- tb %>%
     rowwise() %>%
-    mutate(samples = list(compute_diff(dml, population, yday, variable)))
+    mutate(samples = list(compute_diff(dml, gradient, yday, variable)))
 
 diff_vars <- tbs %>%
     ungroup() %>%
