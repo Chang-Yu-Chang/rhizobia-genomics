@@ -25,7 +25,6 @@ filter_snps <- function (genind_data, isolates) {
 
     return(genind_data_filtered)
 }
-
 make_longer_dist <- function (mdist) {
     mdist %>%
         as.matrix() %>%
@@ -34,7 +33,6 @@ make_longer_dist <- function (mdist) {
         pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "dxy") %>%
         filter(genome_id1 < genome_id2)
 }
-
 compute_dxy <- function (gi_filtered) {
     #' This compute the dxy between the two populations
     ns <- table(gi_filtered@pop)
