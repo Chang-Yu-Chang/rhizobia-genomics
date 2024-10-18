@@ -1,24 +1,11 @@
 #' This script computes the tradeoff between rhizobia growth vs. symbiosis traits
 
 library(tidyverse)
-library(janitor)
-library(corrplot)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
 gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv"))
-
-temp_clean <- function (tb) {
-    tb %>%
-        rename(gradient = population, population = site_group) %>%
-        mutate(gradient = case_when(
-            gradient == "VA" ~ "elevation",
-            gradient == "PA" ~ "urbanization"
-        ))
-}
-isolates <- temp_clean(isolates)
-plants <- temp_clean(plants)
 
 gst_r <- gts %>%
     group_by(exp_id) %>%
@@ -32,43 +19,46 @@ gst_r <- gts %>%
 
 plants_r <- plants %>%
     group_by(gradient, population, exp_id, genome_id, exp_plant, exp_nitrogen) %>%
-    select(shoot_biomass_mg, root_biomass_mg, shoot_height, primary_root_length, nodule_number, leaf_color, leaf_number) %>%
+    select(shoot_biomass_mg, root_biomass_mg, shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    # Compute the strain mean
     summarize(across(everything(), function (x) mean(x, na.rm = T))) %>%
-    filter(!exp_id == "control")
+    filter(!exp_id == "control") %>%
+    ungroup()
 
-plants_rs <- list()
-plants_rs[[1]] <- filter(plants_r, exp_plant == "lupulina", exp_nitrogen == "without nitrogen")
-plants_rs[[2]] <- filter(plants_r, exp_plant == "sativa", exp_nitrogen == "without nitrogen")
-plants_rs[[3]] <- filter(plants_r, exp_plant == "sativa", exp_nitrogen == "with nitrogen")
-
-list_treatments <- c("lupulina w/o N", "sativa w/o N", "sativa w/ N")
-
-for (i in 1:3) {
-    isolates_trait <- isolates %>%
-        filter(!genome_id %in% c("g2", "g3", "g15")) %>%
-        #filter(gradient == "urbanization") %>%
-        left_join(plants_rs[[i]]) %>%
-        left_join(gst_r) %>%
-        drop_na(exp_nitrogen) %>%
-        ungroup()
-
-    m <- isolates_trait[,-c(1:8)]
-    m <- m[,(colSums(is.na(m)) == 0 & colSums(m) != 0)] # Remove traits with NA
-    mm <- cor(m)
-    p_mat <- cor.mtest(m, conf.level = 0.95)
-    tt <- min(which(str_detect(names(m), "^r_"))) # the index of first growth trait; for plotting
-
-    png(paste0(folder_data, "phenotypes/tradeoff/0", i, ".png"), width = 20, height = 20, units = "cm", res = 300)
-
-    corrplot(
-        mm, diag = T, title = paste0(list_treatments[i], ", n_strains = ", nrow(isolates_trait)), mar = c(0,0,2,0),
-        p.mat = p_mat$p, insig = "label_sig", sig.level = c(0.001, 0.01, 0.05), pch.cex = 1,
-        type = "full", tl.col = "black", tl.cex = 1, cl.ratio = 0.1, tl.srt = 45, tl.offset = .5
-    ) %>%
-        corrRect(index = c(1, tt, ncol(m)))
+write_csv(gst_r, paste0(folder_data, "phenotypes/tradeoff/gst_r.csv"))
+write_csv(plants_r, paste0(folder_data, "phenotypes/tradeoff/plants_r.csv"))
 
 
-    dev.off()
+# Compute the PCs
+gst_pc <- gst_r[,-1] %>% prcomp(center = TRUE, scale = TRUE)
+gst_pcs <- as_tibble(summary(gst_pc)$x) %>% mutate(exp_id = gst_r$exp_id) %>% select(exp_id, everything())
+gst_pc_imp <- as_tibble(as.list(summary(gst_pc)$importance[2, ])) # proportion of variance
 
-}
+
+temp <- plants_r %>%
+    select(-genome_id, -gradient, -population) %>%
+    group_by(exp_plant, exp_nitrogen) %>%
+    nest() %>%
+    mutate(
+        data_rmna = map(data, ~ select(.x, where(~ !all(is.na(.))))),
+        exp_ids = map(data_rmna, ~select(.x, exp_id)),
+        plants_pc = map(data_rmna, ~ prcomp(select(.x, -exp_id), center = TRUE, scale. = TRUE)),
+        plants_pcs = map(plants_pc, ~ as_tibble(summary(.x)$x)),
+        plants_pc_imp = map(plants_pc, ~as_tibble(as.list(summary(.x)$importance[2,])))
+    )
+
+plants_pcs <- temp %>%
+    unnest(c(plants_pcs, exp_ids)) %>%
+    select(exp_plant, exp_nitrogen, exp_id, starts_with("PC"))
+
+plants_pc_imp <- temp %>%
+    unnest(plants_pc_imp) %>%
+    select(exp_plant, exp_nitrogen, starts_with("PC"))
+
+
+write_csv(gst_pcs, paste0(folder_data, "phenotypes/tradeoff/gst_pcs.csv"))
+write_csv(gst_pc_imp, paste0(folder_data, "phenotypes/tradeoff/gst_pc_imp.csv"))
+write_csv(plants_pcs, paste0(folder_data, "phenotypes/tradeoff/plants_pcs.csv"))
+write_csv(plants_pc_imp, paste0(folder_data, "phenotypes/tradeoff/plants_pc_imp.csv"))
+
 
