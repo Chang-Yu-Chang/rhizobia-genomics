@@ -29,18 +29,8 @@ sites_center <- sites %>%
 us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
 tt <- travel_time("city", path = tempdir()) # travel time data from Nelson, Andy, Daniel J. Weiss, Jacob van Etten, Andrea Cattaneo, Theresa S. McMenomy, and Jawoo Koo. 2019. “A Suite of Global Accessibility Indicators.” Scientific Data 6 (1): 266.
 
-get_elev_sf <- function (us_elev, sites_center, gra) {
-    scc <- unlist(filter(sites_center, gradient == gra)[,-1])
-    center_coord <- scc[c("lon_mean", "lat_mean")]
-    edge_length <- scc["width_max"]/2
-    extent_area <- ext(center_coord[1] - edge_length, center_coord[1] + edge_length, center_coord[2] - edge_length, center_coord[2] + edge_length)
-    elev1 <- crop(us_elev, extent_area)
-    r_points <- as.data.frame(elev1, xy = TRUE)
-    elev_sf1 <- st_as_sf(r_points, coords = c("x", "y"), crs = 4326)
-    as(st_geometry(elev_sf1), "Spatial")
-    return(elev_sf1)
-}
 
+# Plot the states
 get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) {
     extent_area <- ext(lon_mean - lon_edge/2,
                        lon_mean + lon_edge/2,
@@ -52,10 +42,7 @@ get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) 
     as(st_geometry(elev_sf1), "Spatial")
     return(elev_sf1)
 }
-
-# Plot the states
-sc <- tibble(gradient = "states", lon_mean = -78, lat_mean = 40, width_max = 5)
-elev_sf <- get_elev_state_sf(us_elev, -79, 39, 16, 8)
+elev_sf <- get_elev_state_sf(us_elev, -78.5, 39, 17, 8)
 
 p1 <- us_states %>%
     filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
@@ -63,16 +50,16 @@ p1 <- us_states %>%
     geom_sf(data = elev_sf, aes(color = USA_elv_msk)) +
     geom_sf(fill = NA, color = "grey10", linewidth = .5) +
     geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("cornsilk", 0.5), linewidth = 0.5) +
-    scale_color_gradient(low = alpha("snow", .2), high = alpha("grey20", .1), name = "elevation (m)") +
+    scale_color_gradient(low = alpha("snow", .2), high = alpha("#d6a36e", .1), name = "elevation (m)") +
     scale_fill_manual(values = population_colors) +
     annotation_scale(location = "br", width_hint = .2) +
     coord_sf(expand = F, xlim = c(-87, -70), ylim = c(36, 42.5)) +
     theme_light() +
     theme(
+        panel.background = element_rect(color = NA, fill = alpha("lightblue", .3), linewidth = 1),
         panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
         plot.background = element_rect(color = NA, fill = "white", linewidth = .5),
         legend.position = "bottom",
-        #panel.border = element_blank(),
         panel.grid.major = element_blank(),
         axis.line = element_line(linewidth = .5),
         axis.ticks = element_line(color = "black", linewidth = .5),
@@ -86,6 +73,17 @@ p1 <- us_states %>%
 ggsave(paste0(folder_phenotypes, "sites/map-01-states.png"), p1, width = 6, height = 5)
 
 # Elevation
+get_elev_sf <- function (us_elev, sites_center, gra) {
+    scc <- unlist(filter(sites_center, gradient == gra)[,-1])
+    center_coord <- scc[c("lon_mean", "lat_mean")]
+    edge_length <- scc["width_max"]/2
+    extent_area <- ext(center_coord[1] - edge_length, center_coord[1] + edge_length, center_coord[2] - edge_length, center_coord[2] + edge_length)
+    elev1 <- crop(us_elev, extent_area)
+    r_points <- as.data.frame(elev1, xy = TRUE)
+    elev_sf1 <- st_as_sf(r_points, coords = c("x", "y"), crs = 4326)
+    as(st_geometry(elev_sf1), "Spatial")
+    return(elev_sf1)
+}
 plot_elev_map <- function (sff, gra, midp = 1000) {
     sff %>%
         ggplot() +

@@ -4,9 +4,15 @@
 #'  - 2. 10 elevation medicae
 #'  - 3. 17 urbanization meliloti
 #'
-#' For each set, there will be 6 csv files
-#'  gpa, spa, gpatl, gene_order, gd, gpacl
-#'
+#' For each set, there will be 8 csv files
+#'  - gpa: gene present absence
+#'  - list_sccg: the list of single-copy core genes
+#'  - sml: the pairwise BC distance between genes
+#'  - spa: structural variants
+#'  - gpatl: the long list of gene presence absence
+#'  - gene_order: the order of genes for plotting the pangenome
+#'  - gd: the full gene dataset from PANAROO
+#'  - gpacl: the long list of gene presence absence and the contigs they are located
 
 library(tidyverse)
 library(janitor)

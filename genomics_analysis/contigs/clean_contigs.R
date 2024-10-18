@@ -16,17 +16,17 @@ b_genome <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/b_genome.cs
 
 # Plasmid
 plasmids <- tibble(
-    species = c(rep("meliloti", 4*3), rep("medicae", 3*3), "canadensis", "adhaerens"),
-    strain = c(rep(c("USDA1106", "1021", "WSM1022", "USDA1021", "WSM419", "WSM1115", "SU277"), each = 3), "T173", "Corn53"),
-    replicon_type = c(rep(c("chromosome", "psymA like", "psymB like"), 7), "chromosome", "chromosome"),
+    species = c(rep("meliloti", 4*3), rep("medicae", 3*4+1), "canadensis", "adhaerens"),
+    strain = c(rep(c("USDA1106", "1021", "WSM1022", "USDA1021"), each = 3), rep(c("WSM419", "WSM1115", "SU277"), each = 4), "SU277", "T173", "Corn53"),
+    replicon_type = c(rep(c("chromosome", "pSymA", "pSymB"), 4), rep(c("chromosome", "pSymA", "pSymB", "pAcce"), 3), "pAcce", "chromosome", "chromosome"),
     replicon = c(
         "chromosome", "psymA", "psymB",
         "chromosome", "pSymA", "pSymB",
         "chromosome", "pA", "pB",
         "chromosome", "psymA", "psymB",
-        "chromosome", "pSMED02", "pSMED01",
-        "chromosome", "pWSM1115_2", "pWSM1115_1",
-        "chromosome", "pSU277_2", "pSU277_1",
+        "chromosome", "pSMED02", "pSMED01", "pSMED03",
+        "chromosome", "pWSM1115_2", "pWSM1115_1", "pWSM1115_3",
+        "chromosome", "pSU277_2", "pSU277_1", "pSU277_3", "pSU277_4",
         "chromosome", "chromosome"
     )
 )
@@ -40,7 +40,7 @@ contigs <- genomes %>%
 #
 contigs <- contigs %>%
     drop_na(species) %>%
-    filter(contig_length > 1e6) %>%
+    filter(contig_length > 1e4) %>%
     left_join(plasmids) %>%
     #drop_na(replicon_type) %>%
     # remove odd contigs

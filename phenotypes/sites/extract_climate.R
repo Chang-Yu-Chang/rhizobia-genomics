@@ -62,7 +62,8 @@ sites_dist <- as_tibble(m) %>%
     pivot_longer(-site1, names_to = "site2", values_to = "dist_geo_m") %>%
     left_join(select(sites, site1 = site, gradient1 = gradient)) %>%
     left_join(select(sites, site2 = site, gradient2 = gradient)) %>%
-    select(site1, site2, dist_geo_m)
+    select(site1, site2, dist_geo_m) %>%
+    mutate(dist_geo_km = dist_geo_m / 1000)
 
 write_csv(sites, paste0(folder_phenotypes, "sites/sites.csv"))
 write_csv(sites_dist, paste0(folder_phenotypes, "sites/sites_dist.csv"))
