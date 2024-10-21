@@ -67,6 +67,9 @@ make_long_gpa <- function (gpa) {
     #dim(gpatl) # 244960 3
     return(list(gpatl = gpatl, gene_order = gene_order))
 }
+clean_gpar <- function (gpar_file) {
+    read_delim(gpar_file, show_col_types = F) %>% clean_names() # Rows are genes, columns are genomes
+}
 clean_spa <- function (spa_file) {
     spa <- read_delim(spa_file) %>% clean_names()
     return(spa)
@@ -139,7 +142,7 @@ clean_all <- function (set_name, contigs) {
     dir_path <- paste0(folder_data, "genomics_analysis/gene_content/", set_name)
     if (!dir.exists(dir_path)) dir.create(dir_path, recursive = TRUE) # Create the directory (and parent directories, if needed)
 
-    # Gene presence-absence table. Rows are genes, columns are genomes
+    # Gene presence-absence table. Rows are genes, columns are genomes. Entries are binary
     gpa <- clean_gpa(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.Rtab"))
     dim(gpa) # 26504 genes in union x 37-1 genomes
     write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpa.csv"))
@@ -152,6 +155,10 @@ clean_all <- function (set_name, contigs) {
     # Compute the pairwise bray-curtis simularity based on gene presence absence
     sml <- compute_bc_dist(gpa)
     write_csv(sml, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/sml.csv"))
+
+    # Gene presence-absence. It has the fasta IDs instead of binary entries
+    gpar <- clean_gpar(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.csv"))
+    write_csv(gpar, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpar.csv"))
 
     # Structural variation
     spa <- clean_spa(paste0(folder_data, "genomics/pangenome/", set_name,"/struct_presence_absence.Rtab"))

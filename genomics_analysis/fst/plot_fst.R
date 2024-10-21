@@ -52,19 +52,22 @@ make_snp_fst <- function (gene_fst, per_locus_fst) {
         mutate(locus_id = 1:n()) %>%
         mutate(loc_start = loc_start + location)
 }
-plot_gene_fst <- function (gene_fst) {
-    xx_snps <- distinct(ungroup(xx_gn), n_snps)
+plot_gene_fst <- function (gene_fst, labelled_genes = "fix|nod|nif") {
+    #xx_snps <- distinct(ungroup(xx_gn), n_snps)
     gene_fst %>%
-        #rename_with(.col = starts_with("fst."), function (x) str_remove(x, "fst.")) %>%
+        mutate(labelled_col = ifelse(str_detect(gene, labelled_genes), T, F)) %>%
         mutate(loc_start = loc_start / 10^6) %>%
         ggplot() +
-        geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01), alpha = 0.4) +
+        geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01, color = labelled_col, alpha = labelled_col)) +
         scale_x_continuous(breaks = seq(0, 4, 0.5)) +
+        scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.3)) +
+        scale_color_manual(values = c(`TRUE` = "red", `FALSE` = "black")) +
         facet_grid(.~replicon_type, scales = "free_x", space = "free_x") +
         theme_bw() +
         theme() +
         guides() +
-        labs(x = "core genome (Mbp)", y = "fst")
+        labs(x = "core genome (Mbp)", y = "fst") +
+        ggtitle(label = "", subtitle = labelled_genes)
 
 }
 plot_snps_fst <- function (snp_fst) {
@@ -107,7 +110,7 @@ snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
 
-p1 <- plot_gene_fst(gene_fst) + ggtitle(paste0(set_name, ": ", nrow(gene_fst), " single copy core genes"))
+p1 <- plot_gene_fst(gene_fst, "fix|nod|nif") + ggtitle(paste0(set_name, ": ", nrow(gene_fst), " single copy core genes"))
 p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " SNPs"))
 p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
