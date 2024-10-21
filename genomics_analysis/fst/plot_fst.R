@@ -30,6 +30,7 @@ make_gene_fst <- function (gene_lengths, per_gene_fst, gpacl) {
     gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
         select(gene, replicon_type) %>%
         replace_na(list(replicon_type = "others"))
+
     gene_lengths %>%
         filter(gene %in% per_gene_fst$gene) %>%
         left_join(per_gene_fst) %>% # those genes without Fst do not have SNPs
@@ -38,7 +39,7 @@ make_gene_fst <- function (gene_lengths, per_gene_fst, gpacl) {
         mutate(loc_start = cumsum(sequence_length)) %>%
         mutate(loc_start = lag(loc_start)) %>%
         replace_na(list(loc_start = 0, Gst_est = 0)) %>%
-        mutate(replicon_type = factor(replicon_type, c("chromosome", "psymA like", "psymB like", "others")))
+        mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
 
 }
 make_snp_fst <- function (gene_fst, per_locus_fst) {
@@ -52,13 +53,13 @@ make_snp_fst <- function (gene_fst, per_locus_fst) {
         mutate(loc_start = loc_start + location)
 }
 plot_gene_fst <- function (gene_fst) {
+    xx_snps <- distinct(ungroup(xx_gn), n_snps)
     gene_fst %>%
-        rename_with(.col = starts_with("fst."), function (x) str_remove(x, "fst.")) %>%
+        #rename_with(.col = starts_with("fst."), function (x) str_remove(x, "fst.")) %>%
         mutate(loc_start = loc_start / 10^6) %>%
         ggplot() +
         geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01), alpha = 0.4) +
         scale_x_continuous(breaks = seq(0, 4, 0.5)) +
-        #scale_y_continuous(limits = c(-0.01, 1.01)) +
         facet_grid(.~replicon_type, scales = "free_x", space = "free_x") +
         theme_bw() +
         theme() +
@@ -72,7 +73,6 @@ plot_snps_fst <- function (snp_fst) {
         ggplot() +
         geom_segment(aes(x = loc_start, xend = loc_start, y = fst-0.01, yend = fst+0.01), alpha = 0.4) +
         scale_x_continuous(breaks = seq(0, 4, 0.5)) +
-        #scale_y_continuous() +
         facet_grid(.~replicon_type, scales = "free_x", space = "free_x") +
         theme_bw() +
         theme(
@@ -101,8 +101,8 @@ ff <- read_fsts(set_name)
 
 gene_fst <- make_gene_fst(ff$gene_lengths, ff$per_gene_fst, tt$gpacl)
 snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
-top_gene_fst <- slice_top_genes(gene_fst)
-write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
+#top_gene_fst <- slice_top_genes(gene_fst)
+#write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
 
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps

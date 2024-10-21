@@ -47,7 +47,7 @@ join_dists <- function (ind_dxy, gene_length, per_gene_fst, gpacl, sites_d, isol
         left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
         left_join(sites_d) %>%
         # left_join(sites_dist) %>%
-        left_join(select(per_gene_fst, gene, n_snps = n_snps)) %>%
+        left_join(select(per_gene_fst, gene, n_snps)) %>%
         mutate(dxy_scaled = dxy/sequence_length) %>%
         left_join(gene_replicon)
 }
@@ -197,7 +197,6 @@ plot_replicon_wide_dxy <- function (xx_rp) {
 
 #set_name = "elev_med"
 set_name = "urbn_mel"
-tt <- read_gpas(set_name)
 dd <- read_dxys(set_name)
 
 xx <- join_dists(dd$gene_ind_dxy, dd$gene_lengths, dd$per_gene_fst, tt$gpacl, sites_dist, isolates) # Per gene, dxy between two orthologs coming from two different genomes

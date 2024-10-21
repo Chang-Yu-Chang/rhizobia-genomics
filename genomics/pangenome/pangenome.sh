@@ -6,9 +6,9 @@ source ../env_vars.sh
 
 cd $folder_shell
 mamba activate panaroo
-mkdir -p $folder_genomics/pangenome/isolates
 
 # 1. A total of 36 strains. Skip g38 and g40
+#mkdir -p $folder_genomics/pangenome/isolates
 # for i in {1..32} 34 36 37 38
 # do
 #     echo -e $folder_genomics/gff/$genome_ids[$i].gff
@@ -39,6 +39,11 @@ panaroo \
     --clean-mode strict \
     --remove-invalid-genes
 
+# Output updated GFF files
+panaroo-generate-gffs \
+    -i $folder_genomics/pangenome/elev_med/list_gffs.txt \
+    -o $folder_genomics/pangenome/elev_med
+
 
 # 3. Urbanization meliloti. Total 17
 mkdir -p $folder_genomics/pangenome/urbn_mel
@@ -56,6 +61,9 @@ panaroo \
     --clean-mode strict \
     --remove-invalid-genes
 
+panaroo-generate-gffs \
+    -i $folder_genomics/pangenome/urbn_mel/list_gffs.txt \
+    -o $folder_genomics/pangenome/urbn_mel
 
 
 # cat $folder_genomics/pangenome/isolates/list_gffs.txt > $folder_genomics/pangenome/genomes/list_gffs.txt
