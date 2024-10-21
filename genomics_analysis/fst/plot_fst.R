@@ -20,19 +20,19 @@ read_gpas <- function (set_name) {
     return(list(gpa = gpa, gene_order = gene_order, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
 }
 read_fsts <- function (set_name) {
-    gene_wide_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_wide_fst.csv"))
+    per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
     per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
     gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
-    return(list(gene_wide_fst = gene_wide_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
+    return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
 }
-make_gene_fst <- function (gene_lengths, gene_wide_fst, gpacl) {
+make_gene_fst <- function (gene_lengths, per_gene_fst, gpacl) {
     # Use the first genome
     gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
         select(gene, replicon_type) %>%
         replace_na(list(replicon_type = "others"))
     gene_lengths %>%
-        filter(gene %in% gene_wide_fst$gene) %>%
-        left_join(gene_wide_fst) %>% # those genes without Fst do not have SNPs
+        filter(gene %in% per_gene_fst$gene) %>%
+        left_join(per_gene_fst) %>% # those genes without Fst do not have SNPs
         left_join(gene_replicon) %>% # get the replicon where the gene is
         group_by(replicon_type) %>%
         mutate(loc_start = cumsum(sequence_length)) %>%
@@ -94,12 +94,12 @@ slice_top_genes <- function (gene_fst, prop = 0.01) {
 }
 
 #
-#set_name = "elev_med"
-set_name = "urbn_mel"
+set_name = "elev_med"
+#set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 ff <- read_fsts(set_name)
 
-gene_fst <- make_gene_fst(ff$gene_lengths, ff$gene_wide_fst, tt$gpacl)
+gene_fst <- make_gene_fst(ff$gene_lengths, ff$per_gene_fst, tt$gpacl)
 snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
 top_gene_fst <- slice_top_genes(gene_fst)
 write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))

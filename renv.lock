@@ -331,6 +331,16 @@
       ],
       "Hash": "4ac8e423216b8b70cb9653d1b3f71eb9"
     },
+    "RcppParallel": {
+      "Package": "RcppParallel",
+      "Version": "5.1.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "f38a72a419b91faac0ce5d9eee04c120"
+    },
     "S4Vectors": {
       "Package": "S4Vectors",
       "Version": "0.40.2",
@@ -1366,6 +1376,19 @@
       ],
       "Hash": "fc0b272e5847c58cd5da9b20eedbd026"
     },
+    "gaston": {
+      "Package": "gaston",
+      "Version": "1.6",
+      "Source": "Repository",
+      "Repository": "https://packagemanager.posit.co/cran/2024-01-11",
+      "Requirements": [
+        "Rcpp",
+        "RcppEigen",
+        "RcppParallel",
+        "methods"
+      ],
+      "Hash": "1fcaaf30cd372d63e013730011a5ee3f"
+    },
     "gdtools": {
       "Package": "gdtools",
       "Version": "0.4.0",
@@ -1794,6 +1817,18 @@
       ],
       "Hash": "e18861963cbc65a27736e02b3cd3c4a0"
     },
+    "gtools": {
+      "Package": "gtools",
+      "Version": "3.9.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "588d091c35389f1f4a9d533c8d709b35"
+    },
     "haven": {
       "Package": "haven",
       "Version": "2.5.4",
@@ -1824,6 +1859,21 @@
         "rprojroot"
       ],
       "Hash": "24b224366f9c2e7534d2344d10d59211"
+    },
+    "hierfstat": {
+      "Package": "hierfstat",
+      "Version": "0.5-11",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ade4",
+        "adegenet",
+        "gaston",
+        "gtools",
+        "methods"
+      ],
+      "Hash": "5b52ea0845c3e9203f3c805971967a11"
     },
     "highr": {
       "Package": "highr",
