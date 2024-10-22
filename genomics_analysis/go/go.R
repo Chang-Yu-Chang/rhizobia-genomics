@@ -1,5 +1,6 @@
 #' This script performs the  the GO terms
 #' On Uniprot ID mapping https://www.uniprot.org/id-mapping
+#'
 #' The list of unique genes were searched against four species level taxa IDs:
 #' tax_id 382 Rhizobium meliloti (species)
 #' tax_id 110321 Sinorhizobium medicae (species)
@@ -10,8 +11,6 @@ library(tidyverse)
 library(janitor)
 #library(GO.db) # A set of annotation maps describing the entire Gene Ontology
 library(topGO) # for GO term enrichment
-library(ggsci)
-library(cowplot)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -53,140 +52,169 @@ read_gos <- function (set_name) {
     return(list(list_unique_genes = list_unique_genes, to_med = to_med, to_mel = to_mel, to_eco = to_eco, to_par = to_par, gg_all = gg_all))
 }
 
-#set_name = "elev_med"
-set_name = "urbn_mel"
+make_gene2go <- function (gpa, go_ids) {
+    tt$gpa %>%
+        # Clean up gene names
+        mutate(gene = str_split(gene, "~~~")) %>%
+        unnest(gene) %>%
+        mutate(from = str_remove(gene, "_\\d")) %>%
+        filter(!str_detect(gene, "group")) %>%
+        left_join(go_ids) %>%
+        drop_na(gene_ontology_go) %>%
+        dplyr::select(gene, go_id) %>% # Make sure the paralogs are used
+        deframe()
+}
+make_top_genes_bygene <- function (ff, pp = 0.95) {
+    #' pp = 0.95 means selecting the top 5%
+    ff$per_gene_fst %>%
+        left_join(ff$gene_lengths) %>%
+        # Remove unannotated genes
+        filter(!str_detect(gene, "group")) %>%
+        arrange(desc(fst)) %>%
+        # Choose the top 5% genes
+        mutate(tops = ifelse(fst > quantile(fst, pp), 1, 0)) %>%
+        # Clean up gene names
+        mutate(gene = str_split(gene, "~~~")) %>%
+        unnest(gene) %>%
+        distinct(gene, .keep_all = T)
+}
+make_top_genes_bysnp <- function (ff, pp = 0.95) {
+    ff$per_locus_fst %>%
+        # Remove unannotated genes
+        filter(!str_detect(gene, "group")) %>%
+        left_join(ff$gene_lengths) %>%
+        arrange(desc(fst)) %>%
+        mutate(tops = ifelse(fst > quantile(fst, pp), 1, 0)) %>%
+        # Clean up gene names
+        mutate(gene = str_split(gene, "~~~")) %>%
+        unnest(gene) %>%
+        arrange(desc(tops), gene) %>%
+        distinct(gene, tops, .keep_all = T)
+}
+make_top_genes_bygene_byreplicon <- function (ff, tt, pp = 0.95) {
+    #' pp = 0.95 means selecting the top 5%
+    # Use the first genome
+    gene_replicon <- filter(tt$gpacl, genome_id == tt$gpacl$genome_id[1]) %>%
+        filter(!str_detect(gene, "group")) %>%
+        dplyr::select(gene, replicon_type) %>%
+        replace_na(list(replicon_type = "others"))
+
+    top_genes <- ff$per_gene_fst %>%
+        left_join(ff$gene_lengths) %>%
+        # Remove unannotated genes
+        filter(!str_detect(gene, "group")) %>%
+        # Compute by replicon
+        left_join(gene_replicon) %>%
+        filter(!is.na(replicon_type), replicon_type != "others") %>%
+        group_by(replicon_type) %>%
+        arrange(replicon_type, desc(fst)) %>%
+        # Choose the top 5% genes
+        mutate(tops = ifelse(fst > quantile(fst, pp), 1, 0)) %>%
+        # Clean up gene names
+        mutate(gene = str_split(gene, "~~~")) %>%
+        unnest(gene)
+
+    return(top_genes)
+    # check
+    # top_genes %>%
+    #     group_by(replicon_type, tops) %>%
+    #     count()
+}
+make_top_genes_bygene_bysnp <- function (ff, tt, pp = 0.95) {
+    #' pp = 0.95 means selecting the top 5%
+    # Use the first genome
+    gene_replicon <- filter(tt$gpacl, genome_id == tt$gpacl$genome_id[1]) %>%
+        filter(!str_detect(gene, "group")) %>%
+        dplyr::select(gene, replicon_type) %>%
+        replace_na(list(replicon_type = "others"))
+
+
+    ff$per_locus_fst %>%
+        left_join(ff$gene_lengths) %>%
+        # Remove unannotated genes
+        filter(!str_detect(gene, "group")) %>%
+        # Compute by replicon
+        left_join(gene_replicon) %>%
+        filter(!is.na(replicon_type), replicon_type != "others") %>%
+        #group_by(replicon_type) %>%
+        arrange(replicon_type, desc(fst)) %>%
+        # Choose the top 5% genes
+        mutate(tops = ifelse(fst > quantile(fst, pp), 1, 0)) %>%
+        # Clean up gene names
+        mutate(gene = str_split(gene, "~~~")) %>%
+        unnest(gene) %>%
+        arrange(replicon_type, desc(tops), gene) %>%
+        distinct(gene, tops, .keep_all = T)
+
+
+    return(top_genes)
+    # check
+    top_genes %>%
+        group_by(replicon_type, tops) %>%
+        count()
+}
+make_ginterest <- function (top_genes) {
+    top_genes %>%
+        mutate(tops = factor(tops, c(1, 0))) %>%
+        dplyr::select(gene, tops) %>%
+        deframe()
+}
+go_wrapper <- function (ginterest, oo, suffix = "") {
+    #' A wrapper function for go enrichment analysis
+    list_godata <- list()
+    list_fisher <- list()
+    list_tables <- list()
+    for (o in oo) {
+        # Create the topGOdata object for each category
+        godata <- new(
+            "topGOdata",
+            ontology = o,
+            allGenes = ginterest,
+            nodeSize = 10,
+            annot = annFUN.gene2GO,
+            gene2GO = gene2go
+        )
+        list_godata[[o]] <- godata
+        list_fisher[[o]] <- runTest(godata, algorithm = "classic", statistic = "fisher")
+        list_tables[[o]] <- GenTable(list_godata[[o]], classicFisher = list_fisher[[o]])
+    }
+    goenrich <- bind_rows(list_tables, .id = "Category") %>% clean_names
+    write_csv(goenrich, paste0(folder_data, "genomics_analysis/go/", set_name, "/goenrich", suffix,".csv"))
+}
+
+
+set_name = "elev_med"
+#set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 ff <- read_fsts(set_name)
 gg <- read_gos(set_name)
 
-
-# The list of all genes
+# The list of all genes in this gradient pangenome
 go_ids <- gg$gg_all %>%
     distinct(from, .keep_all = T) %>%
     mutate(go_id = str_extract_all(gene_ontology_go, "GO:\\d+"))
-    #dplyr::select(from, entry, organism, go_id, gene_ontology_go) %>%
-    #unnest(cols = go_id) %>%
-    #mutate(go_id = )
-    # dplyr::select(-gene_ontology_go) %>%
-    # mutate(gop_id = map(go_id, ~ggp[which(names(ggp) == .x)]))
 
-# Mapping object (a R list) required for topGO
-gene2go <- tt$gpa %>%
-    # Clean up gene names
-    mutate(gene = str_split(gene, "~~~")) %>%
-    unnest(gene) %>%
-    mutate(from = str_remove(gene, "_\\d")) %>%
-    filter(!str_detect(gene, "group")) %>%
-    left_join(go_ids) %>%
-    drop_na(gene_ontology_go) %>%
-    dplyr::select(gene, go_id) %>%
-    deframe()
+# Mapping object (a R list) required for topGO. It the gene universe
+gene2go <- make_gene2go(tt$gpa, go_ids)
+length(gene2go) # number of all genes in the universe
 
 # Genes with top 5% Fst
-top_gene_fst <- ff$per_gene_fst %>%
-    left_join(ff$gene_lengths) %>%
-    # Remove unannotated genes
-    filter(!str_detect(gene, "group")) %>%
-    arrange(desc(fst)) %>%
-    # Choose the top 5% genes
-    mutate(tops = ifelse(fst > quantile(fst, 0.95), 1, 0)) %>%
-    # Clean up gene names
-    mutate(gene = str_split(gene, "~~~")) %>%
-    unnest(gene)
-    #mutate(from = str_remove(gene, "_\\d")) %>%
+top_genes_bygene <- make_top_genes_bygene(ff) # by gene wide Fst
+top_genes_bysnp <- make_top_genes_bysnp(ff) # by snp Fst
+#top_genes_bygene_byreplicon <- make_top_genes_bygene_byreplicon(ff, tt) # by gene by replicon
 
+# Make gene of interest
+#gene_interested <- make_gene_interested(top_gene_fst)
+ginterest_bygene <- make_ginterest(top_genes_bygene)
+length(ginterest_bygene)
+table(ginterest_bygene)
+ginterest_bysnp <- make_ginterest(top_genes_bysnp)
+length(ginterest_bysnp)
+table(ginterest_bysnp)
 
-gene_interested <- top_gene_fst %>%
-    mutate(tops = factor(tops, c(1, 0))) %>%
-    dplyr::select(gene, tops) %>%
-    deframe()
-
-# Create the topGOdata object
 oo <- c("BP", "CC", "MF")
-
-list_godata <- list()
-list_fisher <- list()
-list_tables <- list()
-
-for (o in oo) {
-    godata <- new("topGOdata",
-                  ontology = o,
-                  allGenes = gene_interested,
-                  nodeSize = 15,
-                  annot = annFUN.gene2GO,
-                  gene2GO = gene2go
-    )
-    list_godata[[o]] <- godata
-    list_fisher[[o]] <- runTest(godata, algorithm = "classic", statistic = "fisher")
-    list_tables[[o]] <- GenTable(list_godata[[o]], classicFisher = list_fisher[[o]])
-
-}
-
-goenrich <- bind_rows(list_tables, .id = "Category") %>%
-    clean_names %>%
-    mutate(goidterm = paste0(go_id, " ", term))
-
-
-p1 <- goenrich %>%
-    mutate(goidterm = factor(goidterm, rev(goenrich$goidterm))) %>%
-    ggplot() +
-    geom_col(aes(x = goidterm, y = annotated, fill = category)) +
-    coord_flip() +
-    scale_fill_aaas() +
-    theme_bw() +
-    theme(
-        legend.position = "inside",
-        legend.position.inside = c(.9,.9),
-        legend.background = element_rect(color = "black"),
-        axis.text.y.left = element_text(hjust = 0)
-    ) +
-    guides() +
-    labs(x = "", title = set_name)
-
-p2 <- goenrich %>%
-    mutate(goidterm = factor(goidterm, rev(goenrich$goidterm))) %>%
-    ggplot() +
-    geom_col(aes(x = goidterm, y = -log(as.numeric(classic_fisher), 10), fill = category)) +
-    geom_hline(yintercept = -log(0.05, 10)) +
-    coord_flip() +
-    scale_fill_aaas() +
-    theme_bw() +
-    theme(
-        axis.text.y = element_blank(),
-        legend.position = "none"
-    ) +
-    guides() +
-    labs(x = "", y = "-log(p)")
-
-p <- plot_grid(p1, p2, nrow = 1, align = "h", axis = "tb", rel_widths = c(1, .8))
-ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-go.png"), p, width = 15, height = 8)
-
-
-# o = "BP"
-# GenTable(list_godata[[o]], classicFisher = list_fisher[[o]])
-# o = "CC"
-# GenTable(list_godata[[o]], classicFisher = list_fisher[[o]])
-# o = "MF"
-# GenTable(list_godata[[o]], classicFisher = list_fisher[[o]])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+go_wrapper(ginterest_bygene, oo, suffix = "_bygene")
+go_wrapper(ginterest_bysnp, oo, suffix = "_bysnp")
 
 
 
