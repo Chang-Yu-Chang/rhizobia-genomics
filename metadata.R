@@ -6,6 +6,53 @@ folder_data <- "~/Dropbox/lab/rhizobia-genomics/data/" # Enter the directory of 
 folder_genomics <- paste0(folder_data, "genomics/")
 folder_phenotypes <- paste0(folder_data, "phenotypes/")
 
+# Palettes for plotting
+gradient_colors <- c("PA" = "gold2", "VA" = "olivedrab")
+population_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
+pops_colors <- c(
+    `high-high` = "#0C6291",
+    `high-low` = "grey50",
+    `low-low` = "#BF4342",
+    `suburban-suburban` = "#0cc45f",
+    `suburban-urban` = "grey50",
+    `urban-urban` = "#a642bf"
+)
+species_colors <- c(adhaerens = "grey", canadensis = "grey", medicae = "steelblue", meliloti = "maroon")
+species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
+plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
+
+# utils
+read_gpas <- function (set_name) {
+    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
+    gpar <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpar.csv"))
+    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
+    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
+    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
+    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
+    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
+    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+
+    return(list(gpa = gpa, gpar = gpar, list_sccg = list_sccg, sml = sml, spa = spa, gpatl = gpatl, gene_order = gene_order, gd = gd, gpacl = gpacl))
+}
+read_fsts <- function (set_name) {
+    per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
+    per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
+    gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
+    return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
+}
+
+
+
+
+
+
+
+
+
+
 # # Table for genomics workflow
 # genomes <- tibble(
 #     batch_name = c(rep("Chang_Q5C_results", 8), "Chang_Q5C_results_repeated", rep("Chang_Q5C_results", 5), rep("Chang_W8S_results", 18), rep("ncbi", 5)),
@@ -30,33 +77,3 @@ folder_phenotypes <- paste0(folder_data, "phenotypes/")
 # )
 #
 # write_csv(isolates, paste0(folder_data, "mapping/isolates.csv"))
-
-# Color
-gradient_colors <- c("PA" = "gold2", "VA" = "olivedrab")
-population_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
-pops_colors <- c(
-    `high-high` = "#0C6291",
-    `high-low` = "grey50",
-    `low-low` = "#BF4342",
-    `suburban-suburban` = "#0cc45f",
-    `suburban-urban` = "grey50",
-    `urban-urban` = "#a642bf"
-)
-species_colors <- c(adhaerens = "grey", canadensis = "grey", medicae = "steelblue", meliloti = "maroon")
-species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
-plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

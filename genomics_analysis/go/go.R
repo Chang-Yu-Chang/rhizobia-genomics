@@ -1,34 +1,11 @@
-#' This script performs the  the GO terms
-#' On Uniprot ID mapping https://www.uniprot.org/id-mapping
-#'
-#' The list of unique genes were searched against four species level taxa IDs:
-#' tax_id 382 Rhizobium meliloti (species)
-#' tax_id 110321 Sinorhizobium medicae (species)
-#' tax_id 562  Escherichia coli (species)
-#' tax_id 287 Pseudomonas aeruginosa (species)
+#' This script performs the GO enrichment analysis
 
 library(tidyverse)
 library(janitor)
-#library(GO.db) # A set of annotation maps describing the entire Gene Ontology
 library(topGO) # for GO term enrichment
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-read_gpas <- function (set_name) {
-    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
-    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
-    gpar <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpar.csv"))
-    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
-    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
-    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
-    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
-    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
-    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
-
-    return(list(gpa = gpa, gene_order = gene_order, gpar = gpar, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
-}
 read_fsts <- function (set_name) {
     per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
     per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
@@ -42,17 +19,22 @@ read_gos <- function (set_name) {
     to_med <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_to_med.tsv")) %>% clean_names()
     # tax_id 110321 Sinorhizobium medicae (species)
     to_mel <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_to_mel.tsv")) %>% clean_names()
+    # tax_id 380 Rhizobium fredii (species)
+    to_fre <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_to_fre.tsv")) %>% clean_names()
     # tax_id 562  Escherichia coli (species)
     to_eco <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_to_eco.tsv")) %>% clean_names()
     # tax_id 287 Pseudomonas aeruginosa (species)
     to_par <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_to_par.tsv")) %>% clean_names()
     # Drop the entries with no GO description
-    gg_all <- bind_rows(to_med, to_mel, to_par, to_eco) %>% drop_na(gene_ontology_go)
+    gg_all <- bind_rows(to_med, to_mel, to_fre, to_par, to_eco) %>% drop_na(gene_ontology_go)
 
-    return(list(list_unique_genes = list_unique_genes, to_med = to_med, to_mel = to_mel, to_eco = to_eco, to_par = to_par, gg_all = gg_all))
+    return(list(list_unique_genes = list_unique_genes, to_med = to_med, to_mel = to_mel, to_fre = to_fre, to_eco = to_eco, to_par = to_par, gg_all = gg_all))
 }
-
-make_gene2go <- function (gpa, go_ids) {
+read_gos_generic <- function (set_name) {
+    generic <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_generic")) %>% clean_names()
+    return(generic)
+}
+make_gene2go <- function (tts, go_ids) {
     tt$gpa %>%
         # Clean up gene names
         mutate(gene = str_split(gene, "~~~")) %>%
@@ -183,20 +165,26 @@ go_wrapper <- function (ginterest, oo, suffix = "") {
 }
 
 
-set_name = "elev_med"
-#set_name = "urbn_mel"
+#set_name = "elev_med"
+set_name = "urbn_mel"
+
 tt <- read_gpas(set_name)
 ff <- read_fsts(set_name)
 gg <- read_gos(set_name)
+gg$generic <- read_gos_generic(set_name) # GO ids from genric search
 
-# The list of all genes in this gradient pangenome
+# The list of GO ids
 go_ids <- gg$gg_all %>%
+    bind_rows(gg$generic) %>%
+    drop_na(gene_ontology_go) %>%
     distinct(from, .keep_all = T) %>%
     mutate(go_id = str_extract_all(gene_ontology_go, "GO:\\d+"))
 
+round(nrow(go_ids)/nrow(gg$list_unique_genes), 3) # % of genes that have GO ids
+
 # Mapping object (a R list) required for topGO. It the gene universe
-gene2go <- make_gene2go(tt$gpa, go_ids)
-length(gene2go) # number of all genes in the universe
+gene2go <- make_gene2go(gg$list_unique_genes, go_ids)
+length(gene2go) # number of clusters that have GO terms in the universe
 
 # Genes with top 5% Fst
 top_genes_bygene <- make_top_genes_bygene(ff) # by gene wide Fst

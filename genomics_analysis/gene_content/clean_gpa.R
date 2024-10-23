@@ -4,8 +4,9 @@
 #'  - 2. 10 elevation medicae
 #'  - 3. 17 urbanization meliloti
 #'
-#' For each set, there will be 8 csv files
+#' For each set, there will be 9 csv files
 #'  - gpa: gene present absence
+#'  - gpar: Gene presence-absence. It has the fasta IDs instead of binary entries
 #'  - list_sccg: the list of single-copy core genes
 #'  - sml: the pairwise BC distance between genes
 #'  - spa: structural variants
@@ -20,6 +21,7 @@ library(vegan)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv")) %>% select(contig_id, replicon_type) %>% drop_na
 
 clean_gpa <- function (gpa_file) {
     #' This function cleans the raw gpa file
@@ -134,9 +136,6 @@ compute_bc_dist <- function (gpa) {
         pivot_longer(cols = -genome_id1, names_to = "genome_id2", values_to = "bray_curtis_similarity")
     return(sml)
 }
-
-
-
 clean_all <- function (set_name, contigs) {
     #' A wrapper function performing all functions above
     dir_path <- paste0(folder_data, "genomics_analysis/gene_content/", set_name)
@@ -147,6 +146,10 @@ clean_all <- function (set_name, contigs) {
     dim(gpa) # 26504 genes in union x 37-1 genomes
     write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpa.csv"))
 
+    # Gene presence-absence identical to roary output.  It has the fasta IDs instead of binary entries
+    gpar <- clean_gpar(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence_roary.csv"))
+    write_csv(gpar, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpar.csv"))
+
     # Get the list of single-copy core genes
     list_sccg <- get_sccg(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.csv"))
     nrow(list_sccg)
@@ -155,10 +158,6 @@ clean_all <- function (set_name, contigs) {
     # Compute the pairwise bray-curtis simularity based on gene presence absence
     sml <- compute_bc_dist(gpa)
     write_csv(sml, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/sml.csv"))
-
-    # Gene presence-absence. It has the fasta IDs instead of binary entries
-    gpar <- clean_gpar(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.csv"))
-    write_csv(gpar, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpar.csv"))
 
     # Structural variation
     spa <- clean_spa(paste0(folder_data, "genomics/pangenome/", set_name,"/struct_presence_absence.Rtab"))
@@ -191,14 +190,11 @@ clean_all <- function (set_name, contigs) {
 
 }
 
-# 1. All 36 genomes
-contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv")) %>% select(contig_id, replicon_type) %>% drop_na
+# All 36 genomes
 clean_all("isolates", contigs)
-
-# 2. 10 elevation medicae
+# 10 elevation medicae
 clean_all("elev_med", contigs)
-
-# 3. 17 urbanization meliloti
+# 17 urbanization meliloti
 clean_all("urbn_mel", contigs)
 
 

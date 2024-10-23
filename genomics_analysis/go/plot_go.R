@@ -49,8 +49,8 @@ plot_goenrich <- function (goenrich) {
     return(p)
 }
 
-set_name = "elev_med"
-#set_name = "urbn_mel"
+#set_name = "elev_med"
+set_name = "urbn_mel"
 ee <- read_goenrich(set_name)
 
 p <- plot_goenrich(ee$goenrich_bygene)
