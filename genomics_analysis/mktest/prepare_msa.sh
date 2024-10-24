@@ -2,7 +2,12 @@
 source ~/.zshrc
 source ../../genomics/env_vars.sh
 
-# This script assembles the genomes from raw reads following the plasmidsaurus pipeline
+# This script prepares the MSAs for MK test. It includes the following steps
+# 1. Prepare BLAST db from two reference genomes. Both should have been annotated using Prokka so GFF available
+# 2. Move the first sequence from each of the core gene MSA into one single fasta
+# 3. Blast the fasta (the number of sequences in this file should be identical to the number of core genes)
+# 4. For each gene with a match with reference genome, align the reference sequence to the MSA.
+# THis reference is the outgroup and should be at the last sequence
 
 # Prepare BLAST database from references S. meliloti EM1021 and S. medicae WSM419
 mkdir -p $folder_data/genomics_analysis/mktest/outgroup/
@@ -93,9 +98,15 @@ blastn \
     -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore' \
     -num_alignments 5
 
+
+
+
 # For each gene with a match with reference genome, align the reference sequence to the MSA
-set_name="elev_med"
-ref="em1021"
+# set_name="elev_med"
+# ref="em1021"
+
+set_name="urbn_mel"
+ref="wsm419"
 
 folder_sourcemsa=$folder_genomics/pangenome/$set_name/aligned_gene_sequences # source MSA folder
 folder_outputmsa=$folder_data/genomics_analysis/mktest/$set_name/msa_with_outgroup  # aligned MSA folder

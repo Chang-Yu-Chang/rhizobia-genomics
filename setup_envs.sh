@@ -132,7 +132,13 @@ mamba create -n gffread
 mamba activate gffread
 mamba install --yes -c bioconda gffread=0.12.7
 
-
+# For using the python script `subsetMultiFasta.py` to generate contingency table requre from multiFASTA alignment
+# This is for the MK test using R package iMKT
+# The script is from https://imkt.uab.cat/tutorial.html
+mamba create -n mktest
+mamba activate mktest
+mamba install --yes -c bioconda python=2.7.15
+mamba install --yes -c bioconda argparse numpy pandas pyfaidx pybedtools
 
 
 
