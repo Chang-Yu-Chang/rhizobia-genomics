@@ -127,10 +127,23 @@ mamba activate biopython
 mamba install --yes -c conda_forge biopython=1.84
 mamba install --yes -c conda_forge pandas
 
+# Install gffread v0.12.7
+mamba create -n gffread
+mamba activate gffread
+mamba install --yes -c bioconda gffread=0.12.7
 
 
 
 
+
+
+
+
+
+
+
+
+# DEPRECATED ----
 
 
 # Install vcftools 0.1.16
@@ -145,11 +158,6 @@ mamba create -y -n snippy
 mamba activate snippy
 mamba install --yes -c bioconda snippy=4.6.0
 mamba install --yes -c bioconda vcflib=1.0.1 # Because vcflib 1.0.2 breaks snippy. Downgrade it according to https://github.com/tseemann/snippy/issues/561
-
-
-
-
-
 
 # Install mash v2.3
 # Mash is a tool commonly used for fast and memory-efficient sequence similarity estimation and taxonomy classification.

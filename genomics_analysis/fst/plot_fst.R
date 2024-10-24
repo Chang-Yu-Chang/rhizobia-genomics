@@ -70,6 +70,9 @@ plot_snps_fst <- function (snp_fst) {
         guides() +
         labs(x = "core genome (Mbp)", y = "fst")
 }
+plot_box <- function (gene_fst, labelled_genes = "fix|nod|nif") {
+
+}
 slice_top_genes <- function (gene_fst, prop = 0.01) {
     # Genes with top ORs
     gene_fst %>%
@@ -90,8 +93,6 @@ ff <- read_fsts(set_name)
 
 gene_fst <- make_gene_fst(ff$gene_lengths, ff$per_gene_fst, tt$gpacl)
 snp_fst <- make_snp_fst(gene_fst, ff$per_locus_fst)
-#top_gene_fst <- slice_top_genes(gene_fst)
-#write_csv(top_gene_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/top_gene_fst.csv"))
 
 nrow(gene_fst) # number of single copy core genes
 nrow(snp_fst) # number of snps
@@ -110,3 +111,30 @@ ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p,
 #     theme() +
 #     guides() +
 #     labs()
+
+
+if (F) {
+    labelled_genes = "fix|nod|nif|noe|fdx"
+
+    gene_fst %>%
+        filter(str_detect(gene, labelled_genes))
+
+    tt$gpa %>%
+        filter(str_detect(gene, labelled_genes)) %>%
+        view
+    # acce_fst %>%
+    #     filter(str_detect(gene, labelled_genes))
+
+    gene_fst %>%
+        mutate(targeted = str_detect(gene, labelled_genes)) %>%
+        #filter(replicon_type == "p")
+        ggplot() +
+        geom_boxplot(aes(x = targeted, y = fst)) +
+        geom_jitter(aes(x = targeted, y = fst), shape = 21, width = 0.1) +
+        facet_grid(.~replicon_type) +
+        theme_bw() +
+        theme() +
+        guides() +
+        labs()
+
+}
