@@ -13,7 +13,7 @@ make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
         select(gene, replicon_type) %>%
         replace_na(list(replicon_type = "others"))
     per_acce_fst %>%
-        mutate(gene = factor(gene, tt$gene_order$gene)) %>%
+        mutate(gene = factor(gene, gene_order$gene)) %>%
         left_join(gene_replicon) %>%
         mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
 }
@@ -109,10 +109,10 @@ plot_bcsm <- function (sml) {
         theme() +
         labs()
 }
-get_gcn_agg <- function (gcn) {
+get_gcn_agg <- function (gcn, cleaned_gene_names) {
     #' This aggregate the gene number for gene clusters that have the same gene symbol names
     gcn %>%
-        left_join(tt$cleaned_gene_names) %>%
+        left_join(cleaned_gene_names) %>%
         drop_na(from) %>%
         select(from, matches("g\\d")) %>%
         pivot_longer(-from) %>%
@@ -187,7 +187,7 @@ plot_wrapper <- function (set_name) {
     n_all <- nrow(tt$gene_order) # number of all genes
     n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
     acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
-    gcn_agg <- get_gcn_agg(tt$gcn)
+    gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
 
     p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle(paste0(n_accessory, " accessory genes"))
     p2 <- plot_acce_fst(acce_fst)
@@ -199,8 +199,8 @@ plot_wrapper <- function (set_name) {
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-03-singletons.png"), p, width = 10, height = 8)
     p <- plot_bcsm(tt$sml)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-04-gpa_sm.png"), p, width = 10, height = 8)
-    p <- plot_genecopy(gcn_agg, "fix|nod|nif|noe|fdx|syr")
-    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 10)
+    p <- plot_genecopy(gcn_agg, "fdx|fix|hmp|nap|nod|nif|noe|nos|syr")
+    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 12)
     p <- plot_bcsm_gcn(gcn_agg)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-06-gcn_sm.png"), p, width = 9, height = 8)
 }

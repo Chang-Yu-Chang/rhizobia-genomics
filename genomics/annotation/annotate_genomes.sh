@@ -20,11 +20,12 @@ do
 done
 
 ## Reference genomes
-# for ref in em1021 em1022 usda1106 wsm419 casidaa
-# do
-#     # Annotate genomes via prokka
-#     mkdir -p $folder_genomics/annotation/$ref/
-#     zsh 03a-prokka.sh \
-#         $folder_genomics/fasta/genomes/$ref.fasta \
-#         $folder_genomics/annotation/genomes/$ref
-# done
+#for ref in em1021 em1022 usda1106 wsm419 casidaa
+for ref in em1021 wsm419 ngr234
+do
+    # Annotate genomes via prokka
+    mkdir -p $folder_genomics/annotation/$ref/
+    zsh 03a-prokka.sh \
+        $folder_genomics/fasta/ncbi/$ref.fasta \
+        $folder_genomics/annotation/$ref
+done
