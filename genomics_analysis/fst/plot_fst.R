@@ -112,29 +112,37 @@ ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p,
 #     guides() +
 #     labs()
 
+labelled_genes = "fix|nod|nif|noe|fdx"
 
-if (F) {
-    labelled_genes = "fix|nod|nif|noe|fdx"
+gene_fst %>%
+    filter(str_detect(gene, labelled_genes))
 
-    gene_fst %>%
-        filter(str_detect(gene, labelled_genes))
+# acce_fst %>%
+#     filter(str_detect(gene, labelled_genes))
 
-    tt$gpa %>%
-        filter(str_detect(gene, labelled_genes)) %>%
-        view
-    # acce_fst %>%
-    #     filter(str_detect(gene, labelled_genes))
+xx <- gene_fst %>%
+    mutate(targeted = ifelse(str_detect(gene, labelled_genes), "gene of interest", "rest")) %>%
+    filter(replicon_type == "pSymA")
+p <- xx %>%
+    #filter(replicon_type == "p")
+    ggplot() +
+    #geom_boxplot(aes(x = targeted, y = fst)) +
+    geom_jitter(aes(x = targeted, y = fst), shape = 21, width = 0.1) +
+    facet_grid(.~replicon_type) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs(title = str_replace_all(labelled_genes, "\\|", ", "), x = "")
 
-    gene_fst %>%
-        mutate(targeted = str_detect(gene, labelled_genes)) %>%
-        #filter(replicon_type == "p")
-        ggplot() +
-        geom_boxplot(aes(x = targeted, y = fst)) +
-        geom_jitter(aes(x = targeted, y = fst), shape = 21, width = 0.1) +
-        facet_grid(.~replicon_type) +
-        theme_bw() +
-        theme() +
-        guides() +
-        labs()
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-fs_interest.png"), p, width = 10, height = 8)
 
-}
+xx %>%
+    filter(targeted == "gene of interest") %>%
+    arrange(desc(fst))
+
+
+xx$fst[which(xx$targeted == "gene of interest")]
+
+t.test(xx$fst[which(xx$targeted == "gene of interest")],
+       xx$fst[which(xx$targeted == "rest")])
+

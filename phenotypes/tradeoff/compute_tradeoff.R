@@ -7,6 +7,7 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
 gts <- read_csv(paste0(folder_data, "phenotypes/growth/gts.csv"))
 
+# Traits
 gst_r <- gts %>%
     group_by(exp_id) %>%
     mutate(temperature = factor(temperature, paste0(c(25, 30, 35, 40), "c"))) %>%
@@ -19,7 +20,8 @@ gst_r <- gts %>%
 
 plants_r <- plants %>%
     group_by(gradient, population, exp_id, genome_id, exp_plant, exp_nitrogen) %>%
-    select(shoot_biomass_mg, root_biomass_mg, shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    #select(shoot_biomass_mg, root_biomass_mg, shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    select(shoot_biomass_mg, shoot_height, nodule_number) %>%
     # Compute the strain mean
     summarize(across(everything(), function (x) mean(x, na.rm = T))) %>%
     filter(!exp_id == "control") %>%

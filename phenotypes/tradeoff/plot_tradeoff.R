@@ -31,6 +31,7 @@ for (i in 1:3) {
         ungroup()
 
     m <- isolates_trait[,-c(1:8)]
+    m <- drop_na(m, maxOD_30c) # Remove rows with NA
     m <- m[,(colSums(is.na(m)) == 0 & colSums(m) != 0)] # Remove traits with NA
     mm <- cor(m)
     p_mat <- cor.mtest(m, conf.level = 0.95)
@@ -91,19 +92,29 @@ plants_pp[[3]] <- filter(plants_pcs, exp_plant == "sativa", exp_nitrogen == "wit
 list_treatments <- c("lupulina N-", "sativa N-", "sativa N+")
 isolates_pcs <- list()
 for (i in 1:3) {
+    #i=2
     isolates_trait <- isolates %>%
         filter(!genome_id %in% c("g2", "g3", "g15")) %>%
         #filter(gradient == "urbanization") %>%
         left_join(rename_with(plants_pp[[i]], .cols = starts_with("PC"), function (x) paste0("sym_", x))) %>%
         left_join(rename_with(gst_pcs, .cols = starts_with("PC"), function (x) paste0("gth_", x))) %>%
         left_join(gst_r) %>%
-        left_join(plants_rs[[i]]) %>%
+        #left_join(plants_rs[[i]]) %>%
         drop_na(exp_nitrogen) %>%
         ungroup() %>%
         drop_na(sym_PC1, gth_PC1)
 
     isolates_pcs[[list_treatments[i]]] <- isolates_trait
 }
+
+isolates_trait %>%
+    ggplot() +
+    geom_point(aes(x = sym_PC1, y = gth_PC1)) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
+
 
 plot_two_PC1s <- function (isolates_trait, x, y, use_PCs = T, by_gradient = T, sym_pc1 = 0, gst_pc1 = 0) {
     if (by_gradient == T) isolates_trait <- isolates_trait %>% mutate(gradient = factor(gradient, c("elevation", "urbanization")))
@@ -135,7 +146,7 @@ make_cor_label <- function (cor_tidied) {
     paste0("Pearson's r=", round(cor_tidied$estimate, 2), ", p=", round(cor_tidied$p.value, 3))
 }
 
-# Plot by treatment ----
+# Plot by treatment, regrdless of gradient----
 pc_results <- isolates_pcs %>%
     bind_rows(.id = "treatment") %>%
     #group_by(treatment, gradient) %>%
@@ -153,7 +164,7 @@ pc_results <- isolates_pcs %>%
 p_list <- list()
 for (i in 1:nrow(pc_results)) {
     p_list[[i]] <- plot_two_PC1s(
-        pc_results$data[[i]], sym_PC1, maxOD_30c,
+        pc_results$data[[i]], sym_PC1, gth_PC1,
         use_PCs = T, plants_pc_imp$PC1[pc_results$pc_imp_dummy_sym[i]], gst_pc_imp$PC1[pc_results$pc_imp_dummy_gth[i]],
         by_gradient = F
     ) +
@@ -197,18 +208,3 @@ ggsave(paste0(folder_data, "phenotypes/tradeoff/pcs_gradient.png"), p, width = 6
 
 
 
-# xx <- pc_results$data[[2]]
-# tidy(cor.test(xx$sym_PC1, xx$gth_PC1))
-# tidy(cor.test(xx$nodule_number, xx$maxOD_30c))
-# xx$nodule_number
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
