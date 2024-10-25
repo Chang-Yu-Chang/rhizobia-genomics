@@ -7,7 +7,7 @@ source ../../genomics/env_vars.sh
 # 2. Move the first sequence from each of the core gene MSA into one single fasta
 # 3. Blast the fasta (the number of sequences in this file should be identical to the number of core genes)
 # 4. For each gene with a match with reference genome, align the reference sequence to the MSA.
-# THis reference is the outgroup and should be at the last sequence
+# This reference is the outgroup and should be positioned as the last sequence for the python script to work
 
 # Prepare BLAST database from references S. meliloti EM1021 and S. medicae WSM419
 mkdir -p $folder_data/genomics_analysis/mktest/outgroup/

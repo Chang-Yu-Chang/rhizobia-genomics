@@ -1734,6 +1734,25 @@
       ],
       "Hash": "0a4e5ed181eb823957df790ec11a28fc"
     },
+    "ggthemes": {
+      "Package": "ggthemes",
+      "Version": "5.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ggplot2",
+        "graphics",
+        "grid",
+        "lifecycle",
+        "methods",
+        "purrr",
+        "scales",
+        "stringr",
+        "tibble"
+      ],
+      "Hash": "16a4974681fc751a09a1250431361896"
+    },
     "ggtree": {
       "Package": "ggtree",
       "Version": "3.10.1",
@@ -2048,6 +2067,30 @@
         "openssl"
       ],
       "Hash": "ac107251d9d9fd72f0ca8049988f1d7f"
+    },
+    "iMKT": {
+      "Package": "iMKT",
+      "Version": "0.1.1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "sergihervas",
+      "RemoteRepo": "iMKT",
+      "RemoteRef": "master",
+      "RemoteSha": "4e3bc9a92f071f7444491881836daceed6a78350",
+      "Requirements": [
+        "MASS",
+        "R",
+        "cowplot",
+        "ggplot2",
+        "ggthemes",
+        "knitr",
+        "nls2",
+        "reshape2",
+        "stats",
+        "utils"
+      ],
+      "Hash": "2e5cf4bf7be658654c2785170b6571f1"
     },
     "ids": {
       "Package": "ids",
@@ -2462,6 +2505,17 @@
       "Repository": "RSPM",
       "Hash": "27550641889a3abf3aec4d91186311ec"
     },
+    "nls2": {
+      "Package": "nls2",
+      "Version": "0.3-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "proto",
+        "stats"
+      ],
+      "Hash": "99bdbfcb3d1000bd00424c009b4c2ac0"
+    },
     "nnet": {
       "Package": "nnet",
       "Version": "7.3-19",
@@ -2815,6 +2869,13 @@
         "stats"
       ],
       "Hash": "434cd5388a3979e74be5c219bcd6e77d"
+    },
+    "proto": {
+      "Package": "proto",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5cb1623df69ee6102d011c7f78f5791d"
     },
     "proxy": {
       "Package": "proxy",

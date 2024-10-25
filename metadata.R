@@ -34,8 +34,9 @@ read_gpas <- function (set_name) {
     gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
     gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
         mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
-
-    return(list(gpa = gpa, gpar = gpar, list_sccg = list_sccg, sml = sml, spa = spa, gpatl = gpatl, gene_order = gene_order, gd = gd, gpacl = gpacl))
+    gcn <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gcn.csv"))
+    cleaned_gene_names <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/cleaned_gene_names.csv"))
+    return(list(gpa = gpa, gpar = gpar, list_sccg = list_sccg, sml = sml, spa = spa, gpatl = gpatl, gene_order = gene_order, gd = gd, gpacl = gpacl, gcn = gcn, cleaned_gene_names = cleaned_gene_names))
 }
 read_fsts <- function (set_name) {
     per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))

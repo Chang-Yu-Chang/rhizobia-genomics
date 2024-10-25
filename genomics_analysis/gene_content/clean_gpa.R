@@ -4,7 +4,7 @@
 #'  - 2. 10 elevation medicae
 #'  - 3. 17 urbanization meliloti
 #'
-#' For each set, there will be 9 csv files
+#' For each set, there will be 11 csv files
 #'  - gpa: gene present absence
 #'  - gpar: Gene presence-absence. It has the fasta IDs instead of binary entries
 #'  - list_sccg: the list of single-copy core genes
@@ -14,6 +14,8 @@
 #'  - gene_order: the order of genes for plotting the pangenome
 #'  - gd: the full gene dataset from PANAROO
 #'  - gpacl: the long list of gene presence absence and the contigs they are located
+#'  - gcn: a wide format of gene copy number
+#'  - cleaned_gene_names: table of annotated gene cluster with gene symbol. See the function for the criteria
 
 library(tidyverse)
 library(janitor)
@@ -39,7 +41,7 @@ get_sccg <- function (gpa_csv) {
     zz <- yy %>%
         pivot_longer(cols = -gene, values_drop_na = T) %>%
         mutate(value = str_replace_all(value, "/Users/cychang/Dropbox/lab/rhizobia-genomics/data/genomics/fasta/genomes/", ""))
-        #mutate(is_paralog = str_detect(value, ";") | str_detect(value, "refound"))
+    #mutate(is_paralog = str_detect(value, ";") | str_detect(value, "refound"))
     aa <- zz %>%
         filter(!str_detect(value, "refound"), !str_detect(value, ";")) %>%
         pivot_wider(id_cols = gene, names_from = name, values_from = value) %>%
@@ -82,7 +84,7 @@ clean_gd <- function (gd_file) {
         #mutate(annotation_id = str_replace(annotation_id, ".*/g","g")) %>%
         rename(genome_id = gff_file, contig_id = scaffold_name, gene = gene_name) %>%
         mutate(contig_id = paste0(genome_id, "_", contig_id)) %>%
-    return(gd)
+        return(gd)
 }
 clean_gpaf <- function (gpaf_file) {
     gpaf <- read_csv(gpaf_file) %>%
@@ -136,6 +138,95 @@ compute_bc_dist <- function (gpa) {
         pivot_longer(cols = -genome_id1, names_to = "genome_id2", values_to = "bray_curtis_similarity")
     return(sml)
 }
+get_wide_gcn <- function (gpar) {
+    #' Extract the gene copy number from gpar table
+    gpar %>%
+        #filter(str_detect(non_unique_gene_name, "xerC")) %>%
+        select(gene, annotation, matches("^g\\d")) %>%
+        pivot_longer(cols = c(-gene, -annotation), names_to = "genome_id", values_drop_na = T) %>%
+        mutate(
+            ss = map(value, ~basename(str_split(.x, ";")[[1]])), # Remove the path
+            copy_number = map_dbl(ss, length)
+        ) %>%
+        select(gene, genome_id, copy_number) %>%
+        arrange(gene) %>%
+        pivot_wider(id_cols = gene, names_from = genome_id, values_from = copy_number, values_fill = 0)
+
+}
+clean_gene_names <- function (gpar) {
+    #' This function cleans the gene names that are panaroo output
+
+    # lg %>%
+    #     mutate(is_sgn = str_detect(gene, "~~~", negate = T)) %>% # single gene name
+    #     mutate(gg = str_split(gene, "~~~")) %>%
+    #     mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
+    #     rowwise() %>%
+    #     mutate(from = case_when(
+    #         is_sgn ~ gene,
+    #         !is_sgn & is_same_gene ~ gg[[1]]
+    #     )) %>%
+    #     select(-gg) %>%
+    #     drop_na(from) %>%  # remove the genecluster with multiple gene names
+    #     ungroup()
+
+    # tt$gpar %>%
+    #     #    filter(str_detect(gene, "fdx|fix|nif|nod|noe|nol")) %>%
+    #     select(gene, non_unique_gene_name) %>%
+    #     #mutate(gene = str_remove_all(gene, "_\\d+")) %>%
+    #     select(gene) %>%
+
+    gparsub <- gpar %>%
+        filter(!str_detect(gene, "group") | !is.na(non_unique_gene_name) | !(annotation %in% c("hypothetical protein", "putative protein")))
+
+    #' This will be joining three sets of gene
+    #' 1. clusters with one gene name, and the names are in column `gene`
+    #' 2. clusters with one gene name, and the names are in column `non_unique_gene_name`
+    #' 3. clusters with two or more gene names, but with consensus
+
+    tb1 <- gparsub %>%
+        filter(!str_detect(gene, "group"))
+
+    tb2 <- gparsub %>%
+        filter(str_detect(gene, "group")) %>%
+        # The gene names is in non_unique_gene_name
+        filter(!is.na(non_unique_gene_name)) %>%
+        # Clean non_unique_gene_name
+        mutate(
+            non_unique_gene_name = non_unique_gene_name %>%
+                str_remove("^;") %>%
+                str_remove(";.+") %>%
+                str_remove(";")
+        )
+    tb <- bind_rows(tb1, tb2)
+    # Among these genes with two or more gene names, how many have different gene names?
+    tb3 <- bind_rows(tb1, tb2) %>%
+        filter(str_detect(gene, "~~~")) %>%
+        mutate(gene = str_remove_all(gene,"_\\d")) %>%
+        mutate(gg = str_split(gene, "~~~")) %>%
+        mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
+        filter(!is_same_gene)
+
+    t1 <- tb %>%
+        filter(!str_detect(gene, "~~~")) %>%
+        filter(!str_detect(gene, "group")) %>%
+        mutate(from = str_remove_all(gene,"_\\d+")) %>%
+        select(from, everything())
+
+    t2 <- tb %>%
+        filter(!str_detect(gene, "~~~")) %>%
+        filter(str_detect(gene, "group")) %>%
+        mutate(from = str_remove_all(non_unique_gene_name, "_\\d+|'")) %>%
+        select(from, everything())
+
+    t3 <- tb3 %>%
+        mutate(is_concluded = map_lgl(gg, ~length(unique(table(.x))) > 1)) %>%
+        filter(is_concluded) %>%
+        mutate(from = map_chr(gg, ~names(sort(table(.x), decreasing = T))[1])) %>%
+        select(from, everything())
+
+    tts <- bind_rows(t1, t2, t3) %>% select(gene, non_unique_gene_name, annotation, from)
+    return(tts)
+}
 clean_all <- function (set_name, contigs) {
     #' A wrapper function performing all functions above
     dir_path <- paste0(folder_data, "genomics_analysis/gene_content/", set_name)
@@ -188,6 +279,13 @@ clean_all <- function (set_name, contigs) {
     length(unique(gpacl$contig_id)) # 161 contigs
     write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpacl.csv"))
 
+    # Get the wide format of gene copy number. Use the gpar table
+    gcn <- get_wide_gcn(gpar)
+    write_csv(gcn, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gcn.csv"))
+
+    # Clean the gene names. Use only those with annotated gene names
+    cleaned_gene_names <- clean_gene_names(gpar)
+    write_csv(cleaned_gene_names, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/cleaned_gene_names.csv"))
 }
 
 # All 36 genomes
