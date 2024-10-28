@@ -156,77 +156,62 @@ get_wide_gcn <- function (gpar) {
 clean_gene_names <- function (gpar) {
     #' This function cleans the gene names that are panaroo output
 
-    # lg %>%
-    #     mutate(is_sgn = str_detect(gene, "~~~", negate = T)) %>% # single gene name
-    #     mutate(gg = str_split(gene, "~~~")) %>%
-    #     mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
-    #     rowwise() %>%
-    #     mutate(from = case_when(
-    #         is_sgn ~ gene,
-    #         !is_sgn & is_same_gene ~ gg[[1]]
-    #     )) %>%
-    #     select(-gg) %>%
-    #     drop_na(from) %>%  # remove the genecluster with multiple gene names
-    #     ungroup()
-
-    # tt$gpar %>%
-    #     #    filter(str_detect(gene, "fdx|fix|nif|nod|noe|nol")) %>%
-    #     select(gene, non_unique_gene_name) %>%
-    #     #mutate(gene = str_remove_all(gene, "_\\d+")) %>%
-    #     select(gene) %>%
-
     gparsub <- gpar %>%
         filter(!str_detect(gene, "group") | !is.na(non_unique_gene_name) | !(annotation %in% c("hypothetical protein", "putative protein")))
 
-    #' This will be joining three sets of gene
-    #' 1. clusters with one gene name, and the names are in column `gene`
-    #' 2. clusters with one gene name, and the names are in column `non_unique_gene_name`
-    #' 3. clusters with two or more gene names, but with consensus
+    #' This will be joining 4 sets of gene
+    #' 1. clusters with one gene symbol, and the names are in column `gene`
+    #' 2. clusters with one gene symbol, and the names are in column `non_unique_gene_name`
+    #' 3. clusters with two or more gene symbolsm and they are the same
+    #' 3. clusters with two or more gene symbols, but with consensus, meaning that the two gene symbols are the same. Among these genes with two or more gene names, how many have different gene names?
 
     tb1 <- gparsub %>%
-        filter(!str_detect(gene, "group"))
-
-    tb2 <- gparsub %>%
-        filter(str_detect(gene, "group")) %>%
-        # The gene names is in non_unique_gene_name
-        filter(!is.na(non_unique_gene_name)) %>%
-        # Clean non_unique_gene_name
-        mutate(
-            non_unique_gene_name = non_unique_gene_name %>%
-                str_remove("^;") %>%
-                str_remove(";.+") %>%
-                str_remove(";")
-        )
-    tb <- bind_rows(tb1, tb2)
-    # Among these genes with two or more gene names, how many have different gene names?
-    tb3 <- bind_rows(tb1, tb2) %>%
-        filter(str_detect(gene, "~~~")) %>%
-        mutate(gene = str_remove_all(gene,"_\\d")) %>%
-        mutate(gg = str_split(gene, "~~~")) %>%
-        mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
-        filter(!is_same_gene)
-
-    t1 <- tb %>%
         filter(!str_detect(gene, "~~~")) %>%
         filter(!str_detect(gene, "group")) %>%
         mutate(from = str_remove_all(gene,"_\\d+")) %>%
         select(from, everything())
 
-    t2 <- tb %>%
+    tb2 <- gparsub %>%
         filter(!str_detect(gene, "~~~")) %>%
         filter(str_detect(gene, "group")) %>%
+        # The gene names is in non_unique_gene_name
+        filter(!is.na(non_unique_gene_name)) %>%
+        mutate(
+            non_unique_gene_name = non_unique_gene_name %>%
+                str_remove("^;") %>%
+                str_remove(";.+") %>%
+                str_remove(";")
+        ) %>%
         mutate(from = str_remove_all(non_unique_gene_name, "_\\d+|'")) %>%
         select(from, everything())
 
-    t3 <- tb3 %>%
+    tb3 <- gparsub %>%
+        filter(str_detect(gene, "~~~")) %>%
+        mutate(temp = str_remove_all(gene,"_\\d+")) %>%
+        mutate(gg = str_split(temp, "~~~")) %>%
+        # The genes symbols are the same
+        mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
+        filter(is_same_gene) %>%
+        mutate(from = map_chr(gg, ~names(sort(table(.x), decreasing = T))[1])) %>%
+        select(from, everything())
+
+    tb4 <- gparsub %>%
+        filter(str_detect(gene, "~~~")) %>%
+        mutate(temp = str_remove_all(gene,"_\\d+")) %>%
+        mutate(gg = str_split(temp, "~~~")) %>%
+        # The genes symbols are not the same
+        mutate(is_same_gene = map_lgl(gg, ~length(unique(.x)) ==1)) %>%
+        filter(!is_same_gene) %>%
+        # But more than half of the symbols are the same
         mutate(is_concluded = map_lgl(gg, ~length(unique(table(.x))) > 1)) %>%
         filter(is_concluded) %>%
         mutate(from = map_chr(gg, ~names(sort(table(.x), decreasing = T))[1])) %>%
         select(from, everything())
 
-    tts <- bind_rows(t1, t2, t3) %>% select(gene, non_unique_gene_name, annotation, from)
+    tts <- bind_rows(tb1, tb2, tb3, tb4) %>% select(gene, non_unique_gene_name, annotation, from)
     return(tts)
 }
+
 clean_all <- function (set_name, contigs) {
     #' A wrapper function performing all functions above
     dir_path <- paste0(folder_data, "genomics_analysis/gene_content/", set_name)

@@ -7,5 +7,6 @@ Requirements
 
 1. `prepare_msa.sh` prepares the MSA file with a outgroup sequence
 2. `trim_msa.sh` trims the MSA to be divisible by 3, and filter for those CDS starting with ATG
-3. `count_nt.sh` uses sfs_from_fasta_2.py to count the contigency tables 
+3. `count_nt.sh` uses the python script `sfs_from_fasta_2.py` to count the contingency table for each gene
 4. `mktest.R` takes the div and daf tables to perform MK test
+5. `plot_mktest.R` plots the result
