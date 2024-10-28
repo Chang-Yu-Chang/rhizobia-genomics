@@ -34,23 +34,27 @@ clean_gpa <- function (gpa_file) {
 }
 get_sccg <- function (gpa_csv) {
     #gpa_csv = paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpa.csv")
-    xx <- read_csv(gpa_csv) %>%
-        clean_names()
+    xx <- read_csv(gpa_csv) %>% clean_names()
 
-    yy <- xx[,c(1, 4:ncol(xx))]
+    yy <- xx[,c(1, 4:ncol(xx))] %>% arrange(gene)
     zz <- yy %>%
-        pivot_longer(cols = -gene, values_drop_na = T) %>%
-        mutate(value = str_replace_all(value, "/Users/cychang/Dropbox/lab/rhizobia-genomics/data/genomics/fasta/genomes/", ""))
-    #mutate(is_paralog = str_detect(value, ";") | str_detect(value, "refound"))
+        pivot_longer(cols = -gene, values_drop_na = T, names_to = "genome_id") %>%
+        filter(!str_detect(value, "refound")) %>%
+        # gene copy
+        separate_rows(value, sep = ";") %>%
+        mutate(value = basename(value)) %>%
+        group_by(gene, genome_id) %>%
+        count()
+
     aa <- zz %>%
-        filter(!str_detect(value, "refound"), !str_detect(value, ";")) %>%
-        pivot_wider(id_cols = gene, names_from = name, values_from = value) %>%
-        arrange(gene) %>%
-        # Remove accessory genes
+        mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+        arrange(gene, genome_id) %>%
+        # Remove those with more than one paralog
+        filter(n == 1) %>%
+        pivot_wider(names_from = "genome_id", values_from = "n") %>%
         drop_na()
 
     # Remove genes with paralogs
-    #list_sccg <- aa$gene[apply(aa[,-1], 1, sum) == 0]
     list_sccg <- aa$gene
     length(list_sccg)
     return(tibble(gene = list_sccg))
