@@ -1,102 +1,66 @@
 #' This script computes the effect sizes of plant experiments
+#'
+#' 1. Prepare a table for the treatments and continuous response traits
+#' 2. Compute effect size for each trait. There are three metrics: Cohen's d. Hedge's g, and partial eta squared
 
-renv::load()
 library(tidyverse)
 library(janitor)
-library(ggsci)
-library(ggh4x) # for nested facets
 library(lme4) # for linear mixed-effect models
-library(car) # companion to Applied Regression
 library(emmeans) # estimate marginal means
 library(effectsize) # companion to Applied Regression
 library(vcd) # for computing effect sizes of categorical response
-library(boot)
 source(here::here("metadata.R"))
 
-#
-plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
-lupulinas <- read_csv(paste0(folder_phenotypes, "plants/lupulinas.csv"))
-sativas <- read_csv(paste0(folder_phenotypes, "plants/sativas.csv"))
-
-# Remove control and nonsymbiontic strains
+# Remove control and nonsymbiotic strains
+plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
 plants <- plants %>% filter(!genome_id %in% c("g2", "g3", "g15")) %>% filter(genome_id != "control")
-lupulinas <- lupulinas %>% filter(!genome_id %in% c("g2", "g3", "g15")) %>% filter(genome_id != "control")
-sativas <- sativas %>% filter(!genome_id %in% c("g2", "g3", "g15")) %>% filter(genome_id != "control")
-
-if (F) {
-
-# Clean data ----
+lupulinas <- plants %>% filter(exp_plant == "lupulina")
+sativas <- plants %>% filter(exp_plant == "sativa")
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    select(genome_id = genome, species = sm_species, exp_id) %>%
+    select(genome_id = genome, species = contig_species, exp_id) %>%
     bind_rows(tibble(genome_id = c("g_src1", "g_bg1"), species = NA, exp_id = c("src-1", "bg-1")))
 
-lupulinas <- read_csv(paste0(folder_data, "phenotypes_analysis/symbiosis/plants.csv")) %>%
-    left_join(isolates) %>%
-    clean_names() %>%
-    rename(nodule_number = nodule_count) %>%
-    drop_na(nodule_number) %>%
-    mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
-    mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
-    filter(genome_id != "control") %>%
-    # Remove nonsymbiontic strains
-    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
-    arrange(genome_id) %>%
-    mutate(nitrogen_treatment = "without nitrogen") %>%
-    mutate(site_group = factor(site_group, c("low elevation", "high elevation", "urban", "suburban"))) %>%
-    select(population, genome_id, site_group, nitrogen_treatment, everything())
+# Prepare the master table of treatments
+treatments <- tibble(
+    gra = c(rep("elevation", 3), rep("urbanization", 3), rep("elevation", 14), rep("urbanization", 7)),
+    plant = c(rep("lupulina", 6), rep("sativa", 21)),
+    nt = c(rep("without nitrogen", 6+7), rep("with nitrogen", 7), rep("without nitrogen", 7)),
+    response = c(rep(c("nodule_number", "shoot_biomass_mg", "root_biomass_mg"), 2),
+                 rep(c("nodule_number", "primary_root_nodule_number", "lateral_root_nodule_number", "shoot_height", "longest_petiole_length", "leaf_number", "leaf_color"), 2),
+                 "nodule_number", "shoot_height", "leaf_number", "leaf_color", "primary_root_length", "lateral_root_number", "longest_lateral_root_length")
+)
 
-sativas_va <- read_csv(paste0(folder_data, "raw/SymbiosisInSoilData_S24.csv")) %>%
-    clean_names() %>%
-    rename(genome_id = rhizobia_strain, site_group = elevation) %>%
-    mutate(genome_id = tolower(genome_id)) %>%
-    left_join(select(isolates, exp_id, genome_id, site)) %>%
-    left_join(iso) %>%
-    rename(shoot_height = stem_height) %>%
-    # Remove nonsymbiotic strains
-    filter(!genome_id %in% c("g2", "g3", "g15")) %>%
-    mutate(population = "VA") %>%
-    mutate(genome_id = ifelse(site_group == "control", "control", genome_id)) %>%
-    mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
-    filter(genome_id != "control") %>%
-    arrange(genome_id) %>%
-    select(population, genome_id, site_group, nitrogen_treatment, everything(), -notes)
-
-sativas_pa <- read_csv(paste0(folder_data, "raw/BIOL1102_PooledData.csv")) %>%
-    clean_names() %>%
-    rename(exp_id = rhizobia_strain, site_group = location, leaf_color = new_leaf_color) %>%
-    mutate(exp_id = tolower(exp_id) %>% str_remove(" ")) %>%
-    mutate(site_group = tolower(site_group)) %>%
-    left_join(iso) %>% # We dont have WGS for bg-1 and src-1
-    mutate(genome_id = factor(genome_id, c("control", isolates$genome_id))) %>%
-    filter(exp_id != "control") %>%
-    mutate(population = "PA") %>%
-    arrange(genome_id) %>%
-    mutate(nitrogen_treatment = "without nitrogen") %>%
-    select(population, genome_id, site_group, nitrogen_treatment, everything(), -notes, -tube_number)
-
-sativas <- bind_rows(sativas_va, sativas_pa) %>%
-    mutate(site_group = factor(site_group, c("low elevation", "high elevation", "urban", "suburban")))
+# Trait abbreviations
+clean_trait_names <- function (x) {
+    str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")
 }
+traits <- tibble(
+    trait = c("nodule_number", "root_biomass_mg", "shoot_biomass_mg", "lateral_root_nodule_number", "leaf_color", "leaf_number", "longest_petiole_length", "primary_root_nodule_number", "shoot_height", "lateral_root_number", "longest_lateral_root_length", "primary_root_length"),
+    response = c("nodule number", "root biomass ", "shoot biomass", "lateral root nodule number", "leaf color", "leaf number", "longest petiole length", "primary root nodule number", "shoot height", "lateral root number", "longest lateral root length", "primary root length"),
+    trait_abbr = map_chr(response, clean_trait_names)
+)
 
-
-# Compute effect sizes of continuous responses/traits ----
-# Cohen's d
+# Compute effect sizes of continuous responses/traits
+subset_plants <- function (x, y, z) {
+    #' Subset plants data for each trait
+    get(paste0(x, "s")) %>% filter(exp_nitrogen == y, gradient == z)
+}
 compute_cohensd <- function (tb, response) {
-    formu <- paste0(response, " ~ site_group + (1|genome_id)")
+    # Cohen's d
+    formu <- paste0(response, " ~ population + (1|genome_id)")
     mod <- lmer(as.formula(formu), data = tb)
-    emm.mod <- emmeans(mod, specs = "site_group")
+    emm.mod <- emmeans(mod, specs = "population")
     es <- eff_size(emm.mod, sigma = sigma(mod), edf = df.residual(mod))
     return(as_tibble(es))
 }
-# Hedge's g
 compute_hedgesg <- function (tb, response) {
-    # Compute Cohen's d
-    formu <- paste0(response, " ~ site_group + (1|genome_id)")
+    # Hedge's g
+    formu <- paste0(response, " ~ population + (1|genome_id)")
     mod <- lmer(as.formula(formu), data = tb)
-    emm.mod <- emmeans(mod, specs = "site_group")
+    emm.mod <- emmeans(mod, specs = "population")
     es <- eff_size(emm.mod, sigma = sigma(mod), edf = df.residual(mod))
     # Compute Hedge's g which corrects for small sample bias
-    ns <- as.vector(table(tb$site_group))
+    ns <- as.vector(table(tb$population))
     J <- 1 - (3 / (4 * (sum(ns)) - 9))
     hg <- es %>%
         as_tibble() %>%
@@ -106,15 +70,72 @@ compute_hedgesg <- function (tb, response) {
                upper.CL = upper.CL * J)
     return(hg)
 }
-# partial eta squared
 compute_partialetasquared <- function (tb, response) {
-    formu <- paste0(response, " ~ site_group + (1|genome_id)")
+    # partial eta squared
+    formu <- paste0(response, " ~ population + (1|genome_id)")
     mod <- lmer(as.formula(formu), data = tb)
     eta_squared(mod, partial = T) %>%
         as_tibble %>%
         return()
 }
 
+# Compute effect size for each trait
+treatments_eff <- treatments %>%
+    mutate(
+        plants_data = pmap(list(plant, nt, gra), subset_plants),
+        cohensd = map2(plants_data, response, compute_cohensd),
+        hedgesg = map2(plants_data, response, compute_hedgesg),
+        partialetasquared = map2(plants_data, response, compute_partialetasquared),
+    ) %>%
+    rename(gradient = gra, exp_plant = plant, exp_nitrogen = nt, trait = response) %>%
+    left_join(traits)
+
+#
+cohensds <- treatments_eff %>%
+    select(gradient, exp_plant, exp_nitrogen, trait, trait_abbr, cohensd) %>%
+    unnest(cohensd) %>%
+    clean_names()
+
+hedgesgs <- treatments_eff %>%
+    select(gradient, exp_plant, exp_nitrogen, trait, trait_abbr, hedgesg) %>%
+    unnest(hedgesg) %>%
+    clean_names()
+
+partialetasquareds <- treatments_eff %>%
+    select(gradient, exp_plant, exp_nitrogen, trait, trait_abbr, partialetasquared) %>%
+    unnest(partialetasquared) %>%
+    clean_names()
+
+write_csv(cohensds, paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
+write_csv(hedgesgs, paste0(folder_data, "phenotypes/effectsize/hedgesgs.csv"))
+write_csv(partialetasquareds, paste0(folder_data, "phenotypes/effectsize/partialetasquareds.csv"))
+
+
+if (F) {
+
+# Clean the names
+ess <- treatments_eff %>%
+    unnest(cohensd) %>%
+    clean_names() %>%
+    mutate(nt = case_when(
+        nt == "without nitrogen" ~ "N-",
+        nt == "with nitrogen" ~ "N+"
+    )) %>%
+    mutate(
+        pop = factor(pop, c("elevation", "urbanization")),
+        plant = factor(plant, c("lupulina", "sativa"))
+    ) %>%
+    mutate(response = str_remove(response, "mg") %>% str_replace_all("_", " ")) %>%
+    arrange(pop, plant, response)
+}
+if (F) {
+
+background_df <- tibble(
+    pop = factor(c("elevation", "urbanization", "elevation", "urbanization", "elevation"), c("elevation", "urbanization")),
+    plant = c("lupulina", "lupulina", "sativa", "sativa", "sativa"),
+    host_type = c("source", "source", "alternative", "alternative", "alternative"),
+    nt = c("N-", "N-", "N-", "N-", "N+")
+)
 #
 list_treatments <- tibble(
     pop = c(rep("VA", 3), rep("PA", 3), rep("VA", 10), rep("PA", 4)),
@@ -134,157 +155,7 @@ list_treatments <- list_treatments %>%
         partialetasquared = list(compute_partialetasquared(tb, response))
     )
 
-# 1. Plot cohen's d ----
-ess <- list_treatments %>%
-    unnest(cohensd) %>%
-    clean_names() %>%
-    mutate(nt = case_when(
-        nt == "without nitrogen" ~ "w/o N",
-        nt == "with nitrogen" ~ "w/ N"
-    )) %>%
-    mutate(pop = case_when(
-        pop == "PA" ~ "city",
-        pop == "VA" ~ "mountain"
-    )) %>%
-    mutate(
-        study_name = paste0(" ", response),
-        pop = factor(pop, c("mountain", "city")),
-        plant = factor(plant, c("lupulina", "sativa"))
-        ) %>%
-    arrange(pop, plant, response) %>%
-    mutate(id = 1:n())
-
-background_df <- tibble(pop = factor(rep(c("mountain", "city"), each = 2), c("mountain", "city")), plant = rep(c("sativa", "lupulina"), 2))
-strip <- strip_nested(background_y = list(
-    NULL, NULL,
-    element_rect(fill = alpha(plant_colors[2], 0.2), color = NA),
-    element_rect(fill = alpha(plant_colors[1], 0.2), color = NA),
-    element_rect(fill = alpha(plant_colors[2], 0.2), color = NA),
-    element_rect(fill = alpha(plant_colors[1], 0.2), color = NA)
-))
-
-p <- ess %>%
-    ggplot() +
-    geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
-    geom_hline(yintercept = 0, linetype = 2) +
-    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
-    geom_point(aes(x = id, y = effect_size, shape = nt), size = 3, stroke = 1) +
-    scale_x_continuous(breaks = 1:20, labels = ess$study_name, expand = c(0,.8)) +
-    #scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
-    scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
-    scale_fill_manual(values = plant_colors) +
-    #coord_flip() +
-    facet_nested(.~pop + plant, scale = "free_x", space = "free_x", strip = strip) +
-    #facet_grid(.~pop, scale = "free_x", space = "free_x") +
-    #facet_grid(pop ~., scale = "free_y", space = "free_y", switch = "y") +
-    theme_minimal() +
-    theme(
-        axis.title.x = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey90", linetype = 2, linewidth = 0.3),
-        panel.grid.minor.y = element_blank(),
-        panel.spacing.x = unit(c(0,10,0), "mm"),
-        strip.text = element_text(size = 10),
-        plot.background = element_rect(color = NA, fill = "white"),
-        legend.position = "right",
-        legend.title = element_blank(),
-        legend.background = element_rect(color = NA, fill = "white")
-    ) +
-    guides(color = "none") +
-    labs(y = "standardized mean difference (Cohen's d)")
-
-ggsave(paste0(folder_phenotypes, "effectsize/01-cohensd.png"), p, width = 8, height = 5)
-
-
-
-
-if (F) {
-
-
- # 2. Plot Hedge's g ----
-ess <- list_treatments %>%
-    unnest(hedgesg) %>%
-    clean_names() %>%
-    mutate(id = 1:n()) %>%
-    mutate(nt = case_when(
-        nt == "without nitrogen" ~ "w/o N",
-        nt == "with nitrogen" ~ "w/ N"
-    )) %>%
-    mutate(pop = case_when(
-        pop == "PA" ~ "urbanization",
-        pop == "VA" ~ "elevation"
-    )) %>%
-    mutate(study_name = paste0(" ", response))
-
-p <- ess %>%
-    ggplot() +
-    geom_rect(data = background_df, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
-    geom_hline(yintercept = 0, linetype = 2) +
-    geom_segment(aes(x = id, xend = id, y = lower_cl, yend = upper_cl), color = "grey10", linewidth = 1) +
-    geom_point(aes(x = id, y = effect_size, shape = nt), size = 3, stroke = 1) +
-    scale_x_reverse(breaks = 1:20, labels = ess$study_name, expand = c(0,.8), position = "top") +
-    scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
-    scale_shape_manual(values = c(`w/ N` = 16, `w/o N` = 21), labels = c("with nitrogen", "without nitrogen")) +
-    scale_fill_manual(values = plant_colors) +
-    coord_flip() +
-    facet_nested(pop + plant ~., scale = "free_y", space = "free_y", switch = "y", strip = strip) +
-    theme_minimal() +
-    theme(
-        axis.title.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey90", linetype = 2, linewidth = 0.3),
-        panel.grid.minor.y = element_blank(),
-        panel.spacing.y = unit(0, "mm"),
-        strip.text = element_text(size = 10),
-        plot.background = element_rect(color = NA, fill = "white"),
-        legend.position = "top",
-        legend.title = element_blank(),
-        legend.background = element_rect(color = "black", fill = "white")
-    ) +
-    guides(color = "none", fill = "none") +
-    labs(y = "standardized mean difference (Hedge's g)")
-
-ggsave(paste0(folder_phenotypes, "effectsize/02-hedgesg.png"), p, width = 8, height = 6)
 }
-
-# 3. Plot eta squared partial ----
-ess <- list_treatments %>%
-    unnest(partialetasquared) %>%
-    clean_names() %>%
-    mutate(id = 1:n()) %>%
-    mutate(nt = case_when(
-        nt == "without nitrogen" ~ "w/o N",
-        nt == "with nitrogen" ~ "w/ N"
-    )) %>%
-    mutate(study_name = paste(nt, response, sep = ", "))
-
-p <- ess %>%
-    ggplot() +
-    geom_hline(yintercept = 0, linetype = 2) +
-    geom_point(aes(x = id, y = eta2_partial, color = plant), size = 3) +
-    geom_segment(aes(x = id, xend = id, y = ci_low, yend = ci_high, color = plant), linewidth = 1) +
-    scale_x_reverse(breaks = 1:13, labels = ess$study_name, expand = c(0,.7)) +
-    scale_color_aaas() +
-    coord_flip() +
-    facet_grid(plant ~., scale = "free_y", space = "free_y") +
-    theme_light() +
-    theme(
-        axis.title.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey90", linetype = 2, linewidth = 0.3),
-        panel.grid.minor.y = element_blank(),
-        strip.text = element_text(size = 15)
-    ) +
-    guides(color = "none") +
-    labs(y = "partial eta squared")
-ggsave(paste0(folder_phenotypes, "effectsize/03-partialetasquared.png"), p, width = 8, height = 6)
-
-
-
-
-
-
 if (F) {
 
 # Example data
@@ -402,7 +273,7 @@ eta_squared(model, partial = TRUE)
 
 
 }
-
+if (F) {
 
 
 
@@ -472,4 +343,6 @@ p <- ess %>%
 ggsave(paste0(folder_data, "phenotypes_analysis/effectsize/04-cramersv.png"), p, width = 4, height = 3)
 
 
+
+}
 

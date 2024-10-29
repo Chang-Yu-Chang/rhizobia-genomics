@@ -1,9 +1,7 @@
 #' This script
 
-renv::load()
 library(tidyverse)
 library(cowplot)
-library(janitor)
 library(car) # companion to Applied Regression
 library(vegan) # for permanova
 library(lme4)
@@ -14,57 +12,55 @@ library(boot)
 source(here::here("metadata.R"))
 
 set.seed(1)
-
-# Correct the naming ----
-plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv")) %>%
-    mutate(gradient = case_when(
-        population == "VA" ~ "elevation",
-        population == "PA" ~ "urbanization"
-    ), .keep = "unused") %>%
-    rename(population = site_group)
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
-    mutate(gradient = case_when(
-        population == "VA" ~ "elevation",
-        population == "PA" ~ "urbanization"
-    ), .keep = "unused") %>%
-    rename(population = site_group)
-
+plants <- read_csv(paste0(folder_data, "phenotypes/plants/plants.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 # PCA plots ----
-plants_subset <- list(
-    # Lupulinas. First plant exp
-    plants1 = plants %>%
-        filter(exp_plant == "lupulina", exp_id != "control", gradient == "elevation") %>%
-        select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
-        drop_na(),
-    plants2 =  plants %>%
-        filter(exp_plant == "lupulina", exp_id != "control", gradient == "urbanization") %>%
-        select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
-        drop_na(),
-    # sativas. Second plant exp
-    plants3 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "elevation") %>%
-        select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
-        drop_na(),
-    plants4 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "urbanization") %>%
-        select(population, exp_id, shoot_height, nodule_number, leaf_number, leaf_color, lateral_root_number, longest_lateral_root_length) %>%
-        drop_na(),
-    plants5 = plants %>%
-        filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "with nitrogen", gradient == "elevation") %>%
-        select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
-        drop_na()
-)
+tbs <- tibble(
+    gradient = c("elevation", "urbanization", "elevation", "urbanization", "elevation"),
+    exp_plant = c("lupulina", "lupulina", "sativa", "sativa", "sativa"),
+    exp_nitrogen = c("N-", "N-", "N-", "N-", "N+")
+) %>%
+    mutate(treatment = paste(gradient, exp_plant, exp_nitrogen, sep = "\t")) %>%
+    mutate(plants_data = list(
+        # Lupulinas. First plant exp
+        plants1 = plants %>%
+            filter(exp_plant == "lupulina", exp_id != "control", gradient == "elevation") %>%
+            select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
+            drop_na(),
+        plants2 =  plants %>%
+            filter(exp_plant == "lupulina", exp_id != "control", gradient == "urbanization") %>%
+            select(population, exp_id, shoot_biomass_mg, root_biomass_mg, nodule_number) %>%
+            drop_na(),
+        # sativas. Second plant exp
+        plants3 = plants %>%
+            filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "elevation") %>%
+            select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
+            drop_na(),
+        plants4 = plants %>%
+            filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "without nitrogen", gradient == "urbanization") %>%
+            select(population, exp_id, shoot_height, nodule_number, leaf_number, leaf_color, lateral_root_number, longest_lateral_root_length) %>%
+            drop_na(),
+        plants5 = plants %>%
+            filter(exp_plant == "sativa", exp_id != "control", exp_nitrogen == "with nitrogen", gradient == "elevation") %>%
+            select(population, exp_id, shoot_height, nodule_number, longest_petiole_length, leaf_number, leaf_color) %>%
+            drop_na()
+    ))
 
-pca_results <- lapply(plants_subset, function(x) prcomp(x[,-c(1,2)], scale. = TRUE))
-get_pcvar <- function (pca_result) summary(pca_result)$importance[2, ] %>% round(3) * 100
-pcs <- rep(list(NA), 5)
-for (i in 1:5) {
-    pcs[[i]] <- as_tibble(pca_results[[i]]$x) %>%
-        mutate(population = plants_subset[[i]]$population, exp_id = plants_subset[[i]]$exp_id) %>%
+
+do_pca <- function(x) {
+    prcomp(x[,-c(1,2)], scale. = TRUE)
+}
+get_pcs <- function (plants_subset, pca_result) {
+    #' Extract the PCs from the pca object
+    as_tibble(`[[`(pca_result, "x")) %>%
+        mutate(population = plants_subset$population, exp_id = plants_subset$exp_id) %>%
         left_join(distinct(isolates, gradient, population))
 }
-
+get_pcvar <- function (pca_result) {
+    #' Get the variance explained by the top two PCs
+    summary(pca_result)$importance[2, ] %>% round(3) * 100
+}
 plot_pca <- function (pcsi, pca_result) {
     dm <- vegdist(select(pcsi, starts_with("PC")), method = "euclidean")
     # strata by exp_id
@@ -78,8 +74,8 @@ plot_pca <- function (pcsi, pca_result) {
         annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.6, label = paste0("p=", round(mod[1,5], 3))) +
         geom_vline(xintercept = 0, color = "grey10", linetype = 2) +
         geom_hline(yintercept = 0, color = "grey10", linetype = 2) +
-        scale_color_manual(values = site_group_colors) +
-        scale_fill_manual(values = site_group_colors, name = "population") +
+        scale_color_manual(values = population_colors) +
+        scale_fill_manual(values = population_colors, name = "population") +
         scale_x_continuous(breaks = seq(-8,8,2)) +
         scale_y_continuous(breaks = seq(-8,8,2)) +
         coord_cartesian(clip = "off") +
@@ -96,25 +92,28 @@ plot_pca <- function (pcsi, pca_result) {
 
 }
 
-p_pcas <- list(
-    plot_pca(pcs[[1]], pca_results[[1]]),
-    plot_pca(pcs[[2]], pca_results[[2]]),
-    plot_pca(pcs[[3]], pca_results[[3]]),
-    plot_pca(pcs[[4]], pca_results[[4]]),
-    plot_pca(pcs[[5]], pca_results[[5]])
-)
-
+tbs_pca <- tbs %>%
+    mutate(
+        pca_results = map(plants_data, do_pca),
+        pcs = map2(plants_data, pca_results, get_pcs),
+        p_pca = map2(pcs, pca_results, plot_pca)
+    )
+p_pcas <- tbs_pca$p_pca
 
 
 # Effect size ----
 # Remove control and nonsymbiontic strains
 plants <- plants %>% filter(!genome_id %in% c("g2", "g3", "g15")) %>% filter(genome_id != "control")
-lupulinas <- plants %>% filter(exp_plant == "lupulina", !genome_id %in% c("g2", "g3", "g15"), genome_id != "control")
-sativas <- plants %>% filter(exp_plant == "sativa", !genome_id %in% c("g2", "g3", "g15"), genome_id != "control")
+lupulinas <- plants %>% filter(exp_plant == "lupulina")
+sativas <- plants %>% filter(exp_plant == "sativa")
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
     select(genome_id = genome, species = contig_species, exp_id) %>%
     bind_rows(tibble(genome_id = c("g_src1", "g_bg1"), species = NA, exp_id = c("src-1", "bg-1")))
 
+subset_plants <- function (x, y, z) {
+    #' Subset plants data for each trait
+    get(paste0(x, "s")) %>% filter(exp_nitrogen == y, gradient == z)
+}
 compute_cohensd <- function (tb, response) {
     #' Compute Cohen's d
     formu <- paste0(response, " ~ population + (1|genome_id)")
@@ -124,7 +123,7 @@ compute_cohensd <- function (tb, response) {
     return(as_tibble(es))
 }
 
-list_treatments <- tibble(
+treatments <- tibble(
     pop = c(rep("elevation", 3), rep("urbanization", 3), rep("elevation", 14), rep("urbanization", 7)),
     plant = c(rep("lupulina", 6), rep("sativa", 21)),
     nt = c(rep("without nitrogen", 6+7), rep("with nitrogen", 7), rep("without nitrogen", 7)),
@@ -133,17 +132,20 @@ list_treatments <- tibble(
                  "nodule_number", "shoot_height", "leaf_number", "leaf_color", "primary_root_length", "lateral_root_number", "longest_lateral_root_length")
 )
 
-list_treatments <- list_treatments %>%
-    rowwise() %>%
-    mutate(tb = list(get(paste0(plant, "s")) %>% filter(exp_nitrogen == nt, gradient == pop))) %>%
-    mutate(cohensd = list(compute_cohensd(tb, response)))
+# Compute effect size for each trait
+treatments_eff <- treatments %>%
+    mutate(
+        plants_data = pmap(list(plant, nt, pop), subset_plants),
+        cohensd = map2(plants_data, response, compute_cohensd)
+    )
 
-ess <- list_treatments %>%
+# Clean the names
+ess <- treatments_eff %>%
     unnest(cohensd) %>%
     clean_names() %>%
     mutate(nt = case_when(
-        nt == "without nitrogen" ~ "without nitrogen",
-        nt == "with nitrogen" ~ "with nitrogen"
+        nt == "without nitrogen" ~ "N-",
+        nt == "with nitrogen" ~ "N+"
     )) %>%
     mutate(
         pop = factor(pop, c("elevation", "urbanization")),
@@ -156,22 +158,23 @@ background_df <- tibble(
     pop = factor(c("elevation", "urbanization", "elevation", "urbanization", "elevation"), c("elevation", "urbanization")),
     plant = c("lupulina", "lupulina", "sativa", "sativa", "sativa"),
     host_type = c("source", "source", "alternative", "alternative", "alternative"),
-    nt = c("without nitrogen", "without nitrogen", "without nitrogen", "without nitrogen", "with nitrogen")
+    nt = c("N-", "N-", "N-", "N-", "N+")
 )
 
-list_traits <- tibble(
-    response = c("nodule number", "root biomass ", "shoot biomass ", "lateral root nodule number", "leaf color", "leaf number", "longest petiole length", "primary root nodule number", "shoot height", "lateral root number", "longest lateral root length", "primary root length")
-) %>%
-    rowwise() %>%
-    mutate(response_abbr = str_split(response, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " "))
-
+clean_trait_names <- function (x) {
+    str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")
+}
+traits <- tibble(
+    response = c("nodule number", "root biomass ", "shoot biomass ", "lateral root nodule number", "leaf color", "leaf number", "longest petiole length", "primary root nodule number", "shoot height", "lateral root number", "longest lateral root length", "primary root length"),
+    response_abbr = map_chr(response, clean_trait_names)
+)
 
 plot_eff <- function (e, pp, pl, nn) {
     bdf <- background_df %>% filter(pop == pp, plant == pl, nt == nn)
 
     e %>%
         filter(pop == pp, plant == pl, nt == nn) %>%
-        left_join(list_traits) %>%
+        left_join(traits) %>%
         ggplot() +
         #geom_rect(data = bdf, aes(fill = plant), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.2) +
         #geom_text(data = bdf, aes(label = paste("M.", plant)), x = Inf, y = -Inf, size = 5, hjust = 1, vjust = -0.4, fontface = "italic") +
@@ -182,7 +185,7 @@ plot_eff <- function (e, pp, pl, nn) {
         geom_point(aes(x = response_abbr, y = effect_size, shape = nt), size = 3, stroke = 1, fill = "white") +
         scale_x_discrete(expand = c(0,.8), position = "top") +
         scale_y_continuous(limits = c(-3, 3), expand = c(0,.8), breaks = -3:3) +
-        scale_shape_manual(values = c(`with nitrogen` = 16, `without nitrogen` = 21), labels = c("with nitrogen", "without nitrogen")) +
+        scale_shape_manual(values = c(`with nitrogen` = 16, `without nitrogen` = 21), labels = c("N+", "N-")) +
         scale_fill_manual(values = plant_colors) +
         #facet_grid(plant~., space = "free_y", switch = "y") +
         coord_flip(clip = "off") +
@@ -208,11 +211,11 @@ plot_eff <- function (e, pp, pl, nn) {
         labs(y = "standardized mean difference")
 }
 p_effs <- list(
-    plot_eff(ess, "elevation", "lupulina", "without nitrogen") + theme(axis.title.x = element_blank()),
-    plot_eff(ess, "urbanization", "lupulina", "without nitrogen") + theme(axis.title.x = element_blank()),
-    plot_eff(ess, "elevation", "sativa", "without nitrogen") + theme(axis.title.x = element_blank()),
-    plot_eff(ess, "urbanization", "sativa", "without nitrogen"),
-    plot_eff(ess, "elevation", "sativa", "with nitrogen")
+    plot_eff(ess, "elevation", "lupulina", "N-") + theme(axis.title.x = element_blank()),
+    plot_eff(ess, "urbanization", "lupulina", "N-") + theme(axis.title.x = element_blank()),
+    plot_eff(ess, "elevation", "sativa", "N-") + theme(axis.title.x = element_blank()),
+    plot_eff(ess, "urbanization", "sativa", "N-"),
+    plot_eff(ess, "elevation", "sativa", "N+")
 )
 
 # Combine figures ----
@@ -227,21 +230,35 @@ p_dat <- plot_grid(
     labels = c("A", "", "B", "", "C", "", "D", "", "E", "")
 )
 
-# p_dat <- plot_grid(
-#     NULL, NULL, NULL, NULL,
-#     p_pcas[[1]], p_effs[[1]], p_pcas[[2]], p_effs[[2]],
-#     p_pcas[[3]], p_effs[[3]], p_pcas[[4]], p_effs[[4]],
-#     p_pcas[[5]], p_effs[[5]], NULL, NULL,
-#     rel_widths = c(1,2,1,2), nrow = 4, axis = "tbl", align = "hv", scale = .85,
-#     rel_heights = c(.1,1,1,1),
-#     labels = c("", "", "", "", "A", "", "B", "", "C", "", "D", "", "E", "", "", "")
-# )
-
 
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig3.png"), scale = 1) +
     draw_plot(p_dat, x = .15, y = 0.0, width = .85, height = .96) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 12)
+#ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 12)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
