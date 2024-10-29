@@ -7,5 +7,5 @@ Requirements
 
 1. `prepare_msa.sh` prepares the MSA file with a outgroup sequence
 2. `count_nt.sh` uses the python script `sfs_from_fasta_2.py` to count the contingency table for each gene
-3. `mktest.R` takes the div and daf tables to perform MK test
-4. `plot_mktest.R` plots the result
+3. `mktest.R` takes the div and daf tables to perform MK test. Output an aggregated MK test result csv `mktests.csv`
+4. `plot_mktest.R` plots the results

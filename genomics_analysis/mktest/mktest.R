@@ -55,6 +55,6 @@ aggregate_tbs <- function (set_name, ref) {
 
 #check_files("elev_med", "ngr234")
 aggregate_tbs("elev_med", "ngr234")
-aggregate_tbs("elev_med", "em1021")
 aggregate_tbs("urbn_mel", "ngr234")
-aggregate_tbs("urbn_mel", "wsm419")
+#aggregate_tbs("elev_med", "em1021")
+#aggregate_tbs("urbn_mel", "wsm419")

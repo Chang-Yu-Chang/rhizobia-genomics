@@ -4,9 +4,11 @@ source ../../genomics/env_vars.sh
 
 # This script prepares the MSAs for MK test. It includes the following steps
 # 1. Prepare BLAST db from reference genomes, which will be the outgroup. These genomes should have been annotated using Prokka so GFF available
-# 2. Move the first sequence from each of the core gene MSA into one single fasta
-# 3. Blast the fasta (the number of sequences in this file should be identical to the number of core genes)
-# 4. For each gene with a match with reference genome, align the reference sequence to the MSA.
+# 2. Move the first sequence from each of the core gene MSA into one single fasta `one_seq_from_msa`. Also remove the gaps since it's not allowed in blast
+# 3. Blast the query fasta sequences (the number of sequences in this file should be identical to the number of core genes)
+# 4. Distinct the blast results. Some gene has multiple blast hits. Use only the top hit per query gene
+# 5. For each gene with a match with reference genome, align the reference sequence to the MSA. The sequences from the outgroup/reference genome are stored in ref_seq/
+# 6. Trims the MSA to be divisible by 3, and filter for those CDS starting with ATG
 # This reference is the outgroup and should be positioned as the last sequence for the python script to work
 
 # Prepare BLAST database from three genomes
@@ -176,7 +178,9 @@ function process_msa() {
     done < $blast_results
 }
 
+process_msa "elev_med" "em1021"
 process_msa "elev_med" "ngr234"
+process_msa "urbn_mel" "wsm419"
 process_msa "urbn_mel" "ngr234"
 
 # Trims the MSA to be divisible by 3, and filter for those CDS starting with ATG
@@ -221,6 +225,7 @@ function trim_msa() {
     done
 }
 
+trim_msa "elev_med" "em1021"
 trim_msa "elev_med" "ngr234"
+trim_msa "urbn_mel" "wsm419"
 trim_msa "urbn_mel" "ngr234"
-
