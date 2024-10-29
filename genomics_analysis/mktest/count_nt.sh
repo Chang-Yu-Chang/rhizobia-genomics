@@ -32,6 +32,8 @@ function count_nt() {
     done
 }
 
+count_nt "elev_med" "em1021"
 count_nt "elev_med" "ngr234"
+count_nt "urbn_mel" "wsm419"
 count_nt "urbn_mel" "ngr234"
 
