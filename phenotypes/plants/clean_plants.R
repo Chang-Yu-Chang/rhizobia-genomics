@@ -102,7 +102,8 @@ sativas_va <- read_csv(paste0(folder_data, "raw/plants/SymbiosisInSoilData_S24.c
         exp_id = ifelse(genome_id == "control", "control", exp_id),
         genome_name = ifelse(genome_id == "control", "control", genome_name),
         genome_id = factor(genome_id, c(isolates$genome_id, "control")),
-        shoot_height = shoot_height/10,
+        shoot_height = shoot_height/10, # mm -> cm
+        longest_petiole_length = longest_petiole_length/10, # mm -> cm
         gradient = "elevation",
         exp_plant = "sativa"
     ) %>%

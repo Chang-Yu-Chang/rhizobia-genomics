@@ -219,7 +219,9 @@ ggsave(paste0(folder_phenotypes, "symbiosis/01-plant_traits.png"), p, width = 10
 
 }
 
-# ----
+
+
+# deprecated ----
 if (F) {
 
 # 2. Plot the nodule vs plant biomass
