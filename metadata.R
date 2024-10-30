@@ -21,6 +21,29 @@ species_colors <- c(adhaerens = "grey", canadensis = "grey", medicae = "steelblu
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
 plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 
+# Traits
+clean_trait_names <- function (x) str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")
+traits <- tibble(
+    trait_type = c("nodule", "root", "shoot", "nodule", "leaf", "leaf", "leaf", "nodule", "shoot", "root", "root", "root"),
+    trait = c("nodule_number", "root_biomass_mg", "shoot_biomass_mg", "lateral_root_nodule_number", "leaf_color", "leaf_number", "longest_petiole_length", "primary_root_nodule_number", "shoot_height", "lateral_root_number", "longest_lateral_root_length", "primary_root_length")
+) %>%
+    mutate(trait_pre = trait %>% str_remove("_mg") %>% str_replace_all("_", " ")) %>%
+    mutate(trait_abr = map_chr(trait_pre, clean_trait_names)) %>%
+    mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
+    arrange(trait_type) %>%
+    mutate(trait_pre = case_when(
+        trait_pre == "root biomass" ~ "root biomass (mg)",
+        trait_pre == "shoot biomass" ~ "shoot biomass (mg)",
+        trait_pre == "longest petiole length" ~ "longest petiole\nlength (cm)",
+        trait_pre == "lateral root nodule number" ~ "lateral root\nnodule number",
+        trait_pre == "primary root nodule number" ~ "primary root\nnodule number",
+        trait_pre == "shoot height" ~ "shoot height (cm)",
+        trait_pre == "primary root length" ~ "primary root\nlength (cm)",
+        trait_pre == "longest lateral root length" ~ "longest lateral\nroot length(cm)",
+        T ~ trait_pre
+    )) %>%
+    mutate(trait_pre = factor(trait_pre, trait_pre))
+
 # utils
 read_gpas <- function (set_name) {
     gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
@@ -44,33 +67,32 @@ read_fsts <- function (set_name) {
     gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
     return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
 }
+turn_p_to_asteriks <- function (p_value) {
+    if (p_value < 0.001) {
+        asterisks <- "***"
+    } else if (p_value < 0.01) {
+        asterisks <- "**"
+    } else if (p_value < 0.05) {
+        asterisks <- "*"
+    } else {
+        asterisks <- "n.s."
+    }
+    return(asterisks)
+}
 
-# Traits
-clean_trait_names <- function (x) str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")
-traits <- tibble(
-    trait_type = c("nodule", "root", "shoot", "nodule", "leaf", "leaf", "leaf", "nodule", "shoot", "root", "root", "root"),
-    trait = c("nodule_number", "root_biomass_mg", "shoot_biomass_mg", "lateral_root_nodule_number", "leaf_color", "leaf_number", "longest_petiole_length", "primary_root_nodule_number", "shoot_height", "lateral_root_number", "longest_lateral_root_length", "primary_root_length")
-) %>%
-    mutate(trait_pre = trait %>% str_remove("_mg") %>% str_replace_all("_", " ")) %>%
-    mutate(trait_abr = map_chr(trait_pre, clean_trait_names)) %>%
-    mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
-    arrange(trait_type) %>%
-    mutate(trait_pre = case_when(
-        trait_pre == "root biomass" ~ "root biomass (mg)",
-        trait_pre == "shoot biomass" ~ "shoot biomass (mg)",
-        trait_pre == "longest petiole length" ~ "longest petiole length (cm)",
-        trait_pre == "lateral root nodule number" ~ "lateral root\nnodule number",
-        trait_pre == "primary root nodule number" ~ "primary root\nnodule number",
-        trait_pre == "shoot height" ~ "shoot height (cm)",
-        trait_pre == "primary root length" ~ "primary root length (cm)",
-        trait_pre == "longest lateral root length" ~ "longest lateral\nroot length(cm)",
-        T ~ trait_pre
-    )) %>%
-    mutate(trait_pre = factor(trait_pre, trait_pre))
-
-
-
-
+clean_p_lab <- function (p_value) {
+        p_value = round(p_value, 3)
+    if (p_value < 0.001) {
+        cp <- "p<0.001***"
+    } else if (p_value < 0.01) {
+        cp <- paste0("p=", p_value, " **")
+    } else if (p_value < 0.05) {
+        cp <- paste0("p=", p_value, " *")
+    } else {
+        cp <- paste0("p=", p_value, " n.s.")
+    }
+    return(cp)
+}
 
 
 
