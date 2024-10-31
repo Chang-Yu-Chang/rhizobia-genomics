@@ -1,16 +1,22 @@
-#' This script plots the reaction norm of nitrogen treatmetns
+#' This script plots the reaction norm of thermal adaptation
+#' 1. Prepare the table
+#' 2. Check model assumptions
+#' 3. Run models
+#' 4. Table
+#' 5. Plot
 
 library(tidyverse)
-library(janitor)
 library(cowplot)
 library(flextable)
 library(ggh4x) # for nested facets
-library(broom.mixed) # for cleanup the model output
-library(lme4) # for LMM
-library(car) # For anova
+library(broom.mixed) # for tidying the model outputs
+library(glmmTMB) # for checking GLMM assumptions
+library(DHARMa) # for checking GLMM assumptions
+library(lme4) # for lmer
+library(car) # for anova
+library(boot) # for bootstrapping
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
-
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 gcs <- read_csv(paste0(folder_data, "phenotypes/growth/gcs.csv"))

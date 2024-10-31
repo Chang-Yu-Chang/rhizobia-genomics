@@ -16,6 +16,13 @@ isolates <- isolates %>%
 nrow(plants) # 822 plants
 table(plants$exp_plant) # 251 lupulina, 571 sativa
 length(unique(plants$exp_id)) # 26 rhizobia strains used in the plant experiments
+plants %>%
+    filter(exp_plant == "sativa", gradient != "control") %>%
+    #distinct(exp_id, .keep_all = T) %>%
+    group_by(gradient) %>%
+    count()
+
+
 
 # 1. All plant traits ----
 set.seed(1)
