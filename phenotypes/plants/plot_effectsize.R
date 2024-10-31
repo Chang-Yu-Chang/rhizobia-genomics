@@ -45,8 +45,9 @@ ggsave(paste0(folder_phenotypes, "effectsize/02-cohensd_lupulina.png"), p, width
 # 2. Plot the boxplot of traits with Cohen's d -----
 set.seed(1)
 plot_boxes <- function (plants, gra, plant) {
+    # gra = "elevation"
+    # plant = "sativa"
     strips = strip_nested(
-        # Vertical strips
         background_y = elem_list_rect(
             color = NA,
             fill = c("white")
@@ -58,23 +59,31 @@ plot_boxes <- function (plants, gra, plant) {
         by_layer_y = F,
         clip = "off", size = "variable"
     )
+
     plants %>%
         filter(gradient == gra) %>%
         filter(population != "control", exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
+        select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
         select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
         group_by(gradient, population, exp_plant) %>%
         filter(nodule_number <100) %>%
         pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
         left_join(traits) %>%
         arrange(trait_type) %>%
-        ggplot(aes(x = population, y = value, fill = population)) +
-        geom_boxplot(outlier.shape = -1, alpha = 0.5) +
-        geom_jitter(size = .5, shape = 21, width = .2) +
+        group_by(gradient, population, exp_plant, trait_type, trait_pre, value) %>%
+        count() %>%
+        ggplot(aes(x = population, y = value)) +
+        #geom_violin(aes(fill = population), position = "identity", alpha = 0.5, color = NA, trim = T) +
+        geom_boxplot(aes(fill = population), alpha = 0.5, width = .3, outlier.size = -1) +
+        #geom_point(alpha = .8, shape = 16, aes(color = population)) +
+        #geom_dotplot(aes(fill = population), binwidth = .1, binaxis = "y", stackgroups = TRUE, binpositions = "all", stackdir = "center") +
+        geom_point(alpha = .2, shape = 16, aes(color = population, size = n)) +
+        #geom_jitter(size = .5, shape = 21, width = .2) +
         scale_fill_manual(values = population_colors) +
+        scale_color_manual(values = population_colors) +
+        scale_size_continuous(range = c(1,10)) +
         coord_flip(clip = "off") +
-        #facet_nested_wrap(~trait_type + trait, scales = "free", ncol = 1, nest_line = element_line(color = "blue", linetype = 2), dir = "v", strip.position = "left", strip = strips) +
         facet_nested_wrap(trait_type + trait_pre ~., ncol = 1, strip.position = "left", axes = "all", scales = "free", solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), strip = strips) +
-        #facet_wrap2(trait_pre~., scales = "free", remove_labels = F, axes = "all", ncol = 1) +
         theme_bw() +
         theme(
             axis.title.x = element_blank(),
@@ -84,7 +93,6 @@ plot_boxes <- function (plants, gra, plant) {
             panel.border = element_blank(),
             panel.background = element_rect(color = NA, fill = "grey95"),
             strip.background = element_rect(color = NA),
-            #strip.text = element_blank(),
             legend.position = "top",
             legend.key = element_rect(fill = NA, color = NA),
             legend.key.height = unit(10, "mm"),
@@ -93,9 +101,8 @@ plot_boxes <- function (plants, gra, plant) {
             legend.background = element_blank(),
             legend.box.margin = unit(c(0,0,-5,0), "mm")
         ) +
-        guides(fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0))) +
-
-         labs()
+        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0))) +
+        labs()
 }
 plot_eff <- function (cohends, gra, plant) {
     cohensds %>%
@@ -156,6 +163,12 @@ p <- plot_grid(p1, p2, p3, p4, align = "h", axis = "tb", ncol = 2, rel_widths = 
     #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
 ggsave(paste0(folder_phenotypes, "effectsize/05-traits_effectsize.png"), p, width = 8, height = 10)
 
+
+plants %>%
+    mutate(id = 1:n()) %>%
+    select(id, gradient, population, matches("nodule_number")) %>%
+    drop_na(primary_root_nodule_number) %>%
+    view
 
 
 
