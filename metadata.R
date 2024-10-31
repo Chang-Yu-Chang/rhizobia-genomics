@@ -94,8 +94,25 @@ clean_p_lab <- function (p_value) {
     return(cp)
 }
 
-
-
+# Flextable
+edit_p <- function (pv) {
+    if (pv < 0.001) {
+        return("<0.001")
+    } else {
+        return(as.character(round(pv, 3)))
+    }
+}
+detect_sig <- function (pv) {
+    if (pv > 0.05) {
+        return("n.s.")
+    } else if (pv > 0.01) {
+        return("*")
+    } else if (pv > 0.001) {
+        return("**")
+    } else if (pv < 0.001) {
+        return("***")
+    }
+}
 
 
 
