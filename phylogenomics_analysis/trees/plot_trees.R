@@ -1,6 +1,5 @@
 #' This script plots the consensus tree from iqtree
 
-renv::load()
 library(tidyverse)
 library(cowplot)
 library(tidytree)
@@ -12,20 +11,6 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
-read_gpas <- function (set_name) {
-    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
-    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
-    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
-    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
-    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
-    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
-    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
-    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
-
-    return(list(gpa = gpa, gene_order = gene_order, gpatl = gpatl, gpacl = gpacl, gd = gd, sml = sml, list_sccg = list_sccg, spa = spa))
-}
 
 # 1. Plot core gene tree ----
 set_name = "elev_med"
@@ -36,24 +21,23 @@ p1 <- tr_elev_med_core %>%
     left_join(rename(isolates, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label, color = site_group), hjust = 0) +
-    geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
-    # geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
-    # geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
-    # geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
-    #geom_treescale(x = 0, y = 28, width = 0.1) +
-    scale_color_manual(values = site_group_colors, name = "") +
-    #scale_color_manual(values = species_colors) +
-    #scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
+    geom_tiplab(aes(label = label, color = population), hjust = 0, align = T) +
+    #geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
+    geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 3) +
+    scale_color_manual(values = population_colors) +
     coord_cartesian(clip = "off") +
+    geom_treescale() +
     theme_tree() +
     theme(
-        legend.position = "top",
+        legend.position = "none",
+        legend.position.inside = c(0.1, 0.9),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 8),
         plot.margin = unit(c(0,10,0,0), "mm")
     ) +
     guides() +
-    labs(title = paste0(nrow(tt$list_sccg), " single copy core genes: elevation medicae"))
-
+    labs(title = paste0("Elevation S. medicae\n", nrow(tt$list_sccg), " single-copy core genes"))
+p1
 set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 
@@ -62,27 +46,26 @@ p2 <- tr_urbn_mel_core %>%
     left_join(rename(isolates, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label, color = site_group), hjust = 0) +
-    geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
-    # geom_cladelab(node = 49, label = "E. spp", align=TRUE, offset = .1, textcolor = species_colors[1], barcolor = species_colors[1], fontface = 3) +
-    # geom_cladelab(node = 38, label = "E. medicae", align=TRUE, offset = .1, textcolor = species_colors[3], barcolor = species_colors[3], fontface = 3) +
-    # geom_cladelab(node = 55, label = "E. meliloti", align=TRUE, offset = .1, textcolor = species_colors[4], barcolor = species_colors[4], fontface = 3) +
-    #geom_treescale(x = 0, y = 28, width = 0.1) +
-    scale_color_manual(values = site_group_colors) +
-    #scale_color_manual(values = species_colors) +
-    #scale_x_continuous(expand = c(0,0.1), limits = c(NA, 1)) +
+    geom_tiplab(aes(label = label, color = population), hjust = 0, align = T) +
+    #geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
+    geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 3) +
+    scale_color_manual(values = population_colors) +
+    geom_treescale() +
     coord_cartesian(clip = "off") +
     theme_tree() +
     theme(
-        legend.position = "top",
+        legend.position = "none",
+        legend.position.inside = c(0.8, 0.3),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 8),
         plot.margin = unit(c(0,10,0,0), "mm")
     ) +
     guides() +
-    labs(title = paste0(nrow(tt$list_sccg), " single copy core gene: urbanization meliloti"))
+    labs(title = paste0("Urbanization S. meliloti\n", nrow(tt$list_sccg), " single-copy core genes"))
 
-p <- plot_grid(p1, p2, nrow = 1)
+p <- plot_grid(p1, p2, nrow = 2)
 
-ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-combined_sccg.png"), p, width = 10, height = 5)
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-combined_sccg.png"), p, width = 3, height = 6)
 
 
 
@@ -201,16 +184,16 @@ p <- p1 + geom_tree(data = d2) +
 ggsave(paste0(folder_data, "phylogenomics_analysis/trees/05-matched_tree.png"), p, width = 7, height = 3)
 
 # 6. Plot the PAP heatmap, order by sites ----
-ii <- isolates %>% select(genome_id, site_group, population, species)
+ii <- isolates %>% select(genome_id, population, population, species)
 p <- gpatl %>%
     left_join(ii) %>%
     mutate(genome_id = factor(genome_id, rev(ii$genome_id))) %>%
     ggplot() +
-    geom_rect(data = tibble(site_group = names(site_group_colors[-5])), aes(fill = site_group), xmin = 0, xmax = 30000, ymin = 0, ymax = 100, alpha = 0.2) +
+    geom_rect(data = tibble(population = names(population_colors[-5])), aes(fill = population), xmin = 0, xmax = 30000, ymin = 0, ymax = 100, alpha = 0.2) +
     geom_tile(aes(x = gene, y = genome_id), fill = "grey10") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_manual(values = site_group_colors) +
-    facet_grid(site_group~., scales = "free_y", space = "free_y") +
+    scale_fill_manual(values = population_colors) +
+    facet_grid(population~., scales = "free_y", space = "free_y") +
     theme_classic() +
     theme(
         axis.text.x = element_blank(),
@@ -231,8 +214,8 @@ p1 <- tr_seq_core %>%
     left_join(rename(ii, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tippoint(aes(color = site_group)) +
-    scale_color_manual(values = site_group_colors, name = NULL) +
+    geom_tippoint(aes(color = population)) +
+    scale_color_manual(values = population_colors, name = NULL) +
     theme_tree() +
     theme(
         legend.position = "top",
@@ -246,8 +229,8 @@ p2 <- tr_gpa %>%
     left_join(rename(ii, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label, color = site_group), hjust = 0) +
-    scale_color_manual(values = site_group_colors)
+    geom_tiplab(aes(label = label, color = population), hjust = 0) +
+    scale_color_manual(values = population_colors)
 
 d1 <- p1$data
 d2 <- p2$data
@@ -258,8 +241,8 @@ dd <- bind_rows(d1, d2) %>% filter(isTip)
 p <- p1 + geom_tree(data = d2) +
     ggnewscale::new_scale_fill() +
     geom_line(data = dd, aes(x, y, group = label), color = "grey90", linetype = 1, linewidth = .2) +
-    geom_tippoint(aes(color = site_group), size = 2) +
-    geom_tippoint(data = d2, aes(color = site_group), size = 2) +
+    geom_tippoint(aes(color = population), size = 2) +
+    geom_tippoint(data = d2, aes(color = population), size = 2) +
     scale_x_continuous(limits = c(-0.5, 3)) +
     annotate("text", x = c(-0.3, 2.5), y = c(30,30), label = c("core genes", "gene content")) +
     theme_tree() +

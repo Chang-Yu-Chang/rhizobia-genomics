@@ -3,6 +3,7 @@
 library(tidyverse)
 library(janitor)
 library(cowplot)
+library(ggh4x)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -21,7 +22,7 @@ plot_heatmap <- function (gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
     list_cg <- gpa$gene[apply(gpa[,-1], 1, sum) == ncol(gpa)-1]
     gene_order <- unique(gpacl$gene)
     p <- gpacl %>%
-        filter(!gene %in% list_cg) %>%
+        #filter(!gene %in% list_cg) %>%
         # Exclude those genes that are assigned to different contigs in differnt genomes
         #filter(!gene %in% list_wgpa$gene) %>%
         left_join(isolates) %>%
@@ -30,18 +31,20 @@ plot_heatmap <- function (gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
         geom_tile(aes(x = gene, y = genome_id, fill = population)) +
         scale_y_discrete(expand = c(0,0)) +
         scale_fill_manual(values = population_colors) +
+        facet_grid2(population~., scales = "free_y") +
         theme_classic() +
         theme(
             legend.position = "right",
             legend.title = element_blank(),
+            strip.background = element_blank(),
             axis.text.x = element_blank(),
             axis.ticks.x = element_blank(),
             axis.title.y = element_blank(),
             axis.text.y = element_text(size = 10, color = "black"),
             panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
         ) +
-        guides() +
-        labs(x = "accessory gene", y = "genome")
+        guides(fill = "none") +
+        labs(x = "gene cluster", y = "genome")
 
     if (by_replicon) {
         return(p + facet_grid(.~replicon_type, scales = "free_x", space = "free_x"))
@@ -186,10 +189,11 @@ plot_wrapper <- function (set_name) {
     per_acce_fst <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/per_acce_fst.csv"))
     n_all <- nrow(tt$gene_order) # number of all genes
     n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
+    n_core = n_all-n_accessory
     acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
     gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
 
-    p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle(paste0(n_accessory, " accessory genes"))
+    p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle(paste0("Total: ", n_all, ", Core: ", n_core, ", Accessory: ", n_accessory))
     p2 <- plot_acce_fst(acce_fst)
     p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
