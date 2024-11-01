@@ -16,8 +16,9 @@ library(lme4) # for lmer
 library(car) # for anova
 library(boot) # for bootstrapping
 source(here::here("metadata.R"))
-options(contrasts=c("contr.sum", "contr.poly"))
+#options(contrasts=c("contr.sum", "contr.poly"))
 
+# 1. Prepare the data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 gcs <- read_csv(paste0(folder_data, "phenotypes/growth/gcs.csv"))
 gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv"))
@@ -25,47 +26,137 @@ gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv"))
 gtwl <- gtw %>%
     replace_na(list(maxOD = 0)) %>%
     mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
-    rename(yield = maxOD) %>%
+    #rename(yield = maxOD) %>%
     select(-t.r, -startOD) %>%
     pivot_longer(-c(temperature, well, exp_id), names_to = "trait") %>%
-    left_join(distinct(isolates, exp_id, .keep_all = T))
+    left_join(distinct(isolates, exp_id, .keep_all = T)) %>%
+    drop_na(value)
 
 isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
 
-# reaction norm
-tb <- tibble(
-    gradient = rep(c("elevation", "urbanization"), each = 3*4),
-    trait = rep(rep(c("r", "lag", "yield"), each = 4), 2),
-    ff = rep(c(
-        "value ~ population * temperature + (1|exp_id) + (1|well)",
-        "value ~ population * temperature + (1|exp_id) + (0 + temperature | exp_id) + (1|well)",
-        "value ~ population * temperature + (temperature | exp_id) + (1|well)",
-        "value ~ population * temperature + (1 | temperature : exp_id) + (1|well)"
-        ), 6)
-) %>%
-    #filter(!(temperature == "40c" & trait == "lag")) %>%
-    mutate(
-        dat = map2(gradient, trait, ~filter(gtwl, gradient == .x, trait == .y)),
-        mod = map2(dat, ff, ~lmer(as.formula(.y), data = .x)),
-        mod_tided = map(mod, ~tidy(Anova(.x, type=3)))
+# 2. Check assumption ----
+dat <- gtwl %>%
+    filter(gradient == "elevation") %>%
+    filter(trait == "r")
+
+dat %>%
+    ggplot() +
+    geom_histogram(aes(x = value)) +
+    facet_grid(temperature~population) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
+
+mod <- dat %>%
+    #filter(exp_nitrogen == "N+") %>%
+    #mutate(value = log(value)) %>%
+    #glmmTMB(value ~ population, data = ., family = "nbinom2", ziformula = ~1)
+    glmmTMB(value ~ population * temperature, data = ., family = "gaussian")
+plot(simulateResiduals(mod))
+Anova(mod, type = 3)
+
+# 3. Fit the model ----
+tidy_mod <- function (mod) {
+    x <- tidy(mod)$estimate
+    return(x)
+}
+boot_fun <- function(data, indices) {
+    #' Define the bootstrapping function. This is generic depending on the exact model `mod` and the tidy function `tidy_mod`
+    d <- data[indices, ]; eval(parse(text = st))
+    #mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id), data = d)
+    return(tidy_mod(mod)) # Collect the fixed effect estimates
+}
+get_boot_cis <- function (boot_result) {
+    #' Get the CIs of bootstrap value
+    funn <- function(x) {
+        tb <- as_tibble(x[4][[1]])
+        colnames(tb) <- c("ci_lev", "ci_lower", "ci_upper")
+        return(tb)
+    }
+    tibble(
+        #term = tidy(mod)$term[1:4],
+        t0 = boot_result$t0,
+        ind = 1:length(boot_result$t0)
     ) %>%
-    unnest(cols = mod_tided) %>%
-    select(gradient, trait, ff, term, statistic, df, p.value) %>%
-    filter(ff != "value ~ population * temperature + (1|exp_id) + (1|well)")
+        drop_na(t0) %>%
+        mutate(
+            conf = map(ind, ~boot.ci(boot_result, index = .x, type = "norm")),
+            ci = map(conf, funn)
+        ) %>%
+        unnest(ci) %>%
+        select(-conf) %>%
+        select(ind, t0, everything())
+}
+do_stat <- function (dat, st) {
+    d <- dat
+    eval(parse(text = st))
+    return(mod)
+}
 
+conditonal_filter <- function (x, y){
+    if (y %in% "lag") {
+        filter(gtwl, gradient == x, trait == y) %>% filter(temperature != "40c")
+    } else if (y %in% c("r", "maxOD")) filter(gtwl, gradient == x, trait == y)
+}
 
-ft <- tb %>%
-    select(Gradient = gradient, Trait = trait, Formula = ff, Predictor = term, Chisq = statistic, df = df, P = p.value) %>%
-    # Clean the table
-    filter(Predictor != "(Intercept)") %>%
+# gtwl <- gtwl %>%
+#     filter(temperature != "40c")
+tb <- tibble(
+    gradient = rep(c("elevation", "urbanization"), each = 3),
+    trait = rep(c("r", "lag", "maxOD"), 2),
+    st = rep(c(
+        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",
+        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",
+        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)"
+    ), 2)
+) %>%
     mutate(
-        Formula = str_replace(Formula, "value", Trait),
-        Chisq = round(Chisq, 2),
-        `Signif.` = map_chr(P, detect_sig),
-        P = map_chr(P, edit_p),
-        Trait = factor(Trait, c("r", "lag", "yield"))
+        dat = map2(gradient, trait, conditonal_filter),
+        mod = map2(dat, st, do_stat)
+    )
+
+
+# gtwl %>%
+#     filter(gradient == "elevation", trait == "lag") %>%
+#     view
+#     lmer(value ~ population*temperature + (1|temperature:exp_id), data = .)
+#
+# tb$mod[[1]] %>% Anova(type=3)
+#
+# mod <- tb$mod[[2]]
+# tidy(mod)$estimate
+# tb$mod[[3]]
+
+tb$mod_boot <- list(NA)
+tb$mod_cis <- list(NA)
+for (i in 1:nrow(tb)) {
+    st <- tb$st[i]
+    dat <- tb$dat[[i]]
+    tb$mod_boot[[i]] <- boot(data = dat, statistic = boot_fun, R = 100)
+    tb$mod_cis[[i]] <- get_boot_cis(tb$mod_boot[[i]])
+}
+
+tb_tidied <- tb %>%
+    mutate(mod_tidied = map(mod, tidy)) %>%
+    unnest(c(mod_tidied, mod_cis)) %>%
+    select(-dat, -mod_boot, mod) %>%
+    select(gradient, trait, st, ind, t0, ci_lower, ci_upper, effect, group, term, estimate, statistic) %>%
+    mutate(across(c(t0, ci_lower, ci_upper), ~round(.x, 2))) %>%
+    mutate(cis = paste0("[", ci_lower, ", ", ci_upper, "]")) %>%
+    mutate(signlab = ifelse(sign(ci_lower) * sign(ci_upper)==T, "*", "n.s."))
+
+
+# 4. Make the table
+ft <- tb_tidied %>%
+    select(Gradient = gradient, Trait = trait, Model = st, Effect = effect, Term = term, Estimate = t0, `95% CIs` = cis, ` ` = signlab) %>%
+    # Clean the table
+    filter(Term != "(Intercept)") %>%
+    mutate(
+        Model = str_replace(Model, "value", Trait) %>% str_remove("mod <- "),
+        Trait = factor(Trait, c("r", "lag", "maxOD"))
     ) %>%
     arrange(Gradient, Trait) %>%
     flextable() %>%
@@ -73,19 +164,21 @@ ft <- tb %>%
     valign(valign = "top") %>%
     merge_v(j = 1:3) %>%
     valign(j = 1:3, valign = "center") %>%
-    hline(i = seq(3, nrow_part(.), 3)) %>%
+    #hline(i = seq(9, nrow_part(.), 9)) %>%
+    hline(i = c(9,16,25,34,41)) %>%
+    width(j = "Model", 2) %>%
     bg(bg = "white", part = "all") %>%
-    bg(bg = "grey90", i = seq(3, nrow_part(.), 3), j = 4:8) %>%
+    bg(bg = "lightpink", i = ~str_detect(Term, "\\:temperature")) %>%
+    #bg(bg = "grey90", i = seq(6, nrow_part(.), 6), j = 4:8) %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
-    style(part = "header", j = c("df", "P"), pr_t = fp_text_default(italic = T, bold = T)) %>%
-    highlight(j = 8, i = ~ `Signif.` != "n.s." & Predictor == "population:temperature", color = "yellow") %>%
+    #highlight(j = 8, i = ~ `Signif.` != "n.s." & Predictor == "population:temperature", color = "yellow") %>%
     fix_border_issues()
 
 save_as_image(ft, path = paste0(folder_data, "phenotypes/growth/03-rn_table.png"), res = 200)
 
+# 5. Plot reaction norm ----
 
 
-plants
 
 if (F) {
 
@@ -280,3 +373,34 @@ save_as_image(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_ta
 # # Test significance
 # Anova(modelname, type=3)
 
+
+
+# Plot. Reaction norm ----
+# Compute the reaction norm
+gtwlm <- gtwl %>%
+    group_by(gradient, temperature, trait, population) %>%
+    summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value)))
+
+p <- gtwl %>%
+    ggplot() +
+    geom_line(aes(x = temperature, y = value, group = well, color = population), alpha = 0.1) +
+    # Mean value
+    geom_ribbon(data = gtwlm, aes(x = temperature, ymin = mean_value-ci_value, ymax =  mean_value+ci_value, fill = population, group = population), inherit.aes = FALSE, alpha = 0.2) +
+    geom_point(data = gtwlm, aes(x = temperature, y = mean_value, color = population, group = population)) +
+    geom_line(data = gtwlm, aes(x = temperature, y = mean_value, color = population, group = population)) +
+    scale_color_manual(values = population_colors, name = "population") +
+    scale_fill_manual(values = population_colors, name = "population") +
+    facet_grid(trait~gradient, scales = "free_y", switch = "y") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        strip.text.x = element_text(size = 15),
+        strip.placement = "outside",
+        axis.title.y = element_blank()
+    ) +
+    guides() +
+    labs()
+
+ggsave(paste0(folder_data, "phenotypes/growth/02-reaction_norm.png"), p, width = 6, height = 6)

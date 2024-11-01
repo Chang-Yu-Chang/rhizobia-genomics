@@ -4,12 +4,12 @@ library(tidyverse)
 library(cowplot)
 library(ggh4x)
 library(flextable)
-library(ggh4x) # for nested facets
 library(broom.mixed) # for tidying the model outputs
 library(lme4) # for lmer
 library(car) # for anova
 library(boot) # for bootstrapping
 source(here::here("metadata.R"))
+options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
@@ -112,6 +112,14 @@ tb_tidied <- tb %>%
     mutate(cis = paste0("[", ci_lower, ", ", ci_upper, "]")) %>%
     mutate(signlab = ifelse(sign(ci_lower) * sign(ci_upper)==T, "*", "n.s."))
 
+# Single anova
+tb_tidied2 <- tb %>%
+    mutate(mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())) %>%
+    unnest(mod_tidied) %>%
+    #left_join(traits) %>%
+    select(trait_pre, st, term, statistic ,df, p.value)
+
+
 # 4. Make the table ----
 ft <- tb_tidied %>%
     left_join(traits) %>%
@@ -122,6 +130,7 @@ ft <- tb_tidied %>%
         Model = str_replace(Model, "value", trait_abr) %>% str_remove("mod <-"),
         Trait = factor(Trait, traits$trait_pre)
     ) %>%
+    select(-trait_abr) %>%
     arrange(Trait) %>%
     flextable() %>%
     valign(valign = "top") %>%
@@ -130,7 +139,7 @@ ft <- tb_tidied %>%
     align(j = c("Type", "Trait", "Effect"), align = "center", part = "all") %>%
     hline(i = c(4,7,11,14)) %>%
     autofit() %>%
-    width(j = 2, 2) %>%
+    width(j = "Model", 2) %>%
     bg(bg = "white", part = "all") %>%
     bg(bg = "lightpink", i = ~str_detect(Term, "population")) %>%
     bg(bg = "grey90", j = "Effect", i = ~Effect == "fixed") %>%
@@ -139,8 +148,38 @@ ft <- tb_tidied %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_image(ft, path = paste0(folder_phenotypes, "plants/01-sativa_traits_table.png"), res = 300)
+save_as_image(ft, path = paste0(folder_phenotypes, "plants/01-sativa_traits_elev_table.png"), res = 300)
 #save_as_html(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_table.html"))
+
+ft2 <- tb_tidied2 %>%
+    left_join(traits) %>%
+    mutate(statistic = round(statistic, 2)) %>%
+    select(Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, df =df,  p.value) %>%
+    # Clean the table
+    #filter(Predictor != "(Intercept)") %>%
+    mutate(
+        Model = str_replace(Model, "value", "trait") %>% str_remove("mod <-"),
+        Trait = factor(Trait, traits$trait_pre),
+        P = map_chr(p.value, clean_p_lab)
+        #siglab = map_chr(p.value, detect_sig)
+    ) %>%
+    select(-p.value) %>%
+    arrange(Trait) %>%
+    flextable() %>%
+    autofit() %>%
+    merge_v(j = 1:3) %>%
+    width(j = "Model", 3) %>%
+    valign(j = 1:3, valign = "center") %>%
+    align(j = c("Trait", "Term"), align = "center", part = "all") %>%
+    hline(i = seq(2, nrow_part(.), 2)) %>%
+    bg(bg = "white", part = "all") %>%
+    bg(bg = "lightpink", i = ~str_detect(Term, "pop")) %>%
+    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
+    fix_border_issues()
+
+save_as_image(ft2, path = paste0(folder_phenotypes, "plants/01c-sativa_nitrogen_elev_table.png"), res = 300)
+
+
 
 
 

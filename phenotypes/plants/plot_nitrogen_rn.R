@@ -116,7 +116,7 @@ do_stat <- function (dat, st) {
     return(mod)
 }
 
-
+## Bootstrap
 set.seed(1)
 tb <- tibble(
     trait_pre = rep(c(
@@ -158,7 +158,7 @@ tb$mod_cis <- list(NA)
 for (i in 1:nrow(tb)) {
     st <- tb$st[i]
     dat <- tb$dat[[i]]
-    tb$mod_boot[[i]] <- boot(data = dat, statistic = boot_fun, R = 1000)
+    tb$mod_boot[[i]] <- boot(data = dat, statistic = boot_fun, R = 100)
     tb$mod_cis[[i]] <- get_boot_cis(tb$mod_boot[[i]])
 }
 
@@ -170,6 +170,13 @@ tb_tidied <- tb %>%
     mutate(across(c(t0, ci_lower, ci_upper), ~round(.x, 2))) %>%
     mutate(cis = paste0("[", ci_lower, ", ", ci_upper, "]")) %>%
     mutate(signlab = ifelse(sign(ci_lower) * sign(ci_upper)==T, "*", "n.s."))
+
+# Simple test ANOVA
+tb_tidied2 <- tb %>%
+    mutate(ano = map(mod, ~tidy(Anova(.x,type=3)))) %>%
+    unnest(ano) %>%
+    select(trait_pre, st, term, statistic, df, p.value)
+
 
 # 4. Make the table ----
 ft <- tb_tidied %>%
@@ -199,6 +206,47 @@ ft <- tb_tidied %>%
 
 save_as_image(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_table.png"), res = 300)
 #save_as_html(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_table.html"))
+
+ft2 <- tb_tidied2 %>%
+    left_join(traits) %>%
+    mutate(statistic = round(statistic, 2)) %>%
+    select(Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, df =df,  p.value) %>%
+    # Clean the table
+    #filter(Predictor != "(Intercept)") %>%
+    mutate(
+        Model = str_replace(Model, "value", "trait") %>% str_remove("mod <-"),
+        Trait = factor(Trait, traits$trait_pre),
+        P = map_chr(p.value, clean_p_lab)
+        #siglab = map_chr(p.value, detect_sig)
+    ) %>%
+    select(-p.value) %>%
+    arrange(Trait) %>%
+    flextable() %>%
+    autofit() %>%
+    merge_v(j = 1:3) %>%
+    width(j = "Model", 3) %>%
+    valign(j = 1:3, valign = "center") %>%
+    align(j = c("Trait", "Term"), align = "center", part = "all") %>%
+    hline(i = seq(4, nrow_part(.), 4)) %>%
+    bg(bg = "white", part = "all") %>%
+    bg(bg = "lightpink", i = ~str_detect(Term, ":")) %>%
+    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
+    fix_border_issues()
+
+
+save_as_image(ft2, path = paste0(folder_phenotypes, "plants/03b-sativa_nitrogen_table.png"), res = 300)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 5. Plot the reaction norm ----

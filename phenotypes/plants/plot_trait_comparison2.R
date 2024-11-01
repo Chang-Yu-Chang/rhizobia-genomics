@@ -117,6 +117,13 @@ tb_tidied <- tb %>%
     mutate(cis = paste0("[", ci_lower, ", ", ci_upper, "]")) %>%
     mutate(signlab = ifelse(sign(ci_lower) * sign(ci_upper)==T, "*", "n.s."))
 
+# Single anova
+tb_tidied2 <- tb %>%
+    mutate(mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())) %>%
+    unnest(mod_tidied) %>%
+    #left_join(traits) %>%
+    select(trait_pre, st, term, statistic ,df, p.value)
+
 # 4. Make the table ----
 ft <- tb_tidied %>%
     left_join(traits) %>%
@@ -147,6 +154,37 @@ ft <- tb_tidied %>%
 
 save_as_image(ft, path = paste0(folder_phenotypes, "plants/01b-sativa_traits_table.png"), res = 300)
 #save_as_html(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_table.html"))
+
+ft2 <- tb_tidied2 %>%
+    left_join(traits) %>%
+    mutate(statistic = round(statistic, 2)) %>%
+    select(Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, df =df,  p.value) %>%
+    # Clean the table
+    #filter(Predictor != "(Intercept)") %>%
+    mutate(
+        Model = str_replace(Model, "value", paste0(str_sub(Trait, 1,3), "trait")) %>% str_remove("mod <-"),
+        Trait = factor(Trait, traits$trait_pre),
+        P = map_chr(p.value, clean_p_lab)
+        #siglab = map_chr(p.value, detect_sig)
+    ) %>%
+    select(-p.value) %>%
+    arrange(Trait) %>%
+    flextable() %>%
+    autofit() %>%
+    merge_v(j = 1:3) %>%
+    width(j = "Model", 3) %>%
+    valign(j = 1:3, valign = "center") %>%
+    align(j = c("Trait", "Term"), align = "center", part = "all") %>%
+    hline(i = seq(2, nrow_part(.), 2)) %>%
+    bg(bg = "white", part = "all") %>%
+    bg(bg = "lightpink", j = 4:7, i = ~str_detect(Term, "pop")) %>%
+    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
+    fix_border_issues()
+
+save_as_image(ft2, path = paste0(folder_phenotypes, "plants/01c-sativa_nitrogen_urbn_table.png"), res = 300)
+
+
+
 
 
 
