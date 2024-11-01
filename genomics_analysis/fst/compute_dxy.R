@@ -53,8 +53,7 @@ compute_dxy <- function (gi_filtered) {
 
     return(list(pop_dxy = tibble(pi1, pi2, dxy), ind_dxy = dall_ln))
 }
-
-for (set_name in c("elev_med", "urbn_mel")) {
+ibd_wrapper <- function (set_name) {
     #set_name <- "elev_med"
     #set_name <- "urbn_mel"
     list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
@@ -86,4 +85,9 @@ for (set_name in c("elev_med", "urbn_mel")) {
     gene_ind_dxy <- bind_rows(ind_dxy_results, .id = "gene")
     write_csv(gene_pop_dxy, paste0(folder_data, "genomics_analysis/fst/", set_name, "/gene_pop_dxy.csv"))
     write_csv(gene_ind_dxy, paste0(folder_data, "genomics_analysis/fst/", set_name, "/gene_ind_dxy.csv"))
+
 }
+
+ibd_wrapper("elev_med")
+ibd_wrapper("urbn_mel")
+

@@ -194,15 +194,3 @@ p <- plot_genome_wide_dxy(xx_gn) + ggtitle(paste0(set_name, ": ", length(unique(
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-genome_dxy.png"), p, width = 5, height = 4)
 p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
 ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-03-replicon_dxy.png"), p, width = 10, height = 4)
-
-
-
-
-mantel(m1, m2)
-
-
-
-
-
-
-
