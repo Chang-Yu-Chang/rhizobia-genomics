@@ -83,8 +83,8 @@ ibd_wrapper <- function (set_name) {
 
     gene_pop_dxy <- bind_rows(pop_dxy_results, .id = "gene")
     gene_ind_dxy <- bind_rows(ind_dxy_results, .id = "gene")
-    write_csv(gene_pop_dxy, paste0(folder_data, "genomics_analysis/fst/", set_name, "/gene_pop_dxy.csv"))
-    write_csv(gene_ind_dxy, paste0(folder_data, "genomics_analysis/fst/", set_name, "/gene_ind_dxy.csv"))
+    write_csv(gene_pop_dxy, paste0(folder_data, "genomics_analysis/dxy/", set_name, "/gene_pop_dxy.csv"))
+    write_csv(gene_ind_dxy, paste0(folder_data, "genomics_analysis/dxy/", set_name, "/gene_ind_dxy.csv"))
 
 }
 

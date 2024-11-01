@@ -9,31 +9,32 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates <- select(isolates, -exp_id, -genome_name)
 sites_dist <- read_csv(paste0(folder_data, "phenotypes/sites/sites_dist.csv"))
 
-read_dxys <- function (set_name) {
+read_fsts <- function (set_name) {
     per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
     per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
-
-    gene_pop_dxy <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_pop_dxy.csv"))
-    gene_ind_dxy <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_ind_dxy.csv"))
     gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
-    return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths,
-                gene_pop_dxy = gene_pop_dxy, gene_ind_dxy = gene_ind_dxy))
+    return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
 }
-join_dists <- function (ind_dxy, gene_length, per_gene_fst, gpacl, sites_d, isolates) {
+read_dxys <- function (set_name) {
+    gene_pop_dxy <- read_csv(paste0(folder_data, "genomics_analysis/dxy/", set_name,"/gene_pop_dxy.csv"))
+    gene_ind_dxy <- read_csv(paste0(folder_data, "genomics_analysis/dxy/", set_name,"/gene_ind_dxy.csv"))
+    return(list(gene_pop_dxy = gene_pop_dxy, gene_ind_dxy = gene_ind_dxy))
+}
+join_dists <- function (tt, dd, ff) {
     #' This function joins the genetic distance and geo distance
-    gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
+    gene_replicon <- filter(tt$gpacl, genome_id == tt$gpacl$genome_id[1]) %>%
         select(gene, replicon_type) %>%
         replace_na(list(replicon_type = "others"))
 
-    ind_dxy %>%
+    dd$gene_ind_dxy %>%
         # dd$gene_ind_dxy %>%
         # left_join(dd$gene_lengths) %>%
-        left_join(gene_length) %>%
+        left_join(ff$gene_lengths) %>%
         left_join(rename_with(isolates, function (x) paste0(x, "1"))) %>%
         left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
-        left_join(sites_d) %>%
+        left_join(sites_dist) %>%
         # left_join(sites_dist) %>%
-        left_join(select(per_gene_fst, gene, n_snps)) %>%
+        left_join(select(ff$per_gene_fst, gene, n_snps)) %>%
         mutate(dxy_scaled = dxy/sequence_length) %>%
         left_join(gene_replicon)
 }
@@ -180,17 +181,24 @@ plot_replicon_wide_dxy <- function (xx_rp) {
         guides() +
         labs(x = "Geographic distance (km)", y = "Dxy")
 }
+dxy_wrapper <- function (set_name) {
+    #set_name = "elev_med"
+    #set_name = "urbn_mel"
 
-#set_name = "elev_med"
-set_name = "urbn_mel"
-dd <- read_dxys(set_name)
+    tt <- read_gpas(set_name)
+    ff <- read_fsts(set_name)
+    dd <- read_dxys(set_name)
 
-xx <- join_dists(dd$gene_ind_dxy, dd$gene_lengths, dd$per_gene_fst, tt$gpacl, sites_dist, isolates) # Per gene, dxy between two orthologs coming from two different genomes
-xx_rp <- make_replicon_wide_dxy(xx)
-xx_gn <- make_genome_wide_dxy(xx) # Genome wide, dxy between two genomes
-nrow(xx_gn) # choose(10,2) or choose(17,2)
+    xx <- join_dists(tt, dd, ff) # Per gene, dxy between two orthologs coming from two different genomes
+    xx_rp <- make_replicon_wide_dxy(xx)
+    xx_gn <- make_genome_wide_dxy(xx) # Genome wide, dxy between two genomes
+    nrow(xx_gn) # choose(10,2) or choose(17,2)
 
-p <- plot_genome_wide_dxy(xx_gn) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-genome_dxy.png"), p, width = 5, height = 4)
-p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-03-replicon_dxy.png"), p, width = 10, height = 4)
+    p <- plot_genome_wide_dxy(xx_gn) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
+    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 5, height = 4)
+    p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
+    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 4)
+}
+
+dxy_wrapper("elev_med")
+dxy_wrapper("urbn_mel")
