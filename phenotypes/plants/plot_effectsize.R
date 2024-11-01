@@ -44,7 +44,7 @@ ggsave(paste0(folder_phenotypes, "effectsize/02-cohensd_lupulina.png"), p, width
 
 # 2. Plot the boxplot of traits with Cohen's d -----
 set.seed(1)
-plot_boxes <- function (plants, gra, plant) {
+#plot_boxes <- function (plants, gra, plant) {
     # gra = "elevation"
     # plant = "sativa"
     strips = strip_nested(
@@ -104,10 +104,23 @@ plot_boxes <- function (plants, gra, plant) {
         guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0))) +
         labs()
 }
-plot_eff <- function (cohends, gra, plant) {
-    cohensds %>%
-        filter(gradient == gra) %>%
-        filter(exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
+plot_eff <- function (cohensd, gra, plant) {
+    strips = strip_nested(
+        background_y = elem_list_rect(
+            color = NA,
+            fill = c("white")
+        ),
+        text_y = elem_list_text(
+            size = 8,
+            angle = 0
+        ),
+        bleed = T,
+        by_layer_y = F,
+        clip = "off", size = "variable"
+    )
+
+    cohensd %>%
+        filter(gradient == gra, exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
         mutate(exp_nitrogen = factor(exp_nitrogen, c("without nitrogen", "with nitrogen"))) %>%
         left_join(traits) %>%
         ggplot() +
@@ -121,7 +134,8 @@ plot_eff <- function (cohends, gra, plant) {
         #facet_nested_wrap(gradient + trait~., remove_labels = "x", axes = "all", scales = "free_y", dir = "v", strip.position = "left", ncol = 1, strip = strips) +
         #facet_wrap2(vars(trait_pre), scales = "free_y", ncol = 1, axes = "all", remove_labels = "x") +
         #facet_nested(trait_type + trait_pre ~., scales = "free_y", axes = "all", remove_labels = "x", nest_line = element_line(color = "grey30", linetype = 2), strip = strips) +
-        facet_wrap2(trait_pre~., scales = "free_y", remove_labels = "x", axes = "all", ncol = 1) +
+        #facet_wrap2(trait_pre~., scales = "free_y", remove_labels = "x", axes = "all", ncol = 1) +
+        facet_nested_wrap(trait_type + trait_pre ~., ncol = 1, strip.position = "left", axes = "all", scales = "free", solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), strip = strips) +
         coord_flip(clip = "off") +
         theme_bw() +
         theme(
@@ -135,40 +149,41 @@ plot_eff <- function (cohends, gra, plant) {
             legend.title = element_blank(),
             legend.position = "none",
             strip.background = element_rect(color = NA),
-            strip.text = element_blank(),
-            #strip.text = element_text(angle = 90),
             plot.background = element_rect(color = NA, fill = "white")
         ) +
         guides(color = "none", fill = "none") +
         labs(y = "standardized mean difference")
 }
 
-p1 <- plot_boxes(plants, "elevation", "sativa")
-p2 <- plot_eff(plants, "elevation", "sativa")
-p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
-ggsave(paste0(folder_phenotypes, "effectsize/03-elevation.png"), p, width = 8, height = 5)
+cohensds <- filter(cohensds, !trait %in% c("primary_root_nodule_number", "lateral_root_nodule_number"))
+#plot_eff(cohensds, "elevation", "sativa")
 
-p1 <- plot_boxes(plants, "urbanization", "sativa")
-p2 <- plot_eff(plants, "urbanization", "sativa")
-p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
-ggsave(paste0(folder_phenotypes, "effectsize/04-urbanization.png"), p, width = 8, height = 5)
+p1 <- plot_eff(cohensds, "elevation", "sativa")
+p2 <- plot_eff(cohensds, "urbanization", "sativa")
+p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, labels = LETTERS[1:2], scale = 0.94) +
+    theme(plot.background = element_rect(fill = "white", color = NA)) +
+    draw_text(c("Elevation", "Urbanization"), x = c(0.05, 0.55), y = 0.98, hjust = 0)
+    #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
+ggsave(paste0(folder_phenotypes, "effectsize/03-traits_effectsize.png"), p, width = 8, height = 6)
+
+
+
+# p1 <- plot_boxes(plants, "elevation", "sativa")
+# p2 <- plot_eff(plants, "elevation", "sativa")
+# p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
+# ggsave(paste0(folder_phenotypes, "effectsize/03-elevation.png"), p, width = 8, height = 5)
+#
+# p1 <- plot_boxes(plants, "urbanization", "sativa")
+# p2 <- plot_eff(plants, "urbanization", "sativa")
+# p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
+# ggsave(paste0(folder_phenotypes, "effectsize/04-urbanization.png"), p, width = 8, height = 5)
 
 # Combined ----
-p1 <- plot_boxes(plants, "elevation", "sativa")
-p2 <- plot_eff(plants, "elevation", "sativa")
-p3 <- plot_boxes(plants, "urbanization", "sativa")
-p4 <- plot_eff(plants, "urbanization", "sativa")
-p <- plot_grid(p1, p2, p3, p4, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5), labels = LETTERS[1:4]) +
-    draw_text(c("Elevation", "Urbanization"), x = 0.05, y = c(0.98,  0.48), hjust = 0)
-    #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
-ggsave(paste0(folder_phenotypes, "effectsize/05-traits_effectsize.png"), p, width = 8, height = 10)
-
-
-plants %>%
-    mutate(id = 1:n()) %>%
-    select(id, gradient, population, matches("nodule_number")) %>%
-    drop_na(primary_root_nodule_number) %>%
-    view
-
-
-
+# p1 <- plot_boxes(plants, "elevation", "sativa")
+# p2 <- plot_eff(plants, "elevation", "sativa")
+# p3 <- plot_boxes(plants, "urbanization", "sativa")
+# p4 <- plot_eff(plants, "urbanization", "sativa")
+# p <- plot_grid(p1, p2, p3, p4, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5), labels = LETTERS[1:4]) +
+#     draw_text(c("Elevation", "Urbanization"), x = 0.05, y = c(0.98,  0.48), hjust = 0)
+#     #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
+# ggsave(paste0(folder_phenotypes, "effectsize/05-traits_effectsize.png"), p, width = 8, height = 10)

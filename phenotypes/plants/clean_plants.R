@@ -6,6 +6,7 @@ library(janitor)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+
 #' Remove this line after these two strains are sequenced
 isolates <- isolates %>%
     bind_rows(tibble(exp_id = c("src-1", "bg-1"), site = c("src", "bg"), population = c("suburban", "urban"), gradient = "urbanization", genome_name = NA, genome_id = c("g_src1", "g_bg1"))) %>%

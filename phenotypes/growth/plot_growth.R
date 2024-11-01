@@ -11,6 +11,7 @@ library(car) # for anova
 library(boot) # for bootstrapping
 source(here::here("metadata.R"))
 
+# 1.
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 gcs <- read_csv(paste0(folder_data, "phenotypes/growth/gcs.csv"))
 gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv"))
@@ -21,6 +22,7 @@ gtwl <- gtw %>%
     mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
     select(-t.r, -startOD) %>%
     pivot_longer(-c(temperature, well, exp_id), names_to = "trait") %>%
+    mutate(trait = factor(trait, c("r", "lag", "maxOD"))) %>%
     left_join(distinct(isolates, exp_id, .keep_all = T))
     # mutate(trait = case_when(
     #     trait == "r" ~ "growth rate (1/hr)",
@@ -61,6 +63,8 @@ p <- gtwl %>%
     labs()
 
 ggsave(paste0(folder_data, "phenotypes/growth/01-population_pairs.png"), p, width = 6, height = 6)
+
+# 2. Check assumptions ----
 
 # Table
 gtwl_n <- gtwl %>% filter(temperature == "30c") %>% drop_na(value)

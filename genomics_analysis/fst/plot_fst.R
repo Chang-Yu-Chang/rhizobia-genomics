@@ -134,7 +134,7 @@ p <- xx %>%
     guides() +
     labs(title = str_replace_all(labelled_genes, "\\|", ", "), x = "")
 
-ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-fs_interest.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-fs_interest.png"), p, width = 5, height = 4)
 
 xx %>%
     filter(targeted == "gene of interest") %>%

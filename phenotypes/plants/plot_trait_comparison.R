@@ -1,4 +1,9 @@
-#' This script plots the trait data of plant experiments
+#' This script compares the traits in pairs of populations
+#' 1. Prepare data
+#' 2. Check assumptions
+#' 3. Run models
+#' 4. Make the stat tables
+#' 5. Plot
 
 library(tidyverse)
 library(cowplot)
@@ -17,23 +22,7 @@ plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
 isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
-# 1. Prepare data ----
-plants_n <- plants %>%
-    filter(population != "control", exp_plant == "sativa", gradient == "elevation") %>%
-    filter(exp_nitrogen == "without nitrogen") %>%
-    mutate(exp_nitrogen = case_when(
-        exp_nitrogen == "without nitrogen" ~ "N-",
-        exp_nitrogen == "with nitrogen" ~ "N+"
-    )) %>%
-    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
-    select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
-    group_by(gradient, population, exp_plant) %>%
-    filter(nodule_number <100) %>%
-    pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
-    left_join(traits) %>%
-    ungroup()
 
-# 3. Run pairwise stat ----
 tidy_mod <- function (mod) {
     x <- tidy(mod)$estimate
     return(x)
@@ -72,27 +61,78 @@ do_stat <- function (dat, st) {
 }
 
 
-set.seed(1)
+# 1. Prepare data ----
+plants_n <- plants %>%
+    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "without nitrogen") %>%
+    mutate(exp_nitrogen = case_when(
+        exp_nitrogen == "without nitrogen" ~ "N-",
+        exp_nitrogen == "with nitrogen" ~ "N+"
+    )) %>%
+    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
+    select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
+    group_by(gradient, population, exp_plant) %>%
+    filter(nodule_number <100) %>%
+    pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
+    left_join(traits) %>%
+    left_join(isolates) %>%
+    ungroup()
+
+# 2. Check assumptions ----
+
+# 3. Run models ----
+# 3.1 Single anova ----
 tb <- tibble(
-    trait_pre = rep(c(
+    gradient = c(rep("elevation", 5), rep("urbanization", 7)),
+    trait_pre = c(
+        # Elevation traits
         "shoot height (cm)",
         "nodule number",
         "leaf color",
         "leaf number",
-        "longest petiole\nlength (cm)"
-    ), each = 1),
-    st = rep(c(
+        "longest petiole\nlength (cm)",
+        # Urbanization traits
+        "shoot height (cm)",
+        "nodule number",
+        "leaf color",
+        "leaf number",
+        "primary root\nlength (cm)",
+        "lateral root number",
+        "longest lateral\nroot length(cm)"
+    ),
+    st = c(
+        "mod <- lmer(value ~ population + (1|exp_id), data = d)",
+        "mod <- glmer(value ~ population + (1|exp_id), family = 'poisson', data = d)",
+        "mod <- lmer(value ~ population + (1|exp_id), data = d)",
+        "mod <- glmer(value ~ population + (1|exp_id), family = 'poisson', data = d)",
+        "mod <- lmer(value ~ population + (1|exp_id), data = d)",
+        "mod <- lmer(value ~ population + (1|exp_id), data = d)",
+        "mod <- glmer(value ~ population + (1|exp_id), family = 'poisson', data = d)",
         "mod <- lmer(value ~ population + (1|exp_id), data = d)",
         "mod <- glmer(value ~ population + (1|exp_id), family = 'poisson', data = d)",
         "mod <- lmer(value ~ population + (1|exp_id), data = d)",
         "mod <- glmer(value ~ population + (1|exp_id), family = 'poisson', data = d)",
         "mod <- lmer(value ~ population + (1|exp_id), data = d)"
-    ), each = 1)
+    )
 ) %>%
     mutate(
-        dat = map(trait_pre, ~filter(plants_n, trait_pre == .x)),
+        dat = map2(gradient, trait_pre, ~filter(plants_n, gradient ==.x, trait_pre == .y)),
         mod = map2(dat, st, do_stat)
     )
+
+# Tidy up
+tb_tidied <- tb %>%
+    left_join(traits) %>%
+    arrange(gradient, trait_type, trait_pre) %>%
+    mutate(ii = 1:n()) %>%
+    mutate(mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())) %>%
+    unnest(mod_tidied) %>%
+    select(ii, gradient, trait_type, trait_pre, st, term, statistic, df, p.value) %>%
+    mutate(statistic = round(statistic, 2))
+
+
+# 3.2 Bootstrap ----
+set.seed(1)
+
 
 tb$mod_boot <- list(NA)
 tb$mod_cis <- list(NA)
@@ -101,90 +141,93 @@ for (i in 1:nrow(tb)) {
     dat <- tb$dat[[i]]
     tb$mod_boot[[i]] <- boot(data = dat, statistic = boot_fun, R = 100)
     tb$mod_cis[[i]] <- get_boot_cis(tb$mod_boot[[i]])
+    cat(i)
 }
 
-tb_tidied <- tb %>%
+tb_tidied2 <- tb %>%
+    left_join(traits) %>%
+    arrange(gradient, trait_type, trait_pre) %>%
+    mutate(ii = 1:n()) %>%
     mutate(mod_tidied = map(mod, tidy)) %>%
     unnest(c(mod_tidied, mod_cis)) %>%
     select(-dat, -mod_boot, mod) %>%
-    select(trait_pre, st, ind, t0, ci_lower, ci_upper, effect, group, term, estimate, statistic) %>%
+    left_join(traits) %>%
+    select(ii, gradient, trait_type, trait_pre, st, term, ind, t0, ci_lower, ci_upper) %>%
+    # Clean the numberic
     mutate(across(c(t0, ci_lower, ci_upper), ~round(.x, 2))) %>%
     mutate(cis = paste0("[", ci_lower, ", ", ci_upper, "]")) %>%
     mutate(signlab = ifelse(sign(ci_lower) * sign(ci_upper)==T, "*", "n.s."))
 
-# Single anova
-tb_tidied2 <- tb %>%
-    mutate(mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())) %>%
-    unnest(mod_tidied) %>%
-    #left_join(traits) %>%
-    select(trait_pre, st, term, statistic ,df, p.value)
 
-
-# 4. Make the table ----
+# 4. Make the tables ----
+# 4.1 anova ----
+clean_model_string <- function (mod_st, ii) {
+    mod_st %>%
+        str_replace("value", paste0("trait", as.character(ii))) %>%
+        str_remove(fixed("mod <- ")) %>%
+        str_remove(fixed(", data = d)")) %>%
+        str_replace(fixed("lmer("), fixed("lmer: "))
+}
 ft <- tb_tidied %>%
-    left_join(traits) %>%
-    select(Type = trait_type, Trait = trait_pre, Model = st, Effect = effect, Term = term, Estimate = t0, `95% CIs` = cis, ` ` = signlab, trait_abr) %>%
-    # Clean the table
-    #filter(Predictor != "(Intercept)") %>%
+    select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, df, p.value, ii) %>%
     mutate(
-        Model = str_replace(Model, "value", trait_abr) %>% str_remove("mod <-"),
-        Trait = factor(Trait, traits$trait_pre)
-    ) %>%
-    select(-trait_abr) %>%
-    arrange(Trait) %>%
-    flextable() %>%
-    valign(valign = "top") %>%
-    merge_v(j = 1:4) %>%
-    valign(j = 1:3, valign = "center") %>%
-    align(j = c("Type", "Trait", "Effect"), align = "center", part = "all") %>%
-    hline(i = c(4,7,11,14)) %>%
-    autofit() %>%
-    width(j = "Model", 2) %>%
-    bg(bg = "white", part = "all") %>%
-    bg(bg = "lightpink", i = ~str_detect(Term, "population")) %>%
-    bg(bg = "grey90", j = "Effect", i = ~Effect == "fixed") %>%
-    line_spacing(j = "Trait", space = 1.5) %>%
-    line_spacing(j = "Model", space = 1.5) %>%
-    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
-    fix_border_issues()
-
-save_as_image(ft, path = paste0(folder_phenotypes, "plants/01-sativa_traits_elev_table.png"), res = 300)
-#save_as_html(ft, path = paste0(folder_phenotypes, "plants/03-sativa_nitrogen_table.html"))
-
-ft2 <- tb_tidied2 %>%
-    left_join(traits) %>%
-    mutate(statistic = round(statistic, 2)) %>%
-    select(Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, df =df,  p.value) %>%
-    # Clean the table
-    #filter(Predictor != "(Intercept)") %>%
-    mutate(
-        Model = str_replace(Model, "value", "trait") %>% str_remove("mod <-"),
+        Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
         Trait = factor(Trait, traits$trait_pre),
-        P = map_chr(p.value, clean_p_lab)
-        #siglab = map_chr(p.value, detect_sig)
+        P = map_chr(p.value, clean_p_lab),
+        P = ifelse(str_detect(Term, "Intercept"), "", P)
     ) %>%
-    select(-p.value) %>%
-    arrange(Trait) %>%
+    select(-ii, -p.value) %>%
+    arrange(Gradient, Trait) %>%
     flextable() %>%
     autofit() %>%
-    merge_v(j = 1:3) %>%
-    width(j = "Model", 3) %>%
-    valign(j = 1:3, valign = "center") %>%
-    align(j = c("Trait", "Term"), align = "center", part = "all") %>%
+    # Align and spacing
+    merge_v(j = c("Gradient", "Type", "Trait", "Model")) %>%
+    valign(j = c("Gradient", "Type", "Trait", "Model"), valign = "center") %>%
+    align(j = c("Gradient", "Type", "Trait", "Term"), align = "center", part = "all") %>%
+    line_spacing(j = "Trait", space = 1.5) %>%
+    # Lines and background
     hline(i = seq(2, nrow_part(.), 2)) %>%
     bg(bg = "white", part = "all") %>%
     bg(bg = "lightpink", i = ~str_detect(Term, "pop")) %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_image(ft2, path = paste0(folder_phenotypes, "plants/01c-sativa_nitrogen_elev_table.png"), res = 300)
+save_as_image(ft, path = paste0(folder_phenotypes, "plants/pairs_tab_anova.png"), res = 300)
 
+# 4.2 Bootstrap ----
+ft2 <- tb_tidied2 %>%
+    select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Estimate = t0, `95% CIs` = cis, ` ` = signlab, ii) %>%
+    # Clean the table
+    filter(!str_detect(Term, "sd__")) %>%
+    mutate(
+        Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
+        #Model = str_replace(Model, "value", trait_abr) %>% str_remove("mod <-"),
+        Trait = factor(Trait, traits$trait_pre),
+        ` ` = ifelse(str_detect(Term, "Intercept|sd__"), "", ` `)
+    ) %>%
+    select(-ii) %>%
+    arrange(Gradient, Trait) %>%
+    flextable() %>%
+    autofit() %>%
+    # Align and spacing
+    merge_v(j = c("Gradient", "Type", "Trait", "Model")) %>%
+    valign(j = c("Gradient", "Type", "Trait", "Model"), valign = "center") %>%
+    align(j = c("Gradient", "Type", "Trait", "Term"), align = "center", part = "all") %>%
+    line_spacing(j = "Trait", space = 1.5) %>%
+    # Lines and background
+    hline(i = seq(2, nrow_part(.), 2)) %>%
+    bg(bg = "white", part = "all") %>%
+    bg(bg = "lightpink", i = ~str_detect(Term, "pop")) %>%
+    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
+    fix_border_issues()
 
+save_as_image(ft2, path = paste0(folder_phenotypes, "plants/pairs_tab_boot.png"), res = 300)
 
 
 
 # 5. Plot ----
-plot_boxes <- function (plants, gra, plant) {
+# 5.1 Boxplot ----
+plot_boxes <- function (plants_n, gra, plant) {
     # gra = "elevation"
     # plant = "sativa"
     strips = strip_nested(
@@ -193,6 +236,7 @@ plot_boxes <- function (plants, gra, plant) {
             fill = c("white")
         ),
         text_y = elem_list_text(
+            size = 8,
             angle = 0
         ),
         bleed = T,
@@ -200,28 +244,18 @@ plot_boxes <- function (plants, gra, plant) {
         clip = "off", size = "variable"
     )
 
-    plants %>%
+    plants_n %>%
         filter(gradient == gra) %>%
-        filter(population != "control", exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
-        select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
-        select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
-        group_by(gradient, population, exp_plant) %>%
-        filter(nodule_number <100) %>%
-        pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
         left_join(traits) %>%
         arrange(trait_type) %>%
-        group_by(gradient, population, exp_plant, trait_type, trait_pre, value) %>%
+        group_by(gradient, population, exp_plant, trait_type, trait_pre, value, exp_id) %>%
         count() %>%
-        ggplot(aes(x = population, y = value)) +
-        #geom_violin(aes(fill = population), position = "identity", alpha = 0.5, color = NA, trim = T) +
-        geom_boxplot(aes(fill = population), alpha = 0.5, width = .3, outlier.size = -1) +
-        #geom_point(alpha = .8, shape = 16, aes(color = population)) +
-        #geom_dotplot(aes(fill = population), binwidth = .1, binaxis = "y", stackgroups = TRUE, binpositions = "all", stackdir = "center") +
-        geom_point(alpha = .2, shape = 16, aes(color = population, size = n)) +
-        #geom_jitter(size = .5, shape = 21, width = .2) +
+        ggplot() +
+        geom_boxplot(aes(x = population, y = value, fill = population), alpha = 0.3, width = .7, outlier.size = -1) +
+        geom_point(aes(x = population, group = exp_id, y = value, color = population, size = n), alpha = .4, shape = 16, position = position_dodge(width = .7)) +
         scale_fill_manual(values = population_colors) +
         scale_color_manual(values = population_colors) +
-        scale_size_continuous(range = c(1,10)) +
+        scale_size_continuous(range = c(.5,3)) +
         coord_flip(clip = "off") +
         facet_nested_wrap(trait_type + trait_pre ~., ncol = 1, strip.position = "left", axes = "all", scales = "free", solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), strip = strips) +
         theme_bw() +
@@ -244,37 +278,10 @@ plot_boxes <- function (plants, gra, plant) {
         guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0))) +
         labs()
 }
-p <- plot_boxes(plants, "elevation", "sativa")
-ggsave(paste0(folder_phenotypes, "plants/01-sativa_traits.png"), p, width = 8, height = 5)
+p1 <- plot_boxes(plants_n, "elevation", "sativa")
+p2 <- plot_boxes(plants_n, "urbanization", "sativa")
+p <- plot_grid(p1, p2, ncol = 2, labels = LETTERS[1:2], scale = .95) +
+    theme(plot.background = element_rect(fill = "white", color = NA)) +
+    draw_text(c("Elevation", "Urbanization"), x = c(0.05, 0.55), y = 0.98, hjust = 0)
+ggsave(paste0(folder_phenotypes, "plants/pairs_boxes.png"), p, width = 8, height = 6)
 
-
-
-if (F) {
-
-set.seed(1)
-p <- plants %>%
-    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "without nitrogen") %>%
-    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
-    group_by(gradient, population, exp_plant) %>%
-    filter(nodule_number <100) %>%
-    pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
-    left_join(traits) %>%
-    ggplot(aes(x = population, y = value, fill = population)) +
-    geom_boxplot(outlier.shape = -1, alpha = 0.5) +
-    geom_jitter(size = .5, shape = 21, width = .2) +
-    scale_fill_manual(values = population_colors) +
-    coord_cartesian(clip = "off") +
-    facet_nested(
-        gradient~trait_type+trait_pre, switch = "y", scales = "free", independent = "all", render_empty = F,
-        axes = "x", remove_labels = "none",
-        strip = strip_nested(bleed=T, clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("grey90", 4), rep("white", 10))))) +
-    theme_bw() +
-    theme(
-        axis.text.x = element_text(angle = 15, hjust = 1, vjust = 1),
-        strip.placement = "outside",
-        strip.background = element_rect(color = NA, fill = "grey90"),
-    ) +
-    guides(fill = "none") +
-    labs(y = "")
-
-}
