@@ -94,20 +94,3 @@ iso <- isolates %>%
     select(` `, population, site, exp_id, genome, rrna_species, rrna_pident, contig_species, contig_pident)
 
 write_csv(iso, paste0(folder_data, "output/iso.csv"))
-
-
-
-
-if (F) {
-
-    # 1. sourmash ----
-    sm_genome <- read_csv(paste0(folder_data, 'genomics_analysis/taxonomy/sm_genome.csv'))
-    sms <- sm_genome %>%
-        mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-        group_by(genome_id) %>%
-        mutate(species = str_split(name, " ") %>% `[[`(1) %>% `[`(c(2,3)) %>% paste(collapse = " ")) %>%
-        mutate(species = str_replace(species, "Sinorhizobium", "Ensifer")) %>%
-        mutate(species = str_replace(species, "Ensifer", "E.")) %>%
-        select(genome_id, species, query_containment_ani, name)
-    write_csv(sms, paste0(folder_data, "genomics_analysis/taxonomy/sms.csv"))
-}

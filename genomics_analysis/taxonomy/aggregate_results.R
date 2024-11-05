@@ -1,13 +1,11 @@
 #' This script assigns the taxonomy
 
-renv::load()
 library(tidyverse)
 library(janitor)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 names_blast <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
-
 
 # 1. Aggregate the 16s blast results ----
 # Read the reference
@@ -61,36 +59,23 @@ for (i in 1:nrow(isolates)) {
 }
 list_b_genome <- list_b_genome[!is.na(list_b_genome)]
 
-b_genome <- bind_rows(list_b_genome) %>%
+blast_genome <- bind_rows(list_b_genome) %>%
     #filter(pident > 90, bitscore > 10000, length > 10000) %>%
     filter(pident > 90, bitscore > 10000) %>%
-    group_by(genome_id, qseqid) %>%
-    arrange(desc(bitscore)) %>%
-    # Find the top hit
-    slice(1) %>%
     mutate(accession = sseqid) %>%
     left_join(ref_genome) %>%
     ungroup() %>%
     select(genome_id, species, strain, replicon, qseqid, scomment, sseqid, pident, length, bitscore) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-    arrange(genome_id)
+    arrange(genome_id, desc(bitscore))
+
+b_genome <- blast_genome %>%
+    group_by(genome_id, qseqid) %>%
+    arrange(desc(bitscore)) %>%
+    # Find the top hit
+    slice(1)
 
 write_csv(ref_genome, paste0(folder_data, "genomics_analysis/taxonomy/ref_genome.csv"))
+write_csv(blast_genome, paste0(folder_data, "genomics_analysis/taxonomy/blast_genome.csv"))
 write_csv(b_genome, paste0(folder_data, "genomics_analysis/taxonomy/b_genome.csv"))
 
-
-
-if (F) {
-
-    # 1. Aggregate sourmash ----
-    list_sm <- rep(list(NA), nrow(isolates))
-    for (i in 1:length(list_sm)) {
-        tb <- read_csv(paste0(folder_genomics, "taxonomy/", isolates$genome_id[i], "/sourmash/gathered.csv"))
-        list_sm[[i]] <- tb %>% select(name, query_containment_ani) %>%
-            mutate(genome_id = isolates$genome_id[i])
-        # ANI estimated from the query containment in the match.
-    }
-    sm_genome <- bind_rows(list_sm) %>%
-        select(genome_id, everything())
-    write_csv(sm_genome, paste0(folder_data, "genomics_analysis/taxonomy/sm_genome.csv"))
-}

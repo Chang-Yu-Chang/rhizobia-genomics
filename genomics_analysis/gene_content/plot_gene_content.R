@@ -18,7 +18,7 @@ make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
         left_join(gene_replicon) %>%
         mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
 }
-plot_heatmap <- function (tt, list_wgpa, by_replicon = F) {
+plot_heatmap <- function (tt, by_replicon = F) {
     list_cg <- tt$pa$gene[apply(tt$gpa[,-1], 1, sum) == ncol(tt$gpa)-1]
     gene_order <- levels(tt$gpacl$gene)
 
@@ -233,7 +233,7 @@ plot_wrapper <- function (set_name) {
     tt <- read_gpas(set_name)
     per_acce_fst <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/per_acce_fst.csv"))
 
-    p <- plot_heatmap(tt, list_wgpa)
+    p <- plot_heatmap(tt)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
     p <- plot_gfs(tt$gpa)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
