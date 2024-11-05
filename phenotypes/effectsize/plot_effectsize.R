@@ -44,7 +44,7 @@ ggsave(paste0(folder_phenotypes, "effectsize/02-cohensd_lupulina.png"), p, width
 
 # 2. Plot the boxplot of traits with Cohen's d -----
 set.seed(1)
-#plot_boxes <- function (plants, gra, plant) {
+plot_boxes <- function (plants, gra, plant) {
     # gra = "elevation"
     # plant = "sativa"
     strips = strip_nested(

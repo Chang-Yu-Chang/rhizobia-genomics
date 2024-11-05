@@ -24,7 +24,7 @@ iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
 treatments <- tibble(
     gra = c(rep("elevation", 3), rep("urbanization", 3), rep("elevation", 14), rep("urbanization", 7)),
     plant = c(rep("lupulina", 6), rep("sativa", 21)),
-    nt = c(rep("without nitrogen", 6+7), rep("with nitrogen", 7), rep("without nitrogen", 7)),
+    nt = c(rep("N-", 6+7), rep("N+", 7), rep("N-", 7)),
     response = c(rep(c("nodule_number", "shoot_biomass_mg", "root_biomass_mg"), 2),
                  rep(c("nodule_number", "primary_root_nodule_number", "lateral_root_nodule_number", "shoot_height", "longest_petiole_length", "leaf_number", "leaf_color"), 2),
                  "nodule_number", "shoot_height", "leaf_number", "leaf_color", "primary_root_length", "lateral_root_number", "longest_lateral_root_length")

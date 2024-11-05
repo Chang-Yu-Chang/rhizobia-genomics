@@ -74,7 +74,7 @@ lupulinas <- bind_rows(treatments_cyc, treatments_ttb) %>%
         genome_name = ifelse(exp_id == "control", "control", genome_name),
         population = factor(population, c("high elevation", "low elevation", "urban", "suburban", "control")),
         exp_plant = "lupulina",
-        exp_nitrogen = "without nitrogen"
+        exp_nitrogen = "N-"
     ) %>%
     select(-id) %>%
     select(gradient, population, site, exp_id, genome_id, genome_name, exp_plant, exp_nitrogen, everything())
@@ -137,6 +137,10 @@ sativas_pa <- read_csv(paste0(folder_data, "raw/plants/BIOL1102_PooledData.csv")
 
 
 sativas <- bind_rows(sativas_va, sativas_pa) %>%
+    mutate(exp_nitrogen = case_when(
+        exp_nitrogen == "without nitrogen" ~ "N-",
+        exp_nitrogen == "with nitrogen" ~ "N+"
+    )) %>%
     mutate(gradient = ifelse(exp_id == "control", "control", gradient)) %>%
     mutate(population = factor(population, c("low elevation", "high elevation", "urban", "suburban", "control")))
 

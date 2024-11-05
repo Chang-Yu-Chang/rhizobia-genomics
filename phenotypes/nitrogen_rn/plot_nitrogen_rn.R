@@ -66,10 +66,6 @@ isolates <- isolates %>%
 
 plants_n <- plants %>%
     filter(population != "control", exp_plant == "sativa", gradient == "elevation") %>%
-    mutate(exp_nitrogen = case_when(
-        exp_nitrogen == "without nitrogen" ~ "N-",
-        exp_nitrogen == "with nitrogen" ~ "N+"
-    )) %>%
     select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
     select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
     group_by(gradient, population, exp_plant) %>%
@@ -258,16 +254,16 @@ p <- plants_n %>%
     scale_size_continuous(range = c(.5, 10)) +
     facet_nested(
         ~trait_type+trait_pre, switch = "y", scales = "free", independent = "all", render_empty = F,
-        axes = "x", remove_labels = "none",
-        strip = strip_nested(bleed=T, clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("grey90", 3), rep("white", 7))))) +
+        axes = "x", remove_labels = "none", nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), solo_line = T,
+        strip = strip_nested(bleed=T, clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("white", 3), rep("white", 7))))) +
     theme_bw() +
     theme(
         strip.placement = "outside",
         strip.background = element_rect(color = NA, fill = NA)
     ) +
     guides(
-        color = guide_legend(title = "Population", override.aes = list(size = 5)),
-        size = guide_legend(title = "Sample size")
+        color = guide_legend(title = "population", override.aes = list(size = 5)),
+        size = guide_legend(title = "sample size")
     ) +
     labs(x = "Nitrogen treatment", y = "")
 

@@ -66,11 +66,7 @@ do_stat <- function (dat, st) {
 
 # 1. Prepare data ----
 plants_n <- plants %>%
-    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "without nitrogen") %>%
-    mutate(exp_nitrogen = case_when(
-        exp_nitrogen == "without nitrogen" ~ "N-",
-        exp_nitrogen == "with nitrogen" ~ "N+"
-    )) %>%
+    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "N-") %>%
     select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
     select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
     group_by(gradient, population, exp_plant) %>%
@@ -238,19 +234,6 @@ tb_tidied_p <- tb_tidied %>%
 plot_boxes <- function (plants_n, gra, plant) {
     # gra = "elevation"
     # plant = "sativa"
-    strips = strip_nested(
-        background_y = elem_list_rect(
-            color = NA,
-            fill = c("white")
-        ),
-        text_y = elem_list_text(
-            size = 12,
-            angle = 0
-        ),
-        bleed = T,
-        by_layer_y = F,
-        clip = "off", size = "variable"
-    )
     ttp <- tb_tidied_p %>%
         filter(gradient == gra)
 
@@ -281,7 +264,23 @@ plot_boxes <- function (plants_n, gra, plant) {
         scale_color_manual(values = population_colors) +
         scale_size_continuous(range = c(.5,3)) +
         coord_flip(clip = "off") +
-        facet_nested_wrap(trait_type + trait_pre ~., ncol = 1, strip.position = "left", axes = "all", scales = "free", solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), strip = strips) +
+        facet_nested_wrap(
+            trait_type + trait_pre ~.,
+            ncol = 1, strip.position = "left", axes = "all", scales = "free",
+            solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1),
+            strip = strip_nested(
+                background_y = elem_list_rect(
+                    color = NA,
+                    fill = c("white")
+                ),
+                text_y = elem_list_text(
+                    size = 12,
+                    angle = 0
+                ),
+                bleed = T,
+                by_layer_y = F,
+                clip = "off", size = "variable"
+            )) +
         theme_bw() +
         theme(
             axis.title.x = element_blank(),
