@@ -21,12 +21,12 @@ p1 <- tr_elev_med_core %>%
     left_join(rename(isolates, label = genome_id)) %>%
     as.treedata() %>%
     ggtree() +
-    geom_tiplab(aes(label = label, color = population), hjust = 0, align = T) +
+    geom_tiplab(aes(label = label, color = population), hjust = -0.1, align = T, offset = 1e-3) +
     #geom_nodelab(aes(label = label), color = "black", hjust = 0, size = 2) +
     geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 3) +
     scale_color_manual(values = population_colors) +
     coord_cartesian(clip = "off") +
-    geom_treescale() +
+    geom_treescale(width = 1e-3, x = .001) +
     theme_tree() +
     theme(
         legend.position = "none",
@@ -37,7 +37,9 @@ p1 <- tr_elev_med_core %>%
     ) +
     guides() +
     labs(title = paste0("Elevation S. medicae\n", nrow(tt$list_sccg), " single-copy core genes"))
-p1
+
+ggsave(paste0(folder_data, "phylogenomics_analysis/trees/01-elevation_sccg.png"), p1, width = 3, height = 3)
+
 set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 

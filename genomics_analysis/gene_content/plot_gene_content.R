@@ -18,10 +18,15 @@ make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
         left_join(gene_replicon) %>%
         mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
 }
-plot_heatmap <- function (gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
-    list_cg <- gpa$gene[apply(gpa[,-1], 1, sum) == ncol(gpa)-1]
-    gene_order <- unique(gpacl$gene)
-    p <- gpacl %>%
+plot_heatmap <- function (tt, list_wgpa, by_replicon = F) {
+    list_cg <- tt$pa$gene[apply(tt$gpa[,-1], 1, sum) == ncol(tt$gpa)-1]
+    gene_order <- levels(tt$gpacl$gene)
+
+    # GPA
+    n_all <- nrow(tt$gene_order) # number of all genes
+    n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
+    n_core = n_all-n_accessory
+    p1 <- tt$gpacl %>%
         #filter(!gene %in% list_cg) %>%
         # Exclude those genes that are assigned to different contigs in differnt genomes
         #filter(!gene %in% list_wgpa$gene) %>%
@@ -31,25 +36,65 @@ plot_heatmap <- function (gpa, gpatl, gpacl, list_wgpa, by_replicon = F) {
         geom_tile(aes(x = gene, y = genome_id, fill = population)) +
         scale_y_discrete(expand = c(0,0)) +
         scale_fill_manual(values = population_colors) +
-        facet_grid2(population~., scales = "free_y") +
+        facet_grid2(population~., scales = "free_y", space = "free_y") +
+        #coord_radial(start = 0 * pi, end = 1.5 * pi, inner.radius = 0.3) +
         theme_classic() +
         theme(
             legend.position = "right",
             legend.title = element_blank(),
             strip.background = element_blank(),
+            strip.text = element_text(size = 10),
             axis.text.x = element_blank(),
             axis.ticks.x = element_blank(),
+            axis.title.x = element_blank(),
             axis.title.y = element_blank(),
             axis.text.y = element_text(size = 10, color = "black"),
             panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
         ) +
         guides(fill = "none") +
-        labs(x = "gene cluster", y = "genome")
+        labs(x = "gene cluster", y = "genome") +
+        ggtitle(paste0("Total: ", n_all, ", Core: ", n_core, ", Accessory: ", n_accessory))
 
-    if (by_replicon) {
-        return(p + facet_grid(.~replicon_type, scales = "free_x", space = "free_x"))
-    } else return(p)
+    tb_ngenomes <- tibble(gene = tt$gpa$gene, n_genomes = apply(tt$gpa[,-1], 1, sum)) %>%
+        mutate(gene = factor(gene, gene_order)) %>%
+        mutate(is_core = ifelse(n_genomes == max(n_genomes), "core", "accessory")) %>%
+        arrange(gene)
 
+    p2 <- tb_ngenomes %>%
+        ggplot() +
+        geom_col(aes(x = gene, y = n_genomes), width = 0.5) +
+        scale_y_continuous(breaks = c(1, 5, 10), expand = c(0,0)) +
+        theme_classic() +
+        theme(
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.title.x = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
+        ) +
+        guides() +
+        labs(x = "gene cluster", y = "# of genomes")
+
+    table(tb_ngenomes$is_core)
+    p3 <- tb_ngenomes %>%
+        mutate(dum = 1) %>%
+        ggplot() +
+        geom_tile(aes(x = gene, fill = is_core, y = dum)) +
+        scale_y_discrete(expand = c(0,0)) +
+        scale_fill_manual(values = c(core = "black", accessory = "grey90")) +
+        theme_classic() +
+        theme(
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
+        ) +
+        guides(color = "none") +
+        labs(x = "gene cluster", y = "")
+
+
+    if (by_replicon) p1 <- p1 + facet_grid(.~replicon_type, scales = "free_x", space = "free_x")
+
+    p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, .2, .2), align = "v", axis = "rl")
+    return(p)
 }
 plot_acce_fst <- function (acce_fst) {
     #' Plot accessory gene fst
@@ -187,15 +232,8 @@ plot_wrapper <- function (set_name) {
     #set_name = "urbn_mel"
     tt <- read_gpas(set_name)
     per_acce_fst <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/per_acce_fst.csv"))
-    n_all <- nrow(tt$gene_order) # number of all genes
-    n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
-    n_core = n_all-n_accessory
-    acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
-    gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
 
-    p1 <- plot_heatmap(tt$gpa, tt$gpatl, tt$gpacl, list_wgpa) + ggtitle(paste0("Total: ", n_all, ", Core: ", n_core, ", Accessory: ", n_accessory))
-    p2 <- plot_acce_fst(acce_fst)
-    p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
+    p <- plot_heatmap(tt, list_wgpa)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
     p <- plot_gfs(tt$gpa)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
@@ -203,11 +241,17 @@ plot_wrapper <- function (set_name) {
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-03-singletons.png"), p, width = 10, height = 8)
     p <- plot_bcsm(tt$sml)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-04-gpa_sm.png"), p, width = 10, height = 8)
+    acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
+    gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
     p <- plot_genecopy(gcn_agg, "fdx|fix|hmp|nap|nod|nif|noe|nos|syr")
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 12)
     p <- plot_bcsm_gcn(gcn_agg)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-06-gcn_sm.png"), p, width = 9, height = 8)
+    # #p2 <- plot_acce_fst(acce_fst)
+    #p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
 }
 
 plot_wrapper("elev_med")
 plot_wrapper("urbn_mel")
+
+

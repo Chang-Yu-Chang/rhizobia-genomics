@@ -14,6 +14,7 @@ library(grid)
 # then in R >renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
 source(here::here("metadata.R"))
 
+# Get data
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 sites <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>% filter(population != "mid elevation") %>%
     # Use sites where the isolates were from
@@ -29,8 +30,19 @@ sites_center <- sites %>%
 us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
 tt <- travel_time("city", path = tempdir()) # travel time data from Nelson, Andy, Daniel J. Weiss, Jacob van Etten, Andrea Cattaneo, Theresa S. McMenomy, and Jawoo Koo. 2019. “A Suite of Global Accessibility Indicators.” Scientific Data 6 (1): 266.
 
+# Plot the sites
+sites %>%
+    filter(gradient == "elevation") %>%
+    ggplot() +
+    geom_point(aes(x = longitude_dec, y = latitude_dec, color = population)) +
+    geom_text(aes(x = longitude_dec, y = latitude_dec, color = population, label = site), vjust = -1) +
+    scale_color_manual(values = population_colors) +
+    theme_bw() +
+    theme() +
+    guides() +
+    labs()
 
-# Plot the states
+# Plot the states ----
 get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) {
     extent_area <- ext(lon_mean - lon_edge/2,
                        lon_mean + lon_edge/2,
@@ -72,7 +84,7 @@ p1 <- us_states %>%
 
 ggsave(paste0(folder_phenotypes, "sites/map-01-states.png"), p1, width = 6, height = 5)
 
-# Elevation
+# Elevation ----
 get_elev_sf <- function (us_elev, sites_center, gra) {
     scc <- unlist(filter(sites_center, gradient == gra)[,-1])
     center_coord <- scc[c("lon_mean", "lat_mean")]
@@ -113,7 +125,7 @@ p2 <- plot_elev_map(elev_sf1, "elevation", 1000)
 
 ggsave(paste0(folder_phenotypes, "sites/map-02-elevation.png"), p2, width = 6, height = 5)
 
-# Urbanization
+# Urbanization ----
 get_tt_sf <- function (tt, sites_center, gra) {
     scc <- unlist(filter(sites_center, gradient == gra)[,-1])
     center_coord <- scc[c("lon_mean", "lat_mean")]
@@ -154,7 +166,7 @@ p3 <- plot_tt_map(tt_sf2, "urbanization")
 
 ggsave(paste0(folder_phenotypes, "sites/map-03-urbanization.png"), p3, width = 6, height = 5)
 
-# Combine
+# Combine ----
 zoom_polygon1 <- polygonGrob(x = c(.342,.342,.415,.415), y = c(.55,.85,.345,.305), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 zoom_polygon2 <- polygonGrob(x = c(.70,.695,.73,.97), y = c(.6,.6,.53,.53), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 p <- ggdraw(p1) +

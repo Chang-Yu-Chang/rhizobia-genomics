@@ -4,7 +4,8 @@ library(tidyverse)
 library(janitor)
 library(ape) # for reading multiple fasta
 library(poppr) # for reading snps into a genind object
-library(hierfstat) # for computing Fst
+library(mmod) # for computing Fst estimates: Nei's Gst, Hendrick's Gst, and Jost' D
+#library(hierfstat) # for computing Fst
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
@@ -40,8 +41,7 @@ extract_per_locus <- function (wc_object, gi_filtered) {
     }
     return(tb)
 }
-
-for (set_name in c("elev_med", "urbn_mel")) {
+fst_wrapper <- function (set_name) {
     #set_name <- "elev_med"
     #set_name <- "urbn_mel"
     list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
@@ -68,9 +68,12 @@ for (set_name in c("elev_med", "urbn_mel")) {
         if(ncol(gi_filtered@tab) == 0) {cat(gene, "has no polymorphism after removing samples with missing data. \n"); next}
 
         # Compute Fst
-        ww <- wc(gi_filtered, diploid = F) # Weir and Cockerham estimates of Fstatistics
-        per_locus_fst_results[[gene]] <- extract_per_locus(ww, gi_filtered) # per locus F_st results
-        per_gene_fst_results[[gene]] <- tibble(n_snps = length(gi_filtered@loc.n.all), fst = ww$FST) # gene-wide F_st results
+        #ww <- wc(gi_filtered, diploid = F) # Weir and Cockerham estimates of Fstatistics
+        #hierfstat::boot.ppfst(gi_filtered)
+        ww <- diff_stats(gi_filtered)
+
+        per_locus_fst_results[[gene]] <- as_tibble(ww$per.locus) #extract_per_locus(ww, gi_filtered) # per locus F_st results
+        per_gene_fst_results[[gene]] <- as_tibble(as.list(ww$global)) %>% mutate(n_snps = length(gi_filtered@loc.n.all)) # tibble(n_snps = length(gi_filtered@loc.n.all), fst = ww$FST) # gene-wide F_st results
 
         cat("\nProcessed:", gene, "\n")
     }
@@ -84,58 +87,6 @@ for (set_name in c("elev_med", "urbn_mel")) {
     write_csv(per_locus_fst, paste0(folder_data, "genomics_analysis/fst/", set_name, "/per_locus_fst.csv"))
 }
 
+fst_wrapper("elev_med")
+fst_wrapper("urbn_mel")
 
-
-if (F) {
-    # Compute per locus Fst
-    list_snps <- names(gi_filtered@all.names)
-    snp_fst <- list()
-    for (snp in list_snps) {
-        afs <- compute_af(gi_filtered, snp)
-        snp_fst[[snp]] <- compute_fst(afs$af1, afs$n1, afs$af2, afs$n2, afs$aft)
-    }
-    per_snp_fst <- bind_rows(snp_fst, .id = "location")
-    compute_af <- function (gi_filtered, snp) {
-        #' This function computes the allele frequency per population
-        gi_temp <- gi_filtered[, str_detect(colnames(gi_filtered@tab), snp)]
-        ns <- table(gi_temp@pop)
-        pop1 = names(ns)[1]
-        pop2 = names(ns)[2]
-        n1 = ns[1]
-        n2 = ns[2]
-        a1 = gi_temp@tab[which(gi_temp@pop == pop1),1]
-        af1 = mean(a1)
-        a2 = gi_temp@tab[which(gi_temp@pop == pop2),1]
-        af2 = mean(a2)
-        aft = mean(gi_temp@tab[,1])
-
-        return(tibble(af1, n1, af2, n2, aft))
-    }
-    compute_fst <- function (af1, n1, af2, n2, aft, fpc = T) {
-        #' Compute Fst from allele frequency. Same as poppr(gi)$Hexp
-
-        # Correct for finite/small population size
-        if (fpc) {
-            h1 = n1/(n1-1)*(1-af1^2-(1-af1)^2) # pop 1
-            h2 = n2/(n2-1)*(1-af2^2-(1-af2)^2) # pop 2
-            ht = (n1+n2)/(n1+n2-1)*(1-aft^2-(1-aft)^2) # total heterozygosity
-        } else if (fpc == F){
-            h1 = 1-af1^2-(1-af1)^2 # pop 1
-            h2 = 1-af2^2-(1-af2)^2 # pop 2
-            ht = 1-aft^2-(1-aft)^2 # total heterozygosity
-        }
-        hs = (n1*h1+n2*h2)/(n1+n2) # within-population heterozygosity
-        fst = 1-(hs/ht)
-        return(tibble(h1, h2, ht, hs, fst))
-    }
-    # wc(gtrunchier)
-    # varcomp.glob(data.frame(gtrunchier[,1]),gtrunchier[,-c(1)])$F
-    #boot.vc(gtrunchier[,1],gtrunchier[,-c(1)])$ci
-    #yy <- wc(nancycats)
-    #yy$per.loc
-    #xx <- basic.stats(nancycats)
-    #xx$Ho %>% colMeans()
-    #basic.stats(nancycats)
-    #Ho(nancycats)
-
-}

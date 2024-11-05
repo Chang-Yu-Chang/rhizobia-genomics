@@ -1947,21 +1947,6 @@
       ],
       "Hash": "24b224366f9c2e7534d2344d10d59211"
     },
-    "hierfstat": {
-      "Package": "hierfstat",
-      "Version": "0.5-11",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "ade4",
-        "adegenet",
-        "gaston",
-        "gtools",
-        "methods"
-      ],
-      "Hash": "5b52ea0845c3e9203f3c805971967a11"
-    },
     "highr": {
       "Package": "highr",
       "Version": "0.11",
@@ -2426,6 +2411,19 @@
         "Rcpp"
       ],
       "Hash": "785ef8e22389d4a7634c6c944f2dc07d"
+    },
+    "mmod": {
+      "Package": "mmod",
+      "Version": "1.3.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "adegenet",
+        "pegas",
+        "stats"
+      ],
+      "Hash": "a55427db4d44fe8029b66b84674ff1e3"
     },
     "modelr": {
       "Package": "modelr",

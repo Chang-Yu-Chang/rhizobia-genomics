@@ -23,6 +23,7 @@ isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
 
+# 0.1 Bootstrap functions ----
 tidy_mod <- function (mod) {
     x <- tidy(mod)$estimate
     return(x)
@@ -59,6 +60,8 @@ do_stat <- function (dat, st) {
     eval(parse(text = st))
     return(mod)
 }
+
+# 0.2 plotting functions ----
 
 
 # 1. Prepare data ----
@@ -226,6 +229,11 @@ save_as_image(ft2, path = paste0(folder_phenotypes, "plants/pairs_tab_boot.png")
 
 
 # 5. Plot ----
+
+tb_tidied_p <- tb_tidied %>%
+    filter(str_detect(term, "population")) %>%
+    mutate(signlab = map_chr(p.value, detect_sig))
+
 # 5.1 Boxplot ----
 plot_boxes <- function (plants_n, gra, plant) {
     # gra = "elevation"
@@ -236,23 +244,39 @@ plot_boxes <- function (plants_n, gra, plant) {
             fill = c("white")
         ),
         text_y = elem_list_text(
-            size = 8,
+            size = 12,
             angle = 0
         ),
         bleed = T,
         by_layer_y = F,
         clip = "off", size = "variable"
     )
+    ttp <- tb_tidied_p %>%
+        filter(gradient == gra)
+
 
     plants_n %>%
         filter(gradient == gra) %>%
         left_join(traits) %>%
+        mutate(population = factor(population, c("low elevation", "high elevation", "urban", "suburban"))) %>%
         arrange(trait_type) %>%
         group_by(gradient, population, exp_plant, trait_type, trait_pre, value, exp_id) %>%
         count() %>%
         ggplot() +
         geom_boxplot(aes(x = population, y = value, fill = population), alpha = 0.3, width = .7, outlier.size = -1) +
         geom_point(aes(x = population, group = exp_id, y = value, color = population, size = n), alpha = .4, shape = 16, position = position_dodge(width = .7)) +
+        stat_summary(
+            fun.data = function(x) {
+                y_min <- min(x)
+                y_max <- max(x)
+                y_segment <- y_min + 1.05 * (y_max - y_min)  # 75% line
+                data.frame(y = y_segment)
+            },
+            geom = "segment",
+            aes(x = 1, xend = 2, y = value, yend = value),
+            color = "black", linetype = 1, linewidth = .5
+        ) +
+        geom_text(data = ttp, aes(label = signlab), x = 1.5, y = Inf, hjust = 0.3) +
         scale_fill_manual(values = population_colors) +
         scale_color_manual(values = population_colors) +
         scale_size_continuous(range = c(.5,3)) +
@@ -270,12 +294,12 @@ plot_boxes <- function (plants_n, gra, plant) {
             legend.position = "top",
             legend.key = element_rect(fill = NA, color = NA),
             legend.key.height = unit(10, "mm"),
-            legend.text = element_text(size = 8),
+            legend.text = element_text(size = 12),
             legend.title = element_blank(),
             legend.background = element_blank(),
             legend.box.margin = unit(c(0,0,-5,0), "mm")
         ) +
-        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0))) +
+        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0), reverse = T), color = "none") +
         labs()
 }
 p1 <- plot_boxes(plants_n, "elevation", "sativa")
@@ -283,5 +307,5 @@ p2 <- plot_boxes(plants_n, "urbanization", "sativa")
 p <- plot_grid(p1, p2, ncol = 2, labels = LETTERS[1:2], scale = .95) +
     theme(plot.background = element_rect(fill = "white", color = NA)) +
     draw_text(c("Elevation", "Urbanization"), x = c(0.05, 0.55), y = 0.98, hjust = 0)
-ggsave(paste0(folder_phenotypes, "plants/pairs_boxes.png"), p, width = 8, height = 6)
+ggsave(paste0(folder_phenotypes, "plants/pairs_boxes.png"), p, width = 12, height = 6)
 
