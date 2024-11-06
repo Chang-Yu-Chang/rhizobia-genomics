@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(cowplot)
+library(ggh4x)
 library(vegan) # for mantel test
 source(here::here("metadata.R"))
 
@@ -173,10 +174,11 @@ plot_replicon_wide_dxy <- function (xx_rp) {
         geom_point(aes(x = dist_geo_km, y = dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
         geom_text(data = mantel_results, aes(label = paste(n_snps, "SNPs, r² =", round(r_squared, 3), ast)), x = -Inf, y = Inf, hjust = -.1, vjust = 1.5, size = 3, color = "black") +
         scale_color_manual(values = pops_colors) +
-        facet_grid(~replicon_type) +
+        facet_grid2(~replicon_type) +
         theme_bw() +
         theme(
-            legend.title = element_blank()
+            legend.title = element_blank(),
+            strip.background = element_blank()
         ) +
         guides() +
         labs(x = "Geographic distance (km)", y = "Dxy")
@@ -195,9 +197,9 @@ dxy_wrapper <- function (set_name) {
     nrow(xx_gn) # choose(10,2) or choose(17,2)
 
     p <- plot_genome_wide_dxy(xx_gn) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 5, height = 4)
+    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 4, height = 3)
     p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 4)
+    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 3)
 }
 
 dxy_wrapper("elev_med")

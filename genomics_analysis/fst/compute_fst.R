@@ -28,19 +28,6 @@ filter_snps <- function (genind_data, isolates) {
 
     return(genind_data_filtered)
 }
-extract_per_locus <- function (wc_object, gi_filtered) {
-    if (length(gi_filtered@loc.n.all) == 1) { # Single snp in this gene
-        snp_location <- names(gi_filtered@loc.n.all)
-        tb <- tibble(location = snp_location, fst = ww$FST)
-    } else if (length(gi_filtered@loc.n.all) >= 2) {
-        snp_location <- rownames(wc_object$per.loc) %>% str_remove("X")
-        tb <- as_tibble(wc_object$per.loc) %>%
-            mutate(location = snp_location) %>%
-            select(location, everything()) %>%
-            clean_names()
-    }
-    return(tb)
-}
 fst_wrapper <- function (set_name) {
     #set_name <- "elev_med"
     #set_name <- "urbn_mel"
@@ -72,7 +59,7 @@ fst_wrapper <- function (set_name) {
         #hierfstat::boot.ppfst(gi_filtered)
         ww <- diff_stats(gi_filtered)
 
-        per_locus_fst_results[[gene]] <- as_tibble(ww$per.locus) #extract_per_locus(ww, gi_filtered) # per locus F_st results
+        per_locus_fst_results[[gene]] <- as_tibble(ww$per.locus) %>% mutate(location = rownames(ww$per.locus)) #extract_per_locus(ww, gi_filtered) # per locus F_st results
         per_gene_fst_results[[gene]] <- as_tibble(as.list(ww$global)) %>% mutate(n_snps = length(gi_filtered@loc.n.all)) # tibble(n_snps = length(gi_filtered@loc.n.all), fst = ww$FST) # gene-wide F_st results
 
         cat("\nProcessed:", gene, "\n")
@@ -89,4 +76,3 @@ fst_wrapper <- function (set_name) {
 
 fst_wrapper("elev_med")
 fst_wrapper("urbn_mel")
-

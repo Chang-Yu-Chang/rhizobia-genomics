@@ -98,30 +98,29 @@ clean_gpaf <- function (gpaf_file) {
     return(gpaf)
 }
 make_long_gpaf <- function (gpaf) {
-    gpafl <- gpaf %>%
+    gpafl1 <- gpaf %>%
         select(-non_unique_gene_name) %>%
         pivot_longer(-c(gene, annotation), names_to = "genome_id", values_to = "annotation_id", values_drop_na = T) %>%
         mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
         arrange(genome_id) %>%
         mutate(annotation_id = str_remove(annotation_id, "_stop"))
 
-    ## Unpack genes with multiple copies in one genome
+    # Unpack genes with multiple copies in one genome
     split_colons <- function(string) unlist(str_split(string, ";"))
     split_tildes <- function(string) unlist(str_split(string, "~~~"))
-    gpafl_multi <- gpafl %>%
+    gpafl_multi <- gpafl1 %>%
         filter(str_detect(annotation_id, ";")) %>%
         rowwise() %>%
         mutate(annotation_id = list(split_colons(annotation_id))) %>%
         unnest(annotation_id)
-    gpafl <- gpafl %>%
+    gpafl2 <- gpafl1 %>%
         filter(!str_detect(annotation_id, ";")) %>%
         bind_rows(gpafl_multi)
-    dim(gpafl) # 255485
-    return(gpafl)
+    dim(gpafl1) # the one with unique gene numbers
+    dim(gpafl2) # unnested multi coply genes
+    return(list(gpafl1 = gpafl1, gpafl2 = gpafl2))
 }
 make_long_gpac <- function (gpafl, contigs, gd) {
-    # contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv")) %>% select(contig_id, replicon_type) %>% drop_na
-    # gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
     gd <- gd %>% select(genome_id, contig_id, annotation_id)
     gpacl <- gpafl %>%
         arrange(genome_id, annotation_id) %>%
@@ -258,13 +257,14 @@ clean_all <- function (set_name, contigs) {
 
     # Full directory for each gene
     gpaf <- clean_gpaf(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.csv"))
-    dim(gpaf) # 26504 genes x 39-3 genomes. 1) gene name 2) non unique gene name 3) annotation
+    dim(gpaf) #  genes x 39-3 genomes. 1) gene name 2) non unique gene name 3) annotation
     gpafl <- make_long_gpaf(gpaf)
-    dim(gpafl) # 244960 x 4
+    dim(gpafl$gpafl1) #
+    dim(gpafl$gpafl2) #
 
     # Make longer format of gene with contig info
     gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gd.csv"))
-    gpacl <- make_long_gpac(gpafl, contigs, gd)
+    gpacl <- make_long_gpac(gpafl$gpafl1, contigs, gd)
     length(unique(gpacl$contig_id)) # 161 contigs
     write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpacl.csv"))
 

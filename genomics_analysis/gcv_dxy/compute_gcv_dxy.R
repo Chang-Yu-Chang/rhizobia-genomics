@@ -28,35 +28,45 @@ compute_gcv_dxy <- function (tt) {
     n2 = ns[2]
     pop1_gid <- temp$genome_id[temp$population==pop1]
     pop2_gid <- temp$genome_id[temp$population==pop2]
-    # number of gpa difference between sequences
-    pi1 <- mean(dist(t(tt$gpa[,pop1_gid]), method = "manhattan")) # Within pop1 dxy
-    pi2 <- mean(dist(t(tt$gpa[,pop2_gid]), method = "manhattan")) # Within pop2 dxy
+    gpaclw <- tt$gpacl %>%
+        select(replicon_type, gene, genome_id) %>%
+        mutate(temp = 1) %>%
+        filter(replicon_type %in% c("chromosome", "pSymA", "pSymB")) %>%
+        pivot_wider(names_from = genome_id, values_from = temp, values_fill = 0)
+
+    # Whole genome
+    ## number of gpa difference between sequences
     dall <- dist(t(tt$gpa[,-1]), method = "manhattan") # total
     dall_ln <- make_longer_dist(dall)
-    # Between pops dxy
+    ## Between pops dxy
+    pi1 <- mean(dist(t(tt$gpa[,pop1_gid]), method = "manhattan")) # Within pop1 dxy
+    pi2 <- mean(dist(t(tt$gpa[,pop2_gid]), method = "manhattan")) # Within pop2 dxy
     dxy <- mean(as.matrix(dall)[1:n1,(n1+1):(n1+n2)])
 
+    # Replicon
+    drep_ln <- gpaclw %>%
+        nest(data = -replicon_type) %>%
+        mutate(
+            dall = map(data, ~dist(t(.x[,-1]), method = "manhattan")),
+            dall_ln = map(dall, make_longer_dist)
+        ) %>%
+        unnest(dall_ln) %>%
+        select(-data, -dall)
 
-    return(list(pop_dxy = tibble(pi1, pi2, dxy), ind_dxy = dall_ln))
+    return(list(pop_dxy = tibble(pi1, pi2, dxy), ind_dxy = dall_ln, rep_dxy = drep_ln))
+}
+gcv_dxy_wrapper <- function (set_name) {
+    #set_name = "elev_med"
+    #set_name <- "urbn_mel"
+    tt <- read_gpas(set_name)
+    dd <- compute_gcv_dxy(tt)
+
+    write_csv(dd$pop_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_pop_dxy.csv"))
+    write_csv(dd$ind_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_ind_dxy.csv"))
+    write_csv(dd$rep_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_rep_dxy.csv"))
+
 }
 
-set_name = "elev_med"
-tt <- read_gpas(set_name)
-dd <- compute_gcv_dxy(tt)
-gcv_pop_dxy <- dd$pop_dxy
-gcv_ind_dxy <- dd$ind_dxy
-
-write_csv(gcv_pop_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_pop_dxy.csv"))
-write_csv(gcv_ind_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_ind_dxy.csv"))
-
-
-set_name <- "urbn_mel"
-tt <- read_gpas(set_name)
-dd <- compute_gcv_dxy(tt)
-gcv_pop_dxy <- dd$pop_dxy
-gcv_ind_dxy <- dd$ind_dxy
-
-write_csv(gcv_pop_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_pop_dxy.csv"))
-write_csv(gcv_ind_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_ind_dxy.csv"))
-
+gcv_dxy_wrapper("elev_med")
+gcv_dxy_wrapper("urbn_mel")
 

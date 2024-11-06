@@ -225,12 +225,10 @@ save_as_image(ft2, path = paste0(folder_phenotypes, "plants/pairs_tab_boot.png")
 
 
 # 5. Plot ----
-
+# 5.1 Boxplot ----
 tb_tidied_p <- tb_tidied %>%
     filter(str_detect(term, "population")) %>%
     mutate(signlab = map_chr(p.value, detect_sig))
-
-# 5.1 Boxplot ----
 plot_boxes <- function (plants_n, gra, plant) {
     # gra = "elevation"
     # plant = "sativa"
@@ -246,8 +244,8 @@ plot_boxes <- function (plants_n, gra, plant) {
         group_by(gradient, population, exp_plant, trait_type, trait_pre, value, exp_id) %>%
         count() %>%
         ggplot() +
-        geom_boxplot(aes(x = population, y = value, fill = population), alpha = 0.3, width = .7, outlier.size = -1) +
-        geom_point(aes(x = population, group = exp_id, y = value, color = population, size = n), alpha = .4, shape = 16, position = position_dodge(width = .7)) +
+        geom_boxplot(aes(x = exp_id, y = value, fill = population), alpha = 0.3, width = .7, outlier.size = -1) +
+        geom_point(aes(x = exp_id, group = exp_id, y = value, color = population, size = n), alpha = .4, shape = 16, position = position_dodge(width = .7)) +
         stat_summary(
             fun.data = function(x) {
                 y_min <- min(x)
