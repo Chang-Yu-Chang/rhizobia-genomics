@@ -32,16 +32,21 @@ traits <- tibble(
     mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
     arrange(trait_type) %>%
     mutate(trait_pre = case_when(
-        trait_pre == "root biomass" ~ "root biomass (mg)",
-        trait_pre == "shoot biomass" ~ "shoot biomass (mg)",
+        trait_pre == "root biomass" ~ "root\nbiomass (mg)",
+        trait_pre == "shoot biomass" ~ "shoot\nbiomass (mg)",
         trait_pre == "longest petiole length" ~ "longest petiole\nlength (cm)",
+        #trait_pre == "nodule number" ~ "nodule\nnumber",
         trait_pre == "lateral root nodule number" ~ "lateral root\nnodule number",
         trait_pre == "primary root nodule number" ~ "primary root\nnodule number",
+        # trait_pre == "leaf number" ~ "leaf\nnumber",
+        # trait_pre == "leaf color" ~ "leaf\ncolor",
         trait_pre == "shoot height" ~ "shoot height (cm)",
         trait_pre == "primary root length" ~ "primary root\nlength (cm)",
-        trait_pre == "longest lateral root length" ~ "longest lateral\nroot length(cm)",
+        # trait_pre == "longest lateral root length" ~ "longest lateral\nroot length (cm)",
+        #trait_pre == "lateral root number" ~ "lateral\nroot\nnumber",
         T ~ trait_pre
     )) %>%
+    mutate(trait_pre2 = factor(str_replace(trait_pre, " ", "\n"))) %>%
     mutate(trait_pre = factor(trait_pre, trait_pre))
 
 # utils
@@ -53,10 +58,10 @@ read_gpas <- function (set_name) {
     spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
     gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
     gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)))
     gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
     gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
-        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)), gene = factor(gene, gene_order$gene))
+        mutate(genome_id = factor(genome_id, rev(isolates$genome_id)))
     gcn <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gcn.csv"))
     cleaned_gene_names <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/cleaned_gene_names.csv"))
     return(list(gpa = gpa, gpar = gpar, list_sccg = list_sccg, sml = sml, spa = spa, gpatl = gpatl, gene_order = gene_order, gd = gd, gpacl = gpacl, gcn = gcn, cleaned_gene_names = cleaned_gene_names))

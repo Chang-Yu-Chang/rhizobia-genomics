@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(cowplot)
+library(ggh4x)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -69,6 +70,7 @@ plot_gene_fst <- function (gene_fst_long) {
 plot_snps_fst <- function (snp_fst_long) {
     snp_fst_long %>%
         mutate(loc_start = loc_start / 10^6) %>%
+        filter(replicon_type != "pAcce") %>%
         ggplot() +
         geom_point(aes(x = loc_start, y = value), shape = 21, size = .5) +
         scale_x_continuous(breaks = seq(0, 4, 0.5)) +
@@ -77,9 +79,6 @@ plot_snps_fst <- function (snp_fst_long) {
         theme() +
         guides() +
         labs(x = "core genome (Mbp)", y = "fst")
-}
-plot_box <- function (gene_fst, labelled_genes = "fix|nod|nif") {
-
 }
 plot_fst_wrapper <- function (set_name) {
     #set_name = "elev_med"
@@ -97,28 +96,73 @@ plot_fst_wrapper <- function (set_name) {
     p <- plot_gene_fst(gene_fst_long)
     ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-gene_fst.png"), p, width = 10, height = 8)
 
+    p <- plot_snps_fst(snp_fst_long)
+    ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 8)
+
+    p <- snp_fst_long %>%
+        filter(replicon_type != "pAcce") %>%
+        filter(Fst == "Gprime_st") %>%
+        ggplot() +
+        geom_histogram(aes(x = value), binwidth = .1, color = 1, fill = "grey90") +
+        scale_x_continuous(limits = c(-.1, 1), breaks = seq(0, 1, .5)) +
+        scale_y_continuous(expand = c(.02,0)) +
+        facet_wrap2(~replicon_type, ncol = 3, axes = "all", ) +
+        theme_classic() +
+        theme(
+            strip.background = element_blank(),
+            strip.text = element_text(size = 10)
+        ) +
+        guides() +
+        labs(x = "G'st")
+    ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-03-gene_fst_hist.png"), p, width = 8, height = 3)
+
+    # Genes with top Fst
+    gene_fst_long %>%
+        filter(replicon_type != "pAcce") %>%
+        mutate(loc_start = loc_start / 10^6) %>%
+        group_by(replicon_type, Fst) %>%
+        arrange(desc(value)) %>%
+        slice_max(value, prop = .01) %>%
+        filter(Fst %in% "Gprime_st") %>%
+        view
+        #filter(!str_detect(gene, "group"))
+
+    snp_fst_line <- gene_fst_long %>%
+        filter(replicon_type != "pAcce") %>%
+        group_by(replicon_type, Fst) %>%
+        arrange(desc(value)) %>%
+        slice_max(value, prop = .01) %>%
+        filter(Fst %in% "Gprime_st") %>%
+        summarize(min_value = min(value))
+
+    p <- gene_fst_long %>%
+        mutate(loc_start = loc_start / 10^6) %>%
+        filter(replicon_type != "pAcce") %>%
+        filter(Fst == "Gprime_st") %>%
+        ggplot() +
+        geom_point(aes(x = loc_start, y = value), shape = 21, size = .5) +
+        geom_hline(data = snp_fst_line, aes(yintercept = min_value), color = "red", linetype = 2) +
+        scale_x_continuous(breaks = seq(0, 3, .5)) +
+        scale_y_continuous(expand = c(.02,0), breaks = seq(0, 1, .5)) +
+        facet_grid2(~replicon_type, axes = "all", scales = "free_x", space = "free_x") +
+        theme_classic() +
+        coord_cartesian(clip = "off") +
+        theme(
+            strip.background = element_blank(),
+            strip.text = element_text(size = 10),
+            panel.border = element_rect(color = "black", fill = NA)
+        ) +
+        guides() +
+        labs(x = "core genome (Mbp)", y = "G'st")
+    ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-04-gene_fst_gprime.png"), p, width = 8, height = 3)
+
     gene_fst_long %>%
         group_by(replicon_type, Fst) %>%
         arrange(desc(value)) %>%
         slice_max(value, prop = .01) %>%
-        filter(replicon_type == "pSymA")
+        filter(replicon_type == "pSymA") %>%
+        view
 
-    p <- plot_snps_fst(snp_fst_long)
-    ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-02-snp_fst.png"), p, width = 10, height = 8)
-
-    snp_fst_long %>%
-        group_by(replicon_type, Fst) %>%
-        arrange(desc(value)) %>%
-        slice_max(value, prop = .01) %>%
-        filter(!Fst %in% c("Hs", "Ht"))
-        #filter(replicon_type == "pSymA") %>%
-
-
-
-    #p1 <- plot_gene_fst(gene_fst, "fix|nod|nif") + ggtitle(paste0(set_name, ": ", nrow(gene_fst), " single copy core genes"))
-    #p2 <- plot_snps_fst(snp_fst) + ggtitle(paste0(set_name, ": ", nrow(snp_fst), " SNPs"))
-    #p <- plot_grid(p1, p2, nrow = 2, axis = "lr", align = "v")
-    #ggsave(paste0(folder_data, "genomics_analysis/fst/", set_name,"-01-fst.png"), p, width = 10, height = 8)
 
 
 }

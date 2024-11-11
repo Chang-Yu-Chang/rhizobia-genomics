@@ -50,18 +50,7 @@ make_dist_m <- function (xx_gn, dist_name) {
     diag(m_gn) <- 0
     return(m_gn)
 }
-turn_p_to_asteriks <- function (p_value) {
-    if (p_value < 0.001) {
-        asterisks <- "***"
-    } else if (p_value < 0.01) {
-        asterisks <- "**"
-    } else if (p_value < 0.05) {
-        asterisks <- "*"
-    } else {
-        asterisks <- "ns"  # Not significant
-    }
-    return(asterisks)
-}
+
 plot_gcv_dxy <- function (dists) {
     dists %>%
         mutate(pops = paste0(population1, "-", population2)) %>%
@@ -73,18 +62,22 @@ plot_gcv_dxy <- function (dists) {
         mutate(pops = str_remove_all(pops, " elevation")) %>%
         ggplot() +
         geom_smooth(aes(x = dist_geo_km, y = gcv_dxy_scaled), method = "lm", se = F, color = "black") +
-        geom_point(aes(x = dist_geo_km, y = gcv_dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
-        scale_color_manual(values = pops_colors) +
-        annotate("text", x = -Inf, y = Inf, label = paste(n_accessory, " accessory genes", ", r² =", round(r_squared, 3), ast), hjust = -.2, vjust = 1.5, size = 3, color = "black") +
-        theme_bw() +
+        #geom_point(aes(x = dist_geo_km, y = gcv_dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
+        geom_point(aes(x = dist_geo_km, y = gcv_dxy_scaled), shape = 21, size = 2, stroke = 1) +
+        #scale_color_manual(values = pops_colors) +
+        #annotate("text", x = -Inf, y = Inf, label = paste(n_accessory, " accessory genes", ", r² =", round(r_squared, 3), ast), hjust = -.2, vjust = 1.5, size = 3, color = "black") +
+        theme_classic() +
+        coord_cartesian(clip = "off") +
         theme(
             legend.position = "right",
-            legend.title = element_blank()
+            legend.title = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA),
+            plot.title = element_text(size = 8)
         ) +
         guides() +
         labs(x = "Geographic distance (km)", y = "GCV Dxy") +
-        ggtitle(paste0(set_name, ": gene content, ", length(unique(c(dists$genome_id1, dists$genome_id2))), " genomes, ", nrow(dists), " pairs"))
-
+        ggtitle(paste(n_accessory, " accessory genes", ", r² =", round(r_squared, 3), ast))
+        #ggtitle(paste0(set_name, ": gene content, ", length(unique(c(dists$genome_id1, dists$genome_id2))), " genomes, ", nrow(dists), " pairs"))
 }
 
 
@@ -109,7 +102,7 @@ ast <- turn_p_to_asteriks(model$signif)
 
 # Plot
 p <- plot_gcv_dxy(dists)
-ggsave(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name,"-01-gcv_dxy.png"), p, width = 5, height = 4)
+ggsave(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name,"-01-gcv_dxy.png"), p, width = 3, height = 3)
 
 
 

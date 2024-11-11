@@ -16,6 +16,7 @@
 #'  - gpacl: the long list of gene presence absence and the contigs they are located
 #'  - gcn: a wide format of gene copy number
 #'  - cleaned_gene_names: table of annotated gene cluster with gene symbol. See the function for the criteria
+#'  - acce_fst: the fst equivalent of accessory gene content
 
 library(tidyverse)
 library(janitor)
@@ -64,16 +65,9 @@ make_long_gpa <- function (gpa) {
     gpat <- gpa %>%
         pivot_longer(cols = -gene, names_to = "genome_id") %>%
         pivot_wider(names_from = gene, values_from = value, values_fill = 0)
-    #dim(gpat) # 36 genomes x 26505 genes
     gpatl <- gpat %>%
-        pivot_longer(cols = -genome_id, names_to = "gene") %>%
-        filter(value == 1)
-    gene_order <- gpatl %>%
-        group_by(gene) %>%
-        dplyr::count() %>%
-        arrange(desc(n))
-    #dim(gpatl) # 244960 3
-    return(list(gpatl = gpatl, gene_order = gene_order))
+        pivot_longer(cols = -genome_id, names_to = "gene")
+    return(gpatl)
 }
 clean_gpar <- function (gpar_file) {
     read_delim(gpar_file, show_col_types = F) %>% clean_names() # Rows are genes, columns are genomes
@@ -222,7 +216,7 @@ clean_all <- function (set_name, contigs) {
 
     # Gene presence-absence table. Rows are genes, columns are genomes. Entries are binary
     gpa <- clean_gpa(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_presence_absence.Rtab"))
-    dim(gpa) # 26504 genes in union x 37-1 genomes
+    dim(gpa)
     write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpa.csv"))
 
     # Gene presence-absence identical to roary output.  It has the fasta IDs instead of binary entries
@@ -240,15 +234,13 @@ clean_all <- function (set_name, contigs) {
 
     # Structural variation
     spa <- clean_spa(paste0(folder_data, "genomics/pangenome/", set_name,"/struct_presence_absence.Rtab"))
-    dim(spa) # 10557 structural variants x 37-1 genomes
+    dim(spa)
     write_csv(spa, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/spa.csv"))
 
     # Make a longer list and Compute gene counts
-    tt <- make_long_gpa(gpa); gpatl <- tt$gpatl; gene_order <- tt$gene_order
-    dim(gpatl) # 244960 3
-    dim(gene_order) # 26505 genes ordered by the prevalence across gneoms
+    gpatl <- make_long_gpa(gpa)
+    dim(gpatl)
     write_csv(gpatl, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpatl.csv"))
-    write_csv(gene_order, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gene_order.csv"))
 
     # Genes and the contigs they are from
     gd <- clean_gd(paste0(folder_data, "genomics/pangenome/", set_name,"/gene_data.csv"))
@@ -268,6 +260,13 @@ clean_all <- function (set_name, contigs) {
     length(unique(gpacl$contig_id)) # 161 contigs
     write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gpacl.csv"))
 
+    # Gene order
+    gene_order <- gpacl %>%
+        group_by(replicon_type, gene) %>%
+        dplyr::count() %>%
+        arrange(desc(n))
+    write_csv(gene_order, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gene_order.csv"))
+
     # Get the wide format of gene copy number. Use the gpar table
     gcn <- get_wide_gcn(gpar)
     write_csv(gcn, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/gcn.csv"))
@@ -278,7 +277,7 @@ clean_all <- function (set_name, contigs) {
 }
 
 # All 36 genomes
-clean_all("isolates", contigs)
+#clean_all("isolates", contigs)
 # 10 elevation medicae
 clean_all("elev_med", contigs)
 # 17 urbanization meliloti

@@ -9,7 +9,6 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
-
     gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
         select(gene, replicon_type) %>%
         replace_na(list(replicon_type = "others"))
@@ -19,7 +18,6 @@ make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
         mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
 }
 plot_heatmap <- function (tt, by_replicon = F) {
-    list_cg <- tt$pa$gene[apply(tt$gpa[,-1], 1, sum) == ncol(tt$gpa)-1]
     gene_order <- levels(tt$gpacl$gene)
 
     # GPA
@@ -72,7 +70,7 @@ plot_heatmap <- function (tt, by_replicon = F) {
             panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
         ) +
         guides() +
-        labs(x = "gene cluster", y = "# of genomes")
+        labs(x = "gene cluster", y = "# genomes")
 
     table(tb_ngenomes$is_core)
     p3 <- tb_ngenomes %>%
@@ -85,7 +83,8 @@ plot_heatmap <- function (tt, by_replicon = F) {
         theme(
             axis.text = element_blank(),
             axis.ticks = element_blank(),
-            panel.border = element_rect(color = "black", fill = NA, linewidth = .5)
+            panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+            plot.background = element_blank()
         ) +
         guides(color = "none") +
         labs(x = "gene cluster", y = "")
@@ -93,7 +92,8 @@ plot_heatmap <- function (tt, by_replicon = F) {
 
     if (by_replicon) p1 <- p1 + facet_grid(.~replicon_type, scales = "free_x", space = "free_x")
 
-    p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, .2, .2), align = "v", axis = "rl")
+    p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, .2, .2), align = "v", axis = "rl") +
+        theme(plot.background = element_rect(color = NA, fill = "white"))
     return(p)
 }
 plot_acce_fst <- function (acce_fst) {
@@ -231,10 +231,10 @@ plot_wrapper <- function (set_name) {
     #set_name = "elev_med"
     #set_name = "urbn_mel"
     tt <- read_gpas(set_name)
-    per_acce_fst <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/per_acce_fst.csv"))
+    #per_acce_fst <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/per_acce_fst.csv"))
 
     p <- plot_heatmap(tt)
-    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 10, height = 6)
+    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 6, height = 4)
     p <- plot_gfs(tt$gpa)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
     p <- plot_singleton(tt$gpa, tt$gpatl)
@@ -247,7 +247,7 @@ plot_wrapper <- function (set_name) {
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 12)
     p <- plot_bcsm_gcn(gcn_agg)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-06-gcn_sm.png"), p, width = 9, height = 8)
-    # #p2 <- plot_acce_fst(acce_fst)
+    plot_acce_fst(per_acce_fst)
     #p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
 }
 

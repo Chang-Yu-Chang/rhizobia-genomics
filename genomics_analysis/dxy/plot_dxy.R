@@ -73,18 +73,6 @@ make_dist_m <- function (xx_gn, dist_name) {
     diag(m_gn) <- 0
     return(m_gn)
 }
-turn_p_to_asteriks <- function (p_value) {
-    if (p_value < 0.001) {
-        asterisks <- "***"
-    } else if (p_value < 0.01) {
-        asterisks <- "**"
-    } else if (p_value < 0.05) {
-        asterisks <- "*"
-    } else {
-        asterisks <- "ns"  # Not significant
-    }
-    return(asterisks)
-}
 plot_ind_dxy <- function (xx) {
     xx %>%
         ggplot() +
@@ -117,16 +105,21 @@ plot_genome_wide_dxy <- function (xx_gn) {
     xx_gn %>%
         ggplot() +
         geom_smooth(aes(x = dist_geo_km, y = dxy_scaled), method = "lm", se = F, color = "black") +
-        geom_point(aes(x = dist_geo_km, y = dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
-        scale_color_manual(values = pops_colors) +
-        annotate("text", x = -Inf, y = Inf, label = paste(xx_snps$n_snps, "SNPs", ", r² =", round(r_squared, 3), ast), hjust = -.2, vjust = 1.5, size = 3, color = "black") +
-        theme_bw() +
+        #geom_point(aes(x = dist_geo_km, y = dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
+        geom_point(aes(x = dist_geo_km, y = dxy_scaled), shape = 21, size = 2, stroke = 1) +
+        #scale_color_manual(values = pops_colors) +
+        #annotate("text", x = -Inf, y = Inf, label = paste(xx_snps$n_snps, "SNPs", ", r² =", round(r_squared, 3), ast), hjust = -.2, vjust = 1.5, size = 3, color = "black") +
+        theme_classic() +
+        coord_cartesian(clip = "off") +
         theme(
             legend.position = "right",
-            legend.title = element_blank()
+            legend.title = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA),
+            plot.title = element_text(size = 8)
         ) +
         guides() +
-        labs(x = "Geographic distance (km)", y = "Dxy")
+        labs(x = "Geographic distance (km)", y = "Dxy") +
+        ggtitle(paste(xx_snps$n_snps, "SNPs", ", r² =", round(r_squared, 3), ast))
 }
 plot_replicon_wide_dxy <- function (xx_rp) {
     #' This plots the dxy
@@ -196,8 +189,8 @@ dxy_wrapper <- function (set_name) {
     xx_gn <- make_genome_wide_dxy(xx) # Genome wide, dxy between two genomes
     nrow(xx_gn) # choose(10,2) or choose(17,2)
 
-    p <- plot_genome_wide_dxy(xx_gn) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 4, height = 3)
+    p <- plot_genome_wide_dxy(xx_gn)# + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
+    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 3, height = 3)
     p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
     ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 3)
 }

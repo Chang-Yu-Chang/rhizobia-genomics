@@ -8,7 +8,7 @@ library(janitor)
 library(lme4) # for linear mixed-effect models
 library(emmeans) # estimate marginal means
 library(effectsize) # companion to Applied Regression
-library(vcd) # for computing effect sizes of categorical response
+#library(vcd) # for computing effect sizes of categorical response
 source(here::here("metadata.R"))
 
 # Remove control and nonsymbiotic strains
