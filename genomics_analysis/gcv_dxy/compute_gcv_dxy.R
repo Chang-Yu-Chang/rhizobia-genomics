@@ -12,7 +12,7 @@ make_longer_dist <- function (mdist) {
         as.matrix() %>%
         as_tibble() %>%
         mutate(genome_id1 = colnames(.)) %>%
-        pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "dxy") %>%
+        pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "gcv_dxy") %>%
         filter(genome_id1 < genome_id2)
 }
 compute_gcv_dxy <- function (tt) {
@@ -31,7 +31,7 @@ compute_gcv_dxy <- function (tt) {
     gpaclw <- tt$gpacl %>%
         select(replicon_type, gene, genome_id) %>%
         mutate(temp = 1) %>%
-        filter(replicon_type %in% c("chromosome", "pSymA", "pSymB")) %>%
+        filter(replicon_type %in% c("chromosome", "pSymA", "pSymB", "pAcce")) %>%
         pivot_wider(names_from = genome_id, values_from = temp, values_fill = 0)
 
     # Whole genome
@@ -41,7 +41,7 @@ compute_gcv_dxy <- function (tt) {
     ## Between pops dxy
     pi1 <- mean(dist(t(tt$gpa[,pop1_gid]), method = "manhattan")) # Within pop1 dxy
     pi2 <- mean(dist(t(tt$gpa[,pop2_gid]), method = "manhattan")) # Within pop2 dxy
-    dxy <- mean(as.matrix(dall)[1:n1,(n1+1):(n1+n2)])
+    gcv_dxy <- mean(as.matrix(dall)[1:n1,(n1+1):(n1+n2)])
 
     # Replicon
     drep_ln <- gpaclw %>%
@@ -53,7 +53,19 @@ compute_gcv_dxy <- function (tt) {
         unnest(dall_ln) %>%
         select(-data, -dall)
 
-    return(list(pop_dxy = tibble(pi1, pi2, dxy), ind_dxy = dall_ln, rep_dxy = drep_ln))
+    # Number of accessory genes
+    n_acce <- tt$gpacl %>%
+        #distinct(replicon_type, gene) %>%
+        group_by(replicon_type, gene) %>%
+        count() %>%
+        ungroup() %>%
+        filter(n != max(n)) %>%
+        group_by(replicon_type) %>%
+        count(name = "n_accessory")
+
+        #group_by(replicon_type) %>%
+
+    return(list(pop_dxy = tibble(pi1, pi2, gcv_dxy), ind_dxy = dall_ln, rep_dxy = drep_ln, n_acce = n_acce))
 }
 gcv_dxy_wrapper <- function (set_name) {
     #set_name = "elev_med"
@@ -61,9 +73,10 @@ gcv_dxy_wrapper <- function (set_name) {
     tt <- read_gpas(set_name)
     dd <- compute_gcv_dxy(tt)
 
-    write_csv(dd$pop_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_pop_dxy.csv"))
-    write_csv(dd$ind_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_ind_dxy.csv"))
-    write_csv(dd$rep_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/gcv_rep_dxy.csv"))
+    write_csv(dd$pop_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/pop_gcv_dxy.csv"))
+    write_csv(dd$ind_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/ind_gcv_dxy.csv"))
+    write_csv(dd$rep_dxy, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/rep_gcv_dxy.csv"))
+    write_csv(dd$n_acce, paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/n_acce.csv"))
 
 }
 

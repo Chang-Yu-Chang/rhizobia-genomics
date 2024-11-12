@@ -129,7 +129,7 @@ plot_ngen <- function (tt) {
         labs(x = "gene cluster", y = "# of genomes")
 }
 
-tt <- read_gpas("elev_med")
+#tt <- read_gpas("elev_med")
 
 p_tree1 <- plot_tree(tr_elev_med_core) + geom_treescale(width = 1e-3, x = 0, y = 9)
 p_tree2 <- plot_tree(tr_urbn_mel_core) + geom_treescale(width = 1e-3, x = 0, y = 16)
@@ -140,7 +140,6 @@ p_heat2 <- plot_heatmap(read_gpas("urbn_mel"), p_tree2)
 p_ngen1 <- plot_ngen(read_gpas("elev_med"))
 p_ngen2 <- plot_ngen(read_gpas("urbn_mel"))
 #p_test <- ggplot() + theme_bw() + theme(plot.margin = unit(c(0,0,0,0), "mm"))
-
 
 p <- plot_grid(
     p_tree1 + theme(legend.position = "none"), p_heat1,
