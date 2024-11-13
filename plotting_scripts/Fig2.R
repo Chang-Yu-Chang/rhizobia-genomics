@@ -8,6 +8,7 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x)
+library(grid)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -17,8 +18,12 @@ cohensds <- read_csv(paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
 # 1. Prepare data ----
 plants_n <- plants %>%
     filter(population != "control", exp_nitrogen == "N-") %>%
-    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
-    select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
+    select(
+        -nodule_shape, -nodule_size, -nodule_color, -exp_labgroup,
+        -primary_root_nodule_number, -lateral_root_nodule_number,
+        -longest_petiole_length, -longest_lateral_root_length,
+        -lateral_root_number, -primary_root_length
+    ) %>%
     group_by(gradient, population, exp_plant) %>%
     filter(nodule_number <100) %>%
     pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
@@ -27,21 +32,24 @@ plants_n <- plants %>%
     ungroup()
 
 cohensds_n <- cohensds %>%
-    filter(!trait %in% c("primary_root_nodule_number", "lateral_root_nodule_number"))
+    filter(!str_detect(trait, "primary|lateral|root_length|longest"))
 
 # 2. Plots ----
 plot_boxes <- function (plants_n, gra, plant, nt) {
     # gra = "elevation"
     # plant = "sativa"
     # gra = "urbanization"
-    exp_id_lev <- plants_n %>% distinct(exp_id, .keep_all = T) %>% arrange(population) %>% pull(exp_id)
+
+    # Order the strains
+    exp_id_lev <- plants_n %>% distinct(exp_id, .keep_all = T) %>%
+        mutate(population = factor(population, rev(c("high elevation", "low elevation", "suburban", "urban")))) %>%
+        arrange(population) %>% pull(exp_id)
 
     plants_n %>%
         filter(gradient == gra) %>%
         filter(exp_plant == plant) %>%
         filter(exp_nitrogen == nt) %>%
         left_join(traits) %>%
-        mutate(population = factor(population, c("low elevation", "high elevation", "urban", "suburban"))) %>%
         mutate(exp_id = factor(exp_id, exp_id_lev)) %>%
         arrange(trait_type) %>%
         group_by(gradient, population, exp_plant, trait_type, trait_pre2, value, exp_id) %>%
@@ -73,12 +81,12 @@ plot_boxes <- function (plants_n, gra, plant, nt) {
             legend.position = "top",
             legend.key = element_rect(fill = NA, color = NA),
             legend.key.height = unit(10, "mm"),
-            legend.text = element_text(size = 8),
+            legend.text = element_text(size = 6),
             legend.title = element_blank(),
             legend.background = element_blank(),
             legend.box.margin = unit(c(0,0,-5,0), "mm")
         ) +
-        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0), reverse = T), color = "none") +
+        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0)), color = "none") +
         labs()
 }
 plot_cohensds <- function (cohensds, gra, plant, nt) {
@@ -125,39 +133,33 @@ plot_cohensds <- function (cohensds, gra, plant, nt) {
 p1 <- plot_boxes(plants_n, "elevation", "sativa", "N-")
 p3 <- plot_boxes(plants_n, "urbanization", "sativa", "N-")
 p5 <- plot_boxes(plants_n, "elevation", "lupulina", "N-")
+p7 <- plot_boxes(plants_n, "urbanization", "lupulina", "N-")
 leg1 <- get_legend(p1 + theme(legend.position = "right", legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
 leg3 <- get_legend(p3 + theme(legend.position = "right", legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
-
 
 p2 <- plot_cohensds(cohensds_n, "elevation", "sativa", "N-")
 p4 <- plot_cohensds(cohensds_n, "urbanization", "sativa", "N-")
 p6 <- plot_cohensds(cohensds_n, "elevation", "lupulina", "N-")
+p8 <- plot_cohensds(cohensds_n, "urbanization", "lupulina", "N-")
 
 
-p_left <- plot_grid(
-    #leg1, NULL,
-    p1 + theme(legend.position = "none"),
-    p2,
-    p5 + theme(legend.position = "none"),
-    p6,
-    ncol = 2, labels = c("", "", "C", ""), scale = 0.98,
-    align = "vh", axis = "tbr", rel_widths = c(1, .5), rel_heights = c(1, .5)
-)
-p_right <- plot_grid(
-    #leg3, NULL,
-    p3 + theme(legend.position = "none"),
-    p4,
-    ncol = 2, scale = 0.98,
-    align = "h", axis = "tb", rel_widths = c(1, .5), rel_heights = c(1.5)
-)
-
-# p <- plot_grid(p_left, p_right, nrow = 1, align = "vh", axis = "tbr") +
-#     theme(plot.background = element_rect(fill = "white", color = NA))
+arrow_grob1 <- linesGrob(x = unit(c(.4, .48),"npc"), y = unit(c(.95, .95), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open"))
+arrow_grob2 <- linesGrob(x = unit(c(.9, .98),"npc"), y = unit(c(.95, .95), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open"))
 
 p <- plot_grid(
-    leg1, leg3, p_left, p_right, nrow = 2, align = "vh", axis = "tbr",
-    labels = c("A", "B", "", ""), rel_heights = c(.04, 1)
-) + theme(plot.background = element_rect(fill = "white", color = NA))
+    leg1, NULL, leg3, NULL,
+    p1 + theme(legend.position = "none"), p2, p3 + theme(legend.position = "none"), p4,
+    p5 + theme(legend.position = "none"), p6, p7 + theme(legend.position = "none"), p8,
+    ncol = 4,  align = "vh", axis = "tbr",
+    rel_widths = c(1,.5,1,.5), rel_heights = c(.4,4,3),
+    labels = c("A", "", "B", "", rep("", 4), "C", "", "D", "")
+) +
+    draw_grob(arrow_grob1) +
+    draw_grob(arrow_grob2) +
+    draw_text("favor high elevation", x = .48, y = .95, size = 10, hjust = 1, vjust = -1) +
+    draw_text("favor suburban", x = .98, y = .95, size = 10, hjust = 1, vjust = -1) +
+    theme(plot.background = element_rect(fill = "white", color = NA))
+
 
 ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 8)
 

@@ -46,7 +46,7 @@ traits <- tibble(
         #trait_pre == "lateral root number" ~ "lateral\nroot\nnumber",
         T ~ trait_pre
     )) %>%
-    mutate(trait_pre2 = factor(str_replace(trait_pre, " ", "\n"))) %>%
+    mutate(trait_pre2 = factor(str_replace_all(trait_pre, " ", "\n"))) %>%
     mutate(trait_pre = factor(trait_pre, trait_pre))
 
 # utils

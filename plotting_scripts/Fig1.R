@@ -43,20 +43,19 @@ get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) 
 }
 elev_sf <- get_elev_state_sf(us_elev, -78.5, 39, 17, 8)
 plot_states <- function (us_states) {
-
     us_states %>%
         filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
         ggplot() +
-        geom_sf(data = elev_sf, aes(color = USA_elv_msk)) +
+        #geom_sf(data = elev_sf, aes(color = USA_elv_msk)) + # elevation
         geom_sf(fill = NA, color = "grey10", linewidth = .5) +
         geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("cornsilk", 0.5), linewidth = 0.5) +
-        scale_color_gradient(low = alpha("snow", .2), high = alpha("#d6a36e", .1), name = "elevation (m)") +
-        scale_fill_manual(values = population_colors) +
+        #scale_color_gradient(low = alpha("snow", .2), high = alpha("#d6a36e", .1), name = "elevation (m)") +
+        #scale_fill_manual(values = population_colors) +
         annotation_scale(location = "bl", width_hint = .2) +
         coord_sf(expand = F, xlim = c(-87, -70), ylim = c(36, 42.5)) +
         theme_light() +
         theme(
-            panel.background = element_rect(color = NA, fill = alpha("lightblue", .3), linewidth = 1),
+            panel.background = element_rect(color = NA, fill = NA, linewidth = 1),
             panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
             plot.background = element_rect(color = NA, fill = NA, linewidth = .5),
             legend.position = "bottom",
@@ -154,8 +153,8 @@ p3 <- plot_tt_map(tt_sf2, "urbanization")
 
 
 # 4. Map ----
-zoom_polygon1 <- polygonGrob(x = c(.342,.342,.415,.415), y = c(.55,.85,.345,.305), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
-zoom_polygon2 <- polygonGrob(x = c(.70,.695,.73,.97), y = c(.6,.6,.53,.53), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+zoom_polygon1 <- polygonGrob(x = c(.385,.385,.43,.43), y = c(.5,.85,.35,.325), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+zoom_polygon2 <- polygonGrob(x = c(.7,.7,.95,.725), y = c(.6,.58,.58,.6), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 p_map <- ggdraw(p1) +
     draw_grob(zoom_polygon1) +
     draw_grob(zoom_polygon2) +
