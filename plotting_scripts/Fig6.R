@@ -177,38 +177,15 @@ plot_replicon_wide_dxy <- function (xx_gn, xx_rp) {
         guides() +
         labs(x = "Geographic distance (km)", y = "Dxy")
 }
-
-
-
-
-
-
-
-#Dxy
-tb <- tibble(
-    set_name = rep(c("elev_med", "urbn_mel"), each = 1)
-) %>%
-    mutate(
-        tt = map(set_name, read_gpas),
-        dd = map(set_name, read_dxys),
-        ff = map(set_name, read_fsts),
-        xx = pmap(list(tt, dd, ff), join_dists), # Per gene, dxy between two orthologs coming from two different genomes
-        xx_rp = map(xx, make_replicon_wide_dxy),
-        xx_gn = map(xx, make_genome_wide_dxy),
-        p_dxy = map(xx_gn, plot_genome_wide_dxy),
-        p_dxy_rep = map2(xx_gn, xx_rp, plot_replicon_wide_dxy)
-    )
-
 do_mantel <- function (xx_gn) {
     # Do mantel test
     m1 <- make_dist_m(xx_gn, dist_geo_km) # geo distance
     m2 <- make_dist_m(xx_gn, dxy_scaled) # genetic distance
     model <- mantel(m1, m2)
     return(tibble(replicon_type = "genome", r_squared = model$statistic, p_value = model$signif))
-    #ast <- turn_p_to_asteriks(model$signif)
-    #return(paste0("r²=", round(r_squared, 2), " ", ast))
 }
 do_mantel_rep <- function (xx_rp) {
+    # Do mantel test by replicon
     xx_rp %>%
         group_by(replicon_type) %>%
         nest() %>%
@@ -222,31 +199,49 @@ do_mantel_rep <- function (xx_rp) {
 }
 
 
-tb2 <- tb %>%
+#Dxy
+tb <- tibble(
+    set_name = rep(c("elev_med", "urbn_mel"), each = 1)
+) %>%
     mutate(
-        mod = map(xx_gn, do_mantel),
-        mod_rep = map(xx_rp, do_mantel_rep),
-        xx_snps = map(xx_rp, ~distinct(ungroup(.x), replicon_type, n_snps))
+        tt = map(set_name, read_gpas),
+        dd = map(set_name, read_dxys),
+        ff = map(set_name, read_fsts),
+        xx = pmap(list(tt, dd, ff), join_dists), # Per gene, dxy between two orthologs coming from two different genomes
+        xx_gn = map(xx, make_genome_wide_dxy),
+        xx_rp = map(xx, ~make_replicon_wide_dxy(.x) %>% filter(replicon_type != "pAcce")),
+        p_dxy = map(xx_gn, plot_genome_wide_dxy),
+        p_dxy_rep = map2(xx_gn, xx_rp, plot_replicon_wide_dxy)
     )
 
-tb3 <- tb2 %>%
-    select(set_name, mod, mod_rep, xx_snps) %>%
-    unnest(mod_rep) %>%
-    select(set_name, mod, replicon_type, r_squared, p_value, xx_snps)
-# Unnest
-temp1 <- select(tb3, set_name, mod) %>% unnest(mod) %>% distinct()
-temp2 <- select(tb3, set_name, xx_snps) %>% unnest(xx_snps) %>% distinct()
+if (F) {
 
-tb4 <- bind_rows(select(tb3, -mod, -xx_snps), temp1) %>%
-    left_join(temp2) %>%
-    mutate(replicon_type = factor(replicon_type, c("genome", "chromosome", "pSymA", "pSymB", "pAcce"))) %>%
-    arrange(set_name, replicon_type) %>%
-    mutate(
-        r_squared = round(r_squared, 2),
-        ast = map_chr(p_value, turn_p_to_asteriks),
-        set_name = ifelse(set_name == "elev_med", "elevation", "urbanization")
-    )
+    tb2 <- tb %>%
+        mutate(
+            mod = map(xx_gn, do_mantel),
+            mod_rep = map(xx_rp, do_mantel_rep),
+            xx_snps = map(xx_rp, ~distinct(ungroup(.x), replicon_type, n_snps))
+        )
 
+    tb3 <- tb2 %>%
+        select(set_name, mod, mod_rep, xx_snps) %>%
+        unnest(mod_rep) %>%
+        select(set_name, mod, replicon_type, r_squared, p_value, xx_snps)
+    # Unnest
+    temp1 <- select(tb3, set_name, mod) %>% unnest(mod) %>% distinct()
+    temp2 <- select(tb3, set_name, xx_snps) %>% unnest(xx_snps) %>% distinct()
+
+    tb4 <- bind_rows(select(tb3, -mod, -xx_snps), temp1) %>%
+        left_join(temp2) %>%
+        mutate(replicon_type = factor(replicon_type, c("genome", "chromosome", "pSymA", "pSymB", "pAcce"))) %>%
+        arrange(set_name, replicon_type) %>%
+        mutate(
+            r_squared = round(r_squared, 2),
+            ast = map_chr(p_value, turn_p_to_asteriks),
+            set_name = ifelse(set_name == "elev_med", "elevation", "urbanization")
+        )
+
+}
 
 # GCV
 read_gcv_dxys <- function (set_name) {
@@ -352,39 +347,36 @@ plot_replicon_gcv_dxy <- function (dists) {
 }
 
 
-set_name = "elev_med"
-tt <- read_gpas()
-dd <- read_gcv_dxys(set_name)
-dists <- join_gcv_dists(dd)
-p1 <- plot_replicon_gcv_dxy(dists)
-set_name = "urbn_mel"
-tt <- read_gpas()
-dd <- read_gcv_dxys(set_name)
-dists <- join_gcv_dists(dd)
-#do_mantel(dists, gcv_dxy_scaled)
-p2 <- plot_replicon_gcv_dxy(dists)
+tbg <- tibble(set_name = c("elev_med", "urbn_mel")) %>%
+    mutate(
+        tt = map(set_name, read_gpas),
+        dd = map(set_name, read_gcv_dxys),
+        dists = map(dd, ~join_gcv_dists(.x) %>% filter(replicon_type != "pAcce")),
+        p = map(dists, plot_replicon_gcv_dxy)
+    )
 
-
-
-
+theme_consist <- function () {
+    theme(
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "inside",
+        legend.position.inside = c(.02, .65),
+        legend.justification.inside = "left",
+        legend.text = element_text(size = 8),
+        legend.background = element_rect(color = "black", fill = "snow", linewidth = .3),
+        legend.box.margin = margin(0,,0,0, "mm"),
+        legend.margin = margin(0,1,0,0, "mm"),
+        legend.key = element_blank()
+    )
+}
 
 p <- plot_grid(
-    #tb$p_dxy[[1]],
-    tb$p_dxy_rep[[1]],
-    p1,
-    tb$p_dxy_rep[[2]],
-    p2,
-    #tb$p_dxy[[2]],
-    scale = 0.95, ncol = 1, align = "hv", axis = "tbrl", rel_widths = c(1,3), labels = LETTERS[1:4]
+    tb$p_dxy_rep[[1]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) ,
+    tbg$p[[1]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7),
+    tb$p_dxy_rep[[2]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02),
+    tbg$p[[2]] + xlim(0, 17) + ylim(0, .7) + theme(legend.position = "none"),
+    scale = 0.95, ncol = 1, align = "hv", axis = "trl",
+    rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4]
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(here::here("plots/Fig6.png"), p, width = 10, height = 10)
+ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
 
-
-# pt <- tb4 %>%
-#     select(` ` = set_name, Replicon = replicon_type, SNPs = n_snps, R2 = r_squared, `    ` = ast) %>%
-#     flextable() %>%
-#     autofit() %>%
-#     merge_v(j = " ") %>%
-#     hline(i = 5) %>%
-#     fix_border_issues() %>%
-#     gen_grob()

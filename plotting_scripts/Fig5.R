@@ -8,13 +8,11 @@ library(tidytree)
 library(ggtree)
 source(here::here("metadata.R"))
 
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-
-
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
+
 
 plot_tree <- function (tr_core) {
     tr_core %>%
@@ -23,9 +21,9 @@ plot_tree <- function (tr_core) {
         mutate(` ` = "") %>%
         as.treedata() %>%
         ggtree() +
-        geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 5) +
+        #geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 5) +
         geom_tiplab(aes(label = label, color = population, fill = population), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
-        geom_tippoint(aes(color = population, fill = population), shape = 21, size = 2) +
+        geom_tippoint(aes(color = population, fill = population), shape = -1, size = -1) +
         scale_color_manual(values = population_colors) +
         scale_fill_manual(values = population_colors) +
         scale_y_continuous(limits = c(1, length(tr_core$tip.label)), expand = c(0,.5)) +
@@ -44,7 +42,7 @@ plot_tree <- function (tr_core) {
             plot.title = element_text(size = 8),
             plot.margin = unit(c(0,5,0,0), "mm")
         ) +
-        guides(fill = guide_legend(override.aes = list(label = "", color = NA, size = 2))) +
+        guides(fill = guide_legend(override.aes = list(label = "", color = NA, size = 2)), color = guide_legend(override.aes = list(size = 2, shape = 21))) +
         labs()
     #labs(title = paste0("Elevation S. medicae\n", nrow(tt$list_sccg), " single-copy core genes"))
 }
@@ -129,27 +127,31 @@ plot_ngen <- function (tt) {
         labs(x = "gene cluster", y = "# of genomes")
 }
 
-#tt <- read_gpas("elev_med")
 
 p_tree1 <- plot_tree(tr_elev_med_core) + geom_treescale(width = 1e-3, x = 0, y = 9)
 p_tree2 <- plot_tree(tr_urbn_mel_core) + geom_treescale(width = 1e-3, x = 0, y = 16)
 leg1 <- get_legend(p_tree1 + theme(legend.position = "right", legend.direction = "horizontal"))
 leg2 <- get_legend(p_tree2 + theme(legend.position = "right", legend.direction = "horizontal"))
-p_heat1 <- plot_heatmap(read_gpas("elev_med"), p_tree1)
-p_heat2 <- plot_heatmap(read_gpas("urbn_mel"), p_tree2)
+p_gpa1 <- plot_tree(tr_elev_med_gpa) + geom_treescale(width = 5, x = 0, y = 9)
+p_gpa2 <- plot_tree(tr_urbn_mel_gpa) + geom_treescale(width = 5, x = 0, y = 16)
+p_heat1 <- plot_heatmap(read_gpas("elev_med"), p_gpa1)
+p_heat2 <- plot_heatmap(read_gpas("urbn_mel"), p_gpa2)
 p_ngen1 <- plot_ngen(read_gpas("elev_med"))
 p_ngen2 <- plot_ngen(read_gpas("urbn_mel"))
-#p_test <- ggplot() + theme_bw() + theme(plot.margin = unit(c(0,0,0,0), "mm"))
 
 p <- plot_grid(
-    p_tree1 + theme(legend.position = "none"), p_heat1,
-    leg1, p_ngen1,
-    NULL, NULL,
-    p_tree2 + theme(legend.position = "none"), p_heat2,
-    leg2, p_ngen2,
-    nrow = 5,  align = "hv", axis = "blr", labels = c("A", "B", "", "", "", "", "C", "D", "", ""),
-    rel_widths = c(1, 2), rel_heights = c(10, 2, .5, 17, 2)
+    p_tree1 + theme(legend.position = "none"),
+    p_gpa1 + theme(legend.position = "none"),
+    p_heat1,
+    leg1, NULL, p_ngen1,
+    NULL, NULL, NULL,
+    p_tree2 + theme(legend.position = "none"),
+    p_gpa2 + theme(legend.position = "none"),
+    p_heat2,
+    leg2, NULL, p_ngen2,
+    ncol = 3,  align = "hv", axis = "blr", scale = .95,
+    labels = c("A", "C", "E", rep("", 6), "B", "D", "F", rep("", 3)),
+    rel_widths = c(1, 1, 2), rel_heights = c(10, 2, .5, 17, 2)
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig5.png"), p, width = 10, height = 6)
-
