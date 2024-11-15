@@ -5,25 +5,22 @@ library(ape)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
-isolates <- isolates %>% left_join(isolates_contigs)
+# isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
+# isolates <- isolates %>% left_join(isolates_contigs)
 
+curation_wrapper <- function (set_name) {
+    tbtr <- tibble(set_name = rep(set_name, 4), tr_type = c("core", "gpa", "ani", "kmer"), tr = NA)
+    tbtr$tr[1] <- list(read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/combined_sccg/combined_sccg.treefile")))
+    tbtr$tr[2] <- list(read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/tr_gpa.tree")))
+    tbtr$tr[3] <- list(read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/tr_ani.tree")))
+    tbtr$tr[4] <- list(read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/tr_kmer.tree")))
+    return(tbtr)
+}
 
-set_name <- "elev_med"
-tr_elev_med_core <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/combined_sccg/combined_sccg.treefile"))
-tr_elev_med_gpa <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/tr_gpa.tree"))
-
-set_name <- "urbn_mel"
-tr_urbn_mel_core <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/combined_sccg/combined_sccg.treefile"))
-tr_urbn_mel_gpa <- read.tree(paste0(folder_data, "phylogenomics_analysis/trees/", set_name, "/tr_gpa.tree"))
-
-save(
-    tr_elev_med_core,
-    tr_elev_med_gpa,
-    tr_urbn_mel_core,
-    tr_urbn_mel_gpa,
-    file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata")
-)
+tbtr1 <- curation_wrapper("elev_med")
+tbtr2 <- curation_wrapper("urbn_mel")
+tbtr <- bind_rows(tbtr1, tbtr2)
+save(tbtr, file = paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
 if (F) {
 
