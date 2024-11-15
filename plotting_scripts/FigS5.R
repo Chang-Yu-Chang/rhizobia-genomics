@@ -1,12 +1,11 @@
 #'
 
 library(tidyverse)
-library(ape)
-library(TreeDist)
+library(cowplot)
 library(ggh4x)
+library(ape)
+library(TreeDist) # for computing GRF tree distance
 source(here::here("metadata.R"))
-
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 
@@ -33,13 +32,12 @@ for (j in 1:nrow(tb)) {
     tb$rfds[j] <- list(rfds)
 }
 
-
 tb2 <- tb %>%
     mutate(rfd = map2_dbl(tr1, tr2, ~RobinsonFoulds(.x, .y, normalize = T, similarity = F))) %>%
     select(set_name, tr_type1, tr_type2, rfd, rfds) %>%
     unnest(rfds)
 
-
+# Plot
 plot_hist_facet <- function (tb2, sn) {
     tb_obv <- tb2 %>%
         select(-rfds) %>%
@@ -52,25 +50,23 @@ plot_hist_facet <- function (tb2, sn) {
         geom_histogram(aes(x = rfds), binwidth = .05, color = "black", fill = NA) +
         geom_vline(data = tb_obv, aes(xintercept = rfd), color = "red", linetype = 2) +
         facet_grid2(tr_type1 ~ tr_type2, switch = "y", render_empty = F) +
-        scale_x_continuous(breaks = seq(0,1,.2)) +
-        scale_y_continuous(position = "right") +
+        scale_x_continuous(breaks = seq(0,1,.5)) +
+        scale_y_continuous(position = "left") +
         coord_cartesian(clip = "off") +
         theme_classic() +
         theme(
             panel.border = element_rect(color = "black", fill = NA),
-            strip.background = element_blank(),
-            axis.text.x = element_text(angle = 45, hjust = 1)
+            strip.background = element_rect(color = NA, fill = "grey90"),
+            axis.text.x = element_text(angle = 45, hjust = 1),
+            strip.placement = "outside"
         ) +
         guides() +
-        labs()
+        labs(x = "generalized Robinson-Foulds distance")
 
 }
 
-set_name <- "elev_med"
-p <- plot_hist_facet(tb2, set_name)
-ggsave(paste0(folder_data, "phylogenomics_analysis/tree_distance/grfd_", set_name, ".png"), p, width = 5, height = 5)
+p1 <- plot_hist_facet(tb2, "elev_med") + ggtitle("Elevation")
+p2 <- plot_hist_facet(tb2, "urbn_mel") + ggtitle("Urbanization")
 
-set_name <- "urbn_mel"
-p <- plot_hist_facet(tb2, set_name)
-ggsave(paste0(folder_data, "phylogenomics_analysis/tree_distance/grfd_", set_name, ".png"), p, width = 5, height = 5)
-
+p <- plot_grid(p1, p2, scale = .95) + theme(plot.background = element_rect(color = NA, fill = "white"))
+ggsave(here::here("plots/FigS5.png"), p, width = 10, height = 5)
