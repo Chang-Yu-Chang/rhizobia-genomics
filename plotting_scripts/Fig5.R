@@ -128,12 +128,12 @@ plot_ngen <- function (tt) {
 }
 
 
-p_tree1 <- plot_tree(tr_elev_med_core) + geom_treescale(width = 1e-3, x = 0, y = 9)
-p_tree2 <- plot_tree(tr_urbn_mel_core) + geom_treescale(width = 1e-3, x = 0, y = 16)
+p_tree1 <- plot_tree(tbtr$tr[[1]]) + geom_treescale(width = 1e-3, x = 0, y = 9)
+p_tree2 <- plot_tree(tbtr$tr[[5]]) + geom_treescale(width = 1e-3, x = 0, y = 16)
 leg1 <- get_legend(p_tree1 + theme(legend.position = "right", legend.direction = "horizontal"))
 leg2 <- get_legend(p_tree2 + theme(legend.position = "right", legend.direction = "horizontal"))
-p_gpa1 <- plot_tree(tr_elev_med_gpa) + geom_treescale(width = 5, x = 0, y = 9)
-p_gpa2 <- plot_tree(tr_urbn_mel_gpa) + geom_treescale(width = 5, x = 0, y = 16)
+p_gpa1 <- plot_tree(tbtr$tr[[2]]) + geom_treescale(width = 5, x = 0, y = 9)
+p_gpa2 <- plot_tree(tbtr$tr[[6]]) + geom_treescale(width = 5, x = 0, y = 16)
 p_heat1 <- plot_heatmap(read_gpas("elev_med"), p_gpa1)
 p_heat2 <- plot_heatmap(read_gpas("urbn_mel"), p_gpa2)
 p_ngen1 <- plot_ngen(read_gpas("elev_med"))

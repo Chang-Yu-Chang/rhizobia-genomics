@@ -6,8 +6,8 @@ library(ggsci)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-set_name <- "elev_med"
 
+# Gene frequency specture
 plot_gfs <- function (set_name) {
     # Plot gene frequency spectrum
     tt <- read_gpas(set_name)
@@ -38,9 +38,14 @@ p_gfs1 <- plot_gfs("elev_med") + ggtitle("Elevation")
 p_gfs2 <- plot_gfs("urbn_mel") + ggtitle("Urbanization")
 
 
-mt <- table(apply(m, 2, sum))
-sum(mt[!names(mt) %in% c(0)]) # 26504 all genes
-mt[names(mt) == length(unique(gpatl$genome_id))] # 988 core gene
+count_genes <- function (set_name) {
+    tt <- read_gpas(set_name)
+    gg <- table(apply(tt$gpa[,-1], 1, sum))
+    return(list(singleton = gg[1], core = last(gg), total = sum(gg)))
+}
+
+count_genes("elev_med")
+count_genes("urbn_mel")
 
 # Plot core vs accessory sampling
 compute_pan <- function (mi) {
@@ -99,8 +104,6 @@ plot_sampling <- function (tbp, tbpr) {
             legend.position = "top",
             legend.margin = margin(0,0,0,0, "mm"),
             legend.box.margin = margin(0,0,0,0, "mm"),
-            #legend.position = "inside",
-            #legend.position.inside = c(0.8, 0.3),
             legend.background = element_rect(color = NA, fill = NA),
             panel.border = element_rect(color = "black", fill = NA),
             panel.grid.major = element_line(color = "grey90"),
@@ -108,7 +111,6 @@ plot_sampling <- function (tbp, tbpr) {
         ) +
         guides(linetype = "none") +
         labs(x = "Number of genomes", y = "Number of genes (k)")
-
 }
 
 tb1 <- do_sampling("elev_med")
@@ -116,7 +118,6 @@ tb2 <- do_sampling("urbn_mel")
 
 p_s1 <- plot_sampling(tb1$tbp, tb1$tbpr)
 p_s2 <- plot_sampling(tb2$tbp, tb2$tbpr)
-
 
 p <- plot_grid(
     p_gfs1, p_gfs2, p_s1 + theme(legend.position = "none"), p_s2,
