@@ -293,6 +293,70 @@
       ],
       "Hash": "0776bf7526869e0286b0463cb72fb211"
     },
+    "PlotTools": {
+      "Package": "PlotTools",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "fdaa5f64d9d26dc992aa0294a70d7ccf"
+    },
+    "R.cache": {
+      "Package": "R.cache",
+      "Version": "0.16.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R.methodsS3",
+        "R.oo",
+        "R.utils",
+        "digest",
+        "utils"
+      ],
+      "Hash": "fe539ca3f8efb7410c3ae2cf5fe6c0f8"
+    },
+    "R.methodsS3": {
+      "Package": "R.methodsS3",
+      "Version": "1.8.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "utils"
+      ],
+      "Hash": "278c286fd6e9e75d0c2e8f731ea445c8"
+    },
+    "R.oo": {
+      "Package": "R.oo",
+      "Version": "1.27.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R.methodsS3",
+        "methods",
+        "utils"
+      ],
+      "Hash": "6ac79ff194202248cf946fe3a5d6d498"
+    },
+    "R.utils": {
+      "Package": "R.utils",
+      "Version": "2.12.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R.methodsS3",
+        "R.oo",
+        "methods",
+        "tools",
+        "utils"
+      ],
+      "Hash": "3dc2829b790254bfba21e60965787651"
+    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -450,6 +514,47 @@
         "utils"
       ],
       "Hash": "a9c26d0c76fdcde77410b88197efa7bf"
+    },
+    "TreeDist": {
+      "Package": "TreeDist",
+      "Version": "2.9.1",
+      "Source": "Repository",
+      "Repository": "https://packagemanager.posit.co/cran/2024-09-30",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "Rdpack",
+        "TreeTools",
+        "ape",
+        "cli",
+        "colorspace",
+        "memoise",
+        "shiny",
+        "shinyjs",
+        "stats"
+      ],
+      "Hash": "bac5814aff34e015363e0275fbaf7908"
+    },
+    "TreeTools": {
+      "Package": "TreeTools",
+      "Version": "1.12.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "PlotTools",
+        "R",
+        "R.cache",
+        "RCurl",
+        "Rcpp",
+        "Rdpack",
+        "ape",
+        "bit64",
+        "colorspace",
+        "fastmatch",
+        "lifecycle",
+        "methods"
+      ],
+      "Hash": "e46329e896c25807efeb212614afa958"
     },
     "XVector": {
       "Package": "XVector",
@@ -1264,6 +1369,16 @@
       "Repository": "RSPM",
       "Hash": "aa5e1cd11c2d15497494c5292d7ffcc8"
     },
+    "fastmatch": {
+      "Package": "fastmatch",
+      "Version": "1.1-4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "8c406b7284bbaef08e01c6687367f195"
+    },
     "flextable": {
       "Package": "flextable",
       "Version": "0.9.6",
@@ -1499,6 +1614,19 @@
         "terra"
       ],
       "Hash": "4d43570de08ab49ba86bb2ccb6fe117d"
+    },
+    "ggcorrplot": {
+      "Package": "ggcorrplot",
+      "Version": "0.1.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ggplot2",
+        "reshape2",
+        "stats"
+      ],
+      "Hash": "aad38d027d0dd18621e213919c20a65f"
     },
     "ggforce": {
       "Package": "ggforce",
@@ -3354,6 +3482,19 @@
         "xtable"
       ],
       "Hash": "6a293995a66e12c48d13aa1f957d09c7"
+    },
+    "shinyjs": {
+      "Package": "shinyjs",
+      "Version": "2.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "digest",
+        "jsonlite",
+        "shiny"
+      ],
+      "Hash": "802e4786b353a4bb27116957558548d5"
     },
     "slippymath": {
       "Package": "slippymath",

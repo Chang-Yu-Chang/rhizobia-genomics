@@ -141,7 +141,7 @@ make_ginterest <- function (top_genes) {
         dplyr::select(gene, tops) %>%
         deframe()
 }
-go_wrapper <- function (ginterest, oo, suffix = "") {
+go_wrapper <- function (set_name, ginterest, oo, suffix = "") {
     #' A wrapper function for go enrichment analysis
     list_godata <- list()
     list_fisher <- list()
@@ -163,46 +163,44 @@ go_wrapper <- function (ginterest, oo, suffix = "") {
     goenrich <- bind_rows(list_tables, .id = "Category") %>% clean_names
     write_csv(goenrich, paste0(folder_data, "genomics_analysis/go/", set_name, "/goenrich", suffix,".csv"))
 }
+total_wrapper <- function (set_name) {
+    tt <- read_gpas(set_name)
+    ff <- read_fsts(set_name)
+    gg <- read_gos(set_name)
+    gg$generic <- read_gos_generic(set_name) # GO ids from genric search
 
+    # The list of GO ids
+    go_ids <- gg$gg_all %>%
+        bind_rows(gg$generic) %>%
+        drop_na(gene_ontology_go) %>%
+        distinct(from, .keep_all = T) %>%
+        mutate(go_id = str_extract_all(gene_ontology_go, "GO:\\d+"))
 
-#set_name = "elev_med"
-set_name = "urbn_mel"
+    round(nrow(go_ids)/nrow(gg$list_unique_genes), 3) # % of genes that have GO ids
 
-tt <- read_gpas(set_name)
-ff <- read_fsts(set_name)
-gg <- read_gos(set_name)
-gg$generic <- read_gos_generic(set_name) # GO ids from genric search
+    # Mapping object (a R list) required for topGO. It the gene universe
+    gene2go <- make_gene2go(gg$list_unique_genes, go_ids)
+    length(gene2go) # number of clusters that have GO terms in the universe
 
-# The list of GO ids
-go_ids <- gg$gg_all %>%
-    bind_rows(gg$generic) %>%
-    drop_na(gene_ontology_go) %>%
-    distinct(from, .keep_all = T) %>%
-    mutate(go_id = str_extract_all(gene_ontology_go, "GO:\\d+"))
+    # Genes with top 5% Fst
+    top_genes_bygene <- make_top_genes_bygene(ff) # by gene wide Fst
+    top_genes_bysnp <- make_top_genes_bysnp(ff) # by snp Fst
+    #top_genes_bygene_byreplicon <- make_top_genes_bygene_byreplicon(ff, tt) # by gene by replicon
 
-round(nrow(go_ids)/nrow(gg$list_unique_genes), 3) # % of genes that have GO ids
+    # Make gene of interest
+    #gene_interested <- make_gene_interested(top_gene_fst)
+    ginterest_bygene <- make_ginterest(top_genes_bygene)
+    length(ginterest_bygene)
+    table(ginterest_bygene)
+    ginterest_bysnp <- make_ginterest(top_genes_bysnp)
+    length(ginterest_bysnp)
+    table(ginterest_bysnp)
 
-# Mapping object (a R list) required for topGO. It the gene universe
-gene2go <- make_gene2go(gg$list_unique_genes, go_ids)
-length(gene2go) # number of clusters that have GO terms in the universe
+    oo <- c("BP", "CC", "MF")
+    go_wrapper(set_name, ginterest_bygene, oo, suffix = "_bygene")
+    go_wrapper(set_name, ginterest_bysnp, oo, suffix = "_bysnp")
+}
 
-# Genes with top 5% Fst
-top_genes_bygene <- make_top_genes_bygene(ff) # by gene wide Fst
-top_genes_bysnp <- make_top_genes_bysnp(ff) # by snp Fst
-#top_genes_bygene_byreplicon <- make_top_genes_bygene_byreplicon(ff, tt) # by gene by replicon
-
-# Make gene of interest
-#gene_interested <- make_gene_interested(top_gene_fst)
-ginterest_bygene <- make_ginterest(top_genes_bygene)
-length(ginterest_bygene)
-table(ginterest_bygene)
-ginterest_bysnp <- make_ginterest(top_genes_bysnp)
-length(ginterest_bysnp)
-table(ginterest_bysnp)
-
-oo <- c("BP", "CC", "MF")
-go_wrapper(ginterest_bygene, oo, suffix = "_bygene")
-go_wrapper(ginterest_bysnp, oo, suffix = "_bysnp")
-
-
+total_wrapper("elev_med")
+total_wrapper("urbn_mel")
 
