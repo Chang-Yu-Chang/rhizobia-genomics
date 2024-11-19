@@ -2,11 +2,13 @@
 
 library(tidyverse)
 library(cowplot)
-library(tigris) # for getting the US census data
+#library(tigris) # for getting the US census data
 library(sf) # for handling the simple features
 library(geodata) # for getting the elevation data
 library(stars) # for converting st to sf
 library(ggspatial) # for scale bar
+library(geosphere) # for computing the distance between sites
+library(ggs)
 library(grid)
 #' On MacOS, sf depends on gdal so do this in terminal
 #' brew install pkg-config
@@ -27,8 +29,9 @@ sites_center <- sites %>%
     mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
 
 us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
-tt <- travel_time("city", path = tempdir()) # travel time data from Nelson, Andy, Daniel J. Weiss, Jacob van Etten, Andrea Cattaneo, Theresa S. McMenomy, and Jawoo Koo. 2019. “A Suite of Global Accessibility Indicators.” Scientific Data 6 (1): 266.
-
+#tt <- travel_time("city", path = tempdir()) # travel time data from Nelson, Andy, Daniel J. Weiss, Jacob van Etten, Andrea Cattaneo, Theresa S. McMenomy, and Jawoo Koo. 2019. “A Suite of Global Accessibility Indicators.” Scientific Data 6 (1): 266.
+city_hall <- c(-75.1652, 39.9526) # longitude, latitude
+grid_size <- 0.01 # approximately 1 km
 # 1. Plot the states ----
 get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) {
     extent_area <- ext(lon_mean - lon_edge/2,
@@ -112,23 +115,42 @@ elev_sf1 <- get_elev_sf(us_elev, sites_center, "elevation")
 p2 <- plot_elev_map(elev_sf1, "elevation", 1000)
 
 # 3. Urbanization ----
-get_tt_sf <- function (tt, sites_center, gra) {
-    scc <- unlist(filter(sites_center, gradient == gra)[,-1])
-    center_coord <- scc[c("lon_mean", "lat_mean")]
-    edge_length <- scc["width_max"]/2
-    extent_area <- ext(center_coord[1] - edge_length, center_coord[1] + edge_length, center_coord[2] - edge_length, center_coord[2] + edge_length)
-    elev1 <- crop(tt, extent_area)
-    r_points <- as.data.frame(elev1, xy = TRUE)
-    elev_sf1 <- st_as_sf(r_points, coords = c("x", "y"), crs = 4326)
-    as(st_geometry(elev_sf1), "Spatial")
-    return(elev_sf1)
+get_tt_sf <- function (sites_center, grid_size = 0.001) {
+    city_hall <- c(-75.1652, 39.9526) # longitude, latitude
+    #grid_size <- 0.001 # approximately 100m
+
+    dist_to_ch <- function (grid_points) {
+        xx <- apply(grid_points, 1, function(row) {
+            distHaversine(c(row['longitude'], row['latitude']), city_hall)
+        })
+
+        return(mutate(grid_points, distance_to_city_hall = xx))
+    }
+
+    sites_center <- sites_center %>%
+        mutate(
+            lat_range = map2(lat_mean-width_max/2, lat_mean+width_max/2, ~seq(.x, .y, by = grid_size)),
+            lon_range = map2(lon_mean-width_max/2, lon_mean+width_max/2, ~seq(.x, .y, by = grid_size)),
+            grid_points = map2(lon_range, lat_range, ~expand.grid(longitude = .x, latitude = .y)),
+            gps = map(grid_points, dist_to_ch)
+        )
+
+    sc <- sites_center %>%
+        select(gradient, gps) %>%
+        unnest(gps) %>%
+        mutate(distance_to_city_hall_km = distance_to_city_hall / 1000)
+    tt_sf <- st_as_sf(sc, coords = c("longitude", "latitude"), crs = 4326)
+
+    return(tt_sf)
 }
-plot_tt_map <- function (sff, gra, midp = 55) {
-    sff %>%
+plot_tt_map <- function (tt_sf, gra, midp = 10) {
+    #gra = "urbanization"
+    tt_sf %>%
+        filter(gradient == gra) %>%
         ggplot() +
-        geom_sf(aes(color = travel_time_to_cities_1)) +
+        geom_sf(aes(color = distance_to_city_hall_km)) +
         geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), size = 2, shape = 21) +
-        scale_color_gradient2(low = "#a642bf", high = "#0cc45f", mid = "snow", midpoint = midp, name = "time to\ncities (min)") +
+        scale_color_gradient2(low = "#a642bf", high = "#0cc45f", mid = "snow", midpoint = midp, name = "distance to\ncity hall\n(km)") +
         scale_fill_manual(values = population_colors) +
         annotation_scale(width_hint = .4, location = "br", line_width = .2, text_cex = .4, height = unit(1, "mm"), pad_y = unit(1, "mm")) +
         coord_sf(clip = "off", expand = F) +
@@ -141,15 +163,16 @@ plot_tt_map <- function (sff, gra, midp = 55) {
             legend.key.width = unit(3, "mm"),
             legend.key.height = unit(5, "mm"),
             legend.box.margin = unit(c(0,0,0,0), "mm"),
-            #plot.margin = unit(c(3,3,3,8), "mm"),
             plot.margin = unit(c(3,3,3,3), "mm"),
             plot.title = element_text(size = 8, hjust = .5, margin = unit(c(0,0,1,0), "mm"))
         ) +
         guides(fill = "none", color = guide_colorbar(barwidth = .5, barheight = 3)) +
         labs(x = "Longitude", y = "Latitude")
 }
-tt_sf2 <- get_tt_sf(tt, sites_center, "urbanization")
-p3 <- plot_tt_map(tt_sf2, "urbanization")
+tt_sf <- get_tt_sf(sites_center)
+p3 <- plot_tt_map(tt_sf, "urbanization")
+
+
 
 
 # 4. Map ----
