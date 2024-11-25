@@ -1,5 +1,6 @@
 #' This script tidy and combine the data from plant inoculation experiments
-#' including traits: shoot biomass, root biomass, and nodule count
+#' including traits: shoot biomass, root biomass, and nodule count in the lupulina experiments
+#' and traits: leaf, root in the sativa experiment
 
 library(tidyverse)
 library(janitor)
@@ -86,14 +87,16 @@ write_csv(lupulinas, paste0(folder_phenotypes, "plants/lupulinas.csv")) # Symbio
 
 
 # Sativa experiments ----
-sativas_va <- read_csv(paste0(folder_data, "raw/plants/SymbiosisInSoilData_S24.csv")) %>%
+sativas_va <- readxl::read_xlsx(paste0(folder_data, "raw/plants/SymbiosisInSoilData_S24_groups.xlsx")) %>%
     # Make sure the variable names are correct
     clean_names() %>%
     rename(
         genome_id = rhizobia_strain,
         population = elevation,
         exp_nitrogen = nitrogen_treatment,
-        shoot_height = stem_height
+        shoot_height = stem_height,
+        exp_labgroup = group_number,
+        exp_labsection = lab_section
     ) %>%
     mutate(genome_id = tolower(genome_id)) %>%
     # Join the site and isolate information

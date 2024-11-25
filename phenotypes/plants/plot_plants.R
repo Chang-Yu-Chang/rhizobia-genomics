@@ -21,8 +21,8 @@ length(unique(plants$exp_id)) # 26 rhizobia strains used in the plant experiment
 # 1. All plant traits ----
 set.seed(1)
 p <- plants %>%
-    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "without nitrogen") %>%
-    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
+    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "N-") %>%
+    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup, -exp_labsection) %>%
     group_by(gradient, population, exp_plant) %>%
     filter(nodule_number <100) %>%
     pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%
@@ -52,8 +52,8 @@ set.seed(1)
 idf <- arrange(plants, population) %>% distinct(exp_id) %>% pull(exp_id)
 
 p <- plants %>%
-    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "without nitrogen") %>%
-    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
+    filter(population != "control", exp_plant == "sativa", exp_nitrogen == "N-") %>%
+    select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup, -exp_labsection) %>%
     group_by(gradient, population, exp_plant) %>%
     filter(nodule_number <100) %>%
     pivot_longer(cols = -c(1:11), names_to = "trait", values_drop_na = T) %>%

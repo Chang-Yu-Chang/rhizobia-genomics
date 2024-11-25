@@ -42,7 +42,7 @@ traits <- tibble(
         # trait_pre == "leaf color" ~ "leaf\ncolor",
         trait_pre == "shoot height" ~ "shoot height (cm)",
         trait_pre == "primary root length" ~ "primary root\nlength (cm)",
-        # trait_pre == "longest lateral root length" ~ "longest lateral\nroot length (cm)",
+        trait_pre == "longest lateral root length" ~ "longest lateral\nroot length (cm)",
         #trait_pre == "lateral root number" ~ "lateral\nroot\nnumber",
         T ~ trait_pre
     )) %>%
