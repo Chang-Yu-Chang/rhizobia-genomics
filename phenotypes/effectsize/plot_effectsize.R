@@ -13,14 +13,14 @@ cohensds <- read_csv(paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
 plot_cohensds <- function (cohensds, plant) {
     cohensds %>%
         filter(exp_plant == plant) %>%
-        mutate(exp_nitrogen = factor(exp_nitrogen, c("without nitrogen", "with nitrogen"))) %>%
+        mutate(exp_nitrogen = factor(exp_nitrogen, c("N-", "N+"))) %>%
         ggplot() +
         geom_hline(yintercept = 0, linetype = 2) +
         geom_linerange(aes(x = trait, ymin = lower_cl, ymax = upper_cl), color = "grey10", linewidth = 1, position = position_dodge2(width = .5)) +
         geom_point(aes(x = trait, y = effect_size, shape = exp_nitrogen), size = 3, stroke = 1, fill = "white", position = position_dodge2(width = .5, reverse = T)) +
         scale_x_discrete(expand = c(0,.8), position = "top") +
         scale_y_continuous(limits = c(-3, 3), expand = c(0,.1), breaks = -3:3) +
-        scale_shape_manual(values = c(`with nitrogen` = 16, `without nitrogen` = 21), labels = c("N+", "N-")) +
+        scale_shape_manual(values = c(`N+` = 16, `N-` = 21), labels = c("N+", "N-")) +
         scale_fill_manual(values = plant_colors) +
         facet_grid(gradient~exp_nitrogen, scales = "free_y", space = "free_y", switch = "y") +
         coord_flip(clip = "off") +
@@ -62,7 +62,7 @@ plot_boxes <- function (plants, gra, plant) {
 
     plants %>%
         filter(gradient == gra) %>%
-        filter(population != "control", exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
+        filter(population != "control", exp_plant == plant, exp_nitrogen == "N-") %>%
         select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
         select(-nodule_shape, -nodule_size, -nodule_color, -exp_labgroup) %>%
         group_by(gradient, population, exp_plant) %>%
@@ -120,8 +120,8 @@ plot_eff <- function (cohensd, gra, plant) {
     )
 
     cohensd %>%
-        filter(gradient == gra, exp_plant == plant, exp_nitrogen == "without nitrogen") %>%
-        mutate(exp_nitrogen = factor(exp_nitrogen, c("without nitrogen", "with nitrogen"))) %>%
+        filter(gradient == gra, exp_plant == plant, exp_nitrogen == "N-") %>%
+        mutate(exp_nitrogen = factor(exp_nitrogen, c("N-", "N+"))) %>%
         left_join(traits) %>%
         ggplot() +
         geom_hline(yintercept = 0, linetype = 2) +
@@ -129,7 +129,7 @@ plot_eff <- function (cohensd, gra, plant) {
         geom_point(aes(x = trait_pre, y = effect_size, shape = exp_nitrogen), size = 3, stroke = 1, fill = "white", position = position_dodge2(width = .5, reverse = T)) +
         scale_x_discrete(expand = c(0,.8), position = "top") +
         scale_y_continuous(limits = c(-3, 3), expand = c(0,.1), breaks = -3:3) +
-        scale_shape_manual(values = c(`with nitrogen` = 16, `without nitrogen` = 21), labels = c("N+", "N-")) +
+        scale_shape_manual(values = c(`N+` = 16, `N-` = 21), labels = c("N+", "N-")) +
         scale_fill_manual(values = plant_colors) +
         #facet_nested_wrap(gradient + trait~., remove_labels = "x", axes = "all", scales = "free_y", dir = "v", strip.position = "left", ncol = 1, strip = strips) +
         #facet_wrap2(vars(trait_pre), scales = "free_y", ncol = 1, axes = "all", remove_labels = "x") +

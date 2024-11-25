@@ -132,7 +132,6 @@ tb_tidied <- tb %>%
 # 3.2 Bootstrap ----
 set.seed(1)
 
-
 tb$mod_boot <- list(NA)
 tb$mod_cis <- list(NA)
 for (i in 1:nrow(tb)) {

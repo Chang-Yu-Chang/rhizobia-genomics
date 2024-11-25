@@ -152,7 +152,8 @@ nrow(sativas) # 571 plants
 write_csv(sativas, paste0(folder_phenotypes, "plants/sativas.csv"))
 
 # Bind the two tables ----
-plants <- bind_rows(lupulinas, sativas)
+plants <- bind_rows(lupulinas, sativas) %>%
+    select(gradient, population, site, exp_id, genome_id, genome_name, starts_with("exp_"), everything())
 write_csv(plants, paste0(folder_phenotypes, "plants/plants.csv"))
 
 nrow(plants) # 822 plants

@@ -19,7 +19,7 @@ cohensds <- read_csv(paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
 plants_n <- plants %>%
     filter(population != "control", exp_nitrogen == "N-") %>%
     select(
-        -nodule_shape, -nodule_size, -nodule_color, -exp_labgroup,
+        -nodule_shape, -nodule_size, -nodule_color, -exp_labgroup, -exp_labsection,
         -primary_root_nodule_number, -lateral_root_nodule_number,
         -longest_petiole_length, -longest_lateral_root_length,
         -lateral_root_number, -primary_root_length
