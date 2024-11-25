@@ -49,6 +49,12 @@ traits <- tibble(
     mutate(trait_pre2 = factor(str_replace_all(trait_pre, " ", "\n"))) %>%
     mutate(trait_pre = factor(trait_pre, trait_pre))
 
+traits <- bind_rows(traits, tibble(
+    trait_type = "growth", trait = c("r", "lag", "maxOD"), trait_pre = c("growth rate (1/hr)", "lag time (hr)", "yield [OD]")
+))
+
+
+
 # utils
 read_gpas <- function (set_name) {
     gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))

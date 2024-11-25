@@ -1,7 +1,6 @@
 #' This script compares the traits in pairs of populations
 
 library(tidyverse)
-library(cowplot)
 library(ggh4x)
 library(flextable)
 library(broom.mixed) # for tidying the model outputs
@@ -9,7 +8,6 @@ library(glmmTMB) # for checking GLMM assumptions
 library(DHARMa) # for checking GLMM assumptions
 library(lme4) # for lmer
 library(car) # for anova
-library(boot) # for bootstrapping
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 
@@ -33,7 +31,6 @@ plants_n <- plants %>%
     left_join(isolates) %>%
     ungroup()
 
-# 2. Check assumptions ----
 # 2. Check assumptions ----
 dat <- plants_n %>%
     filter(trait_pre == "shoot height (cm)")
@@ -255,7 +252,6 @@ p <- tb_tidied2 %>%
     select(-dat, -mod) %>%
     mutate(trait_pre = factor(trait_pre, traits$trait_pre)) %>%
     unnest(chisq_perm) %>%
-    #drop_na(chisq)
     ggplot() +
     geom_histogram(aes(x = chisq), color = "black", fill = "white") +
     geom_vline(data = tb_tidied2_obv, aes(xintercept = chisq_obv), color = "red", linetype = 2) +
