@@ -2,18 +2,19 @@
 
 library(tidyverse)
 library(cowplot)
-#library(tigris) # for getting the US census data
+library(tigris) # for getting the US census data and state map
 library(sf) # for handling the simple features
 library(geodata) # for getting the elevation data
 library(stars) # for converting st to sf
 library(ggspatial) # for scale bar
 library(geosphere) # for computing the distance between sites
-library(ggs)
+library(ggspatial)
 library(grid)
 #' On MacOS, sf depends on gdal so do this in terminal
 #' brew install pkg-config
 #' brew install gdal
-# then in R >renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
+# then in R > renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
+Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj")
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -49,13 +50,10 @@ plot_states <- function (us_states) {
     us_states %>%
         filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
         ggplot() +
-        #geom_sf(data = elev_sf, aes(color = USA_elv_msk)) + # elevation
         geom_sf(fill = NA, color = "grey10", linewidth = .5) +
         geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("cornsilk", 0.5), linewidth = 0.5) +
-        #scale_color_gradient(low = alpha("snow", .2), high = alpha("#d6a36e", .1), name = "elevation (m)") +
-        #scale_fill_manual(values = population_colors) +
-        annotation_scale(location = "bl", width_hint = .2) +
-        coord_sf(expand = F, xlim = c(-87, -70), ylim = c(36, 42.5)) +
+        annotation_scale(location = "bl", width_hint = .2, ) +
+        coord_sf(expand = F, xlim = c(-87, -70), ylim = c(35, 42.5)) +
         theme_light() +
         theme(
             panel.background = element_rect(color = NA, fill = NA, linewidth = 1),
@@ -66,8 +64,6 @@ plot_states <- function (us_states) {
             axis.line = element_line(linewidth = .5),
             axis.ticks = element_line(color = "black", linewidth = .5),
             axis.text = element_text(color = "black")
-            # axis.text = element_blank(),
-            # axis.title = element_blank(),
         ) +
         guides(fill = "none", color = "none") +
         labs(x = "Longitude", y = "Latitude")
@@ -93,23 +89,22 @@ plot_elev_map <- function (sff, gra, midp = 1000) {
         geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), size = 2, shape = 21) +
         scale_color_gradient2(low = "maroon", high = "steelblue", mid = "snow", midpoint = midp, name = "elevation (m)") +
         scale_fill_manual(values = population_colors) +
-        annotation_scale(width_hint = .4, location = "br", line_width = .2, text_cex = .4, height = unit(1, "mm"), pad_y = unit(1, "mm")) +
+        annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
         coord_sf(clip = "off", expand = F) +
         theme_void() +
         theme(
             plot.background = element_rect(color = "black", fill = "cornsilk1", linewidth = 1),
             axis.ticks = element_line(color = "black", linewidth = .5),
-            legend.text = element_text(size = 5) ,
-            legend.title = element_text(size = 5),
-            legend.key.width = unit(3, "mm"),
-            legend.key.height = unit(5, "mm"),
+            legend.text = element_text(size = 8) ,
+            legend.title = element_text(size = 8),
+            legend.key.width = unit(5, "mm"),
+            legend.key.height = unit(8, "mm"),
             legend.box.margin = unit(c(0,0,0,0), "mm"),
-            #plot.margin = unit(c(3,3,3,8), "mm"),
-            plot.margin = unit(c(3,3,3,3), "mm"),
+            plot.margin = unit(c(2,3,3,3), "mm"),
             plot.title = element_text(size = 8, hjust = .5, margin = unit(c(0,0,1,0), "mm"))
         ) +
-        guides(fill = "none", color = guide_colorbar(barwidth = .5, barheight = 3)) +
-        labs(x = "Longitude", y = "Latitude")
+        guides(fill = "none", color = guide_colorbar(barwidth = .8, barheight = 5)) +
+        labs(x = "Longitude", y = "Latitude", title = "Elevation")
 }
 elev_sf1 <- get_elev_sf(us_elev, sites_center, "elevation")
 p2 <- plot_elev_map(elev_sf1, "elevation", 1000)
@@ -150,47 +145,44 @@ plot_tt_map <- function (tt_sf, gra, midp = 10) {
         ggplot() +
         geom_sf(aes(color = distance_to_city_hall_km)) +
         geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), size = 2, shape = 21) +
-        scale_color_gradient2(low = "#a642bf", high = "#0cc45f", mid = "snow", midpoint = midp, name = "distance to\ncity hall\n(km)") +
+        scale_color_gradient2(low = "#a642bf", high = "#0cc45f", mid = "snow", midpoint = midp, name = "distance to\ncity hall (km)") +
         scale_fill_manual(values = population_colors) +
-        annotation_scale(width_hint = .4, location = "br", line_width = .2, text_cex = .4, height = unit(1, "mm"), pad_y = unit(1, "mm")) +
+        annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
         coord_sf(clip = "off", expand = F) +
         theme_void() +
         theme(
             plot.background = element_rect(color = "black", fill = "cornsilk1", linewidth = 1),
             axis.ticks = element_line(color = "black", linewidth = .5),
-            legend.text = element_text(size = 5) ,
-            legend.title = element_text(size = 5),
-            legend.key.width = unit(3, "mm"),
-            legend.key.height = unit(5, "mm"),
+            legend.text = element_text(size = 8) ,
+            legend.title = element_text(size = 8),
+            legend.key.width = unit(5, "mm"),
+            legend.key.height = unit(8, "mm"),
             legend.box.margin = unit(c(0,0,0,0), "mm"),
-            plot.margin = unit(c(3,3,3,3), "mm"),
+            plot.margin = unit(c(2,3,3,3), "mm"),
             plot.title = element_text(size = 8, hjust = .5, margin = unit(c(0,0,1,0), "mm"))
         ) +
-        guides(fill = "none", color = guide_colorbar(barwidth = .5, barheight = 3)) +
-        labs(x = "Longitude", y = "Latitude")
+        guides(fill = "none", color = guide_colorbar(barwidth = .8, barheight = 5)) +
+        labs(x = "Longitude", y = "Latitude", title = "Urbanization")
 }
 tt_sf <- get_tt_sf(sites_center)
 p3 <- plot_tt_map(tt_sf, "urbanization")
 
 
-
-
-# 4. Map ----
+# 4. combine ----
 zoom_polygon1 <- polygonGrob(x = c(.385,.385,.43,.43), y = c(.5,.85,.35,.325), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 zoom_polygon2 <- polygonGrob(x = c(.7,.7,.95,.725), y = c(.6,.58,.58,.6), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
-p_map <- ggdraw(p1) +
-    draw_grob(zoom_polygon1) +
-    draw_grob(zoom_polygon2) +
-    draw_plot(p2, x = .08, y = .50, width = .35, height = .35) +
-    draw_plot(p3, x = .65, y = .23, width = .35, height = .35) +
-    draw_text("elevation", x = .25, y = .87, size = 10, hjust = .5) +
-    draw_text("urbanization", x = .82, y = .60, size = 10, hjust = .5)
-
-# Combine ----
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig1.png"), scale = 1) +
-    #draw_plot(p_pca, x = .3, y = .48, width = .65, height = .43) +
-    draw_plot(p_map, x = .35, y = .43 , width = .55, height = .55) +
+    draw_plot(p1, x = .35, y = .43, width = .55, height = .55) +
+    #draw_plot(p_map, x = .35, y = .43, width = .55, height = .55) +
+    # draw_grob(zoom_polygon1) +
+    # draw_grob(zoom_polygon2) +
+    draw_plot(p2, x = .37, y = .68, width = .3, height = .25, hjust = 0, vjust = 0) + #width = .3, height = .4, hjust = 0, halign = 0) +
+    draw_plot(p3, x = .62, y = .53, width = .3, height = .25, hjust = 0, vjust = 0) + #width = .7, height = .4, hjust = 0, halign = 0) +
+    # draw_text("elevation", x = .25, y = .87, size = 10) +
+    # draw_text("urbanization", x = .82, y = .60, size = 10, hjust = .5) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
+
 ggsave(here::here("plots/Fig1.png"), p, width = 11, height = 7)
+
