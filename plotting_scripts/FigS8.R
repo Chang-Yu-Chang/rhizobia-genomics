@@ -112,3 +112,19 @@ p <- plot_grid(
 )
 
 ggsave(here::here("plots/FigS8.png"), p, width = 8, height = 6)
+
+# T test
+get_snp_get <- function (set_name) {
+    tt <- read_gpas(set_name)
+    ff <- read_fsts(set_name)
+    gene_fst <- make_gene_fst(ff, tt)
+    snp_fst <- make_snp_fst(gene_fst, ff)
+    return(snp_fst)
+}
+
+snp_fst1 <- get_snp_get("elev_med")
+snp_fst2 <- get_snp_get("urbn_mel")
+
+t.test(snp_fst1$Gprime_st, snp_fst2$Gprime_st)
+
+

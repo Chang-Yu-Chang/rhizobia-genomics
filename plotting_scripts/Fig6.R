@@ -11,6 +11,7 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates <- select(isolates, -exp_id, -genome_name)
 sites_dist <- read_csv(paste0(folder_data, "phenotypes/sites/sites_dist.csv"))
 
+# Dxy ----
 read_fsts <- function (set_name) {
     per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
     per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
@@ -199,7 +200,6 @@ do_mantel_rep <- function (xx_rp) {
 }
 
 
-#Dxy
 tb <- tibble(
     set_name = rep(c("elev_med", "urbn_mel"), each = 1)
 ) %>%
@@ -214,36 +214,7 @@ tb <- tibble(
         p_dxy_rep = map2(xx_gn, xx_rp, plot_replicon_wide_dxy)
     )
 
-if (F) {
-
-    tb2 <- tb %>%
-        mutate(
-            mod = map(xx_gn, do_mantel),
-            mod_rep = map(xx_rp, do_mantel_rep),
-            xx_snps = map(xx_rp, ~distinct(ungroup(.x), replicon_type, n_snps))
-        )
-
-    tb3 <- tb2 %>%
-        select(set_name, mod, mod_rep, xx_snps) %>%
-        unnest(mod_rep) %>%
-        select(set_name, mod, replicon_type, r_squared, p_value, xx_snps)
-    # Unnest
-    temp1 <- select(tb3, set_name, mod) %>% unnest(mod) %>% distinct()
-    temp2 <- select(tb3, set_name, xx_snps) %>% unnest(xx_snps) %>% distinct()
-
-    tb4 <- bind_rows(select(tb3, -mod, -xx_snps), temp1) %>%
-        left_join(temp2) %>%
-        mutate(replicon_type = factor(replicon_type, c("genome", "chromosome", "pSymA", "pSymB", "pAcce"))) %>%
-        arrange(set_name, replicon_type) %>%
-        mutate(
-            r_squared = round(r_squared, 2),
-            ast = map_chr(p_value, turn_p_to_asteriks),
-            set_name = ifelse(set_name == "elev_med", "elevation", "urbanization")
-        )
-
-}
-
-# GCV
+# GCV ----
 read_gcv_dxys <- function (set_name) {
     pop_gcv_dxy <- read_csv(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/pop_gcv_dxy.csv"))
     ind_gcv_dxy <- read_csv(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name, "/ind_gcv_dxy.csv"))
@@ -355,6 +326,7 @@ tbg <- tibble(set_name = c("elev_med", "urbn_mel")) %>%
         p = map(dists, plot_replicon_gcv_dxy)
     )
 
+# Combine
 theme_consist <- function () {
     theme(
         axis.text.x = element_blank(),

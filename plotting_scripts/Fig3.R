@@ -1,18 +1,12 @@
 #' This script plots the reaction norm of nitrogen treatments
 #' 1. Prepare the table
-#' 2. Check model assumptions
-#' 3. Run models
-#' 4. Table
-#' 5. Plot
+#' 2. Plot
+#' 3. permanova
 
 library(tidyverse)
 library(cowplot)
-library(flextable)
 library(ggh4x) # for nested facets
-library(broom.mixed) # for tidying the model outputs
-library(lme4) # for lmer
-library(car) # for anova
-library(boot) # for bootstrapping
+library(vegan)
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 
@@ -81,7 +75,7 @@ plants_n_summ <- plants_n %>%
     mutate(lower = trait_mean-qnorm(0.975)*trait_sem, upper = trait_mean+qnorm(0.975)*trait_sem)
 
 
-# 5. Plot the reaction norm ----
+# 2. Plot the reaction norm ----
 p <- plants_n %>%
     group_by(gradient, population, exp_plant, exp_nitrogen, trait_type, trait_pre, value) %>%
     count() %>%
@@ -110,4 +104,14 @@ p <- plants_n %>%
 
 ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 4)
 
+
+# 3. PERMANOVA ----
+set.seed(1)
+
+dat <- plants %>%
+    filter(population != "control", gradient == "elevation", exp_plant == "sativa") %>%
+    drop_na(shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    select(gradient, population, site, exp_id, exp_nitrogen, shoot_height, nodule_number, leaf_color, leaf_number)
+m <- select(dat, shoot_height, nodule_number, leaf_color, leaf_number)
+adonis2(m ~ exp_nitrogen, data = dat, permutation = 1000)
 

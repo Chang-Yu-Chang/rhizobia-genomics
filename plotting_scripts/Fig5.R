@@ -60,7 +60,7 @@ plot_heatmap <- function (tt, p_tree) {
         geom_tile(aes(x = rep_gene, y = genome_id, fill = population)) +
         scale_y_discrete(expand = c(0,0)) +
         scale_fill_manual(values = population_colors) +
-        facet_grid2(~replicon_type, scales = "free", space = "free_x", switch = "y") +
+        facet_grid2(~replicon_type, scales = "free", space = "free_x", switch = "y", strip = strip_vanilla(clip = "off")) +
         coord_cartesian(clip = "off") +
         theme_classic() +
         theme(
@@ -69,6 +69,7 @@ plot_heatmap <- function (tt, p_tree) {
             strip.background = element_blank(),
             strip.text = element_text(size = 10),
             strip.placement = "outside",
+            strip.clip = "off",
             panel.spacing.x = unit(1, "mm"),
             panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
             axis.title = element_blank(),

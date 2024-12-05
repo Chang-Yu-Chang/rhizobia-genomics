@@ -6,19 +6,16 @@
 #' 5. Plot
 
 library(tidyverse)
-library(janitor)
 library(cowplot)
 library(flextable)
 library(ggh4x) # for nested facets
 library(broom.mixed) # for tidying the model outputs
-library(lme4) # for lmer
-library(car) # for anova
-library(boot) # for bootstrapping
+library(vegan)
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 
 # Prepare the data ----
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>% slice(1:32)
 gcs <- read_csv(paste0(folder_data, "phenotypes/growth/gcs.csv"))
 gtw <- read_csv(paste0(folder_data, "phenotypes/growth/gtw.csv"))
 gtwl <- gtw %>%
@@ -136,3 +133,32 @@ p <- plot_grid(
     theme(plot.background = element_rect(color = NA, fill = "white"))
 ggsave(here::here("plots/Fig4.png"), p, width = 6, height = 6)
 
+
+# PERMANOVA ----
+set.seed(1)
+# Elevation
+dat <- gtw %>%
+    filter(temperature == "30c") %>%
+    select(well, exp_id, r, lag, maxOD) %>%
+    group_by(exp_id) %>%
+    summarize(r = mean(r), lag = mean(lag), maxOD = mean(maxOD)) %>%
+    left_join(select(isolates, population, exp_id, gradient)) %>%
+    filter(gradient == "elevation")
+
+pca_result <- select(dat, r, lag, maxOD) %>% prcomp(scale. = TRUE)
+pcs <- as_tibble(pca_result$x) %>% mutate(population = dat$population)
+dm <- vegdist(select(pcs, starts_with("PC")), method = "euclidean")
+adonis2(dm ~ population, data = pcs, permutations = 1000)
+
+# Urbnaization
+dat <- gtw %>%
+    filter(temperature == "30c") %>%
+    select(well, exp_id, r, lag, maxOD) %>%
+    group_by(exp_id) %>%
+    summarize(r = mean(r), lag = mean(lag), maxOD = mean(maxOD)) %>%
+    left_join(select(isolates, population, exp_id, gradient)) %>%
+    filter(gradient == "urbanization")
+pca_result <- select(dat, r, lag, maxOD) %>% prcomp(scale. = TRUE)
+pcs <- as_tibble(pca_result$x) %>% mutate(population = dat$population)
+dm <- vegdist(select(pcs, starts_with("PC")), method = "euclidean")
+adonis2(dm ~ population, data = pcs, permutations = 1000)
