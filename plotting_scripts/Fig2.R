@@ -9,6 +9,7 @@ library(tidyverse)
 library(cowplot)
 library(ggh4x)
 library(grid)
+library(vegan) # for permanova
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -162,4 +163,59 @@ p <- plot_grid(
 
 
 ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 8)
+
+
+# 3. PERMANOVA ----
+set.seed(1)
+# Sativa elevation
+dat <- plants %>%
+    filter(population != "control", exp_nitrogen == "N-") %>%
+    filter(gradient == "elevation", exp_plant == "sativa") %>%
+    drop_na(shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    select(gradient, population, site, exp_id, exp_waterblock, shoot_height, nodule_number, leaf_color, leaf_number)
+m <- select(dat, shoot_height, nodule_number, leaf_color, leaf_number)
+adonis2(m ~ population, data = dat, permutation = 1000)
+
+# Sativa urbanization
+dat <- plants %>%
+    filter(population != "control", exp_nitrogen == "N-") %>%
+    filter(gradient == "urbanization", exp_plant == "sativa") %>%
+    drop_na(shoot_height, nodule_number, leaf_color, leaf_number) %>%
+    select(gradient, population, site, exp_id, exp_waterblock, shoot_height, nodule_number, leaf_color, leaf_number)
+m <- select(dat, shoot_height, nodule_number, leaf_color, leaf_number)
+adonis2(m ~ population, data = dat, permutation = 1000)
+
+# Luplina elevation
+dat <- plants %>%
+    filter(population != "control", exp_nitrogen == "N-") %>%
+    filter(gradient == "elevation", exp_plant == "lupulina") %>%
+    drop_na(shoot_biomass_mg, nodule_number, root_biomass_mg) %>%
+    select(gradient, population, site, exp_id, exp_waterblock, shoot_biomass_mg, nodule_number, root_biomass_mg)
+m <- select(dat, shoot_biomass_mg, nodule_number, root_biomass_mg)
+adonis2(m ~ population, data = dat, permutation = 1000)
+
+# Luplina urbnaization
+dat <- plants %>%
+    filter(population != "control", exp_nitrogen == "N-") %>%
+    filter(gradient == "urbanization", exp_plant == "lupulina") %>%
+    drop_na(shoot_biomass_mg, nodule_number, root_biomass_mg) %>%
+    select(gradient, population, site, exp_id, exp_waterblock, shoot_biomass_mg, nodule_number, root_biomass_mg)
+m <- select(dat, shoot_biomass_mg, nodule_number, root_biomass_mg)
+adonis2(m ~ population, data = dat, permutation = 1000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
