@@ -13,34 +13,21 @@ read_gcv_fsts <- function (set_name) {
 }
 set_name <- "elev_med"
 ff <- read_gcv_fsts(set_name)
+tt <- read_gpas(set_name)
 gene_replicon <- tt$gpacl %>%
     select(gene, replicon_type) %>%
     replace_na(list(replicon_type = "others")) %>%
     distinct()
-gene_order <- levels(tt$gpacl$gene)
+gene_order <- unique(tt$gpacl$gene)
 
 
 acce_fst <- ff$per_acce_fst %>%
     drop_na(Gst) %>%
     mutate(gene = factor(gene, gene_order)) %>%
-    #filter(gene %in% ff$per_gene_fst$gene) %>%
-    #left_join(ff$per_gene_fst) %>% # those genes without Fst do not have SNPs
     left_join(gene_replicon) %>% # get the replicon where the gene is
     group_by(replicon_type) %>%
-    # mutate(loc_start = cumsum(sequence_length)) %>%
-    # mutate(loc_start = lag(loc_start)) %>%
-    # replace_na(list(loc_start = 0, Gst_est = 0)) %>%
     mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce", "others"))) %>%
     ungroup()
-
-acce_fst %>%
-    pivot_longer(cols = c(Hs, Ht, Gst, Gprime_st, D), names_to = "Fst") %>%
-    mutate(Fst = factor(Fst, c("Hs", "Ht", "Gst_est", "Gprime_st", "D"))) %>%
-    group_by(replicon_type, Fst) %>%
-    filter(Fst == "Gprime_st") %>%
-    slice_max(value, prop = .01) %>%
-    filter(!str_detect(gene, "group")) %>%
-    view
 
 acce_n <- acce_fst %>%
     filter(replicon_type %in% c("chromosome", "pSymA", "pSymB", "pAcce")) %>%

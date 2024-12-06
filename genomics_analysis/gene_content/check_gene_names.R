@@ -7,8 +7,8 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
-set_name = "elev_med"
-#set_name = "urbn_mel"
+#set_name = "elev_med"
+set_name = "urbn_mel"
 tt <- read_gpas(set_name)
 
 # Check the number of gene symbols -----

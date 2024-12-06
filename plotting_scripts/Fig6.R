@@ -326,7 +326,7 @@ tbg <- tibble(set_name = c("elev_med", "urbn_mel")) %>%
         p = map(dists, plot_replicon_gcv_dxy)
     )
 
-# Combine
+# Combine ----
 theme_consist <- function () {
     theme(
         axis.text.x = element_blank(),
@@ -350,5 +350,11 @@ p <- plot_grid(
     scale = 0.95, ncol = 1, align = "hv", axis = "trl",
     rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4]
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
+
 ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
+
+# Compare the slope between gradients
+
+
+
 
