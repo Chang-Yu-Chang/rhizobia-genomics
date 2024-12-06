@@ -4,8 +4,11 @@ library(tidyverse)
 library(cowplot)
 library(ggh4x)
 library(vegan) # for mantel test
-library(flextable)
+library(lme4) # for lmer
+library(car) # for anova
+library(broom.mixed)
 source(here::here("metadata.R"))
+options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates <- select(isolates, -exp_id, -genome_name)
@@ -230,16 +233,14 @@ join_gcv_dists <- function (dd) {
         left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
         #pivot_wider(names_from = replicon_type, values_from = gcv_dxy, names_prefix = "gcv_dxy_") %>%
         left_join(sites_dist) %>%
-        mutate(gcv_dxy_scaled = gcv_dxy/n_accessory)
-
-    # # Genome
-    # dd$ind_gcv_dxy %>%
-    #     rename(gcv_dxy_genome = gcv_dxy) %>%
-    #     left_join(rep_gcv_dxy_long) %>%
-    #     left_join(rename_with(isolates, function (x) paste0(x, "1"))) %>%
-    #     left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
-    #     left_join(sites_dist) %>%
-    #     mutate(gcv_dxy_scaled = gcv_dxy / n_accessory)
+        mutate(gcv_dxy_scaled = gcv_dxy/n_accessory) %>%
+        mutate(pops = paste0(population1, "-", population2)) %>%
+        mutate(pops = case_when(
+            pops == "low elevation-high elevation" ~ "high elevation-low elevation",
+            pops == "urban-suburban" ~ "suburban-urban",
+            T ~ pops
+        )) %>%
+        mutate(pops = str_remove_all(pops, " elevation"))
 }
 make_dist_m <- function (xx_gn, dist_name) {
     #' Pivot the long format of distance to matrix format
@@ -353,8 +354,47 @@ p <- plot_grid(
 
 ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
 
-# Compare the slope between gradients
+# Are urban strains more distant to other than between suburban strains? ----
+## SNPs
+dat <- tb$xx[[2]] %>%
+    filter(population1 == population2)
+
+t.test(
+    dat$dxy_scaled[dat$population1 == "suburban"],
+    dat$dxy_scaled[dat$population1 == "urban"]
+)
+
+## GCV
+dat <- tbg$dists[[2]] %>%
+    filter(population1 == population2)
+
+t.test(
+    dat$gcv_dxy_scaled[dat$population1 == "suburban"],
+    dat$gcv_dxy_scaled[dat$population1 == "urban"]
+)
 
 
+# Compare the slope between gradients ----
+## dat
+dat <- bind_rows(
+    tb$xx_rp[[1]] %>% select(pops, replicon_type, dist_geo_km, dxy_scaled) %>% mutate(gradient = "elevation"),
+    tb$xx_rp[[2]] %>% select(pops, replicon_type, dist_geo_km, dxy_scaled) %>% mutate(gradient = "urbanization")
+) %>% ungroup() %>%
+    nest(data = -replicon_type) %>%
+    mutate(mod = map(data, ~lmer(dxy_scaled ~ dist_geo_km*gradient + (1|pops), data = .x) %>% Anova(type = 3) %>% tidy))
 
+dat %>%
+    unnest(mod) %>%
+    filter(str_detect(term, ":"))
+
+## GCV
+dat <- bind_rows(
+    tbg$dists[[1]] %>% select(pops, replicon_type, dist_geo_km, gcv_dxy_scaled) %>% mutate(gradient = "elevation"),
+    tbg$dists[[2]] %>% select(pops, replicon_type, dist_geo_km, gcv_dxy_scaled) %>% mutate(gradient = "urbanization")
+) %>% ungroup() %>%
+    nest(data = -replicon_type) %>%
+    mutate(mod = map(data, ~lmer(gcv_dxy_scaled ~ dist_geo_km*gradient + (1|pops), data = .x) %>% Anova(type = 3) %>% tidy))
+dat %>%
+    unnest(mod) %>%
+    filter(str_detect(term, ":"))
 
