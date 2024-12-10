@@ -73,7 +73,7 @@ tb_tidied <- tb %>%
 # 3.2 Permutation ----
 tb$chisq_perm <- list(NA)
 tb$emm_perm <- list(NA)
-n_perms = 100
+n_perms = 1000
 for (i in 1:nrow(tb)) {
     st <- tb$st[i]
     dat <- tb$dat[[i]]

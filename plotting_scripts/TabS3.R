@@ -3,11 +3,7 @@
 library(tidyverse)
 library(ggh4x)
 library(flextable)
-library(broom.mixed) # for tidying the model outputs
-library(lme4) # for lmer
-library(car) # for anova
 source(here::here("metadata.R"))
-options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
@@ -15,6 +11,8 @@ plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
 isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
+
+pairs_lab_perm <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_lab_perm.csv"))
 
 
 # 1. Prepare data ----
@@ -130,13 +128,7 @@ clean_model_string <- function (mod_st, ii) {
         str_replace("exp_id", "strain") %>%
         str_replace("exp_labgroup", "labgroup")
 }
-ft2 <- tb_tidied2 %>%
-    select(-dat, -mod, -chisq_perm) %>%
-    unnest(mod_tidied) %>%
-    select(ii, gradient, trait_type, trait_pre, st, term, statistic, df, p_value) %>%
-    mutate(ast = map_chr(p_value, turn_p_to_asteriks)) %>%
-    mutate(siglab = map_chr(p_value, clean_p_lab)) %>%
-    mutate(statistic = round(statistic, 2)) %>%
+ft2 <- pairs_lab_perm %>%
     select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Estimate = statistic, P = siglab, ii) %>%
     # Clean the table
     mutate(

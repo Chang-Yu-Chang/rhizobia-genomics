@@ -87,7 +87,7 @@ plot_boxes <- function (plants_n, gra, plant, nt) {
             legend.background = element_blank(),
             legend.box.margin = unit(c(0,0,-5,0), "mm")
         ) +
-        guides(size = "none", fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0)), color = "none") +
+        guides(fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0)), color = "none") +
         labs()
 }
 plot_cohensds <- function (cohensds, gra, plant, nt) {
@@ -135,8 +135,8 @@ p1 <- plot_boxes(plants_n, "elevation", "sativa", "N-")
 p3 <- plot_boxes(plants_n, "urbanization", "sativa", "N-")
 p5 <- plot_boxes(plants_n, "elevation", "lupulina", "N-")
 p7 <- plot_boxes(plants_n, "urbanization", "lupulina", "N-")
-leg1 <- get_legend(p1 + theme(legend.position = "right", legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
-leg3 <- get_legend(p3 + theme(legend.position = "right", legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
+leg1 <- get_legend(p1 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = guide_legend(nrow = 1, order = 1), fill = guide_legend(order = 2, nrow = 1, override.aes = list(color = NA))))
+leg3 <- get_legend(p3 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = "none", fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
 
 p2 <- plot_cohensds(cohensds_n, "elevation", "sativa", "N-")
 p4 <- plot_cohensds(cohensds_n, "urbanization", "sativa", "N-")
@@ -152,7 +152,7 @@ p <- plot_grid(
     p1 + theme(legend.position = "none"), p2, p3 + theme(legend.position = "none"), p4,
     p5 + theme(legend.position = "none"), p6, p7 + theme(legend.position = "none"), p8,
     ncol = 4,  align = "vh", axis = "tbr",
-    rel_widths = c(1,.5,1,.5), rel_heights = c(.4,4,3),
+    rel_widths = c(1,.5,1,.5), rel_heights = c(.5,4,3),
     labels = c("A", "", "B", "", rep("", 4), "C", "", "D", "")
 ) +
     draw_grob(arrow_grob1) +
@@ -162,7 +162,7 @@ p <- plot_grid(
     theme(plot.background = element_rect(fill = "white", color = NA))
 
 
-ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 8)
+ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 10)
 
 
 # 3. PERMANOVA ----

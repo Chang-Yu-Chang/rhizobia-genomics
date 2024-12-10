@@ -93,7 +93,7 @@ plot_elev_map <- function (sff, gra, midp = 1000) {
         coord_sf(clip = "off", expand = F) +
         theme_void() +
         theme(
-            plot.background = element_rect(color = "black", fill = "cornsilk1", linewidth = 1),
+            plot.background = element_rect(color = "black", fill = "snow", linewidth = 1),
             axis.ticks = element_line(color = "black", linewidth = .5),
             legend.text = element_text(size = 8) ,
             legend.title = element_text(size = 8),
@@ -151,7 +151,7 @@ plot_tt_map <- function (tt_sf, gra, midp = 10) {
         coord_sf(clip = "off", expand = F) +
         theme_void() +
         theme(
-            plot.background = element_rect(color = "black", fill = "cornsilk1", linewidth = 1),
+            plot.background = element_rect(color = "black", fill = "snow", linewidth = 1),
             axis.ticks = element_line(color = "black", linewidth = .5),
             legend.text = element_text(size = 8) ,
             legend.title = element_text(size = 8),
@@ -169,20 +169,16 @@ p3 <- plot_tt_map(tt_sf, "urbanization")
 
 
 # 4. combine ----
-zoom_polygon1 <- polygonGrob(x = c(.385,.385,.43,.43), y = c(.5,.85,.35,.325), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
-zoom_polygon2 <- polygonGrob(x = c(.7,.7,.95,.725), y = c(.6,.58,.58,.6), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+# zoom_polygon1 <- polygonGrob(x = c(.385,.385,.43,.43), y = c(.5,.85,.35,.325), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+# zoom_polygon2 <- polygonGrob(x = c(.7,.7,.95,.725), y = c(.6,.58,.58,.6), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig1.png"), scale = 1) +
-    draw_plot(p1, x = .35, y = .43, width = .55, height = .55) +
+    draw_plot(p1, x = .01, y = .37, width = .95, height = .6) +
     #draw_plot(p_map, x = .35, y = .43, width = .55, height = .55) +
     # draw_grob(zoom_polygon1) +
     # draw_grob(zoom_polygon2) +
-    draw_plot(p2, x = .37, y = .68, width = .3, height = .25, hjust = 0, vjust = 0) + #width = .3, height = .4, hjust = 0, halign = 0) +
-    draw_plot(p3, x = .62, y = .53, width = .3, height = .25, hjust = 0, vjust = 0) + #width = .7, height = .4, hjust = 0, halign = 0) +
-    # draw_text("elevation", x = .25, y = .87, size = 10) +
-    # draw_text("urbanization", x = .82, y = .60, size = 10, hjust = .5) +
+    draw_plot(p2, x = .1, y = .65, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .3, height = .4, hjust = 0, halign = 0) +
+    draw_plot(p3, x = .52, y = .45, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .7, height = .4, hjust = 0, halign = 0) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-
-ggsave(here::here("plots/Fig1.png"), p, width = 11, height = 7)
-
+ggsave(here::here("plots/Fig1.png"), p, width = 9, height = 7)
