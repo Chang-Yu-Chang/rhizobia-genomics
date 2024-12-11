@@ -93,7 +93,7 @@ plot_fst <- function (set_name) {
     gene_fst <- make_gene_fst(ff, tt)
     snp_fst <- make_snp_fst(gene_fst, ff)
     snp_fst_long <- make_snp_fst_long(snp_fst)
-    nrow(gene_fst) # number of single copy core genes
+    nrow(gene_fst) # number of single copy core genes with SNPs
     nrow(snp_fst) # number of snps in these genes
 
     gra <- ifelse(set_name == "elev_med", "Elevation", "Urbanization")

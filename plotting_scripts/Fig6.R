@@ -354,6 +354,25 @@ p <- plot_grid(
 
 ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
 
+# Are low elevations more distant to others than between high elevation strains? ----
+## SNPs
+dat <- tb$xx[[1]] %>%
+    filter(population1 == population2)
+
+t.test(
+    dat$dxy_scaled[dat$population1 == "low elevation"],
+    dat$dxy_scaled[dat$population1 == "high elevation"]
+)
+
+## GCV
+dat <- tbg$dists[[1]] %>%
+    filter(population1 == population2)
+
+t.test(
+    dat$gcv_dxy_scaled[dat$population1 == "low elevation"],
+    dat$gcv_dxy_scaled[dat$population1 == "high elevation"]
+)
+
 # Are urban strains more distant to other than between suburban strains? ----
 ## SNPs
 dat <- tb$xx[[2]] %>%
