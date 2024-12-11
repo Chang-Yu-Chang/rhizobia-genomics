@@ -51,7 +51,7 @@ plot_states <- function (us_states) {
         filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
         ggplot() +
         geom_sf(fill = NA, color = "grey10", linewidth = .5) +
-        geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("cornsilk", 0.5), linewidth = 0.5) +
+        geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("#FFC857", 0.5), linewidth = 0.5) +
         annotation_scale(location = "bl", width_hint = .2, ) +
         coord_sf(expand = F, xlim = c(-87, -70), ylim = c(35, 42.5)) +
         theme_light() +
@@ -85,9 +85,9 @@ get_elev_sf <- function (us_elev, sites_center, gra) {
 plot_elev_map <- function (sff, gra, midp = 1000) {
     sff %>%
         ggplot() +
-        geom_sf(aes(color = USA_elv_msk)) +
-        geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), size = 2, shape = 21) +
-        scale_color_gradient2(low = "maroon", high = "steelblue", mid = "snow", midpoint = midp, name = "elevation (m)") +
+        geom_sf(aes(color = USA_elv_msk), alpha = .9) +
+        geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), color = "black", size = 2, shape = 21) +
+        scale_color_gradient2(low = "#db7272", high = "steelblue", mid = "snow", midpoint = midp, name = "elevation (m)") +
         scale_fill_manual(values = population_colors) +
         annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
         coord_sf(clip = "off", expand = F) +
@@ -143,8 +143,8 @@ plot_tt_map <- function (tt_sf, gra, midp = 10) {
     tt_sf %>%
         filter(gradient == gra) %>%
         ggplot() +
-        geom_sf(aes(color = distance_to_city_hall_km)) +
-        geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), size = 2, shape = 21) +
+        geom_sf(aes(color = distance_to_city_hall_km), alpha = .3) +
+        geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), color = "black", size = 2, shape = 21) +
         scale_color_gradient2(low = "#a642bf", high = "#0cc45f", mid = "snow", midpoint = midp, name = "distance to\ncity hall (km)") +
         scale_fill_manual(values = population_colors) +
         annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
@@ -169,14 +169,15 @@ p3 <- plot_tt_map(tt_sf, "urbanization")
 
 
 # 4. combine ----
-# zoom_polygon1 <- polygonGrob(x = c(.385,.385,.43,.43), y = c(.5,.85,.35,.325), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
-# zoom_polygon2 <- polygonGrob(x = c(.7,.7,.95,.725), y = c(.6,.58,.58,.6), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+zoom_polygon1 <- polygonGrob(x = c(.17,.42,.435,.43), y = c(.65,.608,.608,.65), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+zoom_polygon2 <- polygonGrob(x = c(.648,.595,.85,.658), y = c(.77,.75,.75,.77), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+
 p <- ggdraw() +
     draw_image(here::here("plots/cartoons/Fig1.png"), scale = 1) +
     draw_plot(p1, x = .01, y = .37, width = .95, height = .6) +
     #draw_plot(p_map, x = .35, y = .43, width = .55, height = .55) +
-    # draw_grob(zoom_polygon1) +
-    # draw_grob(zoom_polygon2) +
+    draw_grob(zoom_polygon1) +
+    draw_grob(zoom_polygon2) +
     draw_plot(p2, x = .1, y = .65, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .3, height = .4, hjust = 0, halign = 0) +
     draw_plot(p3, x = .52, y = .45, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .7, height = .4, hjust = 0, halign = 0) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
