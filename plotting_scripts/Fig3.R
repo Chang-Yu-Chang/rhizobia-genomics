@@ -77,7 +77,7 @@ p <- plants_n %>%
     ) +
     guides(
         color = guide_legend(title = "population", override.aes = list(size = 5)),
-        size = guide_legend(title = "sample size")
+        size = guide_legend(title = "num. of plants")
     ) +
     labs(x = "Nitrogen treatment", y = "")
 

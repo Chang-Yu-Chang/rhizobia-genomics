@@ -176,7 +176,8 @@ plot_replicon_wide_dxy <- function (xx_gn, xx_rp) {
             legend.title = element_blank(),
             strip.background = element_blank(),
             panel.border = element_rect(color = "black", fill = NA),
-            plot.title = element_text(size = 8)
+            plot.title = element_text(size = 8),
+            plot.background = element_blank()
         ) +
         guides() +
         labs(x = "Geographic distance (km)", y = "Dxy")
@@ -311,7 +312,8 @@ plot_replicon_gcv_dxy <- function (dists) {
             legend.title = element_blank(),
             panel.border = element_rect(color = "black", fill = NA),
             strip.background = element_blank(),
-            plot.title = element_text(size = 8)
+            plot.title = element_text(size = 8),
+            plot.background = element_blank()
         ) +
         guides() +
         labs(x = "Geographic distance (km)", y = "GCV Dxy")
@@ -343,14 +345,19 @@ theme_consist <- function () {
     )
 }
 
-p <- plot_grid(
+p_combined <- plot_grid(
     tb$p_dxy_rep[[1]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) ,
-    tbg$p[[1]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7),
     tb$p_dxy_rep[[2]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02),
+    tbg$p[[1]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7),
     tbg$p[[2]] + xlim(0, 17) + ylim(0, .7) + theme(legend.position = "none"),
     scale = 0.95, ncol = 1, align = "hv", axis = "trl",
-    rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4]
-) + theme(plot.background = element_rect(color = NA, fill = "white"))
+    rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4], label_x = .05
+)
+
+p <- ggdraw() +
+    draw_image(here::here("plots/cartoons/Fig6.png"), scale = 1) +
+    draw_plot(p_combined, x = .05, width = .95) +
+    theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
 

@@ -60,7 +60,7 @@ plot_boxes <- function (plants_n, gra, plant, nt) {
         geom_point(aes(x = exp_id, y = value, color = population, size = n), alpha = .4, shape = 16, position = position_dodge(width = .7)) +
         scale_fill_manual(values = population_colors) +
         scale_color_manual(values = population_colors) +
-        scale_size_continuous(range = c(.5,3)) +
+        scale_size_continuous(range = c(.5,3), limits = c(1, 20), breaks = c(5, 10 ,20)) +
         coord_flip(clip = "off") +
         facet_nested_wrap(
             trait_type + trait_pre2 ~., ncol = 1, strip.position = "left", axes = "all", scales = "free",
@@ -85,7 +85,8 @@ plot_boxes <- function (plants_n, gra, plant, nt) {
             legend.text = element_text(size = 6),
             legend.title = element_blank(),
             legend.background = element_blank(),
-            legend.box.margin = unit(c(0,0,-5,0), "mm")
+            legend.box.margin = unit(c(0,0,-5,0), "mm"),
+            plot.background = element_blank()
         ) +
         guides(fill = guide_legend(override.aes = list(color = NA, size = 0, shape = 0)), color = "none") +
         labs()
@@ -135,35 +136,51 @@ p1 <- plot_boxes(plants_n, "elevation", "sativa", "N-")
 p3 <- plot_boxes(plants_n, "urbanization", "sativa", "N-")
 p5 <- plot_boxes(plants_n, "elevation", "lupulina", "N-")
 p7 <- plot_boxes(plants_n, "urbanization", "lupulina", "N-")
-leg1 <- get_legend(p1 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = guide_legend(nrow = 1, order = 1), fill = guide_legend(order = 2, nrow = 1, override.aes = list(color = NA))))
-leg3 <- get_legend(p3 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = "none", fill = guide_legend(nrow = 1, override.aes = list(color = NA))))
+leg1 <- get_legend(p1 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = "none", fill = guide_legend(order = 2, nrow = 1, override.aes = list(color = NA))))
+leg2 <- get_legend(p1 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = guide_legend(nrow = 1, order = 1), fill = "none"))
+leg3 <- get_legend(p3 + theme(legend.position = "right", legend.spacing = unit(-8, "mm"), legend.key.size = unit(6, "mm"), legend.text = element_text(size = 10)) + guides(size = "none", fill = guide_legend(order = 2, nrow = 1, override.aes = list(color = NA))))
 
-p2 <- plot_cohensds(cohensds_n, "elevation", "sativa", "N-")
-p4 <- plot_cohensds(cohensds_n, "urbanization", "sativa", "N-")
+p2 <- plot_cohensds(cohensds_n, "elevation", "sativa", "N-") + theme(axis.title.x = element_blank())
+p4 <- plot_cohensds(cohensds_n, "urbanization", "sativa", "N-") + theme(axis.title.x = element_blank())
 p6 <- plot_cohensds(cohensds_n, "elevation", "lupulina", "N-")
 p8 <- plot_cohensds(cohensds_n, "urbanization", "lupulina", "N-")
 
 
-arrow_grob1 <- linesGrob(x = unit(c(.4, .48),"npc"), y = unit(c(.95, .95), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open"))
-arrow_grob2 <- linesGrob(x = unit(c(.9, .98),"npc"), y = unit(c(.95, .95), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open"))
+arrow_y = 0.92
+arrow_grob1 <- linesGrob(x = unit(c(.35, .48),"npc"), y = unit(c(arrow_y, arrow_y), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open", ends = "both"))
+arrow_grob2 <- linesGrob(x = unit(c(.85, .98),"npc"), y = unit(c(arrow_y, arrow_y), "npc"), gp = gpar(col = "black", lwd = 2), arrow =  arrow(length = unit(2, "mm"), angle = 30, type = "open", ends = "both"))
 
-p <- plot_grid(
-    leg1, NULL, leg3, NULL,
+p_combined <- plot_grid(
+    leg1, leg2, leg3, NULL,
     p1 + theme(legend.position = "none"), p2, p3 + theme(legend.position = "none"), p4,
     p5 + theme(legend.position = "none"), p6, p7 + theme(legend.position = "none"), p8,
-    ncol = 4,  align = "vh", axis = "tbr",
+    ncol = 4,  align = "vh", axis = "tbr", scale = .95,
     rel_widths = c(1,.5,1,.5), rel_heights = c(.5,4,3),
-    labels = c("A", "", "B", "", rep("", 4), "C", "", "D", "")
+    labels = c(rep("", 4), "A", "", "B", "", rep("", 0), "C", "", "D", ""), label_x = .1
 ) +
+    # Panel titles legend
+    draw_text("N strains = 8, N plants = 225", x = .1, y = .91, size = 10, hjust = 0, vjust = -1) +
+    draw_text("N strains = 8, N plants = 105", x = .6, y = .91, size = 10, hjust = 0, vjust = -1) +
+    draw_text("N strains = 6, N plants = 159", x = .1, y = .38, size = 10, hjust = 0, vjust = -1) +
+    draw_text("N strains = 8, N plants = 68", x = .6, y = .38, size = 10, hjust = 0, vjust = -1) +
+    # Effect size legend
     draw_grob(arrow_grob1) +
     draw_grob(arrow_grob2) +
-    draw_text("favor high elevation", x = .48, y = .95, size = 10, hjust = 1, vjust = -1) +
-    draw_text("favor suburban", x = .98, y = .95, size = 10, hjust = 1, vjust = -1) +
-    theme(plot.background = element_rect(fill = "white", color = NA))
+    draw_text("low", x = .34, y = arrow_y, size = 10, hjust = 0, vjust = -1) +
+    draw_text("high", x = .49, y = arrow_y, size = 10, hjust = 1, vjust = -1) +
+    draw_text("urban", x = .84, y = arrow_y, size = 10, hjust = 0, vjust = -1) +
+    draw_text("suburban", x = .99, y = arrow_y, size = 10, hjust = 1, vjust = -1)
 
+p <- ggdraw() +
+    draw_image(here::here("plots/cartoons/Fig2.png"), scale = 1) +
+    draw_plot(p_combined, x = .05, width = .9) +
+    theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 10, height = 10)
 
+
+#
+plants %>% filter(exp_nitrogen == "N-", exp_id != "control") %>% group_by(exp_plant, gradient) %>% count()
 
 # 3. PERMANOVA ----
 set.seed(1)
