@@ -5,6 +5,7 @@ library(janitor)
 library(daymetr) # for extracting climate data
 library(elevatr) # for getting elevation
 library(sf) # for handing simple features
+Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj") # for crs
 source(here::here("metadata.R"))
 
 dms2dec <- function(x) {

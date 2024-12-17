@@ -13,7 +13,7 @@ library(grid) # add polygons
 #' brew install pkg-config
 #' brew install gdal
 # then in R > renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
-Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj")
+Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj") # for crs
 source(here::here("metadata.R"))
 
 # Read data
