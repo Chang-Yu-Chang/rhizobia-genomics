@@ -4,19 +4,20 @@ library(tidyverse)
 library(flextable)
 source(here::here("metadata.R"))
 
-tb_tidied2 <- read_csv(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.csv"))
+nitrogen_rn_perm <- read_csv(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.csv"))
 
 clean_model_string <- function (mod_st, ii) {
     mod_st %>%
+        str_replace("value", paste0("trait", as.character(ii))) %>%
+        str_replace("exp_id", "strain") %>%
+        str_replace("exp_labgroup", "labgroup") %>%
+        str_replace("exp_nitrogen", "nitrogen") %>%
         str_remove(fixed("mod <- ")) %>%
         str_remove(fixed(", data = d)")) %>%
-        str_replace(fixed("lmer("), fixed("lmer: ")) %>%
-        str_remove(fixed(": value")) %>%
-        str_replace("exp_id", "strain") %>%
-        str_replace("exp_labgroup", "labgroup")
+        str_remove("glmer\\(|lmer\\(")
 }
-ft2 <- tb_tidied2  %>%
-    select(ii, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Estimate = statistic, P = siglab) %>%
+ft2 <- nitrogen_rn_perm  %>%
+    select(ii, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab) %>%
     # Clean the table
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
@@ -28,9 +29,8 @@ ft2 <- tb_tidied2  %>%
     autofit() %>%
     # Align and spacing
     merge_v(j = c("Type", "Trait", "Model")) %>%
-    valign(j = c("Type", "Trait", "Model"), valign = "center") %>%
+    valign(j = c("Type", "Trait", "Model"), valign = "top") %>%
     align(j = c("Type", "Trait", "Term"), align = "center", part = "all") %>%
-    line_spacing(j = "Model", space = 1.5) %>%
     width(j = "Model", width = 4) %>%
     # Lines and background
     hline(i = seq(4, nrow_part(.), 4)) %>%

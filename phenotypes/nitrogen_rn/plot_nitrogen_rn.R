@@ -6,12 +6,11 @@ library(cowplot)
 library(ggh4x) # for nested facets
 source(here::here("metadata.R"))
 
-
-# 1. Prepare the data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
 nitrogen_rn_perm <- read_csv(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.csv"))
 
+# Plot the reaction norm ----
 isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
@@ -36,9 +35,34 @@ plants_n_summ <- plants_n %>%
     mutate(lower = trait_mean-qnorm(0.975)*trait_sem, upper = trait_mean+qnorm(0.975)*trait_sem) %>%
     mutate(trait_type = factor(trait_type, unique(traits$trait_type)), trait_pre = factor(trait_pre, traits$trait_pre))
 
+p <- plants_n %>%
+    group_by(gradient, population, exp_plant, exp_nitrogen, trait_type, trait_pre, value) %>%
+    count() %>%
+    ggplot(aes(x = exp_nitrogen, y = value)) +
+    geom_point(aes(color = population, size = n), alpha = .5, shape = 16, position = position_dodge(width = .3)) +
+    geom_linerange(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, ymin = lower, ymax = upper), linewidth = 1, position = position_dodge2(width = .3)) +
+    geom_line(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, group = population), linewidth = 1, position = position_dodge(width = .3)) +
+    geom_point(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean), size = 2, shape = 21, stroke = 1, fill = "white", position = position_dodge2(width = .3)) +
+    scale_color_manual(values = population_colors) +
+    scale_size_continuous(range = c(.5, 10)) +
+    facet_nested(
+        ~trait_type+trait_pre, switch = "y", scales = "free", independent = "all", render_empty = F,
+        axes = "x", remove_labels = "none", nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), solo_line = T,
+        strip = strip_nested(bleed=T, clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("white", 3), rep("white", 7))))) +
+    theme_bw() +
+    theme(
+        strip.placement = "outside",
+        strip.background = element_rect(color = NA, fill = NA)
+    ) +
+    guides(
+        color = guide_legend(title = "population", override.aes = list(size = 5)),
+        size = guide_legend(title = "sample size")
+    ) +
+    labs(x = "Nitrogen treatment", y = "")
 
+ggsave(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn.png"), p, width = 10, height = 4)
 
-#  Make the table permutation ----
+# Make the table ----
 clean_model_string <- function (mod_st, ii) {
     mod_st %>%
         str_remove(fixed("mod <- ")) %>%
@@ -73,33 +97,3 @@ ft2 <- nitrogen_rn_perm  %>%
     fix_border_issues()
 
 save_as_image(ft2, path = paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.png"), res = 300)
-
-# Plot the reaction norm ----
-p <- plants_n %>%
-    group_by(gradient, population, exp_plant, exp_nitrogen, trait_type, trait_pre, value) %>%
-    count() %>%
-    ggplot(aes(x = exp_nitrogen, y = value)) +
-    geom_point(aes(color = population, size = n), alpha = .5, shape = 16, position = position_dodge(width = .3)) +
-    geom_linerange(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, ymin = lower, ymax = upper), linewidth = 1, position = position_dodge2(width = .3)) +
-    geom_line(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, group = population), linewidth = 1, position = position_dodge(width = .3)) +
-    geom_point(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean), size = 2, shape = 21, stroke = 1, fill = "white", position = position_dodge2(width = .3)) +
-    scale_color_manual(values = population_colors) +
-    scale_size_continuous(range = c(.5, 10)) +
-    facet_nested(
-        ~trait_type+trait_pre, switch = "y", scales = "free", independent = "all", render_empty = F,
-        axes = "x", remove_labels = "none", nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), solo_line = T,
-        strip = strip_nested(bleed=T, clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("white", 3), rep("white", 7))))) +
-    theme_bw() +
-    theme(
-        strip.placement = "outside",
-        strip.background = element_rect(color = NA, fill = NA)
-    ) +
-    guides(
-        color = guide_legend(title = "population", override.aes = list(size = 5)),
-        size = guide_legend(title = "sample size")
-    ) +
-    labs(x = "Nitrogen treatment", y = "")
-
-ggsave(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn.png"), p, width = 10, height = 4)
-
-

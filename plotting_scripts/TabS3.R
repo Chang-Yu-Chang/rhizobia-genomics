@@ -4,12 +4,7 @@ library(tidyverse)
 library(flextable)
 source(here::here("metadata.R"))
 
-# Stat tables
-pairs_anova <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_anova.csv"))
 pairs_perm <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_perm.csv"))
-# For histogram
-pairs_perm_obv <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_perm_obv.csv"))
-pairs_perm_raw <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_perm_raw.csv"))
 
 clean_model_string <- function (mod_st, ii) {
     mod_st %>%
@@ -21,8 +16,6 @@ clean_model_string <- function (mod_st, ii) {
         str_remove("glmer\\(|lmer\\(")
 }
 
-
-# Anova table ----
 ft2 <- pairs_perm %>%
     select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
     # Clean the table

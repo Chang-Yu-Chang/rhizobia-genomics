@@ -16,7 +16,6 @@ isolates <- isolates %>%
     mutate(genome_id = factor(genome_id))
 
 plants_n <- plants %>%
-    filter(nodule_number <100) %>%
     filter(population != "control", exp_plant == "sativa", gradient == "elevation") %>%
     select(-nodule_shape, -nodule_size, -nodule_color, -primary_root_nodule_number, -lateral_root_nodule_number) %>%
     group_by(gradient, population) %>%
