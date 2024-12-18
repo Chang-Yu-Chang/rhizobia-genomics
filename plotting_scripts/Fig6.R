@@ -212,7 +212,7 @@ tb <- tibble(
         dd = map(set_name, read_dxys),
         ff = map(set_name, read_fsts),
         xx = pmap(list(tt, dd, ff), join_dists), # Per gene, dxy between two orthologs coming from two different genomes
-        xx_gn = map(xx, make_genome_wide_dxy),
+        xx_gn = map(xx, make_genome_wide_dxy), # genome wide distance
         xx_rp = map(xx, ~make_replicon_wide_dxy(.x) %>% filter(replicon_type != "pAcce")),
         p_dxy = map(xx_gn, plot_genome_wide_dxy),
         p_dxy_rep = map2(xx_gn, xx_rp, plot_replicon_wide_dxy)
@@ -260,6 +260,11 @@ make_dist_m <- function (xx_gn, dist_name) {
 
     diag(m_gn) <- 0
     return(m_gn)
+}
+make_genome_wide_gcv_dxy <- function (dists) {
+     dists %>%
+        group_by(pops, genome_id1, genome_id2) %>%
+        summarize(gcv_dxy_scaled = sum(gcv_dxy_scaled))
 }
 do_mantel <- function (data, genetic_d) {
     m1 <- make_dist_m(data, dist_geo_km) # geo distance
@@ -326,6 +331,7 @@ tbg <- tibble(set_name = c("elev_med", "urbn_mel")) %>%
         tt = map(set_name, read_gpas),
         dd = map(set_name, read_gcv_dxys),
         dists = map(dd, ~join_gcv_dists(.x) %>% filter(replicon_type != "pAcce")),
+        xx_gn = map(dists, ~make_genome_wide_gcv_dxy(.x)),
         p = map(dists, plot_replicon_gcv_dxy)
     )
 
@@ -363,41 +369,43 @@ ggsave(here::here("plots/Fig6.png"), p, width = 8, height = 10)
 
 # Are low elevations more distant to others than between high elevation strains? ----
 ## SNPs
-dat <- tb$xx[[1]] %>%
-    filter(population1 == population2)
+dat <- tb$xx_gn[[1]] %>%
+    filter(pops %in% c("high elevation-high elevation", "low elevation-low elevation"))
 
 t.test(
-    dat$dxy_scaled[dat$population1 == "low elevation"],
-    dat$dxy_scaled[dat$population1 == "high elevation"]
+    dat$dxy_scaled[dat$pops == "low elevation-low elevation"],
+    dat$dxy_scaled[dat$pops == "high elevation-high elevation"]
 )
 
 ## GCV
-dat <- tbg$dists[[1]] %>%
-    filter(population1 == population2)
+dat <- tbg$xx_gn[[1]] %>%
+    filter(pops %in% c("high-high", "low-low"))
 
 t.test(
-    dat$gcv_dxy_scaled[dat$population1 == "low elevation"],
-    dat$gcv_dxy_scaled[dat$population1 == "high elevation"]
+    dat$gcv_dxy_scaled[dat$pops == "low-low"],
+    dat$gcv_dxy_scaled[dat$pops == "high-high"]
 )
 
 # Are urban strains more distant to other than between suburban strains? ----
 ## SNPs
-dat <- tb$xx[[2]] %>%
-    filter(population1 == population2)
+dat <- tb$xx_gn[[2]] %>%
+    filter(pops %in% c("suburban-suburban", "urban-urban"))
 
 t.test(
-    dat$dxy_scaled[dat$population1 == "suburban"],
-    dat$dxy_scaled[dat$population1 == "urban"]
+    dat$dxy_scaled[dat$pops == "suburban-suburban"],
+    dat$dxy_scaled[dat$pops == "urban-urban"]
 )
 
 ## GCV
-dat <- tbg$dists[[2]] %>%
-    filter(population1 == population2)
+dat <- tbg$xx_gn[[2]] %>%
+    filter(pops %in% c("suburban-suburban", "urban-urban"))
 
 t.test(
-    dat$gcv_dxy_scaled[dat$population1 == "suburban"],
-    dat$gcv_dxy_scaled[dat$population1 == "urban"]
+    dat$gcv_dxy_scaled[dat$pops == "suburban-suburban"],
+    dat$gcv_dxy_scaled[dat$pops == "urban-urban"]
 )
+
+
 
 
 # Compare the slope between gradients ----
