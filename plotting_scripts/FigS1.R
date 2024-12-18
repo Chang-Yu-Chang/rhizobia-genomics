@@ -11,10 +11,9 @@ tb_month <- read_csv(paste0(folder_data, "phenotypes/sites/tb_month.csv")) %>% m
 
 site_colors <- rep(c("#0C6291", "#BF4342", "#0cc45f", "#a642bf"), each = 4) %>% setNames(sites$site[-9])
 site_alphas <- rep(seq(1, 0.4, length.out = 4), 4) %>% setNames(sites$site[-9])
-season_fills <- setNames(grey(c(0,1,0,1)), c("spring", "summer", "fall", "winter"))
 month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
 
-plot_composites <- function (dml_i, diff_var, diff_var_i, p1_title, p2_title) {
+plot_composites <- function (dml_i, diff_var, diff_var_i, p1_title, p2_title, show_legend = T) {
     # Panel A ----
     p1 <- dml_i %>%
         ggplot() +
@@ -33,14 +32,15 @@ plot_composites <- function (dml_i, diff_var, diff_var_i, p1_title, p2_title) {
             panel.grid.major.x = element_line(color = "black", linewidth = 0.1, linetype = 2),
             panel.grid.minor.x = element_line(color = "black", linewidth = 0.1, linetype = 2),
             legend.position = "right",
-            legend.direction = "vertical",
-            legend.title = element_text(size = 15),
-            legend.text = element_text(size = 15),
+            legend.direction = "horizontal",
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
             legend.key.height = unit("10", "mm"),
             legend.box.margin = margin(0,0,10,0, unit = "mm"),
-            legend.background = element_rect(color = 1, fill = NA)
+            legend.box.background = element_blank(),
+            legend.background = element_rect(color = NA, fill = NA)
         ) +
-        guides(fill = "none", color = guide_legend(byrow = F, ncol = 2, override.aes = list(linewidth = 2), title.position = "left")) +
+        guides(fill = "none", color = guide_legend(byrow = T, nrow = 2, override.aes = list(linewidth = 2), title.position = "left")) +
         labs(x = "", y = p1_title)
 
     # Panel B the bootstrapped temperature ----
@@ -86,12 +86,14 @@ plot_composites <- function (dml_i, diff_var, diff_var_i, p1_title, p2_title) {
         labs(x = p2_title)
 
     #
-    p_top <- plot_grid(p1 + guides(color = "none", alpha = "none"), p2, nrow = 1, labels = c("A", "B"), align = "hv", axis = "lrtb", scale = 0.95)
-    p_bottom <- plot_grid(p_legend, p3, labels = c("", "C"), rel_widths = c(1.05, 1), scale = 0.95)
+    p_top <- plot_grid(p1 + guides(color = "none", alpha = "none"), p2, nrow = 1, labels = c("", ""), align = "hv", axis = "lrtb", scale = 0.95)
+    p_bottom <- plot_grid(NULL, p3, labels = c("", ""), rel_widths = c(1.05, 1), scale = 0.95)
+    if (show_legend) p_bottom <- plot_grid(p_legend, p3, labels = c("", ""), rel_widths = c(1.05, 1), scale = 0.95)
     p <- plot_grid(p_top, p_bottom, nrow = 2, rel_heights = c(3,1)) + theme(plot.background = element_rect(fill = "white", color = NA))
     return(p)
 
 }
+
 compute_mean <- function (diff_var_i) {
     dvs <- diff_var_i %>% group_by(yday) %>% summarize(diff_var = mean(diff_var))
     return(list(
@@ -100,53 +102,59 @@ compute_mean <- function (diff_var_i) {
         ))
 }
 
+get_dmli <- function (gra) dml %>% filter(gradient == gra, population != "mid elevation") %>% mutate(site = factor(site, sites$site))
+get_diff_vari <- function (gra, t_deg_c) diff_vars %>% filter(gradient == gra, variable == t_deg_c)
+
 
 # elevation tmax
-dml_i <- dml %>% filter(population %in% c("high elevation", "low elevation"), population != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(gradient == "elevation", variable == "tmax_deg_c")
-p <- plot_composites(dml_i, tmax_deg_c, diff_var_i,
-    expression(t[max](degree*C)),
-    expression(mean ~ "[" ~ t[max] ~ "("~L~")" - t[max]~ "("~H~")" ~ "]"(degree*C)))
-ggsave(here::here("plots/FigS1.png"), p, width = 8, height = 8)
-compute_mean(diff_var_i)
-# 3.080306
-# t = 46.509, df = 364, p-value < 2.2e-16
+p1 <- plot_composites(
+    get_dmli("elevation"), tmax_deg_c, get_diff_vari("elevation", "tmax_deg_c"),
+    expression(t[a](degree*C)),
+    expression(mean ~ "[" ~ t[a] ~ "("~L~")" - t[a]~ "("~H~")" ~ "]"(degree*C))
+)
 
 # elevation tmin
-dml_i <- dml %>% filter(population %in% c("high elevation", "low elevation"), population != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(gradient == "elevation", variable == "tmin_deg_c")
-# p <- plot_composites(dml_i, tmin_deg_c, diff_var_i,
-#     expression(t[min](degree*C)),
-#     expression(mean ~ "[" ~ t[min] ~ "("~L~")" - t[min]~ "("~H~")" ~ "]"(degree*C)))
-#ggsave(here::here("plots/FigS2.png"), p, width = 8, height = 8)
-compute_mean(diff_var_i)
-# 0.9417112
-# t = 10.551, df = 364, p-value < 2.2e-16
-
+p2 <- plot_composites(
+    get_dmli("elevation"), tmin_deg_c, get_diff_vari("elevation", "tmin_deg_c"),
+    expression(t[i](degree*C)),
+    expression(mean ~ "[" ~ t[i] ~ "("~L~")" - t[i]~ "("~H~")" ~ "]"(degree*C)),
+    show_legend = F
+)
 
 # urbanization tmax
-dml_i <- dml %>% filter(population %in% c("suburban", "urban"), population != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(gradient == "urbanization", variable == "tmax_deg_c")
-# p <- plot_composites(dml_i, tmax_deg_c, diff_var_i,
-#     expression(t[max](degree*C)),
-#     expression(mean ~ "[" ~ t[max] ~ "("~L~")" - t[max]~ "("~H~")" ~ "]"(degree*C)))
-#ggsave(here::here("plots/FigS3.png"), p, width = 8, height = 8)
-compute_mean(diff_var_i)
-# 0.376837
-# t = 29.586, df = 364, p-value < 2.2e-16
+p3 <- plot_composites(
+    get_dmli("urbanization"), tmax_deg_c, get_diff_vari("urbanization", "tmax_deg_c"),
+    expression(t[a](degree*C)),
+    expression(mean ~ "[" ~ t[a] ~ "("~L~")" - t[a]~ "("~H~")" ~ "]"(degree*C))
+)
 
 # urbanization tmin
-dml_i <- dml %>% filter(population %in% c("suburban", "urban"), population != "mid elevation") %>% mutate(site = factor(site, sites$site))
-diff_var_i <- diff_vars %>% filter(gradient == "urbanization", variable == "tmin_deg_c")
-# p <- plot_composites(dml_i, tmin_deg_c, diff_var_i,
-#     expression(t[min](degree*C)),
-#     expression(mean ~ "[" ~ t[min] ~ "("~L~")" - t[min]~ "("~H~")" ~ "]"(degree*C)))
-#ggsave(here::here("plots/FigS4.png"), p, width = 8, height = 8)
-compute_mean(diff_var_i)
-# 0.2657312
-# t = 14.825, df = 364, p-value < 2.2e-16
+p4 <- plot_composites(
+    get_dmli("urbanization"), tmin_deg_c, get_diff_vari("urbanization", "tmin_deg_c"),
+    expression(t[i](degree*C)),
+    expression(mean ~ "[" ~ t[i] ~ "("~L~")" - t[i]~ "("~H~")" ~ "]"(degree*C)),
+    show_legend = F
+)
+
+p <- plot_grid(p1, p2, p3, p4, ncol = 2, align = "h", labels = LETTERS[1:4])
+
+ggsave(here::here("plots/FigS1.png"), p, width = 12, height = 12)
 
 
+# Stat ----
+compute_mean(get_diff_vari("elevation", "tmax_deg_c"))
+# 2.94137
+# t = 45.844, df = 364, p-value < 2.2e-16
 
+compute_mean(get_diff_vari("elevation", "tmin_deg_c"))
+# 0.8360737
+# t = 9.9063, df = 364, p-value < 2.2e-16
 
+compute_mean(get_diff_vari("urbanization", "tmax_deg_c"))
+# 0.4041381
+# t = 29.515, df = 364, p-value < 2.2e-16
+
+compute_mean(get_diff_vari("urbanization", "tmin_deg_c"))
+# 0.28186
+# t = 14.812, df = 364, p-value < 2.2e-16
 
