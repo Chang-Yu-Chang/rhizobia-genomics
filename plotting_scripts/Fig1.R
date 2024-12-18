@@ -32,8 +32,6 @@ sites_center <- sites %>%
     mutate(hjust = c(0.8, 0.8)) %>%
     mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
 
-
-
 # 1. Plot the states ----
 plot_states <- function (us_states) {
     us_states %>%

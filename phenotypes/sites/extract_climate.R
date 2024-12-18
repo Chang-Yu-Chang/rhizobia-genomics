@@ -1,4 +1,8 @@
 #' This script uses DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
+#' 0. Clean the site coordinate format and obtain elevation data
+#' 1. Extract the year 2022 climatology data from Daymet
+#' 2. Bootstrap the temp difference between populations
+#' 3. Get the day for plotting the month shades
 
 library(tidyverse)
 library(janitor)
@@ -24,7 +28,7 @@ sites_phila <- read_csv(paste0(folder_data, "raw/plants/sites_phila.csv"), show_
     mutate(description = tolower(description) %>% str_remove("'")) %>%
     separate(col = coord, into = c("latitude_dec", "longitude_dec"), sep = ",\\s", convert = T)
 
-# 0. Clean up the site coordinates
+# 0. Clean up the site coordinates ----
 # mlbs
 sites_mlbs <- sites_mlbs %>%
     clean_names() %>%
@@ -69,7 +73,7 @@ sites_dist <- as_tibble(m) %>%
 write_csv(sites, paste0(folder_phenotypes, "sites/sites.csv"))
 write_csv(sites_dist, paste0(folder_phenotypes, "sites/sites_dist.csv"))
 
-# 1. Extract the climatology data from Daymet
+# 1. Extract the climatology data from Daymet ----
 list_dm <- rep(list(NA), nrow(sites))
 for (i in 1:nrow(sites)) {
     dm <- download_daymet(site = sites$site[i],
@@ -92,7 +96,7 @@ dml <- bind_rows(list_dm) %>%
 write_csv(dml, paste0(folder_phenotypes, "sites/dml.csv"))
 
 
-# 2. Resample the temperature difference between paired sites
+# 2. Resample the temperature difference between paired sites ----
 tb <- crossing(gradient = c("elevation", "urbanization"), variable = c("tmax_deg_c", "tmin_deg_c"), yday = 1:365)
 
 compute_diff <- function(dml, gra, y, variable) {
@@ -125,36 +129,7 @@ diff_vars <- tbs %>%
 
 write_csv(diff_vars, paste0(folder_phenotypes, "sites/diff_vars.csv"))
 
-# 3. Shade for month
-tb_season <- dml %>%
-    distinct(yday, ydate, ymonth) %>%
-    mutate(season = case_when(
-        ymonth %in% 1:3 ~ "spring",
-        ymonth %in% 4:6 ~ "summer",
-        ymonth %in% 7:9 ~ "fall",
-        ymonth %in% 10:12 ~ "winter",
-    )) %>%
-    group_by(season) %>%
-    filter(ydate == max(ydate) | ydate == min(ydate)) %>%
-    mutate(temp = c("start", "end")) %>%
-    select(-ydate, -ymonth) %>%
-    pivot_wider(names_from = temp, values_from = yday) %>%
-    ungroup()
-
-tb_summer <- dml %>%
-    distinct(yday, ydate, ymonth) %>%
-    mutate(season = case_when(
-        ymonth %in% 5:10 ~ "summer",
-        T ~ NA
-    )) %>%
-    group_by(season) %>%
-    filter(ydate == max(ydate) | ydate == min(ydate)) %>%
-    mutate(temp = c("start", "end")) %>%
-    drop_na(season) %>%
-    select(-ydate, -ymonth) %>%
-    pivot_wider(names_from = temp, values_from = yday) %>%
-    ungroup()
-
+# 3. Shade for month ----
 tb_month <- dml %>%
     distinct(yday, ydate, ymonth) %>%
     group_by(ymonth) %>%
@@ -165,7 +140,4 @@ tb_month <- dml %>%
     mutate(ymonth = factor(ymonth)) %>%
     ungroup()
 
-write_csv(tb_summer, paste0(folder_phenotypes, "sites/tb_summer.csv"))
-write_csv(tb_season, paste0(folder_phenotypes, "sites/tb_season.csv"))
 write_csv(tb_month, paste0(folder_phenotypes, "sites/tb_month.csv"))
-

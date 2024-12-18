@@ -6,9 +6,8 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x) # for nested facets
-library(vegan)
+library(vegan) # for PERMANOVA
 source(here::here("metadata.R"))
-options(contrasts=c("contr.sum", "contr.poly"))
 
 # 1. Prepare the data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -84,7 +83,7 @@ p <- plants_n %>%
 ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 4)
 
 
-  # 3. PERMANOVA ----
+# 3. PERMANOVA ----
 set.seed(1)
 
 dat <- plants %>%

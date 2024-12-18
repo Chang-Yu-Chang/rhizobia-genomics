@@ -1,16 +1,13 @@
 #' This script plots the reaction norm of thermal adaptation
-#' 1. Prepare the table
-#' 2. Check model assumptions
-#' 3. Run models
-#' 4. Table
-#' 5. Plot
+#' 1. Prepare Data
+#' 2. Plot
+#' 5. PERMANOVA
 
 library(tidyverse)
 library(cowplot)
 library(flextable)
 library(ggh4x) # for nested facets
-library(broom.mixed) # for tidying the model outputs
-library(vegan)
+library(vegan) # for PERMANOVA
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 

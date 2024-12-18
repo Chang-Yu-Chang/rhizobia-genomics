@@ -12,6 +12,7 @@ library(grid)
 #' brew install pkg-config
 #' brew install gdal
 # then in R >renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
+Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj") # for crs
 source(here::here("metadata.R"))
 
 # Get data
@@ -30,19 +31,7 @@ sites_center <- sites %>%
 us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
 tt <- travel_time("city", path = tempdir()) # travel time data from Nelson, Andy, Daniel J. Weiss, Jacob van Etten, Andrea Cattaneo, Theresa S. McMenomy, and Jawoo Koo. 2019. “A Suite of Global Accessibility Indicators.” Scientific Data 6 (1): 266.
 
-# Plot the sites
-sites %>%
-    filter(gradient == "elevation") %>%
-    ggplot() +
-    geom_point(aes(x = longitude_dec, y = latitude_dec, color = population)) +
-    geom_text(aes(x = longitude_dec, y = latitude_dec, color = population, label = site), vjust = -1) +
-    scale_color_manual(values = population_colors) +
-    theme_bw() +
-    theme() +
-    guides() +
-    labs()
-
-# Plot the states ----
+# 1. Plot the states ----
 get_elev_state_sf <- function (us_elev, lon_mean, lat_mean, lon_edge, lat_edge) {
     extent_area <- ext(lon_mean - lon_edge/2,
                        lon_mean + lon_edge/2,
@@ -84,7 +73,7 @@ p1 <- us_states %>%
 
 ggsave(paste0(folder_phenotypes, "sites/map-01-states.png"), p1, width = 6, height = 5)
 
-# Elevation ----
+# 2. Elevation ----
 get_elev_sf <- function (us_elev, sites_center, gra) {
     scc <- unlist(filter(sites_center, gradient == gra)[,-1])
     center_coord <- scc[c("lon_mean", "lat_mean")]
@@ -125,7 +114,7 @@ p2 <- plot_elev_map(elev_sf1, "elevation", 1000)
 
 ggsave(paste0(folder_phenotypes, "sites/map-02-elevation.png"), p2, width = 6, height = 5)
 
-# Urbanization ----
+# 3. Urbanization ----
 get_tt_sf <- function (tt, sites_center, gra) {
     scc <- unlist(filter(sites_center, gradient == gra)[,-1])
     center_coord <- scc[c("lon_mean", "lat_mean")]
@@ -166,7 +155,7 @@ p3 <- plot_tt_map(tt_sf2, "urbanization")
 
 ggsave(paste0(folder_phenotypes, "sites/map-03-urbanization.png"), p3, width = 6, height = 5)
 
-# Combine ----
+# 4. Combine ----
 zoom_polygon1 <- polygonGrob(x = c(.342,.342,.415,.415), y = c(.55,.85,.345,.305), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 zoom_polygon2 <- polygonGrob(x = c(.70,.695,.73,.97), y = c(.6,.6,.53,.53), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 p <- ggdraw(p1) +
@@ -176,3 +165,44 @@ p <- ggdraw(p1) +
     draw_plot(p3, x = .7, y = .23, width = .3, height = .3)
 
 ggsave(paste0(folder_phenotypes, "sites/map-04-combined.png"), p, width = 8, height = 5)
+
+# 5. Urbanization map by fraction impervious space ----
+fi <- rast(paste0(folder_data, "raw/plants/Annual_NLCD_FctImp_2022.tiff")) # imperious space data
+
+get_fi_sf <- function (fi) {
+    project(fi, "EPSG:4326") %>%
+        terra::as.data.frame(xy = TRUE, na.rm = TRUE) %>%
+        as_tibble %>%
+        rename(fctimp = Annual_NLCD_FctImp_2022) %>%
+        st_as_sf(coords = c("x", "y"), crs = 4326)
+
+}
+plot_fi_map <- function (fi_sf, gra, midp = 50) {
+    fi_sf %>%
+        ggplot() +
+        geom_sf(aes(color = fctimp), alpha = .8) +
+        geom_point(data = filter(sites, gradient == gra), aes(x = longitude_dec, y = latitude_dec, fill = population), color = "black", size = 2, shape = 21, stroke = 1) +
+        scale_color_gradient2(low = "#0cc45f", high = "#a642bf", mid = "snow", midpoint = 50, name = "frac.\nimpervious\nsurface", breaks = c(0, 25, 50, 75, 100), limits = c(0, 100)) +
+        scale_fill_manual(values = population_colors) +
+        scale_x_continuous(limits = c(sites_center$lon_mean[2] - sites_center$width_max[2]/2, sites_center$lon_mean[2] + sites_center$width_max[2]/2), expand = c(0,0)) +
+        scale_y_continuous(limits = c(sites_center$lat_mean[2] - sites_center$width_max[2]/2, sites_center$lat_mean[2] + sites_center$width_max[2]/2), expand = c(0,0)) +
+        annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
+        coord_sf() +
+        theme_void() +
+        theme(
+            plot.background = element_rect(color = "black", fill = "snow", linewidth = 1),
+            legend.text = element_text(size = 8) ,
+            legend.title = element_text(size = 8),
+            legend.key.width = unit(5, "mm"),
+            legend.key.height = unit(8, "mm"),
+            legend.box.margin = unit(c(0,0,0,0), "mm"),
+            plot.margin = unit(c(2,3,3,3), "mm"),
+            plot.title = element_text(size = 8, hjust = .5, margin = unit(c(0,0,1,0), "mm"))
+        ) +
+        guides(fill = "none", color = guide_colorbar(barwidth = .8, barheight = 5)) +
+        labs(x = "Longitude", y = "Latitude", title = "Urbanization")
+}
+fi_sf <- get_fi_sf(fi)
+p <- plot_fi_map(fi_sf, "urbanization", 50)
+
+ggsave(paste0(folder_phenotypes, "sites/map-05-frac_impervious_surface.png"), p, width = 8, height = 5)

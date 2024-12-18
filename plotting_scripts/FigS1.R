@@ -7,7 +7,6 @@ source(here::here("metadata.R"))
 dml <- read_csv(paste0(folder_data, "phenotypes/sites/dml.csv"))
 sites <- read_csv(paste0(folder_data, "phenotypes/sites/sites.csv"))
 diff_vars <- read_csv(paste0(folder_data, "phenotypes/sites/diff_vars.csv"))
-tb_season <- read_csv(paste0(folder_data, "phenotypes/sites/tb_season.csv"))
 tb_month <- read_csv(paste0(folder_data, "phenotypes/sites/tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
 
 site_colors <- rep(c("#0C6291", "#BF4342", "#0cc45f", "#a642bf"), each = 4) %>% setNames(sites$site[-9])

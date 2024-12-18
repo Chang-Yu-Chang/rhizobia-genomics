@@ -1,7 +1,6 @@
 #' This script plots the figures
 
 library(tidyverse)
-library(janitor)
 library(cowplot)
 library(ggh4x)
 library(tidytree)
@@ -13,7 +12,6 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_contigs <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_contigs.csv"))
 contigs <- read_csv(paste0(folder_data, "genomics_analysis/contigs/contigs.csv"))
 
-
 plot_tree <- function (tr_core) {
     tr_core %>%
         as_tibble() %>%
@@ -21,7 +19,6 @@ plot_tree <- function (tr_core) {
         mutate(` ` = "") %>%
         as.treedata() %>%
         ggtree() +
-        #geom_nodepoint(color = "grey70", shape = 16, alpha = .5, size = 5) +
         geom_tiplab(aes(label = label, color = population, fill = population), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
         geom_tippoint(aes(color = population, fill = population), shape = -1, size = -1) +
         scale_color_manual(values = population_colors) +
@@ -31,7 +28,6 @@ plot_tree <- function (tr_core) {
         facet_grid2(~` `) +
         theme_tree() +
         theme(
-            # legend.position = "inside",
             legend.title = element_blank(),
             legend.background = element_blank(),
             strip.background = element_blank(),
@@ -44,7 +40,6 @@ plot_tree <- function (tr_core) {
         ) +
         guides(fill = guide_legend(override.aes = list(label = "", color = NA, size = 2)), color = guide_legend(override.aes = list(size = 2, shape = 21))) +
         labs()
-    #labs(title = paste0("Elevation S. medicae\n", nrow(tt$list_sccg), " single-copy core genes"))
 }
 plot_heatmap <- function (tt, p_tree) {
 
@@ -80,10 +75,8 @@ plot_heatmap <- function (tt, p_tree) {
         ) +
         guides(fill = "none") +
         labs(x = "gene cluster", y = "genome")
-    #ggtitle(paste0("Total: ", n_all, ", Core: ", n_core, ", Accessory: ", n_accessory))
 }
 plot_ngen <- function (tt) {
-    #tt<-read_gpas("elev_med")
     tb_ngenomes <- tt$gpacl %>%
         group_by(replicon_type, gene) %>%
         count(name = "n_genomes") %>%
@@ -112,7 +105,6 @@ plot_ngen <- function (tt) {
             legend.title = element_blank(),
             strip.background = element_blank(),
             strip.text.x = element_blank(),
-            #strip.text.y = element_text(angle = 45),
             strip.text.y = element_blank(),
             strip.clip = "off",
             axis.title = element_blank(),
