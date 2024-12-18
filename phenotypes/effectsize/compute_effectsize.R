@@ -8,7 +8,6 @@ library(janitor)
 library(lme4) # for linear mixed-effect models
 library(emmeans) # estimate marginal means
 library(effectsize) # companion to Applied Regression
-#library(vcd) # for computing effect sizes of categorical response
 source(here::here("metadata.R"))
 
 # Remove control and nonsymbiotic strains
@@ -109,4 +108,3 @@ partialetasquareds <- treatments_eff %>%
 write_csv(cohensds, paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
 write_csv(hedgesgs, paste0(folder_data, "phenotypes/effectsize/hedgesgs.csv"))
 write_csv(partialetasquareds, paste0(folder_data, "phenotypes/effectsize/partialetasquareds.csv"))
-

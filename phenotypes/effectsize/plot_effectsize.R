@@ -45,8 +45,6 @@ ggsave(paste0(folder_phenotypes, "effectsize/02-cohensd_lupulina.png"), p, width
 # 2. Plot the boxplot of traits with Cohen's d -----
 set.seed(1)
 plot_boxes <- function (plants, gra, plant) {
-    # gra = "elevation"
-    # plant = "sativa"
     strips = strip_nested(
         background_y = elem_list_rect(
             color = NA,
@@ -73,12 +71,8 @@ plot_boxes <- function (plants, gra, plant) {
         group_by(gradient, population, exp_plant, trait_type, trait_pre, value) %>%
         count() %>%
         ggplot(aes(x = population, y = value)) +
-        #geom_violin(aes(fill = population), position = "identity", alpha = 0.5, color = NA, trim = T) +
         geom_boxplot(aes(fill = population), alpha = 0.5, width = .3, outlier.size = -1) +
-        #geom_point(alpha = .8, shape = 16, aes(color = population)) +
-        #geom_dotplot(aes(fill = population), binwidth = .1, binaxis = "y", stackgroups = TRUE, binpositions = "all", stackdir = "center") +
         geom_point(alpha = .2, shape = 16, aes(color = population, size = n)) +
-        #geom_jitter(size = .5, shape = 21, width = .2) +
         scale_fill_manual(values = population_colors) +
         scale_color_manual(values = population_colors) +
         scale_size_continuous(range = c(1,10)) +
@@ -131,10 +125,6 @@ plot_eff <- function (cohensd, gra, plant) {
         scale_y_continuous(limits = c(-3, 3), expand = c(0,.1), breaks = -3:3) +
         scale_shape_manual(values = c(`N+` = 16, `N-` = 21), labels = c("N+", "N-")) +
         scale_fill_manual(values = plant_colors) +
-        #facet_nested_wrap(gradient + trait~., remove_labels = "x", axes = "all", scales = "free_y", dir = "v", strip.position = "left", ncol = 1, strip = strips) +
-        #facet_wrap2(vars(trait_pre), scales = "free_y", ncol = 1, axes = "all", remove_labels = "x") +
-        #facet_nested(trait_type + trait_pre ~., scales = "free_y", axes = "all", remove_labels = "x", nest_line = element_line(color = "grey30", linetype = 2), strip = strips) +
-        #facet_wrap2(trait_pre~., scales = "free_y", remove_labels = "x", axes = "all", ncol = 1) +
         facet_nested_wrap(trait_type + trait_pre ~., ncol = 1, strip.position = "left", axes = "all", scales = "free", solo_line = T, nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), strip = strips) +
         coord_flip(clip = "off") +
         theme_bw() +
@@ -156,34 +146,10 @@ plot_eff <- function (cohensd, gra, plant) {
 }
 
 cohensds <- filter(cohensds, !trait %in% c("primary_root_nodule_number", "lateral_root_nodule_number"))
-#plot_eff(cohensds, "elevation", "sativa")
 
 p1 <- plot_eff(cohensds, "elevation", "sativa")
 p2 <- plot_eff(cohensds, "urbanization", "sativa")
 p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, labels = LETTERS[1:2], scale = 0.94) +
     theme(plot.background = element_rect(fill = "white", color = NA)) +
     draw_text(c("Elevation", "Urbanization"), x = c(0.05, 0.55), y = 0.98, hjust = 0)
-    #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
 ggsave(paste0(folder_phenotypes, "effectsize/03-traits_effectsize.png"), p, width = 8, height = 6)
-
-
-
-# p1 <- plot_boxes(plants, "elevation", "sativa")
-# p2 <- plot_eff(plants, "elevation", "sativa")
-# p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
-# ggsave(paste0(folder_phenotypes, "effectsize/03-elevation.png"), p, width = 8, height = 5)
-#
-# p1 <- plot_boxes(plants, "urbanization", "sativa")
-# p2 <- plot_eff(plants, "urbanization", "sativa")
-# p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5))
-# ggsave(paste0(folder_phenotypes, "effectsize/04-urbanization.png"), p, width = 8, height = 5)
-
-# Combined ----
-# p1 <- plot_boxes(plants, "elevation", "sativa")
-# p2 <- plot_eff(plants, "elevation", "sativa")
-# p3 <- plot_boxes(plants, "urbanization", "sativa")
-# p4 <- plot_eff(plants, "urbanization", "sativa")
-# p <- plot_grid(p1, p2, p3, p4, align = "h", axis = "tb", ncol = 2, rel_widths = c(1, .5), labels = LETTERS[1:4]) +
-#     draw_text(c("Elevation", "Urbanization"), x = 0.05, y = c(0.98,  0.48), hjust = 0)
-#     #draw_text(c("trait type", "trait"), x = c(0.05, 0.16), y = 0.45, hjust = 0.5, size = 10)
-# ggsave(paste0(folder_phenotypes, "effectsize/05-traits_effectsize.png"), p, width = 8, height = 10)
