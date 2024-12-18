@@ -1,4 +1,9 @@
 #' This script compares the traits in pairs of populations
+#' It outputs four tables
+#' 1. pairs_anova.csv is the stat table of simple anova
+#' 2. pairs_perm.csv is the stat table of permutation test.
+#' 3. pairs_perm_obv.csv is the value of simple anova
+#' 4. pairs_perm_raw.csv is the raw permutation output used for generating histogram
 
 library(tidyverse)
 library(ggh4x)
@@ -16,14 +21,12 @@ isolates <- isolates %>%
     arrange(population) %>%
     mutate(genome_id = factor(genome_id))
 
-
 # 1. Prepare data ----
 plants_n <- plants %>%
     filter(population != "control", exp_plant == "sativa", exp_nitrogen == "N-") %>%
     select(-nodule_shape, -nodule_size, -nodule_color) %>%
     select(-primary_root_nodule_number, -lateral_root_nodule_number) %>%
     group_by(gradient, population, exp_plant) %>%
-    filter(nodule_number <100) %>%
     pivot_longer(cols = -c(1:13), names_to = "trait", values_drop_na = T) %>%
     left_join(traits) %>%
     left_join(isolates) %>%
@@ -70,7 +73,6 @@ tb <- tibble(
 # Tidy up
 tb_tidied <- tb %>%
     left_join(traits) %>%
-    arrange(gradient, trait_type, trait_pre) %>%
     mutate(ii = 1:n()) %>%
     mutate(mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())) %>%
     unnest(mod_tidied) %>%
@@ -78,7 +80,7 @@ tb_tidied <- tb %>%
     mutate(statistic = round(statistic, 2)) %>%
     mutate(ast = map_chr(p.value, turn_p_to_asteriks))
 
-write_csv(tb_tidied, paste0(folder_data, "phenotypes/plants/pairs_lab_anova.csv"))
+write_csv(tb_tidied, paste0(folder_data, "phenotypes/plants/pairs_anova.csv"))
 
 # 2.2 Permutation ----
 tb$chisq_perm <- list(NA)
@@ -113,7 +115,6 @@ get_perm_p <- function (chisq_perm, chisq_obv) {
 }
 tb_tidied2 <- tb %>%
     left_join(traits) %>%
-    #arrange(gradient, trait_type, trait_pre) %>%
     mutate(
         ii = 1:n(),
         chisq_obv = map(mod, ~Anova(.x, type = 3) %>% tidy %>% select(term, statistic))
@@ -132,18 +133,18 @@ tb_tidied3 <- tb_tidied2 %>%
     ) %>%
     select(ii, gradient, trait_type, trait_pre, st, term, statistic, p_value, siglab)
 
-write_csv(tb_tidied3, paste0(folder_data, "phenotypes/plants/pairs_lab_perm.csv"))
+write_csv(tb_tidied3, paste0(folder_data, "phenotypes/plants/pairs_perm.csv"))
 
 
 # For histogram ----
-pairs_lab_perm_forhist <- tb_tidied2 %>%
+pairs_perm_raw <- tb_tidied2 %>%
     select(-dat, -mod, -term, -statistic) %>%
     mutate(trait_pre = factor(trait_pre, traits$trait_pre)) %>%
     unnest(chisq_perm) %>%
     filter(!str_detect(term, "Intercept"))
-pairs_lab_perm_obv <- tb_tidied2 %>%
+pairs_perm_obv <- tb_tidied2 %>%
     filter(!str_detect(term, "Intercept")) %>%
     select(gradient, trait_pre, trait, term, statistic)
-write_csv(pairs_lab_perm_obv, paste0(folder_data, "phenotypes/plants/pairs_lab_perm_obv.csv"))
-write_csv(pairs_lab_perm_forhist, paste0(folder_data, "phenotypes/plants/pairs_lab_perm_forhist.csv"))
+write_csv(pairs_perm_obv, paste0(folder_data, "phenotypes/plants/pairs_perm_obv.csv"))
+write_csv(pairs_perm_raw, paste0(folder_data, "phenotypes/plants/pairs_perm_raw.csv"))
 

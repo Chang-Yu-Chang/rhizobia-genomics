@@ -82,7 +82,7 @@ lupulinas <- bind_rows(treatments_cyc, treatments_ttb) %>%
 
 nrow(lupulinas) # 251 plants
 lupulinas %>% filter(!is.na(shoot_biomass_mg), shoot_biomass_mg != 0) %>% nrow # 231 plants with non-zero shoot mass
-write_csv(lupulinas, paste0(folder_phenotypes, "plants/lupulinas.csv")) # Symbiosis traits per plant
+#write_csv(lupulinas, paste0(folder_phenotypes, "plants/lupulinas.csv"))
 
 
 
@@ -149,7 +149,7 @@ sativas <- bind_rows(sativas_va, sativas_pa) %>%
 
 
 nrow(sativas) # 571 plants
-write_csv(sativas, paste0(folder_phenotypes, "plants/sativas.csv"))
+#write_csv(sativas, paste0(folder_phenotypes, "plants/sativas.csv"))
 
 # Bind the two tables ----
 plants <- bind_rows(lupulinas, sativas) %>%
