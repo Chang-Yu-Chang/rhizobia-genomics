@@ -24,25 +24,25 @@ plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 # Traits
 clean_trait_names <- function (x) str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")
 traits <- tibble(
-    trait_type = c("nodule", "root", "shoot", "nodule", "leaf", "leaf", "leaf", "nodule", "shoot", "root", "root", "root"),
-    trait = c("nodule_number", "root_biomass_mg", "shoot_biomass_mg", "lateral_root_nodule_number", "leaf_color", "leaf_number", "longest_petiole_length", "primary_root_nodule_number", "shoot_height", "lateral_root_number", "longest_lateral_root_length", "primary_root_length")
+    trait_type = c("nodule", "nodule", "nodule", "nodule", "root", "shoot", "nodule", "leaf", "leaf", "leaf", "nodule", "shoot", "root", "root", "root"),
+    trait = c("nodule_number", "nodule_shape", "nodule_size", "nodule_color", "root_biomass_mg", "shoot_biomass_mg", "lateral_root_nodule_number", "leaf_color", "leaf_number", "longest_petiole_length", "primary_root_nodule_number", "shoot_height", "lateral_root_number", "longest_lateral_root_length", "primary_root_length")
 ) %>%
     mutate(trait_pre = trait %>% str_remove("_mg") %>% str_replace_all("_", " ")) %>%
-    mutate(trait_abr = map_chr(trait_pre, clean_trait_names)) %>%
+    #mutate(trait_abr = map_chr(trait_pre, clean_trait_names)) %>%
     mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
     arrange(trait_type) %>%
     mutate(trait_pre = case_when(
-        trait_pre == "root biomass" ~ "root\nbiomass (mg)",
-        trait_pre == "shoot biomass" ~ "shoot\nbiomass (mg)",
-        trait_pre == "longest petiole length" ~ "longest petiole\nlength (cm)",
-        #trait_pre == "nodule number" ~ "nodule\nnumber",
-        trait_pre == "lateral root nodule number" ~ "lateral root\nnodule number",
-        trait_pre == "primary root nodule number" ~ "primary root\nnodule number",
-        # trait_pre == "leaf number" ~ "leaf\nnumber",
+        trait_pre == "root biomass" ~ "root biomass (mg)",
+        trait_pre == "shoot biomass" ~ "shoot biomass (mg)",
+        trait_pre == "longest petiole length" ~ "longest petiole length (cm)",
+        # trait_pre == "nodule number" ~ "nodule number",
+        # trait_pre == "lateral root nodule number" ~ "lateral root\nnodule number",
+        # trait_pre == "primary root nodule number" ~ "primary root\nnodule number",
+        # trait_pre == "leaf number" ~ "leaf number",
         # trait_pre == "leaf color" ~ "leaf\ncolor",
         trait_pre == "shoot height" ~ "shoot height (cm)",
-        trait_pre == "primary root length" ~ "primary root\nlength (cm)",
-        trait_pre == "longest lateral root length" ~ "longest lateral\nroot length (cm)",
+        trait_pre == "primary root length" ~ "primary root length (cm)",
+        trait_pre == "longest lateral root length" ~ "longest lateral root length (cm)",
         #trait_pre == "lateral root number" ~ "lateral\nroot\nnumber",
         T ~ trait_pre
     )) %>%

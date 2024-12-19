@@ -69,7 +69,7 @@ lupulinas <- bind_rows(treatments_cyc, treatments_ttb) %>%
     mutate(
         across(c(shoot_biomass_mg, root_biomass_mg), function(x) round(x, 2)),
         exp_id = str_replace(exp_id, "control_\\d", "control"),
-        gradient = ifelse(exp_id == "control", "control", gradient),
+        #gradient = ifelse(exp_id == "control", "control", gradient),
         population = ifelse(exp_id == "control", "control", population),
         genome_id = ifelse(exp_id == "control", "control", genome_id),
         genome_name = ifelse(exp_id == "control", "control", genome_name),
@@ -144,7 +144,7 @@ sativas <- bind_rows(sativas_va, sativas_pa) %>%
         exp_nitrogen == "without nitrogen" ~ "N-",
         exp_nitrogen == "with nitrogen" ~ "N+"
     )) %>%
-    mutate(gradient = ifelse(exp_id == "control", "control", gradient)) %>%
+    #mutate(gradient = ifelse(exp_id == "control", "control", gradient)) %>%
     mutate(population = factor(population, c("low elevation", "high elevation", "urban", "suburban", "control")))
 
 
@@ -161,16 +161,19 @@ plants %>%
     group_by(exp_plant, gradient, population) %>%
     count()
 
-# Groups:   exp_plant, gradient, population [10]
+# A tibble: 12 × 4
+# Groups:   exp_plant, gradient, population [12]
 # exp_plant gradient     population         n
 # <chr>     <chr>        <fct>          <int>
-# 1 lupulina  control      control           24
-# 2 lupulina  elevation    high elevation    80
-# 3 lupulina  elevation    low elevation     79
+# 1 lupulina  elevation    high elevation    80
+# 2 lupulina  elevation    low elevation     79
+# 3 lupulina  elevation    control            8
 # 4 lupulina  urbanization urban             34
 # 5 lupulina  urbanization suburban          34
-# 6 sativa    control      control          105
+# 6 lupulina  urbanization control           16
 # 7 sativa    elevation    high elevation   179
 # 8 sativa    elevation    low elevation    182
-# 9 sativa    urbanization urban             52
-# 10 sativa    urbanization suburban          53
+# 9 sativa    elevation    control           53
+# 10 sativa    urbanization urban             52
+# 11 sativa    urbanization suburban          53
+# 12 sativa    urbanization control           52

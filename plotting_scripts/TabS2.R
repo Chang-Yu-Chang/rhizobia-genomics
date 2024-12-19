@@ -40,8 +40,6 @@ plasmids <- tibble(
     rename(Strain = strain)
 
 
-
-# Flextable
 ft <- en %>%
     left_join(plasmids) %>%
     select(-chromosome) %>%
@@ -49,7 +47,7 @@ ft <- en %>%
     autofit() %>%
     merge_v(j = "Species") %>%
     bg(bg = "white", part = "all") %>%
-    bg(bg = "grey90", i = c(1:4,8:11,13,17, 19), j = 1:4) %>%
+    bg(bg = "grey90", i = c(1:4,8:11,13,17, 19)) %>%
     align(part = "all", align = "center") %>%
     valign(j = "Species", valign = "top") %>%
     style(j = "Species", pr_t = fp_text_default(italic = T)) %>%
@@ -57,4 +55,4 @@ ft <- en %>%
     fix_border_issues()
 
 save_as_html(ft, path = here::here("plots/TabS2.html"))
-save_as_image(ft, path = here::here("plots/TabS2.png"))
+save_as_image(ft, path = here::here("plots/TabS2.png"), res = 300)

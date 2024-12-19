@@ -4,7 +4,14 @@ library(tidyverse)
 library(flextable)
 source(here::here("metadata.R"))
 
-pairs_perm <- read_csv(paste0(folder_data, "phenotypes/plants/pairs_perm.csv"))
+pairs_perm <- read_csv(paste0(folder_data, "phenotypes/plants/sativa/pairs_perm.csv"))
+pairs_cont_perm <- read_csv(paste0(folder_data, "phenotypes/plants/sativa_all/pairs_cont_perm.csv"))
+pairs_cata_perm <- read_csv(paste0(folder_data, "phenotypes/plants/sativa_all/pairs_cata_perm.csv"))
+
+tb <- bind_rows(pairs_cont_perm, pairs_cata_perm) %>%
+    mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
+    arrange(gradient, trait_type) %>%
+    mutate(ii = rep(1:(n()/2), each = 2))
 
 clean_model_string <- function (mod_st, ii) {
     mod_st %>%
@@ -16,18 +23,18 @@ clean_model_string <- function (mod_st, ii) {
         str_remove("glmer\\(|lmer\\(")
 }
 
-ft <- pairs_perm %>%
+ft <- tb %>%
     select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
     # Clean the table
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
-        Trait = factor(Trait, traits$trait_pre),
+        #Trait = factor(Trait, traits$trait_pre),
         P = ifelse(str_detect(Term, "Intercept|sd__"), "", P),
         P = str_replace(P, "p<", "<"),
         P = str_replace(P, "p=", "")
     ) %>%
     select(-ii) %>%
-    arrange(Gradient, Trait) %>%
+    #arrange(Gradient, Trait) %>%
     flextable() %>%
     # Align and spacing
     merge_v(j = c("Gradient", "Type", "Trait", "Model")) %>%
