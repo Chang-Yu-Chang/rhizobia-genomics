@@ -16,12 +16,13 @@ clean_model_string <- function (mod_st, ii) {
         str_remove(fixed(", data = d)")) %>%
         str_remove("glmer\\(|lmer\\(")
 }
-ft2 <- nitrogen_rn_perm  %>%
+ft <- nitrogen_rn_perm  %>%
     select(ii, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab) %>%
     # Clean the table
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
-        Trait = factor(Trait, traits$trait_pre)
+        Trait = factor(Trait, traits$trait_pre),
+        P = ifelse(str_detect(Term, "Intercept"), "", P)
     ) %>%
     select(-ii) %>%
     arrange(Trait) %>%
@@ -40,5 +41,5 @@ ft2 <- nitrogen_rn_perm  %>%
     fix_border_issues()
 
 
-save_as_html(ft2, path = here::here("plots/TabS5.html"), res = 300)
-save_as_image(ft2, path = here::here("plots/TabS5.png"), res = 300)
+save_as_html(ft, path = here::here("plots/TabS5.html"), res = 300)
+save_as_image(ft, path = here::here("plots/TabS5.png"), res = 300)

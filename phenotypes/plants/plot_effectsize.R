@@ -7,7 +7,7 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
-cohensds <- read_csv(paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
+cohensds <- read_csv(paste0(folder_data, "phenotypes/plants/effectsize/cohensds.csv"))
 
 # 1. Cohen's d ----
 plot_cohensds <- function (cohensds, plant) {
@@ -38,9 +38,9 @@ plot_cohensds <- function (cohensds, plant) {
         labs(y = "standardized mean difference (Cohen's d)", title = paste0(plant, " experiment"))
 }
 p <- plot_cohensds(cohensds, "sativa")
-ggsave(paste0(folder_phenotypes, "effectsize/01-cohensd_sativa.png"), p, width = 8, height = 5)
+ggsave(paste0(folder_phenotypes, "plants/effectsize/01-cohensd_sativa.png"), p, width = 8, height = 5)
 p <- plot_cohensds(cohensds, "lupulina")
-ggsave(paste0(folder_phenotypes, "effectsize/02-cohensd_lupulina.png"), p, width = 5, height = 5)
+ggsave(paste0(folder_phenotypes, "plants/effectsize/02-cohensd_lupulina.png"), p, width = 5, height = 5)
 
 # 2. Plot the boxplot of traits with Cohen's d -----
 set.seed(1)
@@ -152,4 +152,4 @@ p2 <- plot_eff(cohensds, "urbanization", "sativa")
 p <- plot_grid(p1, p2, align = "h", axis = "tb", ncol = 2, labels = LETTERS[1:2], scale = 0.94) +
     theme(plot.background = element_rect(fill = "white", color = NA)) +
     draw_text(c("Elevation", "Urbanization"), x = c(0.05, 0.55), y = 0.98, hjust = 0)
-ggsave(paste0(folder_phenotypes, "effectsize/03-traits_effectsize.png"), p, width = 8, height = 6)
+ggsave(paste0(folder_phenotypes, "plants/effectsize/03-traits_effectsize.png"), p, width = 8, height = 6)

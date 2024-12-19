@@ -105,6 +105,6 @@ partialetasquareds <- treatments_eff %>%
     unnest(partialetasquared) %>%
     clean_names()
 
-write_csv(cohensds, paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
-write_csv(hedgesgs, paste0(folder_data, "phenotypes/effectsize/hedgesgs.csv"))
-write_csv(partialetasquareds, paste0(folder_data, "phenotypes/effectsize/partialetasquareds.csv"))
+write_csv(cohensds, paste0(folder_phenotypes, "plants/effectsize/cohensds.csv"))
+write_csv(hedgesgs, paste0(folder_phenotypes, "plants/effectsize/hedgesgs.csv"))
+write_csv(partialetasquareds, paste0(folder_phenotypes, "plants/effectsize/partialetasquareds.csv"))

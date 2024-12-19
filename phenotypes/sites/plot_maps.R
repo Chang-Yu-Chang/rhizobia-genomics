@@ -71,7 +71,7 @@ p1 <- us_states %>%
     guides(fill = "none", color = "none") +
     labs(x = "Longitude", y = "Latitude")
 
-ggsave(paste0(folder_phenotypes, "sites/map-01-states.png"), p1, width = 6, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/maps/01-states.png"), p1, width = 6, height = 5)
 
 # 2. Elevation ----
 get_elev_sf <- function (us_elev, sites_center, gra) {
@@ -112,7 +112,7 @@ plot_elev_map <- function (sff, gra, midp = 1000) {
 elev_sf1 <- get_elev_sf(us_elev, sites_center, "elevation")
 p2 <- plot_elev_map(elev_sf1, "elevation", 1000)
 
-ggsave(paste0(folder_phenotypes, "sites/map-02-elevation.png"), p2, width = 6, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/maps/02-elevation.png"), p2, width = 6, height = 5)
 
 # 3. Urbanization ----
 get_tt_sf <- function (tt, sites_center, gra) {
@@ -153,7 +153,7 @@ plot_tt_map <- function (sff, gra, midp = 55) {
 tt_sf2 <- get_tt_sf(tt, sites_center, "urbanization")
 p3 <- plot_tt_map(tt_sf2, "urbanization")
 
-ggsave(paste0(folder_phenotypes, "sites/map-03-urbanization.png"), p3, width = 6, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/maps/03-urbanization.png"), p3, width = 6, height = 5)
 
 # 4. Combine ----
 zoom_polygon1 <- polygonGrob(x = c(.342,.342,.415,.415), y = c(.55,.85,.345,.305), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
@@ -164,7 +164,7 @@ p <- ggdraw(p1) +
     draw_plot(p2, x = .08, y = .55, width = .3, height = .3) +
     draw_plot(p3, x = .7, y = .23, width = .3, height = .3)
 
-ggsave(paste0(folder_phenotypes, "sites/map-04-combined.png"), p, width = 8, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/maps/04-combined.png"), p, width = 8, height = 5)
 
 # 5. Urbanization map by fraction impervious space ----
 fi <- rast(paste0(folder_data, "raw/plants/Annual_NLCD_FctImp_2022.tiff")) # imperious space data
@@ -205,4 +205,4 @@ plot_fi_map <- function (fi_sf, gra, midp = 50) {
 fi_sf <- get_fi_sf(fi)
 p <- plot_fi_map(fi_sf, "urbanization", 50)
 
-ggsave(paste0(folder_phenotypes, "sites/map-05-frac_impervious_surface.png"), p, width = 8, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/maps/05-frac_impervious_surface.png"), p, width = 8, height = 5)

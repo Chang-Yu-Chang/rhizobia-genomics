@@ -51,7 +51,7 @@ p2 <- dml %>%
     labs(x = "day", y = expression(t[min]))
 
 p <- plot_grid(p1, p2, nrow = 2, labels = c("A", "B"))
-ggsave(paste0(folder_phenotypes, "sites/sites-01-daily_t.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_phenotypes, "sites/temperatures/01-daily_t.png"), p, width = 10, height = 8)
 
 # 2. Plot the H vs L temperature ----
 temp <- dml %>%
@@ -99,7 +99,7 @@ p2 <- temp %>%
 
 p <- plot_grid(p1, p2, nrow = 2, labels = c("A", "B"))
 
-ggsave(paste0(folder_phenotypes, "sites/sites-02-H_vs_L.png"), p, width = 10, height = 8)
+ggsave(paste0(folder_phenotypes, "sites/temperatures/02-H_vs_L.png"), p, width = 10, height = 8)
 
 # 3. Plot the resampled temperature difference  ----
 p <- diff_vars %>%
@@ -114,7 +114,7 @@ p <- diff_vars %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_phenotypes, "sites/sites-03-resample_difference_HL.png"), p, width = 6, height = 5)
+ggsave(paste0(folder_phenotypes, "sites/temperatures/03-resample_difference_HL.png"), p, width = 6, height = 5)
 
 # 4. For each site, use the August data  ----
 p <- dml %>%
@@ -131,5 +131,5 @@ p <- dml %>%
     guides() +
     labs()
 
-ggsave(paste0(folder_phenotypes, "sites/sites-04-august_HL.png"), p, width = 8, height = 4)
+ggsave(paste0(folder_phenotypes, "sites/temperatures/04-august_HL.png"), p, width = 8, height = 4)
 

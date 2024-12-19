@@ -17,15 +17,13 @@ clean_model_string <- function (mod_st, ii) {
         str_remove("glmer\\(|lmer\\(")
 }
 
-ft2 <- pairs_perm %>%
-    # Remove the intercept estimates
-    mutate(p_value = ifelse(str_detect(term, "Intercept"), "", p_value)) %>%
+ft <- pairs_perm %>%
     select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
     # Clean the table
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
         Trait = factor(Trait, traits$trait_pre),
-        P = ifelse(str_detect(Term, "Intercept|sd__"), "", P)
+        P = ifelse(str_detect(Term, "Intercept"), "", P)
     ) %>%
     select(-ii) %>%
     arrange(Gradient, Trait) %>%
@@ -35,6 +33,7 @@ ft2 <- pairs_perm %>%
     merge_v(j = c("Gradient", "Type", "Trait", "Model")) %>%
     valign(j = c("Gradient", "Type", "Trait", "Model"), valign = "top") %>%
     align(j = c("Gradient", "Type", "Trait", "Term"), align = "center", part = "all") %>%
+    width(j = "Model", width = 4) %>%
     # Lines and background
     hline(i = seq(2, nrow_part(.), 2)) %>%
     bg(bg = "white", part = "all") %>%
@@ -42,5 +41,5 @@ ft2 <- pairs_perm %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_html(ft2, path = here::here("plots/TabS4.html"), res = 300)
-save_as_image(ft2, path = here::here("plots/TabS4.png"), res = 300)
+save_as_html(ft, path = here::here("plots/TabS4.html"), res = 300)
+save_as_image(ft, path = here::here("plots/TabS4.png"), res = 300)

@@ -30,26 +30,21 @@ do_stat <- function (dat, st) {
     eval(parse(text = st))
     return(mod)
 }
-do_emm <- function (mod) {
-    emmeans(mod, specs = "population", by = "temperature") %>% pairs() %>% as_tibble()
-}
-conditonal_filter <- function (x, y){
+conditonal_filter <- function (x, y, z){
     if (y %in% "lag") {
-        filter(gtwl, gradient == x, trait == y) %>% filter(temperature != "40c")
-    } else if (y %in% c("r", "maxOD")) filter(gtwl, gradient == x, trait == y)
+        filter(gtwl, gradient == x, trait == y, temperature == z) %>% filter(temperature != "40c")
+    } else if (y %in% c("r", "maxOD")) filter(gtwl, gradient == x, trait == y, temperature == z)
 }
 
 tb <- tibble(
-    gradient = rep(c("elevation", "urbanization"), each = 3),
-    trait = rep(c("r", "lag", "maxOD"), 2),
-    st = rep(c(
-        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",
-        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",
-        "mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)"
-    ), 2)
+    gradient = rep(c("elevation", "urbanization"), each = 12),
+    temperature = rep(c("25c", "30c", "35c", "40c"), 6),
+    trait = rep(rep(c("r", "lag", "maxOD"), each = 4), 2),
+    st = rep("mod <- lmer(value ~ population + (1|exp_id), data = d)", 24)
 ) %>%
+    filter(!(temperature == "40c" & trait == "lag")) %>%
     mutate(
-        dat = map2(gradient, trait, conditonal_filter),
+        dat = pmap(list(gradient, trait, temperature), conditonal_filter),
         mod = map2(dat, st, do_stat)
     )
 
@@ -59,10 +54,9 @@ tb_tidied <- tb %>%
     arrange(gradient, trait_pre) %>%
     mutate(
         ii = 1:n(),
-        mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy()),
-        mod_emm = map(mod, do_emm)
+        mod_tidied = map(mod, ~Anova(.x, type = 3) %>% tidy())
     ) %>%
-    select(ii, gradient, trait_pre, st, mod_tidied) %>%
+    select(ii, gradient, temperature, trait_pre, st, mod_tidied) %>%
     unnest(mod_tidied) %>%
     mutate(
         statistic = round(statistic, 2),
@@ -70,11 +64,11 @@ tb_tidied <- tb %>%
         siglab = map_chr(p.value, clean_p_lab)
     )
 
-write_csv(tb_tidied, paste0(folder_phenotypes, "growth/pairs_rn_anova.csv"))
+write_csv(tb_tidied, paste0(folder_phenotypes, "growth/pairs_anova.csv"))
 
 # 3.2 Permutation ----
 tb$chisq_perm <- list(NA)
-tb$emm_perm <- list(NA)
+
 n_perms = 1000
 for (i in 1:nrow(tb)) {
     st <- tb$st[i]
@@ -89,11 +83,9 @@ for (i in 1:nrow(tb)) {
         eval(parse(text = st))
         mod_tidied <- Anova(mod, type = 3) %>% tidy()
         list_chisq[[j]] <- select(mod_tidied, term, statistic)
-        list_emm[[j]] <- do_emm(mod) %>% select(temperature, t.ratio)
         if (j %% 100 == 0) cat("\n", j)
     }
     tb$chisq_perm[[i]] <- bind_rows(list_chisq)
-    tb$emm_perm[[i]] <- bind_rows(list_emm)
     cat("\n", i)
 }
 
@@ -114,7 +106,6 @@ tb_tidied2 <- tb %>%
     ) %>%
     unnest(chisq_obv)
 
-# Decouple the three terms. Pop, temp, and pop:temp
 tb_tidied2$chisq_perm2 <- NA
 for (i in 1:nrow(tb_tidied2)) tb_tidied2$chisq_perm2[i] <- list(filter(tb_tidied2$chisq_perm[[i]], term == tb_tidied2$term[i]))
 
@@ -127,35 +118,4 @@ tb_tidied3 <- tb_tidied2 %>%
     ) %>%
     select(ii, gradient, trait_pre, st, term, statistic, p_value, siglab)
 
-write_csv(tb_tidied3, paste0(folder_phenotypes, "growth/pairs_rn_perm.csv"))
-
-# 3.3 Post hoc tuckey comparison ----
-tb_tidied4 <- tb %>%
-    mutate(
-        ii = 1:n(),
-        emm_obv = map(mod, ~select(do_emm(.x), temperature, t.ratio))
-    ) %>%
-    unnest(emm_obv)
-
-get_perm_p2 <- function (emm_perm, emm_obv) {
-    #' Rank and find the oberved chisq among the permutation values
-    temp <- bind_rows(emm_perm, tibble(t.ratio = emm_obv)) %>%
-        arrange(desc(t.ratio)) %>%
-        mutate(rank = row_number()) %>%
-        filter(t.ratio == emm_obv) %>%
-        unique()
-    p_value <- (temp$rank-1)/nrow(emm_perm)
-    if (p_value > 0.5) p_value <- 1-p_value
-    return(p_value)
-}
-
-tb_tidied5 <- tb_tidied4 %>%
-    left_join(traits) %>%
-    mutate(
-        t.ratio = round(t.ratio, 2),
-        p_value = map2_dbl(emm_perm, t.ratio, get_perm_p2),
-        siglab = map_chr(p_value, clean_p_lab)
-    ) %>%
-    select(ii, gradient, trait_pre, st, temperature, t.ratio, p_value, siglab)
-
-write_csv(tb_tidied5, paste0(folder_phenotypes, "growth/pairs_rn_posthoc.csv"))
+write_csv(tb_tidied3, paste0(folder_phenotypes, "growth/pairs_perm.csv"))

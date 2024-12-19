@@ -117,4 +117,4 @@ tb_tidied3 <- tb_tidied2 %>%
     ) %>%
     select(ii, trait_type, trait_pre, st, term, statistic, p_value, siglab)
 
-write_csv(tb_tidied3, paste0(folder_data, "phenotypes/nitrogen_rn/nitrogen_rn_perm.csv"))
+write_csv(tb_tidied3, paste0(folder_data, "phenotypes/plants/nitrogen_rn_perm.csv"))

@@ -8,7 +8,7 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
-nitrogen_rn_perm <- read_csv(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.csv"))
+nitrogen_rn_perm <- read_csv(paste0(folder_phenotypes, "plants/nitrogen_rn_perm.csv"))
 
 # Plot the reaction norm ----
 isolates <- isolates %>%
@@ -60,7 +60,7 @@ p <- plants_n %>%
     ) +
     labs(x = "Nitrogen treatment", y = "")
 
-ggsave(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn.png"), p, width = 10, height = 4)
+ggsave(paste0(folder_phenotypes, "plants/nitrogen_rn.png"), p, width = 10, height = 4)
 
 # Make the table ----
 clean_model_string <- function (mod_st, ii) {
@@ -96,4 +96,4 @@ ft2 <- nitrogen_rn_perm  %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_image(ft2, path = paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.png"), res = 300)
+save_as_image(ft2, path = paste0(folder_phenotypes, "plants/nitrogen_rn_perm.png"), res = 300)

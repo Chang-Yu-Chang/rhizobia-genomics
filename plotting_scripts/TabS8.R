@@ -4,7 +4,7 @@ library(tidyverse)
 library(flextable)
 source(here::here("metadata.R"))
 
-pairs_perm <- read_csv(paste0(folder_phenotypes, "growth/pairs_perm.csv"))
+pairs_rn_posthoc <- read_csv(paste0(folder_phenotypes, "growth/pairs_rn_posthoc.csv"))
 
 clean_model_string <- function (mod_st, ii) {
     mod_st %>%
@@ -14,14 +14,13 @@ clean_model_string <- function (mod_st, ii) {
         str_remove(fixed(", data = d)")) %>%
         str_remove("glmer\\(|lmer\\(")
 }
-ft <- pairs_perm  %>%
-    select(ii, gradient, trait_pre, st, term, statistic, p_value, siglab) %>%
-    select(Gradient = gradient, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
-    # Clean the table
+
+ft <- pairs_rn_posthoc %>%
+    select(ii, gradient, trait_pre, st, temperature, t.ratio, p_value, siglab) %>%
+    select(Gradient = gradient, Trait = trait_pre, Model = st, Temperature = temperature, `T ratio` = t.ratio, P = siglab, ii) %>%
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
-        Trait = factor(Trait, traits$trait_pre),
-        P = ifelse(str_detect(Term, "Intercept"), "", P)
+        Trait = factor(Trait, traits$trait_pre)
     ) %>%
     select(-ii) %>%
     arrange(Gradient, Trait) %>%
@@ -30,14 +29,18 @@ ft <- pairs_perm  %>%
     # Align and spacing
     merge_v(j = c("Gradient", "Trait", "Model")) %>%
     valign(j = c("Gradient", "Trait", "Model"), valign = "top") %>%
-    align(j = c("Gradient", "Trait", "Model", "Term"), align = "center", part = "all") %>%
+    align(j = c("Gradient", "Trait", "Model", "Temperature", "T ratio"), align = "center", part = "all") %>%
+    autofit() %>%
+    width(j = "Model", width = 4) %>%
     # Lines and background
-    hline(i = seq(2, nrow_part(.), 2)) %>%
+    hline(i = c(4,7,11,15,18,22)) %>%
     bg(bg = "white", part = "all") %>%
-    bg(bg = "grey90", j = c("Term", "Chisq", "P"), i = ~str_detect(Term, "pop")) %>%
+    bg(bg = "pink", j = "P", i = ~str_detect(P, "\\*")) %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
+save_as_html(ft, path = here::here("plots/TabS8.html"), res = 300)
+save_as_image(ft, path = here::here("plots/TabS8.png"), res = 300)
 
-save_as_html(ft, path = here::here("plots/TabS6.html"), res = 300)
-save_as_image(ft, path = here::here("plots/TabS6.png"), res = 300)
+
+

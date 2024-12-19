@@ -16,7 +16,7 @@ clean_model_string <- function (mod_st, ii) {
         str_remove("glmer\\(|lmer\\(")
 }
 
-ft2 <- pairs_perm %>%
+ft <- pairs_perm %>%
     select(Gradient = gradient, Type = trait_type, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
     # Clean the table
     mutate(
@@ -41,5 +41,5 @@ ft2 <- pairs_perm %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_html(ft2, path = here::here("plots/TabS3.html"), res = 300)
-save_as_image(ft2, path = here::here("plots/TabS3.png"), res = 300)
+save_as_html(ft, path = here::here("plots/TabS3.html"), res = 300)
+save_as_image(ft, path = here::here("plots/TabS3.png"), res = 300)
