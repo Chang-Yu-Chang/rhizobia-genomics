@@ -14,7 +14,7 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
-cohensds <- read_csv(paste0(folder_data, "phenotypes/effectsize/cohensds.csv"))
+cohensds <- read_csv(paste0(folder_data, "phenotypes/plants/effectsize/cohensds.csv"))
 
 # 1. Prepare data ----
 plants_n <- plants %>%
@@ -51,8 +51,10 @@ plot_boxes <- function (plants_n, gra, plant, nt) {
         filter(exp_plant == plant) %>%
         filter(exp_nitrogen == nt) %>%
         left_join(traits) %>%
+        mutate(trait_type = factor(trait_type, c("shoot", "nodule", "leaf", "root"))) %>%
+        mutate(trait_pre2 = factor(trait_pre2, traits$trait_pre2)) %>%
         mutate(exp_id = factor(exp_id, exp_id_lev)) %>%
-        arrange(trait_type) %>%
+        arrange(trait_type, trait_pre2) %>%
         group_by(gradient, population, exp_plant, trait_type, trait_pre2, value, exp_id) %>%
         count() %>%
         ggplot() +
