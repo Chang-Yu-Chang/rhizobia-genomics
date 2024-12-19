@@ -276,8 +276,6 @@ clean_all <- function (set_name, contigs) {
     write_csv(cleaned_gene_names, paste0(folder_data, "genomics_analysis/gene_content/", set_name,"/cleaned_gene_names.csv"))
 }
 
-# All 36 genomes
-#clean_all("isolates", contigs)
 # 10 elevation medicae
 clean_all("elev_med", contigs)
 # 17 urbanization meliloti

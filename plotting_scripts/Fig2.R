@@ -221,20 +221,3 @@ dat <- plants %>%
     select(gradient, population, site, exp_id, exp_waterblock, shoot_biomass_mg, nodule_number, root_biomass_mg)
 m <- select(dat, shoot_biomass_mg, nodule_number, root_biomass_mg)
 adonis2(m ~ population, data = dat, permutation = 1000)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -40,7 +40,6 @@ plot_tree <- function (tr) {
         ) +
         guides(fill = guide_legend(override.aes = list(label = "", color = NA, size = 2)), color = guide_legend(override.aes = list(size = 2, shape = 21))) +
         labs()
-    #labs(title = paste0("Elevation S. medicae\n", nrow(tt$list_sccg), " single-copy core genes"))
 }
 
 tbtr <- tbtr %>%
