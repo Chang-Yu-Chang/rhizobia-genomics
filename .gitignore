@@ -7,6 +7,8 @@ deprecated/
 */deprecated1/
 */deprecated2/
 */deprecated3/
+deprecated2/
+deprecated3/
 
 # busco lineage
 shell_scripts/busco_*.log
