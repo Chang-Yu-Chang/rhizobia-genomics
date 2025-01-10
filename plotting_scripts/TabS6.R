@@ -14,9 +14,10 @@ clean_model_string <- function (mod_st, ii) {
         str_remove(fixed(", data = d)")) %>%
         str_remove("glmer\\(|lmer\\(")
 }
+
 ft <- pairs_perm  %>%
-    select(ii, gradient, trait_pre, st, term, statistic, p_value, siglab) %>%
-    select(Gradient = gradient, Trait = trait_pre, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
+    select(ii, gradient, temperature, trait_pre, st, term, statistic, p_value, siglab) %>%
+    select(Gradient = gradient, Trait = trait_pre, Temperature = temperature, Model = st, Term = term, Chisq = statistic, P = siglab, ii) %>%
     # Clean the table
     mutate(
         Model = map2_chr(Model, ii, ~clean_model_string(.x,.y)),
@@ -28,9 +29,9 @@ ft <- pairs_perm  %>%
     flextable() %>%
     autofit() %>%
     # Align and spacing
-    merge_v(j = c("Gradient", "Trait", "Model")) %>%
-    valign(j = c("Gradient", "Trait", "Model"), valign = "top") %>%
-    align(j = c("Gradient", "Trait", "Model", "Term"), align = "center", part = "all") %>%
+    merge_v(j = c("Gradient", "Trait", "Temperature", "Model")) %>%
+    valign(j = c("Gradient", "Trait", "Temperature", "Model"), valign = "top") %>%
+    align(j = c("Gradient", "Trait", "Temperature", "Model", "Term"), align = "center", part = "all") %>%
     # Lines and background
     hline(i = seq(2, nrow_part(.), 2)) %>%
     bg(bg = "white", part = "all") %>%

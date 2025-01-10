@@ -116,6 +116,6 @@ tb_tidied3 <- tb_tidied2 %>%
         p_value = map2_dbl(chisq_perm2, statistic, get_perm_p),
         siglab = map_chr(p_value, clean_p_lab)
     ) %>%
-    select(ii, gradient, trait_pre, st, term, statistic, p_value, siglab)
+    select(ii, gradient, temperature, trait_pre, st, term, statistic, p_value, siglab)
 
 write_csv(tb_tidied3, paste0(folder_phenotypes, "growth/pairs_perm.csv"))
