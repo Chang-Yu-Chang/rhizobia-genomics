@@ -1,6 +1,5 @@
 #' This script aggregates the assembled genome fasta
 
-renv::load()
 library(tidyverse)
 library(janitor)
 library(seqinr)

@@ -7,8 +7,7 @@ library(poppr) # for reading snps into a genind object
 library(mmod) # for computing Fst estimates: Nei's Gst, Hendrick's Gst, and Jost' D
 source(here::here("metadata.R"))
 
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
-    filter(!genome_id %in% c("g20", "g28"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 
 gcv_fst_wrapper <- function (set_name) {

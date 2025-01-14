@@ -39,30 +39,5 @@ distl <- dist_ani %>%
     left_join(dist_kmer)
 
 # Save the files
-nrow(distl) # 36^2 = 1296
+nrow(distl) # 38^2 = 1444
 write_csv(distl, paste0(folder_data, "genomics_analysis/ani_kmers/distl.csv"))
-
-
-#
-m_ani <- dist_ani %>%
-    pivot_wider(names_from = genome_id2, values_from = d_ani) %>%
-    select(-genome_id1) %>%
-    as.dist()
-
-as.phylo(hclust(m_ani))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

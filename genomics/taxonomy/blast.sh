@@ -10,7 +10,8 @@ blast_genomes_db=$folder_genomics/blast_db/genomes
 
 mkdir -p $folder_genomics/taxonomy
 
-for i in {1..36}
+for i in 37 38
+#for i in {1..38}
 do
     echo $genome_ids[$i]
     genome_fa=$folder_genomics/fasta/genomes/$genome_ids[$i].fasta

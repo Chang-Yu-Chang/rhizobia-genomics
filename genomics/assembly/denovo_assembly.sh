@@ -6,7 +6,6 @@ source ../env_vars.sh
 
 cd $folder_shell
 
-#for i in {1..18} 20 21 22 {24..34} 36 38  # 19 23 35 37
 for i in {1..38}
 do
     echo $genome_ids[$i]

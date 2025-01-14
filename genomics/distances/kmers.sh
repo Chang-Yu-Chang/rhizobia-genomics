@@ -9,7 +9,7 @@ cd $folder_shell
 mkdir -p $folder_genomics/kmer/signatures
 
 ## Create kmer signatures
-for i in {1..36}
+for i in {1..38}
 do
     zsh 06b-genome_kmer.sh \
         $folder_genomics/fasta/genomes/$genome_ids[$i].fasta \
@@ -17,7 +17,7 @@ do
 done
 
 ## Create a list of kmer signatures
-for i in {1..36}
+for i in {1..38}
 do
     echo $folder_genomics/kmer/signatures/$genome_ids[$i].sig
 done |> $folder_genomics/kmer/list_sigs.txt

@@ -9,7 +9,6 @@ library(mmod) # for computing Fst estimates: Nei's Gst, Hendrick's Gst, and Jost
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
-    filter(!genome_id %in% c("g20", "g28"))
 
 read_aln <- function (aln_file) {
     paste0(aln_file) %>%

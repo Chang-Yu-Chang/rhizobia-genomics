@@ -9,7 +9,7 @@ cd $folder_shell
 mkdir -p $folder_genomics/ani
 
 ## Create a list of genome fasta files
-for i in {1..36}
+for i in {1..38}
 do
     echo -e $folder_genomics/fasta/genomes/$genome_ids[$i].fasta
 done >| $folder_genomics/ani/list_genomes.txt

@@ -1,6 +1,5 @@
 #' This script aggregates filtered reads
 
-renv::load()
 library(tidyverse)
 library(janitor)
 library(seqinr)

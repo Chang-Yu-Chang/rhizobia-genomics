@@ -19,12 +19,12 @@ do
         -o $folder_genomics/assembly/$genome_ids[$i]/quast
 
     # BUSCO
-    # mamba activate busco
-    # busco \
-    #     -i $dir/medaka/consensus.fasta \
-    #     -m genome \
-    #     -l alphaproteobacteria_odb10 \
-    #     -o "" \
-    #     --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
+    mamba activate busco
+    busco \
+        -i $dir/medaka/consensus.fasta \
+        -m genome \
+        -l alphaproteobacteria_odb10 \
+        -o "" \
+        --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
 
 done
