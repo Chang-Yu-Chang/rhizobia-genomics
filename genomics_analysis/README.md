@@ -1,8 +1,10 @@
 This folder contains scripts for analyzing the genomics data including:
 
-1. examine raw reads
-2. examine assembled genome size
-3. examine gene content
-4. identify taxonomy using custom blast database and rRNA 
-5. compute fst for SNPs and GCV
-6. perform GO enrichment analysis
+1. `raw_reads`: examine raw reads
+2. `genomes`, `contigs`: examine assembled genome size and aggregate contig data
+3. `gene_content`: examine gene content on panaroo outputs
+4. `taxonomy`: aggregates the blast results
+5. `fst`, `gcv_fst`: compute fst for SNPs and GCV (gene content variation)
+6. `dxy`, `gcv_dxy`: compute for SNPs and GCV
+7. `go`, `gcv_go`: perform GO enrichment analysis for SNPs and GCV
+8. `mktest`: perform mktest. Deprecated
