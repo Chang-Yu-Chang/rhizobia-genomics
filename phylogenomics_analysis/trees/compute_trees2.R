@@ -5,7 +5,7 @@ library(ape)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-distl <- read_csv(paste0(folder_data, "genomics_analysis/ani_kmers/distl.csv"))
+distl <- read_csv(paste0(folder_data, "genomics_analysis/distances/distl.csv"))
 
 
 compute_gpa_tree <- function (set_name) {
