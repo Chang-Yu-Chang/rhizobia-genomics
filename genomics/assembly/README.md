@@ -6,5 +6,15 @@
 4. `consolidate_genomes.sh` consolidates genome fasta files into one folder
 5. `manual_concat.sh` concatenates the contigs based on the blast result
 
+To reproduce it, do the following
+
+```
+zsh assess_reads.sh
+zsh denovo_assembly.sh
+zsh assess_assemblies.sh
+zsh consolidate_genomes.sh
+zsh manual_concat.sh
+```
+
 # deprecated
 6. `extract_contigs.sh` splits each genome into contigs. This includes 32 genomes of our isolates and 5 NCBI reference genomes 

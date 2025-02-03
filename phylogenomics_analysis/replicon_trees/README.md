@@ -13,5 +13,5 @@ To reproduce the intermediate files without invoking the exploratory plots
 zsh concatenate_alignment.sh
 zsh compute_trees1.sh
 cd ../../
-Rscript -e "renv::activate('.'); source('phylogenomics_analysis/trees/compute_trees2.R'); source('phylogenomics_analysis/trees/curate_trees.R')"
+Rscript -e "renv::activate('.'); source('phylogenomics_analysis/replicon_trees/compute_trees2.R'); source('phylogenomics_analysis/replicon_trees/curate_trees.R')"
 ```
