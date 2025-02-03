@@ -17,8 +17,10 @@ dist_ani <- dist_ani %>%
     mutate(d_ani = 1-d_ani/100) %>%
     mutate(genome_id1 = str_remove(genome_id1, ".+/genomes/") %>% str_remove(".fasta")) %>%
     mutate(genome_id2 = str_remove(genome_id2, ".+/genomes/") %>% str_remove(".fasta")) %>%
+    view
     mutate(genome_id1 = ordered(genome_id1, isolates$genome_id), genome_id2 = ordered(genome_id2, isolates$genome_id)) %>%
     arrange(genome_id1, genome_id2) %>%
+    view
     select(genome_id1, genome_id2, d_ani)
 
 # k-mers

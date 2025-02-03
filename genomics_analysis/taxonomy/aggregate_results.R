@@ -60,7 +60,6 @@ for (i in 1:nrow(isolates)) {
 list_b_genome <- list_b_genome[!is.na(list_b_genome)]
 
 blast_genome <- bind_rows(list_b_genome) %>%
-    #filter(pident > 90, bitscore > 10000, length > 10000) %>%
     filter(pident > 90, bitscore > 10000) %>%
     mutate(accession = sseqid) %>%
     left_join(ref_genome) %>%

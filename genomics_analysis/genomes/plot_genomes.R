@@ -46,31 +46,3 @@ p <- genomes %>%
     labs(x = "genome", y = "genome size (Mbp)", title = "contigs < 10kb removed")
 
 ggsave(paste0(folder_data, "genomics_analysis/genomes/02-genome_size.png"), p, width = 15, height = 6)
-
-if (F) {
-
-# contigs
-c_size <- genomes %>%
-    left_join(isolates) %>%
-    filter(population %in% c("VA", "PA")) %>%
-    group_by(genome_id) %>%
-    mutate(contig_size = contig_length/10^6)
-
-c_size %>%
-    filter(contig_length > 500000) %>%
-    filter(genome_id != "g28") %>%
-    count() %>%
-    pull(n) %>%
-    range() # 3 5
-
-
-# genome size
-g_size <- c_size %>%
-    group_by(genome_id) %>%
-    summarise(genome_size = sum(contig_length)/10^6)
-
-nrow(g_size) # 32 genomes
-g_size <- g_size %>% filter(genome_size < 14)
-round(range(g_size$genome_size), 2) #   6.79 8.02
-round(median(g_size$genome_size), 2) # 7.25
-}

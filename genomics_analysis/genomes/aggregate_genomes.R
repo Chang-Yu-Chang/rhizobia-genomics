@@ -22,8 +22,8 @@ genomes <- bind_rows(list_g_contigs) %>%
     # Arrange contigs by length
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id, desc(contig_length)) %>%
-    # Remove small contigs < 100kb
-    filter(contig_length > 100000)
+    # Remove small contigs < 10kb
+    filter(contig_length > 10000)
 
 write_csv(genomes, paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 

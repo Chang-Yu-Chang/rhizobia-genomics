@@ -9,7 +9,7 @@ isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolate
 isolates_all <- read_csv(paste0(folder_data, "mapping/isolates_all.csv"))
 
 iso <- isolates %>%
-    filter(!genome_id %in% c("g28", "g38")) %>% # duplicated of g20 and g40
+    #filter(!genome_id %in% c("g28", "g38")) %>% # duplicated of g20 and g40
     left_join(isolates_tax) %>%
     # Remove these two lines after correcting the code
     mutate(contig_species = str_replace(contig_species, "E. ", "S. ")) %>%
