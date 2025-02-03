@@ -7,7 +7,7 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
-# Gene frequency specture
+# Gene frequency spectrum
 plot_gfs <- function (set_name) {
     # Plot gene frequency spectrum
     tt <- read_gpas(set_name)

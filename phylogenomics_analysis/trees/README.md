@@ -6,3 +6,11 @@ Compute genome wide tree
 4. `compute_trees2.R` computes trees for gpa, ani, and kmers
 5. `curate_trees.R` combines the tree objects into a Rdata file `trees.rdata`
 6. `plot.trees.R` plots trees
+
+To reproduce the intermediate files without invoking the exploratory plots
+
+```
+zsh concatenate_alignment.sh
+zsh compute_trees1.sh
+Rscript -e "renv::activate('.'); source('compute_trees2.R'); source('curate_trees.R')"
+```
