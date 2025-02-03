@@ -15,9 +15,9 @@ compute_q <- function (asc) {
     round(-10*log10(sum(10^(-phred/10))/nchar(asc)), 2)
 }
 
-list_filtered_reads <- rep(list(NA), 32)
+list_filtered_reads <- rep(list(NA), 38)
 
-for (i in 1:32) {
+for (i in 1:38) {
     list_filtered_reads[[i]] <- read_table(paste0(folder_genomics, "/assembly/", genomes$genome_id[i], "/filtered_reads.txt"), col_names = c("name", "asc", "length"), show_col_types = F) %>%
         rowwise() %>%
         mutate(q_score = compute_q(asc), .keep = "unused") %>%

@@ -1,6 +1,5 @@
 #' This script plots the the genomes by contigs
 
-renv::load()
 library(tidyverse)
 library(cowplot)
 library(janitor)
@@ -12,9 +11,8 @@ genomes <- read_csv(paste0(folder_data, "genomics_analysis/genomes/genomes.csv")
     mutate(genome_id = factor(genome_id, isolates$genome_id))
 qcs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/qcs.csv"))
 
-# 1. Number of contigs
+# 1. Number of contigs ----
 p <- genomes %>%
-    #filter(genome_id != "g28") %>%
     group_by(genome_id) %>%
     summarize(n_contigs = n()) %>%
     ggplot() +
@@ -29,7 +27,7 @@ p <- genomes %>%
 ggsave(paste0(folder_data, "genomics_analysis/genomes/01-n_contigs.png"), p, width = 4, height = 4)
 
 
-# 2. plot the genome size by contigs
+# 2. plot the genome size by contigs ----
 p <- genomes %>%
     group_by(genome_id) %>%
     mutate(contig_ordered = factor(1:n())) %>%
@@ -46,3 +44,17 @@ p <- genomes %>%
     labs(x = "genome", y = "genome size (Mbp)", title = "contigs < 10kb removed")
 
 ggsave(paste0(folder_data, "genomics_analysis/genomes/02-genome_size.png"), p, width = 15, height = 6)
+
+
+# 3. genome size ----
+genome_size <- genomes %>%
+    group_by(genome_id) %>%
+    summarise(genome_size = sum(contig_length))
+
+range(genome_size$genome_size)/1e6 # 6.789865 8.187957
+median(genome_size$genome_size)/1e6 # 7.18255
+
+# 4. quality control ----
+# busco completeness
+range(qcs$completeness)*100 # 94.21296 98.84259
+

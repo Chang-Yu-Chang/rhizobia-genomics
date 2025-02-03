@@ -1,6 +1,5 @@
 #' This script summarize assembled genome information
 
-renv::load()
 library(tidyverse)
 library(janitor)
 library(seqinr)
@@ -10,7 +9,7 @@ genomes <- read_csv(paste0(folder_data, "mapping/genomes.csv"))
 filtered_reads <- read_csv(paste0(folder_data, "genomics_analysis/raw_reads/filtered_reads.csv"))
 
 # Remove reads that are too long
-sum(filtered_reads$length > 80000) # 9 reads with > 80kb length
+sum(filtered_reads$length > 80000) # 22 reads with > 80kb length
 filtered_reads <- filtered_reads %>%
     mutate(genome_id = factor(genome_id, genomes$genome_id)) %>%
     filter(length < 80000)
@@ -20,8 +19,8 @@ n_reads <- filtered_reads %>%
     group_by(genome_id) %>%
     dplyr::count(name = "n_reads") %>%
     ungroup()
-range(n_reads$n_reads) # 47161 234638
-median(n_reads$n_reads) # 104054.5
+range(n_reads$n_reads)/1e3 # 47.161 234.638
+median(n_reads$n_reads)/1e3 # 101.42
 
 
 # 1. Read length vs. q score
@@ -57,7 +56,7 @@ p <- filtered_reads %>%
 ggsave(paste0(folder_data, "genomics_analysis/raw_reads/02-read_length.png"), p, width = 10, height = 10)
 
 #
-range(filtered_reads_median$median_length) # 2748 5367
+range(filtered_reads_median$median_length)/1e3 # 2.748 5.367
 
 # 3. weighted histogram of read length
 p <- filtered_reads %>%
@@ -72,20 +71,13 @@ p <- filtered_reads %>%
 ggsave(paste0(folder_data, "genomics_analysis/raw_reads/03-weighted_read_length.png"), p, width = 10, height = 10)
 
 #
-range(filtered_reads_median$median_q_score) # 18.26 20.24
+range(filtered_reads_median$median_q_score) # 18.26 22.54
 
-# 4. Calculat estimated coverage
+# 4. Calculate estimated coverage
 filtered_reads_coverage <- filtered_reads %>%
     group_by(genome_id) %>%
     summarize(total_length = sum(length)) %>%
     mutate(coverage = total_length/(7*10^6))
 
-round(range(filtered_reads_coverage$coverage)) # 48 171
-
-
-
-
-
-
-
+round(range(filtered_reads_coverage$coverage)) # 48 192
 

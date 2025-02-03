@@ -2,7 +2,7 @@
 source ~/.zshrc
 source ../env_vars.sh
 
-# This script consolidates genome fasta files into one folderx
+# This script consolidates genome fasta files into one folder
 
 mamba activate seqkit
 

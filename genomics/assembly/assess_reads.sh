@@ -20,9 +20,9 @@ do
         $filtered_reads
 
     # # Extract the filtered reads to a txt file for plotting
-    # zsh 01b-extract_reads.sh \
-    #     $filtered_reads \
-    #     $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt
+    zsh 01b-extract_reads.sh \
+        $filtered_reads \
+        $folder_genomics/assembly/$genome_ids[$i]/filtered_reads.txt
 
     # # Plot the filtered reads
     # Rscript 01c-plot_reads.R \

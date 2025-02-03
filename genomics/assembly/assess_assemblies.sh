@@ -23,6 +23,7 @@ do
     busco \
         -i $dir/medaka/consensus.fasta \
         -m genome \
+        -c 10 \
         -l alphaproteobacteria_odb10 \
         -o "" \
         --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
