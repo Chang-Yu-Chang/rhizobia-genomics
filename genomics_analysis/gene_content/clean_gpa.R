@@ -278,7 +278,7 @@ clean_all <- function (set_name, contigs) {
 
 # 10 elevation medicae
 clean_all("elev_med", contigs)
-# 17 urbanization meliloti
+# 20 urbanization meliloti
 clean_all("urbn_mel", contigs)
 
 

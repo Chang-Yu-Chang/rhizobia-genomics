@@ -1,4 +1,4 @@
-#'
+#' Plots the maps
 
 library(tidyverse)
 library(cowplot)

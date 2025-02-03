@@ -29,9 +29,9 @@ panaroo-generate-gffs \
     -o $folder_genomics/pangenome/elev_med
 
 
-# Urbanization meliloti Total 19
+# Urbanization meliloti Total 20
 mkdir -p $folder_genomics/pangenome/urbn_mel
-for i in {21..27} {31..37} 39 41 43 44 45
+for i in {21..27} {31..37} 39 41 42 43 44 45
 do
     echo -e $folder_genomics/gff/g$i.gff
 done >| $folder_genomics/pangenome/urbn_mel/list_gffs.txt

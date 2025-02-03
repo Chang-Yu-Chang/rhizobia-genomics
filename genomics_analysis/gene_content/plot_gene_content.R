@@ -8,15 +8,6 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
-make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
-    gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
-        select(gene, replicon_type) %>%
-        replace_na(list(replicon_type = "others"))
-    per_acce_fst %>%
-        mutate(gene = factor(gene, gene_order$gene)) %>%
-        left_join(gene_replicon) %>%
-        mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
-}
 plot_heatmap <- function (tt, by_replicon = F) {
     gene_order <- levels(tt$gpacl$gene)
 
@@ -127,19 +118,19 @@ plot_gfs <- function (gpa) {
         guides() +
         labs(x = "# of genomes", y = "# of genes")
 }
-plot_singleton <- function (gpa, gpatl) {
+plot_singleton <- function (tt) {
     #' Plot the number of singletons per genome
-    list_sg <- gpa$gene[which(apply(gpa[,-1], 1, sum) == 1)]
-    gpatlsg <- gpatl %>%
+    list_sg <- tt$gpa$gene[which(apply(tt$gpa[,-1], 1, sum) == 1)]
+    gpatlsg <- tt$gpatl %>%
         filter(gene %in% list_sg) %>%
         mutate(genome_id = factor(genome_id, isolates$genome_id))
 
     gpatlsg %>%
         group_by(genome_id) %>%
-        count() %>%
+        summarize(n = sum(value)) %>%
         ggplot() +
-        geom_col(aes(x = genome_id, y = n), color = "black") +
-        theme_bw() +
+        geom_col(aes(x = genome_id, y = n), color = "black", fill = "white") +
+        theme_classic() +
         theme() +
         guides() +
         labs(title = "Symbiotic and non-symbiotic strains", y = "# of singltons")
@@ -157,76 +148,6 @@ plot_bcsm <- function (sml) {
         theme() +
         labs()
 }
-get_gcn_agg <- function (gcn, cleaned_gene_names) {
-    #' This aggregate the gene number for gene clusters that have the same gene symbol names
-    gcn %>%
-        left_join(cleaned_gene_names) %>%
-        drop_na(from) %>%
-        select(from, matches("g\\d")) %>%
-        pivot_longer(-from) %>%
-        mutate(name = factor(name, isolates$genome_id)) %>%
-        group_by(from, name) %>%
-        summarize(value = sum(value)) %>%
-        pivot_wider() %>%
-        ungroup()
-}
-plot_genecopy <- function (gcn_agg, labelled_genes) {
-    #' This plots the heatmap of gene copy using the list of labelled genes
-    tbw <- gcn_agg %>% filter(str_detect(from, labelled_genes))
-    list_genes <- tbw$from
-    tb <- tbw %>% pivot_longer(-from, names_to = "genome_id", values_to = "count")
-    n_colors <- length(unique(tb$count))
-    count_colors <- set_names(grey(seq(0.9, 0, length.out = n_colors)), sort(unique(tb$count)))
-
-    tb %>%
-        left_join(isolates) %>%
-        # Orders
-        mutate(from = factor(from, rev(list_genes))) %>%
-        mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-        # Panels
-        mutate(gene_family = str_sub(from, 1, 3)) %>%
-        mutate(count = factor(as.character(count), 0:1000)) %>%
-        ggplot() +
-        geom_tile(aes(x = genome_id, y = from, fill = count), width = 0.95, height = 0.95) +
-        scale_fill_manual(values = count_colors) +
-        scale_x_discrete(position = "top", expand = c(0,0)) +
-        scale_y_discrete(expand = c(0,0)) +
-        facet_grid(gene_family~population, scale = "free", space = "free", switch = "y") +
-        theme_minimal() +
-        theme(
-            #strip.text = element_text(angle = 90),
-            strip.placement = "outside",
-            strip.background = element_rect(color = "black"),
-            panel.grid = element_blank(),
-            panel.spacing = unit(3, "mm"),
-            plot.background = element_rect(color = NA, fill = "white")
-        ) +
-        guides() +
-        labs(x = "", y = "")
-}
-plot_bcsm_gcn <- function (gcn_agg) {
-    #' Plot BC distance based on gene copy number
-    nrow(gcn_agg) # 1990 genes
-    m <- t(as.matrix(gcn_agg[,-1]))
-    vegan::vegdist(m) %>%
-        as.matrix() %>%
-        as_tibble %>%
-        mutate(genome_id1 = colnames(.)) %>%
-        pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "dist") %>%
-        # left_join(rename_with(isolates, function (x) paste0(x, "1"))) %>%
-        # left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
-        mutate(genome_id1 = factor(genome_id1, isolates$genome_id), genome_id2 = factor(genome_id2, rev(isolates$genome_id))) %>%
-        ggplot() +
-        geom_tile(aes(x = genome_id1, y = genome_id2, fill = dist)) +
-        scale_x_discrete(position = "top",) +
-        scale_fill_gradient(low = "white", high = "maroon", name = "BC distance") +
-        theme_minimal() +
-        theme(
-            plot.background = element_rect(color = NA, fill = "white")
-        ) +
-        guides() +
-        labs(x = "", y = "", title = paste0("copy number of ", nrow(gcn_agg), " genes"))
-}
 plot_wrapper <- function (set_name) {
     #set_name = "elev_med"
     #set_name = "urbn_mel"
@@ -237,21 +158,101 @@ plot_wrapper <- function (set_name) {
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-01-gpa_heatmap.png"), p, width = 6, height = 4)
     p <- plot_gfs(tt$gpa)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-02-gene_frequency_spectrum.png"), p, width = 5, height = 4)
-    p <- plot_singleton(tt$gpa, tt$gpatl)
+    p <- plot_singleton(tt)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-03-singletons.png"), p, width = 10, height = 8)
     p <- plot_bcsm(tt$sml)
     ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-04-gpa_sm.png"), p, width = 10, height = 8)
-    acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
-    gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
-    p <- plot_genecopy(gcn_agg, "fdx|fix|hmp|nap|nod|nif|noe|nos|syr")
-    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 12)
-    p <- plot_bcsm_gcn(gcn_agg)
-    ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-06-gcn_sm.png"), p, width = 9, height = 8)
-    plot_acce_fst(per_acce_fst)
+    # acce_fst <- make_acce_fst(per_acce_fst, tt$gene_order, tt$gpacl)
+    # gcn_agg <- get_gcn_agg(tt$gcn, tt$cleaned_gene_names)
+    # p <- plot_genecopy(gcn_agg, "fdx|fix|hmp|nap|nod|nif|noe|nos|syr")
+    # ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-05-gcn_sym.png"), p, width = 8, height = 12)
+    # p <- plot_bcsm_gcn(gcn_agg)
+    # ggsave(paste0(folder_data, "genomics_analysis/gene_content/", set_name,"-06-gcn_sm.png"), p, width = 9, height = 8)
+    # plot_acce_fst(per_acce_fst)
     #p <- plot_grid(p1, p2, nrow = 2, axis = "lrt", align = "vh")
 }
 
 plot_wrapper("elev_med")
 plot_wrapper("urbn_mel")
 
+if (F) {
+    make_acce_fst <- function (per_acce_fst, gene_order, gpacl) {
+        gene_replicon <- filter(gpacl, genome_id == gpacl$genome_id[1]) %>%
+            select(gene, replicon_type) %>%
+            replace_na(list(replicon_type = "others"))
+        per_acce_fst %>%
+            mutate(gene = factor(gene, gene_order$gene)) %>%
+            left_join(gene_replicon) %>%
+            mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
+    }
+    get_gcn_agg <- function (gcn, cleaned_gene_names) {
+        #' This aggregate the gene number for gene clusters that have the same gene symbol names
+        gcn %>%
+            left_join(cleaned_gene_names) %>%
+            drop_na(from) %>%
+            select(from, matches("g\\d")) %>%
+            pivot_longer(-from) %>%
+            mutate(name = factor(name, isolates$genome_id)) %>%
+            group_by(from, name) %>%
+            summarize(value = sum(value)) %>%
+            pivot_wider() %>%
+            ungroup()
+    }
+    plot_genecopy <- function (gcn_agg, labelled_genes) {
+        #' This plots the heatmap of gene copy using the list of labelled genes
+        tbw <- gcn_agg %>% filter(str_detect(from, labelled_genes))
+        list_genes <- tbw$from
+        tb <- tbw %>% pivot_longer(-from, names_to = "genome_id", values_to = "count")
+        n_colors <- length(unique(tb$count))
+        count_colors <- set_names(grey(seq(0.9, 0, length.out = n_colors)), sort(unique(tb$count)))
 
+        tb %>%
+            left_join(isolates) %>%
+            # Orders
+            mutate(from = factor(from, rev(list_genes))) %>%
+            mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
+            # Panels
+            mutate(gene_family = str_sub(from, 1, 3)) %>%
+            mutate(count = factor(as.character(count), 0:1000)) %>%
+            ggplot() +
+            geom_tile(aes(x = genome_id, y = from, fill = count), width = 0.95, height = 0.95) +
+            scale_fill_manual(values = count_colors) +
+            scale_x_discrete(position = "top", expand = c(0,0)) +
+            scale_y_discrete(expand = c(0,0)) +
+            facet_grid(gene_family~population, scale = "free", space = "free", switch = "y") +
+            theme_minimal() +
+            theme(
+                #strip.text = element_text(angle = 90),
+                strip.placement = "outside",
+                strip.background = element_rect(color = "black"),
+                panel.grid = element_blank(),
+                panel.spacing = unit(3, "mm"),
+                plot.background = element_rect(color = NA, fill = "white")
+            ) +
+            guides() +
+            labs(x = "", y = "")
+    }
+    plot_bcsm_gcn <- function (gcn_agg) {
+        #' Plot BC distance based on gene copy number
+        nrow(gcn_agg) # 1990 genes
+        m <- t(as.matrix(gcn_agg[,-1]))
+        vegan::vegdist(m) %>%
+            as.matrix() %>%
+            as_tibble %>%
+            mutate(genome_id1 = colnames(.)) %>%
+            pivot_longer(-genome_id1, names_to = "genome_id2", values_to = "dist") %>%
+            # left_join(rename_with(isolates, function (x) paste0(x, "1"))) %>%
+            # left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
+            mutate(genome_id1 = factor(genome_id1, isolates$genome_id), genome_id2 = factor(genome_id2, rev(isolates$genome_id))) %>%
+            ggplot() +
+            geom_tile(aes(x = genome_id1, y = genome_id2, fill = dist)) +
+            scale_x_discrete(position = "top",) +
+            scale_fill_gradient(low = "white", high = "maroon", name = "BC distance") +
+            theme_minimal() +
+            theme(
+                plot.background = element_rect(color = NA, fill = "white")
+            ) +
+            guides() +
+            labs(x = "", y = "", title = paste0("copy number of ", nrow(gcn_agg), " genes"))
+    }
+}

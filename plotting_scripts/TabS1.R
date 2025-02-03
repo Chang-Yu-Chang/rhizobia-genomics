@@ -6,7 +6,6 @@ source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates_tax <- read_csv(paste0(folder_data, "genomics_analysis/taxonomy/isolates_tax.csv"))
-isolates_all <- read_csv(paste0(folder_data, "mapping/isolates_all.csv"))
 
 iso <- isolates %>%
     #filter(!genome_id %in% c("g28", "g38")) %>% # duplicated of g20 and g40
@@ -16,12 +15,11 @@ iso <- isolates %>%
     mutate(rrna_species = str_replace(rrna_species, "E. ", "S. ")) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(gradient, population, genome_id) %>%
-    select(gradient, population, exp_id, genome_id, starts_with("rrna"), starts_with("contig")) %>%
+    select(gradient, population, exp_id, genome_id, starts_with("rrna"), starts_with("contig"), starts_with("exp"), growth_curve) %>%
     mutate(contig_length = round(contig_length/1000, 2),
            contig_pident = round(contig_pident, 1),
            rrna_pident = round(rrna_pident, 1)) %>%
     mutate(` ` = 1:n()) %>%
-    left_join(select(isolates_all, exp_id, genome_id, exp_lup, exp_sativa, growth_curve)) %>%
     mutate(
         exp_lup = ifelse(exp_lup == 1, "+", ""),
         exp_sativa = ifelse(exp_sativa == 1, "+", ""),
@@ -29,8 +27,7 @@ iso <- isolates %>%
     ) %>%
     select(` `, population, exp_id, genome_id, rrna_species, rrna_pident, contig_species, contig_pident, exp_sativa, exp_lup, growth_curve)
 
-write_csv(iso, paste0(folder_data, "output/iso.csv"))
-
+#write_csv(iso, paste0(folder_data, "output/iso.csv"))
 
 ft <- flextable(iso) %>%
     # Labels

@@ -191,8 +191,8 @@ dxy_wrapper <- function (set_name) {
 
     p <- plot_genome_wide_dxy(xx_gn)# + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
     ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-01-genome_dxy.png"), p, width = 3, height = 3)
-    p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
-    ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 3)
+    # p <- plot_replicon_wide_dxy(xx_rp) + ggtitle(paste0(set_name, ": ", length(unique(c(xx_gn$genome_id1, xx_gn$genome_id2))), " genomes, ", nrow(xx_gn), " pairs"))
+    # ggsave(paste0(folder_data, "genomics_analysis/dxy/", set_name,"-02-replicon_dxy.png"), p, width = 10, height = 3)
 }
 
 dxy_wrapper("elev_med")

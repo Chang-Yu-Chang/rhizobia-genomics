@@ -181,24 +181,3 @@ plot_fst_wrapper <- function (set_name) {
 }
 plot_fst_wrapper("elev_med")
 plot_fst_wrapper("urbn_mel")
-
-#
-# gene_fst_long %>%
-#     filter(replicon_type != "pAcce") %>%
-#     mutate(loc_start = loc_start / 10^6) %>%
-#     group_by(replicon_type, Fst) %>%
-#     arrange(desc(value)) %>%
-#     slice_max(value, prop = .01) %>%
-#     filter(Fst %in% "Gprime_st") %>%
-#     view
-# #filter(!str_detect(gene, "group"))
-#
-
-
-# gene_fst_long %>%
-#     group_by(replicon_type, Fst) %>%
-#     arrange(desc(value)) %>%
-#     slice_max(value, prop = .01) %>%
-#     filter(replicon_type == "pSymA") %>%
-#     view
-

@@ -9,7 +9,7 @@ source(here::here("metadata.R"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 # ANI
-dist_ani <- read_delim(paste0(folder_data, "genomics/ani/ani_genomes.txt"), delim = "\t", col_names = F)
+dist_ani <- read_delim(paste0(folder_data, "genomics/distances/ani/ani_genomes.txt"), delim = "\t", col_names = F)
 colnames(dist_ani) <- c("genome_id1", "genome_id2", "d_ani", "frag1", "frag2")
 
 dist_ani <- dist_ani %>%
@@ -22,8 +22,8 @@ dist_ani <- dist_ani %>%
     select(genome_id1, genome_id2, d_ani)
 
 # k-mers
-dist_kmer <- read_delim(paste0(folder_data, "genomics/kmer/kmer.txt"))
-list_sigs <- read_delim(paste0(folder_data, "genomics/kmer/list_sigs.txt"), delim = "\t", col_names = F)
+dist_kmer <- read_delim(paste0(folder_data, "genomics/distances/kmer/kmer.txt"))
+list_sigs <- read_delim(paste0(folder_data, "genomics/distances/kmer/list_sigs.txt"), delim = "\t", col_names = F)
 
 dist_kmer <- dist_kmer %>%
     mutate(genome_id1 = colnames(.)) %>%
@@ -40,4 +40,4 @@ distl <- dist_ani %>%
 
 # Save the files
 nrow(distl) # 38^2 = 1444
-write_csv(distl, paste0(folder_data, "genomics_analysis/ani_kmers/distl.csv"))
+write_csv(distl, paste0(folder_data, "genomics_analysis/distances/distl.csv"))

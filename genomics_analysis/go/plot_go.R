@@ -49,10 +49,15 @@ plot_goenrich <- function (goenrich) {
     return(p)
 }
 
-#set_name = "elev_med"
+set_name = "elev_med"
+ee <- read_goenrich(set_name)
+p <- plot_goenrich(ee$goenrich_bygene)
+ggsave(paste0(folder_data, "genomics_analysis/go/", set_name,"-01-go_bygene.png"), p, width = 15, height = 8)
+p <- plot_goenrich(ee$goenrich_bysnp)
+ggsave(paste0(folder_data, "genomics_analysis/go/", set_name,"-02-go_bysno.png"), p, width = 15, height = 8)
+
 set_name = "urbn_mel"
 ee <- read_goenrich(set_name)
-
 p <- plot_goenrich(ee$goenrich_bygene)
 ggsave(paste0(folder_data, "genomics_analysis/go/", set_name,"-01-go_bygene.png"), p, width = 15, height = 8)
 p <- plot_goenrich(ee$goenrich_bysnp)

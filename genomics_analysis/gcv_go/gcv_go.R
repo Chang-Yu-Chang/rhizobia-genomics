@@ -122,4 +122,3 @@ total_wrapper <- function (set_name) {
 
 total_wrapper("elev_med")
 total_wrapper("urbn_mel")
-

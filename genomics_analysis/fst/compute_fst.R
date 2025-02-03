@@ -5,10 +5,9 @@ library(janitor)
 library(ape) # for reading multiple fasta
 library(poppr) # for reading snps into a genind object
 library(mmod) # for computing Fst estimates: Nei's Gst, Hendrick's Gst, and Jost' D
-#library(hierfstat) # for computing Fst
 source(here::here("metadata.R"))
 
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 
 read_aln <- function (aln_file) {
     paste0(aln_file) %>%

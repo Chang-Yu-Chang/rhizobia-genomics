@@ -112,58 +112,13 @@ plot_replicon_gcv_dxy <- function (dists) {
         #ggtitle(paste(n_accessory, " accessory genes", ", r² =", round(r_squared, 3), ast))
 }
 
-#set_name = "elev_med"
-#set_name = "urbn_mel"
-tt <- read_gpas(set_name)
-dd <- read_gcv_dxys(set_name)
-dists <- join_gcv_dists(dd)
-#do_mantel(dists, gcv_dxy_scaled)
+plot_gcv_dxy_wrapper <- function (set_name) {
+    tt <- read_gpas(set_name)
+    dd <- read_gcv_dxys(set_name)
+    dists <- join_gcv_dists(dd)
+    p <- plot_replicon_gcv_dxy(dists)
+    ggsave(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name,"-01-replicon_gcv_dxy.png"), p, width = 10, height = 3)
 
-p <- plot_replicon_gcv_dxy(dists)
-ggsave(paste0(folder_data, "genomics_analysis/gcv_dxy/", set_name,"-01-replicon_gcv_dxy.png"), p, width = 10, height = 3)
-
-
-# dists %>%
-#     pivot_longer(cols = starts_with("gcv_dxy_"), names_prefix = "gcv_dxy_", names_to = "replicon_type", values_to = "gcv_dxy") %>%
-#     clean_pop_names() %>%
-#     left_join(n_accessory_rep) %>%
-#     mutate(dxy_scaled = dxy/n) %>%
-#     #select(replicon_type, genome_id1, genome_id2, dist_geo_km, dxy_scaled) %>%
-#     ggplot() +
-#     geom_smooth(aes(x = dist_geo_km, y = dxy_scaled), method = "lm", se = F, color = "black") +
-#     geom_point(aes(x = dist_geo_km, y = dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
-#     scale_color_manual(values = pops_colors) +
-#     facet_grid(~replicon_type) +
-#     coord_cartesian(clip = "off") +
-#     theme_classic() +
-#     theme(
-#         panel.border = element_rect(color = "black", fill = NA),
-#         strip.background = element_blank()
-#     ) +
-#     guides() +
-#     labs(x = "Geographic distance (km)", y = "GCV Dxy")
-#
-#
-#
-#
-# xx <- dists %>%
-#     pivot_longer(cols = starts_with("dxy_"), names_prefix = "dxy_", names_to = "replicon_type", values_to = "dxy") %>%
-#     left_join(n_accessory_rep) %>%
-#     mutate(dxy_scaled = dxy/n) %>%
-#     select(replicon_type, genome_id1, genome_id2, dist_geo_km, dxy_scaled) %>%
-#     nest(data = -replicon_type) %>%
-#     #unnest(data) %>% view
-#     mutate(
-#         mod = map(data, do_mantel)
-#     )
-# xx$mod[[2]]
-#
-#
-#
-#
-# # n_accessory <- tt$gpa$gene[apply(tt$gpa[,-1], 1, sum) != ncol(tt$gpa)-1] %>% length # number of accessory genes
-# # n_accessory_rep <- tt$gpacl %>%
-# #     select(replicon_type, gene) %>%
-# #     distinct(replicon_type, gene) %>%
-# #     group_by(replicon_type) %>%
-# #     count()
+}
+plot_gcv_dxy_wrapper("elev_med")
+plot_gcv_dxy_wrapper("urbn_mel")

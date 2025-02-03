@@ -1,0 +1,52 @@
+﻿exp_id,site,population,gradient,on list,freezer,sent to sanger,sanger_id,sanger results,send to wgs,genome_name,genome_id,wgs result,exp_sativa,exp_lup,growth_curve
+H1M1R1,H1,high elevation,elevation,1,1,1,1,rhizobium,1,Chang_Q5C_1,g1,,,,
+H2M3R1,H2,high elevation,elevation,1,1,1,9,ensifer,1,Chang_Q5C_2,g2,ensifer sp,1,1,1
+H2M3R2,H2,high elevation,elevation,1,1,1,10,ensifer,1,Chang_Q5C_3,g3,ensifer sp,,,1
+H3M1R1,H3,high elevation,elevation,1,1,1,12,ensifer,1,Chang_Q5C_4,g4,medicae,1,1,1
+H3M3R2,H3,high elevation,elevation,1,1,1,15,ensifer,1,Chang_Q5C_5,g5,medicae,1,,1
+H3M4R1,H3,high elevation,elevation,1,1,1,17,ensifer,1,Chang_Q5C_6,g6,medicae,1,,1
+H3M4R2,H3,high elevation,elevation,1,1,1,18,rhizobium,1,Chang_Q5C_7,g7,,,,
+H4M5R1,H4,high elevation,elevation,1,1,1,23,ensifer,1,Chang_Q5C_8,g8,medicae,,1,1
+L1M2R2,L1,low elevation,elevation,1,1,1,29,ensifer,1,Chang_Q5C_9,g9,medicae,1,,1
+L2M2R1,L2,low elevation,elevation,1,1,1,37,ensifer,1,Chang_Q5C_10,g10,meliloti,,1,1
+L2M4R1,L2,low elevation,elevation,1,1,1,40,ensifer,1,Chang_Q5C_11,g11,medicae,1,,1
+L3M4R1,L3,low elevation,elevation,1,1,1,48,rhizobium,1,Chang_Q5C_12,g12,,,,
+L3M5R1,L3,low elevation,elevation,1,1,1,51,ensifer,1,Chang_Q5C_13,g13,medicae,1,1,1
+L3M6R2,L3,low elevation,elevation,1,1,1,54,rhizobium,,Chang_Q5C_14,g14,,,,
+L4M2R2,L4,low elevation,elevation,1,1,1,57,ensifer,1,Chang_Q5C_15,g15,ensifer sp,,1,1
+L4M3R3,L4,low elevation,elevation,1,1,1,58,ensifer,1,Chang_Q5C_16,g16,medicae,1,,1
+L4M4R1,L4,low elevation,elevation,1,1,1,59,ensifer,1,Chang_Q5C_17,g17,medicae,,,1
+L4M4R3,L4,low elevation,elevation,1,1,1,60,rhizobium,1,Chang_Q5C_18,g18,,,,
+L4M7R1,L4,low elevation,elevation,1,1,1,65,ensifer,1,Chang_Q5C_19,g19,medicae,,,1
+L3M1R1,L3,low elevation,elevation,1,1,1,44,ensifer,1,Chang_W8S_1,g20,meliloti,,,1
+src-1,src,suburban,urbanization,1,,1,68,NA,,,g44,meliloti,1,,
+src-2,src,suburban,urbanization,1,1,1,69,ensifer,1,Chang_W8S_2,g21,meliloti,,1,1
+src-2a,src,suburban,urbanization,,1,,,,,,,,,,
+src-2b,src,suburban,urbanization,,1,,,,,,g39,,,,
+src-3,src,suburban,urbanization,1,1,1,70,NA,,,,,,,
+fp1-2,fp,suburban,urbanization,1,1,1,71,ensifer,1,Chang_W8S_3,g22,meliloti,1,1,1
+fp1-3,fp,suburban,urbanization,1,1,1,72,ensifer,1,Chang_W8S_4,g23,meliloti,,,1
+fp2-2,fp,suburban,urbanization,1,1,1,73,ensifer,1,Chang_W8S_5,g24,meliloti,,,1
+crp1-2,crp,suburban,urbanization,1,1,1,74,NA,1,Chang_W8S_6,g25,meliloti,1,1,1
+crp1-3,crp,suburban,urbanization,1,1,1,75,ensifer,1,Chang_W8S_7,g26,meliloti,,,1
+crp2-2,crp,suburban,urbanization,1,1,1,76,ensifer,1,Chang_W8S_8,g27,meliloti,,,1
+gp1-1,gp,suburban,urbanization,1,1,1,77,ensifer,1,Chang_W8S_9,g40,meliloti,,1,1
+gp1-2,gp,suburban,urbanization,1,1,1,78,ensifer,1,Chang_W8S_10,g29,medicae,1,,1
+gp1-3,gp,suburban,urbanization,1,1,1,79,ensifer,1,Chang_W8S_11,g30,medicae,,,1
+bg-1,bg,urban,urbanization,1,,1,80,pseudomonas,,,g45,meliloti,1,,
+bg-2,bg,urban,urbanization,1,,1,81,ensifer,1,Chang_W8S_12,g31,meliloti,,1,1
+bg-2a,bg,urban,urbanization,,1,,,,,,g41,,,,
+bg-2b,bg,urban,urbanization,,1,,,,,,,,,,
+bg-3,bg,urban,urbanization,1,1,1,82,ensifer,1,Chang_W8S_13,g32,meliloti,,,1
+pms-1,pms,urban,urbanization,1,1,1,83,NA,1,Chang_W8S_14,g33,meliloti,1,,1
+pms-2,pms,urban,urbanization,1,1,1,84,ensifer,1,Chang_W8S_15,g34,meliloti,,1,1
+pms-3,pms,urban,urbanization,1,1,1,85,ensifer,1,Chang_W8S_16,g35,meliloti,,,1
+ppf-1,ppf,urban,urbanization,1,1,1,86,ensifer,1,Chang_W8S_17,g36,meliloti,1,,1
+ppf-2,ppf,urban,urbanization,1,1,1,87,NA,,,g42,,,1,
+ppf-3,ppf,urban,urbanization,1,1,1,88,pseudomonas,,,,,,,
+40th-1,40th,urban,urbanization,1,1,1,89,ensifer,1,Chang_W8S_18,g37,meliloti,1,,1
+40th-2,40th,urban,urbanization,1,1,1,90,ensifer,,,g43,,,1,
+40th-2a,40th,urban,urbanization,,,,,,,,,,,,
+40th-2b,40th,urban,urbanization,,,,,,,,,,,,
+40th-3,40th,urban,urbanization,1,1,1,91,NA,,,,,,,
+50,50,50,50,44,44,44,44,44,36,37,37,32,16,14,32

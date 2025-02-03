@@ -34,7 +34,7 @@ read_gos_generic <- function (set_name) {
     generic <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_generic")) %>% clean_names()
     return(generic)
 }
-make_gene2go <- function (tts, go_ids) {
+make_gene2go <- function (tt, tts, go_ids) {
     tt$gpa %>%
         # Clean up gene names
         mutate(gene = str_split(gene, "~~~")) %>%
@@ -79,7 +79,7 @@ make_ginterest <- function (top_genes) {
         dplyr::select(gene, tops) %>%
         deframe()
 }
-go_wrapper <- function (set_name, ginterest, oo, suffix = "") {
+go_wrapper <- function (set_name, gene2go, ginterest, oo, suffix = "") {
     #' A wrapper function for go enrichment analysis
     list_godata <- list()
     list_fisher <- list()
@@ -102,6 +102,7 @@ go_wrapper <- function (set_name, ginterest, oo, suffix = "") {
     write_csv(goenrich, paste0(folder_data, "genomics_analysis/go/", set_name, "/goenrich", suffix,".csv"))
 }
 total_wrapper <- function (set_name) {
+    #set_name <- "urbn_mel"
     tt <- read_gpas(set_name)
     ff <- read_fsts(set_name)
     gg <- read_gos(set_name)
@@ -117,7 +118,7 @@ total_wrapper <- function (set_name) {
     round(nrow(go_ids)/nrow(gg$list_unique_genes), 3) # % of genes that have GO ids
 
     # Mapping object (a R list) required for topGO. It the gene universe
-    gene2go <- make_gene2go(gg$list_unique_genes, go_ids)
+    gene2go <- make_gene2go(tt, gg$list_unique_genes, go_ids)
     length(gene2go) # number of clusters that have GO terms in the universe
 
     # Genes with top 5% Fst
@@ -137,77 +138,9 @@ total_wrapper <- function (set_name) {
     table(ginterest_bysnp)
 
     oo <- c("BP", "CC", "MF")
-    go_wrapper(set_name, ginterest_bygene, oo, suffix = "_bygene")
-    go_wrapper(set_name, ginterest_bysnp, oo, suffix = "_bysnp")
+    go_wrapper(set_name, gene2go, ginterest_bygene, oo, suffix = "_bygene")
+    go_wrapper(set_name, gene2go, ginterest_bysnp, oo, suffix = "_bysnp")
 }
 
 total_wrapper("elev_med")
 total_wrapper("urbn_mel")
-
-
-
-if (F) {
-    make_top_genes_bygene_byreplicon <- function (ff, tt, pp = 0.95) {
-        #' pp = 0.95 means selecting the top 5%
-        # Use the first genome
-        gene_replicon <- filter(tt$gpacl, genome_id == tt$gpacl$genome_id[1]) %>%
-            filter(!str_detect(gene, "group")) %>%
-            dplyr::select(gene, replicon_type) %>%
-            replace_na(list(replicon_type = "others"))
-
-        top_genes <- ff$per_gene_fst %>%
-            left_join(ff$gene_lengths) %>%
-            # Remove unannotated genes
-            filter(!str_detect(gene, "group")) %>%
-            # Compute by replicon
-            left_join(gene_replicon) %>%
-            filter(!is.na(replicon_type), replicon_type != "others") %>%
-            group_by(replicon_type) %>%
-            arrange(replicon_type, desc(Gprime_st)) %>%
-            # Choose the top 5% genes
-            mutate(tops = ifelse(Gprime_st > quantile(Gprime_st, pp), 1, 0)) %>%
-            # Clean up gene names
-            mutate(gene = str_split(gene, "~~~")) %>%
-            unnest(gene)
-
-        return(top_genes)
-        # check
-        # top_genes %>%
-        #     group_by(replicon_type, tops) %>%
-        #     count()
-    }
-    make_top_genes_bygene_bysnp <- function (ff, tt, pp = 0.95) {
-        #' pp = 0.95 means selecting the top 5%
-        # Use the first genome
-        gene_replicon <- filter(tt$gpacl, genome_id == tt$gpacl$genome_id[1]) %>%
-            filter(!str_detect(gene, "group")) %>%
-            dplyr::select(gene, replicon_type) %>%
-            replace_na(list(replicon_type = "others"))
-
-
-        ff$per_locus_fst %>%
-            left_join(ff$gene_lengths) %>%
-            # Remove unannotated genes
-            filter(!str_detect(gene, "group")) %>%
-            # Compute by replicon
-            left_join(gene_replicon) %>%
-            filter(!is.na(replicon_type), replicon_type != "others") %>%
-            #group_by(replicon_type) %>%
-            arrange(replicon_type, desc(Gprime_st)) %>%
-            # Choose the top 5% genes
-            mutate(tops = ifelse(Gprime_st > quantile(Gprime_st, pp), 1, 0)) %>%
-            # Clean up gene names
-            mutate(gene = str_split(gene, "~~~")) %>%
-            unnest(gene) %>%
-            arrange(replicon_type, desc(tops), gene) %>%
-            distinct(gene, tops, .keep_all = T)
-
-
-        return(top_genes)
-        # check
-        top_genes %>%
-            group_by(replicon_type, tops) %>%
-            count()
-    }
-
-}
