@@ -83,6 +83,23 @@ This data repository consist of xxxx data files, yyy code scripts, and this READ
 
 The shell scripts were executed on a 2021 iMac with Apple M1 chip 16GB memory and macOS version 14.7. 
 
+## Reproducing figures and tables
+
+With the data attached in this repository, all the figures and tables in both main text and supplements can be reproduced using the R scrips. 
+
+The folder `plotting_scripts/` includes Rscripts each generates a figure or table in the manuscript. Some figures use a pre-made cartoon (e.g., Figs 1, 2, 6, and S5), which is stored in `plots/cartoons/` as png/pdf format.
+
+To run all Rscripts, execute the following shell script
+
+```
+for file in plotting_scripts/*.R; do
+    Rscript -e "renv::activate('.'); source('$file')"
+done
+```
+
+## Reproducing anaylsis from raw data
+
+Because of the storage limit on github, the 
 The scripts included in this repository can reproduce the figures from raw reads, trait data, and map data.
 
 ```
@@ -176,28 +193,4 @@ source('phylogenomics_analysis/replicon_trees/count_snps.R');
 Rscript -e "renv::activate('.'); 
 source('phylogenomics_analysis/tree_distance/rf_tree.R');
 "
-```
-
-
-
-
-## Visualization
-
-The folder `plotting_scripts/` includes Rscripts each generates a figure or table in the manuscript.
-To run all Rscripts, execute the following shell script
-
-```
-for file in plotting_scripts/*.R; do
-    Rscript -e "renv::activate('.'); source('$file')"
-done
-```
-
-Some figures use a pre-made cartoon (e.g., Figs 1, 2, 6, and S5), which is stored in `plots/cartoons/` as png/pdf format.
-
-
-```
-for file in plotting_scripts/*.R; do
-    echo $file
-done
-Rscript -e "renv::activate('.'); source('plotting_scripts/FigS4.R')"
 ```
