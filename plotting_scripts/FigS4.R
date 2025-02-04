@@ -41,11 +41,12 @@ p_gfs2 <- plot_gfs("urbn_mel") + ggtitle("Urbanization")
 count_genes <- function (set_name) {
     tt <- read_gpas(set_name)
     gg <- table(apply(tt$gpa[,-1], 1, sum))
-    return(list(singleton = gg[1], core = last(gg), total = sum(gg)))
+    return(c(singleton = gg[[1]], core = last(gg), single_core = nrow(tt$list_sccg), total = sum(gg)))
 }
 
-count_genes("elev_med")
-count_genes("urbn_mel")
+count_genes("elev_med") # 1521       5520        4702       10419
+count_genes("urbn_mel") # 788        5188        4471       10224
+
 
 # Plot core vs accessory sampling
 compute_pan <- function (mi) {

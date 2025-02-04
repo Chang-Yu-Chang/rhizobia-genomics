@@ -15,7 +15,7 @@ n_accessory <- read_csv(paste0(folder_data, "phylogenomics_analysis/replicon_tre
 
 n_sccg <- n_sccg %>% mutate(tr_type = "core") %>% rename(n_gene = n_sccg)
 n_accessory <- n_accessory %>% mutate(tr_type = "gpa") %>% rename(n_gene = n_accessory) %>% select(-n_core)
-n_genes = bind_rows(n_sccg, n_accessory)
+n_genes <- bind_rows(n_sccg, n_accessory)
 
 plot_tree <- function (tr, n_gene) {
     tr %>%

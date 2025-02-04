@@ -375,7 +375,7 @@ dat <- tb$xx_gn[[1]] %>%
 t.test(
     dat$dxy_scaled[dat$pops == "low elevation-low elevation"],
     dat$dxy_scaled[dat$pops == "high elevation-high elevation"]
-)
+) # t = 0.49117, df = 6.7978, p-value = 0.6388
 
 ## GCV
 dat <- tbg$xx_gn[[1]] %>%
@@ -384,7 +384,7 @@ dat <- tbg$xx_gn[[1]] %>%
 t.test(
     dat$gcv_dxy_scaled[dat$pops == "low-low"],
     dat$gcv_dxy_scaled[dat$pops == "high-high"]
-)
+) # t = 0.81807, df = 7.1628, p-value = 0.4397
 
 # Are urban strains more distant to other than between suburban strains? ----
 ## SNPs
@@ -394,7 +394,7 @@ dat <- tb$xx_gn[[2]] %>%
 t.test(
     dat$dxy_scaled[dat$pops == "suburban-suburban"],
     dat$dxy_scaled[dat$pops == "urban-urban"]
-)
+) # t = 4.4003, df = 57.459, p-value = 4.749e-05
 
 ## GCV
 dat <- tbg$xx_gn[[2]] %>%
@@ -403,9 +403,7 @@ dat <- tbg$xx_gn[[2]] %>%
 t.test(
     dat$gcv_dxy_scaled[dat$pops == "suburban-suburban"],
     dat$gcv_dxy_scaled[dat$pops == "urban-urban"]
-)
-
-
+) # t = 4.513, df = 66.497, p-value = 2.673e-05
 
 
 # Compare the slope between gradients ----
@@ -419,7 +417,9 @@ dat <- bind_rows(
 
 dat %>%
     unnest(mod) %>%
-    filter(str_detect(term, ":"))
+    filter(str_detect(term, ":")) %>%
+    arrange(replicon_type) %>%
+    select(replicon_type, term, statistic, df, p.value)
 
 ## GCV
 dat <- bind_rows(
@@ -430,5 +430,7 @@ dat <- bind_rows(
     mutate(mod = map(data, ~lmer(gcv_dxy_scaled ~ dist_geo_km*gradient + (1|pops), data = .x) %>% Anova(type = 3) %>% tidy))
 dat %>%
     unnest(mod) %>%
-    filter(str_detect(term, ":"))
+    filter(str_detect(term, ":")) %>%
+    arrange(replicon_type) %>%
+    select(replicon_type, term, statistic, df, p.value)
 

@@ -147,7 +147,7 @@ source('genomics_analysis/gcv_fst/compute_gcv_fst.R'); # Compute Fst for accesso
 source('genomics_analysis/dxy/compute_dxy.R'); 
 source('genomics_analysis/gcv_dxy/compute_gcv_dxy.R');
 source('genomics_analysis/go/go.R');
-source('genomics_analysis/gcv_go/gcv_go.R);
+source('genomics_analysis/gcv_go/gcv_go.R');
 "
 
 # Trees
@@ -169,6 +169,7 @@ cd ../../
 Rscript -e "renv::activate('.'); 
 source('phylogenomics_analysis/replicon_trees/compute_trees2.R'); 
 source('phylogenomics_analysis/replicon_trees/curate_trees.R');
+source('phylogenomics_analysis/replicon_trees/count_snps.R');
 "
 
 ## Tree distance
@@ -176,6 +177,7 @@ Rscript -e "renv::activate('.');
 source('phylogenomics_analysis/tree_distance/rf_tree.R');
 "
 ```
+
 
 
 
@@ -193,3 +195,9 @@ done
 Some figures use a pre-made cartoon (e.g., Figs 1, 2, 6, and S5), which is stored in `plots/cartoons/` as png/pdf format.
 
 
+```
+for file in plotting_scripts/*.R; do
+    echo $file
+done
+Rscript -e "renv::activate('.'); source('plotting_scripts/FigS4.R')"
+```

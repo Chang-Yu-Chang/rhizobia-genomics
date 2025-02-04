@@ -37,11 +37,8 @@ plot_go_p <- function (goenrich) {
         geom_hline(yintercept = -log(0.05, 10)) +
         coord_flip() +
         scale_x_discrete(position = "top") +
-        #scale_y_continuous(limits = c(0, 3)) +
-        #scale_fill_aaas() +
         theme_bw() +
         theme(
-            #axis.text.y = element_blank(),
             axis.text.y = element_text(hjust = 0),
             legend.position = "top"
         ) +
@@ -68,8 +65,10 @@ p <- plot_grid(
 ggsave(here::here("plots/FigS9.png"), p, width = 8, height = 10)
 
 # Top genes
-ee1$top_genes_bygene %>%
-    arrange(desc(Gprime_st))
+ee1$top_genes_bygene %>% arrange(desc(Gprime_st)) # yhdY
+nrow(ee1$top_genes_bygene) # 1872 core genes with GO terms
+sum(ee1$top_genes_bygene$tops) # 103 top genes
 
-ee2$top_genes_bygene %>%
-    arrange(desc(Gprime_st))
+ee2$top_genes_bygene %>% arrange(desc(Gprime_st)) # paoC and nanR
+nrow(ee2$top_genes_bygene) # 2200 core genes with GO terms
+sum(ee2$top_genes_bygene$tops) # 117 top genes

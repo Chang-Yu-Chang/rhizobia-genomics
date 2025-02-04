@@ -31,6 +31,7 @@ read_gos <- function (set_name) {
     return(list(list_unique_genes = list_unique_genes, to_med = to_med, to_mel = to_mel, to_fre = to_fre, to_eco = to_eco, to_par = to_par, gg_all = gg_all))
 }
 read_gos_generic <- function (set_name) {
+    # The GO term generic file
     generic <- read_tsv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/", set_name, "_generic")) %>% clean_names()
     return(generic)
 }

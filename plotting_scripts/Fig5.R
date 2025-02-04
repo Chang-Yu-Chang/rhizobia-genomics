@@ -144,7 +144,7 @@ p <- plot_grid(
     leg2, NULL, p_ngen2,
     ncol = 3,  align = "hv", axis = "blr", scale = .95,
     labels = c("A", "C", "E", rep("", 6), "B", "D", "F", rep("", 3)),
-    rel_widths = c(1, 1, 2), rel_heights = c(10, 2, .5, 17, 2)
+    rel_widths = c(1, 1, 2), rel_heights = c(10, 2, .5, 19, 2)
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig5.png"), p, width = 10, height = 6)

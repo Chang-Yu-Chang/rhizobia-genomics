@@ -77,5 +77,4 @@ p <- plot_grid(
 ggsave(here::here("plots/FigS10.png"), p, width = 8, height = 6)
 
 # T test
-t.test(ff1$per_acce_fst$Gprime_st, ff2$per_acce_fst$Gprime_st)
-
+t.test(ff1$per_acce_fst$Gprime_st, ff2$per_acce_fst$Gprime_st) # t = 11.14, df = 8317.5, p-value < 2.2e-16

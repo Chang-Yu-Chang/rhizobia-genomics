@@ -125,7 +125,7 @@ get_snp_get <- function (set_name) {
 snp_fst1 <- get_snp_get("elev_med")
 snp_fst2 <- get_snp_get("urbn_mel")
 
-t.test(snp_fst1$Gprime_st, snp_fst2$Gprime_st)
+t.test(snp_fst1$Gprime_st, snp_fst2$Gprime_st) # t = 4.3064, df = 45079, p-value = 1.663e-05
 
 # Numbers
 nrow(snp_fst1) # 26042 snps
@@ -133,8 +133,8 @@ length(unique(snp_fst1$gene)) # 3169 single-copy core genes with snps
 tt <- read_gpas("elev_med")
 nrow(tt$list_sccg) # 4702
 
-nrow(snp_fst2) # 41060 snps
-length(unique(snp_fst2$gene)) # 3609 single-copy core genes with snps
+nrow(snp_fst2) # 41668 snps
+length(unique(snp_fst2$gene)) # 3659 single-copy core genes with snps
 tt <- read_gpas("urbn_mel")
-nrow(tt$list_sccg) # 4417
+nrow(tt$list_sccg) # 4471
 
