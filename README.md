@@ -70,22 +70,49 @@ For first time `renv` user, install renv and restore the packages recorded in `r
 
 # Data files and variables
 
-[describe each column (variable) in each of your data files]
+There are 6 data folders. The data included in this repository should allow a user to reproduce all the figures and tables in both main text and supplements.
 
-1. [data file name]
-[list of variable anmes and descriptions]
-2. [data file name]
-[list of variable anmes and descriptions]
-This data repository consist of xxxx data files, yyy code scripts, and this README document, with the following data and code filenames and variables
+Some folders are labeled with (NOT IN THIS REPO) because it exceeds the github repo file limit. These files will be available in the final version.
 
+1. `raw/` 
+    - `growth_curves/`: the raw growth assay data
+    - `plants/`: sampling site coordinate and plant experiment data
+    - `ensifer_ncbi.csv`: the list of Sinorhizobium/Ensifer reference genomes
+    - (NOT IN THIS REPO) `plasmidsaurus/`: contains the raw ON long-read sequences from Plasmidsaurus
+2. `mapping/` has two mapping files used by all files
+    - `genomes.csv` is the mapping between sequencing batches and strain id
+    - `isolates.csv` is the list of isolates/strains and their ids
+3. (NOT IN THIS REPO) `genomics/` contains the intermediate files of genome assembly, annotation, and pangenomes
+4. `genomics_analysis`
+    - `contigs/contigs.csv`: contig data
+    - `genomes/`
+        - `genomes.csv`: genome size
+        - `qcs.csv`: quality control metrics from quast and busco
+    - `distances/distl.csv`: long-form ANI and kmer data
+    - `taxonomy/`: intermediate files for taxonomic identification using blast
+        - `isolates_tax.csv`: contig level and rRNA level blast result for strains
+    - The folders below are dependent on panaroo pangenomic output, so each folder consists of two subforders
+        - `elev_med/`: S medicae strains in the elevation gradient
+        - `urbn_mel/`: S meliloti strains in the urbanization gradient
+    - `gene_content/`: gene presence and absence. Basically cleaned panaroo tables
+    - `fst/` and `gcv_fst/`: fst for SNPs and GCV (gene content variation)
+    - `dxy/` and `gcv_dxy/`: dxy for SNPs and GCV
+    - `go/` and `gcv_go`: GO enrichment analysis for SNPs and GCV
+5. `phylogenomics_analysis/`
+    - `trees/trees.rdata`: R phylo objects of whole-genome tree
+    - `replicon_trees/`: R phylo objects of replicon-level tree
+6. `phenotypes/` 
+    - `sites/`: field sampling sites
+    - `growth/`: growth traits
+    - `plants/`: symbiosis traits
+    - `tradeoff/`: trade-off between growth and symbiosis
+    
 
 # Workflow
 
 The shell scripts were executed on a 2021 iMac with Apple M1 chip 16GB memory and macOS version 14.7. 
 
 ## Reproducing figures and tables
-
-With the data attached in this repository, all the figures and tables in both main text and supplements can be reproduced using the R scrips. 
 
 The folder `plotting_scripts/` includes Rscripts each generates a figure or table in the manuscript. Some figures use a pre-made cartoon (e.g., Figs 1, 2, 6, and S5), which is stored in `plots/cartoons/` as png/pdf format.
 
@@ -99,8 +126,7 @@ done
 
 ## Reproducing anaylsis from raw data
 
-Because of the storage limit on github, the 
-The scripts included in this repository can reproduce the figures from raw reads, trait data, and map data.
+To reproduce analysis from raw data (raw reads and trait data), analysis, to the final figures and tables, execute the following shell script
 
 ```
 # Assembly
@@ -110,13 +136,6 @@ zsh denovo_assembly.sh # Assembly
 zsh assess_assemblies.sh # Quality control (quast and busco); the busco mamba env binary needs to be specified in zshrc
 zsh consolidate_genomes.sh # Move genome fasta to one folder
 zsh manual_concat.sh # Manually concatenate the two genomes g20 and g24
-
-## OPTIONAL
-cd ../../
-Rscript -e "renv::activate('.'); 
-source('genomics_analysis/raw_reads/aggregate_reads.R'); # Aggregate the raw read data for plotting and 
-source('genomics_analysis/raw_reads/plot_reads.R'); # Plot the raw read data
-"
 
 # Annotation
 cd genomics/annotation/
@@ -192,5 +211,32 @@ source('phylogenomics_analysis/replicon_trees/count_snps.R');
 ## Tree distance
 Rscript -e "renv::activate('.'); 
 source('phylogenomics_analysis/tree_distance/rf_tree.R');
+"
+
+# Growth assay
+Rscript -e "renv::activate('.'); 
+source('phenotypes/growth/fit_gc.R'); # Smooth the raw growth curve and computes the growth traits 
+source('phenotypes/growth/stat_growth.R'); # Compare between populations for each temperature for each trait
+source('phenotypes/growth/stat_growth_rn.R')  # Compares between populations for each trait
+"
+
+# Map and climate
+Rscript -e "renv::activate('.'); 
+source('phenotypes/sites/extract_climate.R'); # Use DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
+"
+
+# Plant/symbiosis experiment
+Rscript -e "renv::activate('.'); 
+source('phenotypes/plants/clean_plants.R'); # Clean the variable names and binds the lupulina/sativa data tables into one `plants.csv`
+source('phenotypes/plants/stat_trait_comparison.R'); # Stats for pairwise population comparison
+source('phenotypes/plants/stat_trait_all.R'); # Stats for pairwise population comparison, using all sativa traits, including continuous and catagorical data
+source('phenotypes/plants/clean_plants.R'); # Clean the variable names and binds the lupulina/sativa data tables into one `plants.csv`
+source('phenotypes/plants/compute_effectsize.R'); # Compute effect size for each trait. There are three metrics: Cohen's d. Hedge's g, and partial eta squared
+source('phenotypes/plants/stat_nitrogen_rn.R'); # Perform permutation for reaction norm of nitrogen X population
+"
+
+# Tradeoff
+Rscript -e "renv::activate('.'); 
+source('phenotypes/tradeoff/compute_tradeoff.R'); 
 "
 ```
