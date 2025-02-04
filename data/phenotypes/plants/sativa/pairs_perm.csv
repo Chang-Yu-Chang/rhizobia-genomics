@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7cdb2f081a94397e832baeb0793b7d6a8d555e10bdfd2233bb05091e418ffdf3
-size 2511
+ii,gradient,trait_type,trait_pre,st,term,statistic,p_value,siglab
+1,elevation,shoot,shoot height (cm),"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",(Intercept),148.27,0,p<0.001***
+1,elevation,shoot,shoot height (cm),"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",population,32.51,0,p<0.001***
+2,elevation,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),18.99,0,p<0.001***
+2,elevation,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,0.52,0.832,p=0.832 n.s.
+3,elevation,leaf,leaf color,"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",(Intercept),4251,0,p<0.001***
+3,elevation,leaf,leaf color,"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",population,87.87,0,p<0.001***
+4,elevation,leaf,leaf number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),844.19,0,p<0.001***
+4,elevation,leaf,leaf number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,52.86,0,p<0.001***
+5,urbanization,shoot,shoot height (cm),"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",(Intercept),134.38,0.989,p=0.989 n.s.
+5,urbanization,shoot,shoot height (cm),"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",population,0.04,0.838,p=0.838 n.s.
+6,urbanization,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),285.98,0.369,p=0.369 n.s.
+6,urbanization,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,0.04,0.873,p=0.873 n.s.
+7,urbanization,leaf,leaf color,"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",(Intercept),2842.74,0.948,p=0.948 n.s.
+7,urbanization,leaf,leaf color,"mod <- lmer(value ~ population + (1|exp_id) + (1|exp_labgroup), data = d)",population,0.02,0.886,p=0.886 n.s.
+8,urbanization,leaf,leaf number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),1019.31,0.302,p=0.302 n.s.
+8,urbanization,leaf,leaf number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,0,1,p=1 n.s.

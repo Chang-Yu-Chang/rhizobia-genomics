@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:94f7b686fd141ffc093283fcfb020be1248874faa2d4436042f706ab526ca33b
-size 1855
+category,go_id,term,annotated,significant,expected,classic_fisher
+BP,GO:0046677,response to antibiotic,19,5,1.13,0.046
+BP,GO:0006549,isoleucine metabolic process,10,3,0.6,0.085
+BP,GO:0007059,chromosome segregation,10,3,0.6,0.085
+BP,GO:0009097,isoleucine biosynthetic process,10,3,0.6,0.085
+BP,GO:0009082,branched-chain amino acid biosynthetic p...,11,3,0.66,0.108
+BP,GO:1903509,liposaccharide metabolic process,21,4,1.25,0.186
+BP,GO:0000105,histidine biosynthetic process,14,3,0.84,0.188
+BP,GO:0009081,branched-chain amino acid metabolic proc...,14,3,0.84,0.188
+BP,GO:0006547,histidine metabolic process,16,3,0.95,0.248
+BP,GO:0009103,lipopolysaccharide biosynthetic process,16,3,0.95,0.248
+CC,GO:0005694,chromosome,11,3,0.55,0.08
+CC,GO:0030288,outer membrane-bounded periplasmic space,41,5,2.05,0.36
+CC,GO:0030313,cell envelope,49,5,2.46,0.51
+CC,GO:0031975,envelope,57,5,2.86,0.66
+CC,GO:1990234,transferase complex,11,1,0.55,0.67
+CC,GO:0043232,intracellular non-membrane-bounded organ...,36,3,1.8,0.69
+CC,GO:0043190,ATP-binding cassette (ABC) transporter c...,62,5,3.11,0.73
+CC,GO:0098533,ATPase dependent transmembrane transport...,62,5,3.11,0.73
+CC,GO:1902495,transmembrane transporter complex,63,5,3.16,0.74
+CC,GO:1990351,transporter complex,63,5,3.16,0.74
+MF,GO:0019842,vitamin binding,43,9,2.92,0.09
+MF,GO:0008237,metallopeptidase activity,16,4,1.09,0.14
+MF,GO:0030170,pyridoxal phosphate binding,28,6,1.9,0.14
+MF,GO:0070279,vitamin B6 binding,28,6,1.9,0.14
+MF,GO:0030246,carbohydrate binding,23,4,1.56,0.34
+MF,GO:0015145,monosaccharide transmembrane transporter...,10,2,0.68,0.38
+MF,GO:0015146,pentose transmembrane transporter activi...,10,2,0.68,0.38
+MF,GO:0015407,ABC-type monosaccharide transporter acti...,10,2,0.68,0.38
+MF,GO:0051119,sugar transmembrane transporter activity,10,2,0.68,0.38
+MF,GO:1901681,sulfur compound binding,17,3,1.15,0.38

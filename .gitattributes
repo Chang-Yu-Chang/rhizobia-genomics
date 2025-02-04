@@ -1,3 +1,4 @@
-*.csv filter=lfs diff=lfs merge=lfs -text
 data/genomics_analysis/gene_content/elev_med/elev_med_generic filter=lfs diff=lfs merge=lfs -text
 data/genomics_analysis/gene_content/urbn_mel/urbn_mel_generic filter=lfs diff=lfs merge=lfs -text
+data/genomics_analysis/gene_content/elev_med/gd.csv filter=lfs diff=lfs merge=lfs -text
+data/genomics_analysis/gene_content/urbn_mel/gd.csv filter=lfs diff=lfs merge=lfs -text

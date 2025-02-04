@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8f913151ab6958d2c1cfef8bcdcb8e61ac0c2ca8d47a6f27c4906dfb0643b2dc
-size 1857
+category,go_id,term,annotated,significant,expected,classic_fisher
+BP,GO:0015774,polysaccharide transport,13,3,0.65,0.024
+BP,GO:0033037,polysaccharide localization,13,3,0.65,0.024
+BP,GO:0008653,lipopolysaccharide metabolic process,15,3,0.75,0.035
+BP,GO:0009103,lipopolysaccharide biosynthetic process,15,3,0.75,0.035
+BP,GO:0009064,glutamine family amino acid metabolic pr...,51,6,2.55,0.038
+BP,GO:0051301,cell division,29,4,1.45,0.052
+BP,GO:0006810,transport,248,18,12.38,0.053
+BP,GO:0008643,carbohydrate transport,42,5,2.1,0.054
+BP,GO:0051179,localization,250,18,12.48,0.057
+BP,GO:0051234,establishment of localization,250,18,12.48,0.057
+CC,GO:0042597,periplasmic space,94,9,5.36,0.078
+CC,GO:0030288,outer membrane-bounded periplasmic space,44,5,2.51,0.099
+CC,GO:0030313,cell envelope,60,6,3.42,0.120
+CC,GO:1990204,oxidoreductase complex,13,2,0.74,0.167
+CC,GO:0031975,envelope,73,6,4.16,0.231
+CC,GO:0071944,cell periphery,447,28,25.47,0.291
+CC,GO:0016020,membrane,552,34,31.45,0.294
+CC,GO:0005886,plasma membrane,431,27,24.56,0.298
+CC,GO:0098796,membrane protein complex,87,6,4.96,0.375
+CC,GO:0110165,cellular anatomical entity,1041,60,59.32,0.493
+MF,GO:0016645,"oxidoreductase activity, acting on the C...",22,5,1.11,0.004
+MF,GO:0016647,"oxidoreductase activity, acting on the C...",14,3,0.71,0.030
+MF,GO:0030246,carbohydrate binding,25,4,1.26,0.034
+MF,GO:0003700,DNA-binding transcription factor activit...,149,12,7.54,0.068
+MF,GO:0140110,transcription regulator activity,150,12,7.59,0.071
+MF,GO:0016880,acid-ammonia (or amide) ligase activity,10,2,0.51,0.087
+MF,GO:0003746,translation elongation factor activity,11,2,0.56,0.104
+MF,GO:1901682,sulfur compound transmembrane transporte...,11,2,0.56,0.104
+MF,GO:0016879,"ligase activity, forming carbon-nitrogen...",36,4,1.82,0.105
+MF,GO:0004553,"hydrolase activity, hydrolyzing O-glycos...",13,2,0.66,0.138

@@ -1,3 +1,28 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:897db5f3a1e3dba6b10a80db114040798c768afa397c18cbc3833276a81eeefe
-size 2481
+gradient,exp_plant,exp_nitrogen,trait,trait_abbr,parameter,eta2_partial,ci,ci_low,ci_high
+elevation,lupulina,N-,nodule_number,NN  ,population,0.590013360334767,0.95,0,1
+elevation,lupulina,N-,shoot_biomass_mg,SB  ,population,0.0016574476506780597,0.95,0,1
+elevation,lupulina,N-,root_biomass_mg,RB  ,population,0.028096696120795395,0.95,0,1
+urbanization,lupulina,N-,nodule_number,NN  ,population,0.10264902456481298,0.95,0.010524227843270702,1
+urbanization,lupulina,N-,shoot_biomass_mg,SB  ,population,0.04393301342478453,0.95,0,1
+urbanization,lupulina,N-,root_biomass_mg,RB  ,population,0.5121997024409403,0.95,0,1
+elevation,sativa,N-,nodule_number,NN  ,population,0.6481579492595165,0.95,0.051476502610700914,1
+elevation,sativa,N-,primary_root_nodule_number,PRNN,population,0.0162240137296855,0.95,0,1
+elevation,sativa,N-,lateral_root_nodule_number,LRNN,population,0.7374560565870002,0.95,0.16380767301451524,1
+elevation,sativa,N-,shoot_height,SH  ,population,0.8512333720974483,0.95,0.5124412137882989,1
+elevation,sativa,N-,longest_petiole_length,LPL ,population,0.8095255086471465,0.95,0.36234170975081975,1
+elevation,sativa,N-,leaf_number,LN  ,population,0.885696888235792,0.95,0.5985439536034258,1
+elevation,sativa,N-,leaf_color,LC  ,population,0.9249882610698278,0.95,0.7434338659857084,1
+elevation,sativa,N+,nodule_number,NN  ,population,0.20667581794124806,0.95,0,1
+elevation,sativa,N+,primary_root_nodule_number,PRNN,population,0.010739080185356638,0.95,0,1
+elevation,sativa,N+,lateral_root_nodule_number,LRNN,population,0.16686822638051976,0.95,0,1
+elevation,sativa,N+,shoot_height,SH  ,population,0.09859213070458892,0.95,0,1
+elevation,sativa,N+,longest_petiole_length,LPL ,population,6.541195385025135e-4,0.95,0,1
+elevation,sativa,N+,leaf_number,LN  ,population,0.005765473014019839,0.95,0,1
+elevation,sativa,N+,leaf_color,LC  ,population,0.04853051990176786,0.95,0,1
+urbanization,sativa,N-,nodule_number,NN  ,population,0.024329592696047442,0.95,0,1
+urbanization,sativa,N-,shoot_height,SH  ,population,6.053958678224355e-4,0.95,0,1
+urbanization,sativa,N-,leaf_number,LN  ,population,0.0011407538875692362,0.95,0,1
+urbanization,sativa,N-,leaf_color,LC  ,population,2.626929972661903e-4,0.95,0,1
+urbanization,sativa,N-,primary_root_length,PRL ,population,0.12694241865263586,0.95,0,1
+urbanization,sativa,N-,lateral_root_number,LRN ,population,0.029987296242443028,0.95,0,1
+urbanization,sativa,N-,longest_lateral_root_length,LLRL,population,0.0010934639976449669,0.95,0,1

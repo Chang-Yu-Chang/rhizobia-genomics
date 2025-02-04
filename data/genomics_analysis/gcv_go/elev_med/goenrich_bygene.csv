@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:994666ae0bb025bc987b87ffa6270b2fcb80b3c8df54c2de6e47c29543aa4039
-size 1808
+category,go_id,term,annotated,significant,expected,classic_fisher
+BP,GO:0000270,peptidoglycan metabolic process,11,4,0.91,0.0086
+BP,GO:0006022,aminoglycan metabolic process,11,4,0.91,0.0086
+BP,GO:0009150,purine ribonucleotide metabolic process,11,4,0.91,0.0086
+BP,GO:0030203,glycosaminoglycan metabolic process,11,4,0.91,0.0086
+BP,GO:0045229,external encapsulating structure organiz...,11,4,0.91,0.0086
+BP,GO:0071554,cell wall organization or biogenesis,11,4,0.91,0.0086
+BP,GO:0071555,cell wall organization,11,4,0.91,0.0086
+BP,GO:0006163,purine nucleotide metabolic process,17,5,1.4,0.0087
+BP,GO:1901135,carbohydrate derivative metabolic proces...,47,9,3.88,0.0092
+BP,GO:0007049,cell cycle,24,6,1.98,0.0094
+CC,GO:0043228,non-membrane-bounded organelle,10,5,0.97,0.0011
+CC,GO:0043232,intracellular non-membrane-bounded organ...,10,5,0.97,0.0011
+CC,GO:0043226,organelle,26,8,2.52,0.0015
+CC,GO:0043229,intracellular organelle,26,8,2.52,0.0015
+CC,GO:0030313,cell envelope,29,5,2.81,0.1344
+CC,GO:0031975,envelope,32,5,3.1,0.1839
+CC,GO:0043227,membrane-bounded organelle,19,3,1.84,0.2751
+CC,GO:0043231,intracellular membrane-bounded organelle,19,3,1.84,0.2751
+CC,GO:0005622,intracellular anatomical structure,132,13,12.77,0.5364
+CC,GO:0005829,cytosol,29,3,2.81,0.5498
+MF,GO:0003676,nucleic acid binding,129,20,10.6,0.0013
+MF,GO:0003677,DNA binding,115,16,9.45,0.0151
+MF,GO:0016835,carbon-oxygen lyase activity,21,5,1.73,0.0228
+MF,GO:0019842,vitamin binding,32,6,2.63,0.0393
+MF,GO:0016788,"hydrolase activity, acting on ester bond...",27,5,2.22,0.0618
+MF,GO:0005488,binding,362,34,29.74,0.1352
+MF,GO:0004518,nuclease activity,16,3,1.31,0.1367
+MF,GO:0008270,zinc ion binding,16,3,1.31,0.1367
+MF,GO:0016829,lyase activity,34,5,2.79,0.1374
+MF,GO:0140640,"catalytic activity, acting on a nucleic ...",44,6,3.61,0.1420

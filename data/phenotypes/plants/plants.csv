@@ -1,3 +1,823 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:163decc93603e0f3d5db46d7b059a63f5b364deaef1d31720d1f8809821173f0
-size 103275
+gradient,population,site,exp_id,genome_id,genome_name,exp_plant,exp_nitrogen,exp_plantsite,exp_plantmaternal,exp_waterblock,exp_labgroup,exp_labsection,shoot_biomass_mg,nodule_number,root_biomass_mg,primary_root_nodule_number,lateral_root_nodule_number,nodule_shape,nodule_size,nodule_color,shoot_height,longest_petiole_length,leaf_number,leaf_color,primary_root_length,lateral_root_number,longest_lateral_root_length
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M4,1,NA,NA,1.2,0,0.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M5,1,NA,NA,6.6,0,2.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M3,1,NA,NA,3.4,0,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M4,1,NA,NA,7.5,0,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M1,1,NA,NA,5.2,0,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M1,1,NA,NA,5,0,1.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M6,2,NA,NA,5.3,0,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M6,2,NA,NA,6.2,0,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M3,2,NA,NA,7.4,0,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M4,2,NA,NA,4.7,1,2.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M4,2,NA,NA,9.7,18,3.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M5,2,NA,NA,2.2,0,0.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M7,3,NA,NA,5.5,0,2.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M6,3,NA,NA,4.4,0,1.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M3,3,NA,NA,13.8,0,3.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M3,3,NA,NA,6.7,0,3.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M4,3,NA,NA,4.4,0,3.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M1,4,NA,NA,12.5,8,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M3,4,NA,NA,6.3,11,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M1,4,NA,NA,3.8,7,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M1,4,NA,NA,5.6,6,1.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M1,4,NA,NA,1.8,3,0.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M3,4,NA,NA,11.1,13,4.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M1,5,NA,NA,4.4,0,0.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M2,5,NA,NA,9.5,7,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M1,5,NA,NA,7.9,17,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M3,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M1,5,NA,NA,8.4,14,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H2M1,5,NA,NA,3.5,5,0.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M2,7,NA,NA,15.8,14,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M3,7,NA,NA,16.4,15,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M1,7,NA,NA,8.1,4,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M2,7,NA,NA,17.1,28,3.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M1,7,NA,NA,13.6,13,3.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M3,7,NA,NA,7.9,6,2.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M1,8,NA,NA,5,5,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M3,8,NA,NA,7.4,6,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M2,8,NA,NA,14.2,19,4.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M1,8,NA,NA,20.3,7,4.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M2,8,NA,NA,15.8,24,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L1M3,8,NA,NA,5.1,6,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M3,10,NA,NA,23.8,19,5.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M6,10,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M6,10,NA,NA,7.8,9,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M5,10,NA,NA,12.5,13,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M6,10,NA,NA,15.5,18,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M5,10,NA,NA,8.9,3,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,11,NA,NA,14.9,17,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,11,NA,NA,12.7,15,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M7,11,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M3,11,NA,NA,6.7,8,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M3,11,NA,NA,4.5,1,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M1,11,NA,NA,8,5,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,12,NA,NA,21.1,18,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,12,NA,NA,13.5,17,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M1,12,NA,NA,13.1,16,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M3,12,NA,NA,14.2,7,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,12,NA,NA,9.8,3,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M4,13,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M4,13,NA,NA,15.1,8,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M3,13,NA,NA,9.8,9,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M3,13,NA,NA,32.4,25,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M6,13,NA,NA,7.1,16,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M5,13,NA,NA,17.6,13,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M6,14,NA,NA,2.3,5,0.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M1,14,NA,NA,5.6,9,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M3,14,NA,NA,6.2,2,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M7,14,NA,NA,9.9,7,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M4,14,NA,NA,2.7,5,0.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M4,14,NA,NA,11.6,14,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M1,15,NA,NA,2.5,1,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M4,15,NA,NA,8.6,9,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M6,15,NA,NA,7.4,10,1.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M5,15,NA,NA,18.9,6,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M3,15,NA,NA,17,9,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H4M3,16,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H4M1,16,NA,NA,6.6,0,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M1,16,NA,NA,5.7,8,0.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H4M1,16,NA,NA,10,3,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M2,16,NA,NA,5.6,13,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H4M3,16,NA,NA,1.3,2,0.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M3,17,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H4M1,17,NA,NA,10.9,5,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M1,17,NA,NA,14.4,18,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M1,17,NA,NA,6.1,4,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M1,17,NA,NA,7.1,15,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M1,17,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M3,19,NA,NA,11.1,12,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M1,19,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M1,19,NA,NA,2.1,2,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M3,19,NA,NA,7.2,10,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M1,19,NA,NA,6.2,6,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L3M2,19,NA,NA,25.2,39,3.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L3M2,20,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M3,20,NA,NA,6.1,13,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L3M1,20,NA,NA,11.4,11,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L3M2,20,NA,NA,11.9,12,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L3M2,20,NA,NA,6.1,9,1.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,L,L1M3,20,NA,NA,5.7,14,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M7,22,NA,NA,15.2,17,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M4,22,NA,NA,32.2,53,6.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M6,22,NA,NA,17.7,23,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M4,22,NA,NA,9.6,18,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M3,22,NA,NA,18.2,13,2.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M3,22,NA,NA,11.5,8,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M6,23,NA,NA,9.2,21,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M6,23,NA,NA,13.7,14,2.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M4,23,NA,NA,12,10,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M4,23,NA,NA,16.3,25,3.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M1,23,NA,NA,7.6,9,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M3,23,NA,NA,16.6,9,4.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M1,24,NA,NA,8.6,7,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M5,24,NA,NA,4.8,6,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M4,24,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M5,24,NA,NA,4.1,2,0.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M3,24,NA,NA,4.5,4,0.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M7,25,NA,NA,5.7,14,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M6,25,NA,NA,4,8,1.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M1,25,NA,NA,9.2,24,2.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M4,25,NA,NA,3.7,5,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M5,25,NA,NA,13.5,26,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M5,25,NA,NA,6.6,9,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M3,26,NA,NA,13.2,8,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M4,26,NA,NA,9.9,11,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M4,26,NA,NA,5.3,12,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M3,26,NA,NA,17.4,20,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M4,26,NA,NA,12.4,51,4.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M6,26,NA,NA,26.7,19,3.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M6,27,NA,NA,5,4,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M3,27,NA,NA,10.3,15,1.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M1,27,NA,NA,12.8,16,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M4,27,NA,NA,25.7,30,4.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M3,27,NA,NA,11,10,5.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M6,28,NA,NA,4.4,1,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M6,28,NA,NA,4.1,0,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M4,28,NA,NA,2.8,0,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M4,28,NA,NA,3,0,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M5,28,NA,NA,5.8,7,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M4,28,NA,NA,1.9,0,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M3,29,NA,NA,7.3,0,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M3,29,NA,NA,4.2,0,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M3,29,NA,NA,3.7,3,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M4,29,NA,NA,8.4,0,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M1,29,NA,NA,3.8,0,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M4,29,NA,NA,3.1,0,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M5,30,NA,NA,1.8,0,0.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M6,30,NA,NA,3.9,0,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M7,30,NA,NA,5.4,0,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M1,30,NA,NA,4.2,0,2.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M3,30,NA,NA,6.4,6,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,L,L3M2,6,NA,NA,14.3,16,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,lupulina,N-,S,S5M6,3,NA,NA,5,0,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,S,S5M4,12,NA,NA,17.3,10,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H4,H4M5R1,g8,Chang_Q5C_8,lupulina,N-,S,S5M6,15,NA,NA,14.6,9,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,S,S5M6,24,NA,NA,2.1,0,0.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,lupulina,N-,S,S5M7,27,NA,NA,12.6,13,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L4,L4M2R2,g15,Chang_Q5C_15,lupulina,N-,S,S5M1,30,NA,NA,7.7,16,1.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,lupulina,N-,H,H4M3,6,NA,NA,5.8,3,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M7,31,NA,NA,3.8,2,1.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M3,31,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M3,31,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M4,31,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M1,32,NA,NA,5.4,6,1.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M1,32,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M7,32,NA,NA,6.9,0,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,low elevation,L2,L2M2R1,g10,Chang_Q5C_10,lupulina,N-,H,H2M3,9,NA,NA,5.1,4,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,control,co,control,control,control,lupulina,N-,S,S5M7,32,NA,NA,9.8,13,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,1,NA,NA,19.2,11,3.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,1,NA,NA,24,8,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,1,NA,NA,11.8,11,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,2,NA,NA,3.8,3,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,2,NA,NA,3.5,3,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,2,NA,NA,33.3,24,4.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,3,NA,NA,11.5,2,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,3,NA,NA,5.5,6,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,3,NA,NA,7.5,3,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,3,NA,NA,4.5,3,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,4,NA,NA,8.5,0,2.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,4,NA,NA,6.8,4,1.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,4,NA,NA,15.9,18,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,4,NA,NA,35.2,9,6.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,4,NA,NA,3,6,0.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,5,NA,NA,16,7,2.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,5,NA,NA,17.8,11,2.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,5,NA,NA,31.4,22,6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,5,NA,NA,7.3,8,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,6,NA,NA,1.2,0,1.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,6,NA,NA,1.5,0,1.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,6,NA,NA,2.6,0,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,6,NA,NA,2.5,0,0.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,7,NA,NA,31.8,14,6.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,7,NA,NA,40.4,12,6.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,7,NA,NA,24.1,14,5.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,7,NA,NA,26.7,14,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,8,NA,NA,12.6,9,2.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,8,NA,NA,5.8,5,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,8,NA,NA,12.2,7,3.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,8,NA,NA,29.8,23,5.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,9,NA,NA,31.4,28,6.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,9,NA,NA,3.5,3,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,9,NA,NA,34.4,8,6.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,gp,gp1-1,g40,NCTPXL_3,lupulina,N-,NA,NA,9,NA,NA,4.3,1,2.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,10,NA,NA,5.8,5,2.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,10,NA,NA,29.4,12,4.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,10,NA,NA,46.4,25,10.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,10,NA,NA,28.9,5,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,40th,40th-2,NA,NA,lupulina,N-,NA,NA,10,NA,NA,22.5,18,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,11,NA,NA,49.4,33,11.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,11,NA,NA,29.5,13,6.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,11,NA,NA,33.1,34,6.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,11,NA,NA,18.7,11,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,12,NA,NA,14.1,13,3.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,12,NA,NA,17.1,13,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,12,NA,NA,45.5,17,8.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,12,NA,NA,8.9,7,3.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,13,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,13,NA,NA,52.1,27,6.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,13,NA,NA,27.6,10,3.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,13,NA,NA,25.5,14,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,lupulina,N-,NA,NA,13,NA,NA,28.5,9,3.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,14,NA,NA,8.1,7,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,14,NA,NA,45,4,5.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,14,NA,NA,19.1,5,1.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,ppf,ppf-2,g42,NCTPXL_5,lupulina,N-,NA,NA,14,NA,NA,26,9,5.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,15,NA,NA,15,7,2.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,15,NA,NA,20.5,16,3.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,15,NA,NA,42.8,12,6.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,src,src-2,g21,Chang_W8S_2,lupulina,N-,NA,NA,15,NA,NA,25.2,12,4.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,16,NA,NA,7.2,5,1.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,16,NA,NA,13.2,6,2.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,16,NA,NA,8.2,5,1.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,16,NA,NA,10.8,7,1.2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,17,NA,NA,27.8,8,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,17,NA,NA,39.2,13,3.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,17,NA,NA,48,19,5.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,pms,pms-2,g34,Chang_W8S_15,lupulina,N-,NA,NA,17,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,18,NA,NA,8.3,8,2.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,18,NA,NA,12.4,8,2.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,18,NA,NA,8.9,7,2.7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,control,control,control,control,control,lupulina,N-,NA,NA,18,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,19,NA,NA,25.9,8,4.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,19,NA,NA,24.8,12,4.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,19,NA,NA,26.2,23,3.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,lupulina,N-,NA,NA,19,NA,NA,25.7,13,4.9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,20,NA,NA,28.6,13,3.4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,20,NA,NA,15,12,2.8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,20,NA,NA,9.5,6,1.6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+urbanization,urban,bg,bg-2,g31,Chang_W8S_12,lupulina,N-,NA,NA,20,NA,NA,36.7,12,4.3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,101-2,101,NA,0,NA,0,0,NA,NA,NA,7,2.5,6,8,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,101-2,101,NA,0,NA,0,0,NA,NA,NA,12.5,2.4,6,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,101-2,101,NA,0,NA,0,0,NA,NA,NA,9.2,1.2,5,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,102-2,102,NA,0,NA,0,0,NA,NA,NA,18.5,2.7,10,8,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,102-2,102,NA,0,NA,0,0,NA,NA,NA,15.2,3.6,11,8,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,102-2,102,NA,0,NA,0,0,NA,NA,NA,13.1,1.9,11,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,107-2,107,NA,0,NA,0,0,NA,NA,NA,14.8,2.6,10,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,107-2,107,NA,0,NA,0,0,NA,NA,NA,14.9,3.3,11,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,107-2,107,NA,3,NA,3,0,oval,small,white,13.9,4.2,11,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,108-2,108,NA,0,NA,0,0,NA,NA,NA,15.5,3.5,9,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,108-2,108,NA,0,NA,0,0,NA,NA,NA,10.9,2.9,9,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,108-2,108,NA,0,NA,0,0,oval,NA,NA,11,4,11,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,109-2,109,NA,0,NA,0,0,NA,NA,NA,13.4,3.2,9,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,109-2,109,NA,0,NA,0,0,NA,NA,NA,10,5.5,10,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,109-2,109,NA,0,NA,0,0,NA,NA,NA,10.5,1.5,11,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,113-2,113,NA,0,NA,0,0,NA,NA,NA,16,2,6,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,113-2,113,NA,0,NA,0,0,NA,NA,NA,14,3.5,9,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,113-2,113,NA,0,NA,0,0,NA,NA,NA,14,3.5,14,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,602-2,602,NA,0,NA,0,0,NA,NA,NA,10.8,1.7,9,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,602-2,602,NA,7,NA,0,7,oval,small,white,17.2,3,16,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,603-8,603,NA,7,NA,1,6,oval,small,white,19.5,2.9,12,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N+,NA,NA,NA,603-8,603,NA,4,NA,4,0,oval,small,white,15.8,3.2,8,8,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,101-1,101,NA,0,NA,0,0,NA,NA,NA,3.4,2.1,3,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,101-1,101,NA,0,NA,0,0,NA,NA,NA,1.5,2.5,2,3,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,101-1,101,NA,0,NA,0,0,NA,NA,NA,10.8,1.7,9,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,102-1,102,NA,0,NA,0,0,NA,NA,NA,2,2.1,2,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,102-1,102,NA,0,NA,0,0,NA,NA,NA,0.5,1,3,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,102-1,102,NA,0,NA,0,0,NA,NA,NA,1.5,1.7,2,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,107-1,107,NA,0,NA,0,0,NA,NA,NA,2.9,1.7,6,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,107-1,107,NA,0,NA,0,0,NA,NA,NA,3.3,1.7,6,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,107-1,107,NA,0,NA,0,0,NA,NA,NA,3.2,2.2,4,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,108-1,108,NA,0,NA,0,0,NA,NA,NA,2,1.4,2,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,108-1,108,NA,0,NA,0,0,NA,NA,NA,1.8,0.4,2,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,108-1,108,NA,0,NA,0,0,NA,NA,NA,2.5,1.5,3,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,109-1,109,NA,0,NA,0,0,NA,NA,NA,1.4,1.1,2,3,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,109-1,109,NA,4,NA,0,4,round,large,white,3.8,1.8,2,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,109-1,109,NA,1,NA,0,1,oval,small,pink,2.3,1.5,2,3,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,113-1,113,NA,0,NA,0,0,NA,NA,NA,3.6,1.6,2,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,113-1,113,NA,0,NA,0,0,NA,NA,NA,2.3,1.3,2,3,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,113-1,113,NA,0,NA,0,0,NA,NA,NA,1.1,1.6,3,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,113-3,113,NA,0,NA,0,0,NA,NA,NA,3.5,1.9,2,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,113-3,113,NA,0,NA,0,0,NA,NA,NA,1.6,2.1,3,5,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,602-1,602,NA,0,NA,0,0,NA,NA,NA,5,2.1,2,4,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,602-1,602,NA,0,NA,0,0,NA,NA,NA,1.5,2.2,3,7,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,602-1,602,NA,0,NA,0,0,NA,NA,NA,3.3,1.9,1,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,603-7,603,NA,0,NA,0,0,NA,NA,NA,3.3,1.9,1,6,NA,NA,NA
+elevation,high elevation,H2,H2M3R1,g2,Chang_Q5C_2,sativa,N-,NA,NA,NA,603-7,603,NA,0,NA,0,0,NA,NA,NA,3.6,1.6,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,101-4,101,NA,0,NA,0,0,NA,NA,NA,16.5,3.5,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,101-4,101,NA,0,NA,0,0,NA,NA,NA,9.5,3.5,6,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,101-4,101,NA,0,NA,0,0,NA,NA,NA,17.5,2.5,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,102-4,102,NA,0,NA,0,0,NA,NA,NA,15.5,3,14,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,102-4,102,NA,6,NA,0,6,oval,small,white,13.5,4,13,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,102-4,102,NA,0,NA,0,0,NA,NA,NA,18,2.5,15,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,108-4,108,NA,9,NA,0,9,round,large,white,15,3.3,12,8,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,108-4,108,NA,15,NA,0,15,round,large,white,17.2,2.4,14,8,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,108-4,108,NA,19,NA,0,19,round,large,white,20,2.6,16,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,109-4,109,NA,7,NA,3,4,round,small,white,23,4.5,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,109-4,109,NA,3,NA,1,2,round,small,white,17,3.5,9,8,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,109-4,109,NA,4,NA,1,3,oval,small,white,14,2,11,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,113-5,113,NA,4,NA,0,4,oval,small,pink,23,2.9,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,113-5,113,NA,0,NA,0,0,NA,NA,NA,15.3,2.1,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,602-4,602,NA,0,NA,0,0,NA,NA,NA,13.2,2.2,7,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,602-4,602,NA,6,NA,2,4,oval,small,white,15,2,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N+,NA,NA,NA,602-4,602,NA,6,NA,2,4,oval,small,white,18,3,12,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,101-3,101,NA,14,NA,7,7,round,small,white,1.2,2.1,2,3,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,101-3,101,NA,11,NA,5,6,round,small,white,1.7,2.1,3,3,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,101-3,101,NA,33,NA,1,32,round,large,pink,4,1.7,5,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,102-3,102,NA,2,NA,0,2,oval,small,pink,1,3,6,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,102-3,102,NA,0,NA,0,0,NA,NA,NA,1,2.5,7,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,102-3,102,NA,20,NA,0,20,oval,small,white,1,3,7,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,107-3,107,NA,17,NA,0,17,round,small,white,14.5,3.1,12,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,107-3,107,NA,4,NA,0,4,round,small,white,14.4,3.6,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,107-3,107,NA,40,NA,0,40,oval,small,white,21,2.9,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,107-4,107,NA,29,NA,4,25,round,small,white,1.4,1.5,3,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,107-4,107,NA,16,NA,3,13,round,small,white,1.8,0.8,3,7,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,108-3,108,NA,19,NA,1,18,round,small,white,0.9,1.2,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,108-3,108,NA,55,NA,3,52,round,small,white,22.3,0.4,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,108-3,109,NA,12,NA,4,8,oval,small,white,14.9,0.4,2,4,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,109-3,109,NA,15,NA,2,13,oval,large,white,11.8,1.2,1,4,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,109-3,109,NA,18,NA,1,17,round,small,white,3.6,1.6,3,3,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,109-3,109,NA,17,NA,3,14,round,small,white,3.5,2,3,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-4,113,NA,0,NA,0,0,NA,NA,NA,2.8,1.9,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-4,113,NA,14,NA,0,14,round,small,white,2.1,1.8,2,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-4,113,NA,1,NA,0,1,oval,large,white,2.6,1.3,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-6,113,NA,17,NA,1,16,round,small,white,1.3,1.55,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-6,113,NA,6,NA,2,4,round,small,white,2,1.5,2,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,113-6,113,NA,13,NA,6,7,round,small,white,1.4,1.8,1,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,602-3,602,NA,12,NA,1,11,round,small,white,1.9,1.7,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,602-3,602,NA,5,NA,1,4,round,small,white,0.9,1.5,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M1R1,g4,Chang_Q5C_4,sativa,N-,NA,NA,NA,602-3,602,NA,9,NA,2,7,round,small,white,3.7,1.7,2,2,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,103-2,103,NA,13,NA,3,10,round,large,pink,13.4,3,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,103-2,103,NA,8,NA,0,8,oval,small,pink,14.3,3.2,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,103-2,103,NA,3,NA,0,3,round,small,white,13.4,3.5,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,104-2,104,NA,4,NA,0,4,oval,small,white,17.3,2.8,7,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,104-2,104,NA,0,NA,0,0,NA,NA,NA,11.1,2.8,13,8,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,104-2,104,NA,0,NA,0,0,NA,NA,NA,13.5,3.4,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,105-2,105,NA,0,NA,0,0,NA,NA,NA,19.3,2.9,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,105-2,105,NA,0,NA,0,0,NA,NA,NA,17,2.7,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,105-2,105,NA,12,NA,0,12,round,small,white,7.6,2.6,12,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,106-2,106,NA,0,NA,0,0,NA,NA,NA,13.5,2.5,11,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,106-2,106,NA,0,NA,0,0,NA,NA,NA,11.3,2.6,8,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,106-2,106,NA,8,NA,0,8,round,small,white,11,2.5,14,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,110-2,110,NA,0,NA,0,0,NA,NA,NA,15,4,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,110-2,110,NA,0,NA,0,0,NA,NA,NA,17.5,4,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,110-2,110,NA,0,NA,0,0,NA,NA,NA,16.5,3.5,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,111-2,111,NA,0,NA,0,0,NA,NA,NA,12.5,3,9,8,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,111-2,111,NA,18,NA,0,18,round,large,white,14,4,14,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,111-2,111,NA,17,NA,0,17,round,large,pink,13.7,4,16,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,112-2,112,NA,0,NA,0,0,NA,NA,NA,14.2,2.2,10,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,112-2,112,NA,0,NA,0,0,NA,NA,NA,11.2,3.5,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,112-2,112,NA,43,NA,13,30,round,small,white,7,3.5,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,603-2,603,NA,0,NA,0,0,NA,NA,NA,14.1,2.4,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,603-2,603,NA,0,NA,0,0,NA,NA,NA,15.8,3.6,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N+,NA,NA,NA,603-2,603,NA,0,NA,0,0,NA,NA,NA,12.8,3.6,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,103-1,103,NA,0,NA,0,0,NA,NA,NA,1.6,1.7,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,103-1,103,NA,7,NA,1,6,round,small,white,0.8,1.3,3,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,103-1,103,NA,10,NA,0,10,round,small,white,1.6,0.9,2,4,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,104-1,104,NA,30,NA,4,26,round,large,pink,1.5,0.4,3,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,104-1,104,NA,31,NA,4,27,round,small,pink,1.2,0.9,4,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,104-1,104,NA,40,NA,3,37,round,large,pink,1.8,1.2,5,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,105-1,105,NA,24,NA,3,21,round,small,white,1.9,2.2,4,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,105-1,105,NA,28,NA,12,16,round,small,white,6,1,2,4,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,105-1,105,NA,17,NA,13,4,round,large,white,5,0.5,2,3,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,106-1,106,NA,26,NA,4,22,round,small,white,4.2,1.4,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,106-1,106,NA,69,NA,4,65,round,small,white,1,1.3,3,3,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,106-1,106,NA,8,NA,7,1,round,small,white,1.5,0.7,3,7,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,110-1,110,NA,22,NA,5,17,oval,large,white,1.6,0.7,2,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,110-1,110,NA,20,NA,2,18,oval,large,white,1.8,1,1,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,110-1,110,NA,52,NA,6,46,oval,large,white,2.2,1.5,3,4,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,111-1,111,NA,10,NA,0,10,round,large,white,1.4,1.5,4,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,111-1,111,NA,48,NA,11,37,round,small,white,1.5,2.5,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,111-1,111,NA,17,NA,1,16,round,small,white,3.3,1.8,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,112-1,112,NA,36,NA,0,36,round,large,white,2.1,1.9,4,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,112-1,112,NA,17,NA,0,17,round,large,white,3.5,2,4,4,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,112-1,112,NA,15,NA,0,15,round,small,white,1.2,1.8,2,4,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,603-1,603,NA,9,NA,0,9,oval,small,white,6.3,1.4,2,6,NA,NA,NA
+elevation,high elevation,H3,H3M3R2,g5,Chang_Q5C_5,sativa,N-,NA,NA,NA,603-1,603,NA,15,NA,0,15,oval,small,white,1.8,2,4,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,103-4,103,NA,10,NA,3,7,round,small,white,17.3,2.3,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,103-4,103,NA,0,NA,0,0,NA,NA,NA,15.6,2.9,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,103-4,103,NA,0,NA,0,0,NA,NA,NA,15.2,3.7,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,104-4,104,NA,10,NA,3,7,round,small,white,17.3,2.3,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,104-4,104,NA,2,NA,0,2,round,small,white,24,3,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,104-4,104,NA,11,NA,1,10,round,large,white,8,1.5,13,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,105-4,105,NA,0,NA,0,0,NA,NA,NA,13.6,2.5,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,105-4,105,NA,0,NA,0,0,NA,NA,NA,2.5,5.2,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,105-4,105,NA,0,NA,0,0,NA,NA,NA,3,2.8,11,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,106-4,106,NA,0,NA,0,0,NA,NA,NA,2.8,2.1,8,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,106-4,106,NA,0,NA,0,0,NA,NA,NA,6.8,4.1,7,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,106-4,106,NA,0,NA,0,0,NA,NA,NA,3.3,2.4,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,110-4,110,NA,0,NA,0,0,NA,NA,NA,11.5,6.5,10,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,110-4,110,NA,0,NA,0,0,NA,NA,NA,13.5,3.5,8,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,110-4,110,NA,3,NA,3,0,oval,small,white,15,2.7,9,8,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,111-4,111,NA,0,NA,0,0,NA,NA,NA,5.6,3.8,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,111-4,111,NA,0,NA,0,0,NA,NA,NA,1.47,2,5,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,111-4,111,NA,5,NA,0,5,oval,small,white,13.7,3.1,12,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,112-4,112,NA,2,NA,0,2,round,small,white,16,2.4,10,8,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,112-4,112,NA,6,NA,0,6,oval,large,pink,18,3.1,10,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N+,NA,NA,NA,112-4,112,NA,6,NA,0,6,round,small,white,13.5,2.8,9,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,103-3,103,NA,18,NA,1,17,round,large,white,4.6,2.1,6,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,103-3,103,NA,10,NA,3,7,oval,large,pink,5.4,1.2,4,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,103-3,103,NA,8,NA,1,7,round,large,pink,4.1,1.7,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,104-3,104,NA,22,NA,0,22,round,large,white,4.9,1.6,5,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,104-3,104,NA,69,NA,13,56,round,small,white,3.4,1.5,8,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,104-3,104,NA,25,NA,3,22,round,small,pink,3.9,2.4,3,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,105-3,105,NA,64,NA,0,64,round,small,white,13.9,2.1,4,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,105-3,105,NA,22,NA,0,22,round,small,white,14.3,0.9,4,2,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,105-3,105,NA,20,NA,0,20,round,small,white,17.2,1.8,5,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,106-3,106,NA,45,NA,2,43,round,small,white,1.5,2.1,2,3,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,106-3,106,NA,30,NA,6,24,round,small,white,4,1.9,2,3,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,106-3,106,NA,32,NA,4,28,round,small,white,3.1,2.1,3,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,110-3,110,NA,8,NA,3,5,round,large,white,0.5,2,1,3,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,110-3,110,NA,21,NA,0,21,round,small,white,1,2.5,2,4,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,110-3,110,NA,9,NA,1,8,round,large,pink,1.4,1,4,7,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,111-3,111,NA,27,NA,4,23,round,small,white,1.2,1,2,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,111-3,111,NA,30,NA,0,30,round,small,white,2.2,2.1,2,5,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,111-3,111,NA,50,NA,0,50,round,small,white,0.9,0.7,3,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,112-3,112,NA,11,NA,0,11,round,small,white,4.5,1.2,9,6,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,112-3,112,NA,4,NA,0,4,round,small,white,2.4,0.2,3,3,NA,NA,NA
+elevation,high elevation,H3,H3M4R1,g6,Chang_Q5C_6,sativa,N-,NA,NA,NA,112-3,112,NA,5,NA,1,4,round,small,white,4.1,2.3,6,6,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,101-6,101,NA,13,NA,2,11,round,small,pink,9.5,4,6,4,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,101-6,101,NA,0,NA,7,2,round,small,white,15.2,4.5,8,5,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,101-6,101,NA,8,NA,1,7,round,small,white,13,2.8,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,102-6,102,NA,0,NA,0,0,NA,NA,NA,13,1.5,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,102-6,102,NA,3,NA,2,1,round,small,white,9.6,3.1,7,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,102-6,102,NA,4,NA,0,4,round,small,pink,21,2.35,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,107-6,106,NA,9,NA,0,9,round,large,pink,12.5,2.5,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,107-6,107,NA,12,NA,1,11,oval,large,pink,19.5,7,12,8,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,107-6,107,NA,10,NA,0,10,oval,large,white,16,2.8,12,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,108-6,108,NA,4,NA,0,4,round,small,white,26.5,3,10,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,108-6,108,NA,7,NA,0,7,oval,large,pink,24.5,3,13,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,108-6,108,NA,12,NA,0,12,oval,large,pink,16,2.7,15,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,109-6,109,NA,10,NA,4,6,oval,large,pink,15.5,3,10,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,109-6,109,NA,11,NA,1,10,round,small,white,16.5,2.3,11,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,109-6,109,NA,13,NA,0,13,oval,large,pink,23,2.5,11,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,113-8,113,NA,4,NA,0,4,oval,large,white,17,2.5,10,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,113-8,113,NA,2,NA,0,2,round,small,pink,17.5,1.75,10,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N+,NA,NA,NA,113-8,113,NA,9,NA,2,7,round,small,pink,18.5,2,11,6,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,101-5,101,NA,15,NA,5,10,oval,large,pink,5,1.5,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,101-5,101,NA,17,NA,6,11,oval,large,pink,15,2,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,101-5,101,NA,18,NA,7,11,oval,large,pink,10,2.5,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,102-5,102,NA,8,NA,1,7,oval,large,pink,10.6,2,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,102-5,102,NA,13,NA,1,12,oval,large,pink,4.2,1.5,4,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,102-5,102,NA,15,NA,13,2,oval,large,pink,8.5,2.3,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,107-5,107,NA,13,NA,1,12,round,small,white,2.1,1.8,2,3,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,107-5,107,NA,6,NA,0,6,oval,large,pink,12.8,1.6,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,107-5,107,NA,3,NA,0,3,oval,small,pink,6,2,4,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,108-5,108,NA,6,NA,0,6,oval,large,pink,12,2.9,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,108-5,108,NA,12,NA,2,10,round,large,pink,2.4,2,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,108-5,108,NA,7,NA,0,7,oval,large,pink,5.5,1.3,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,109-5,109,NA,11,NA,0,11,oval,large,pink,5.6,1.3,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,109-5,109,NA,5,NA,2,3,oval,small,pink,15,2.2,6,8,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,109-5,109,NA,3,NA,0,3,oval,small,pink,5.5,1,1,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-7,113,NA,9,NA,1,8,oval,small,pink,7.19,2.85,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-7,113,NA,19,NA,8,11,oval,small,pink,11,2,6,6,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-7,113,NA,19,NA,8,11,oval,large,pink,10,2.5,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-9,113,NA,10,NA,6,4,oval,small,pink,10.85,2.91,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-9,113,NA,9,NA,3,6,oval,small,white,7.790000000000001,3.08,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,113-9,113,NA,14,NA,5,9,oval,large,pink,12,1.8,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-5,602,NA,4,NA,2,2,oval,large,pink,9,1.8,9,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-5,602,NA,10,NA,2,8,oval,large,pink,8,2.1,5,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-5,602,NA,17,NA,0,17,oval,large,pink,12.2,2.4,6,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-6,602,NA,21,NA,0,21,round,small,pink,15.6,3.5,8,7,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-6,602,NA,33,NA,4,29,oval,large,pink,23.4,2,12,8,NA,NA,NA
+elevation,low elevation,L1,L1M2R2,g9,Chang_Q5C_9,sativa,N-,NA,NA,NA,602-6,602,NA,14,NA,3,11,oval,large,pink,11.1,2.3,11,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,101-8,101,NA,6,NA,0,6,oval,small,pink,12,2.2,11,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,101-8,101,NA,7,NA,0,7,oval,small,pink,19,4.7,11,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,101-8,101,NA,12,NA,0,12,oval,small,pink,16,3.2,12,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,102-8,102,NA,0,NA,0,0,NA,NA,NA,14.1,2.8,10,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,102-8,102,NA,1,NA,0,1,round,small,pink,8.9,3.8,7,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,102-8,102,NA,2,NA,2,0,oval,small,pink,10.6,2.8,6,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,108-8,108,NA,2,NA,0,2,oval,small,pink,17.5,1.8,8,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,108-8,108,NA,13,NA,0,13,oval,small,white,18.5,3,12,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N+,NA,NA,NA,108-8,108,NA,7,NA,1,6,oval,large,white,15.9,2.3,13,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-7,101,NA,13,NA,2,11,oval,large,pink,5.8,2.2,6,5,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-7,101,NA,9,NA,2,7,oval,large,pink,2.5,2.2,5,6,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-7,101,NA,12,NA,5,7,oval,large,pink,8.7,2.7,7,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-9,101,NA,9,NA,8,1,oval,large,pink,10,2.5,7,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-9,101,NA,6,NA,2,4,oval,large,pink,8.5,2.5,5,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,101-9,101,NA,21,NA,2,19,oval,large,pink,11.5,2.5,10,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-7,102,NA,11,NA,5,6,oval,large,pink,5.5,1.5699999999999998,3,6,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-7,102,NA,0,NA,0,0,NA,NA,NA,21.59,3.5,6,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-7,102,NA,12,NA,0,12,oval,small,pink,27.2,4,7,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-9,102,NA,10,NA,6,4,round,large,pink,6,1,3,5,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-9,102,NA,8,NA,0,8,oval,small,pink,23.3,3.2,5,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,102-9,102,NA,6,NA,2,4,oval,large,pink,7,2.1,4,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-10,107,NA,12,NA,7,5,oval,large,pink,4,2,2,6,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-10,107,NA,19,NA,0,19,oval,large,white,4.4,2.4,8,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-10,107,NA,5,NA,5,0,oval,large,pink,11,2,11,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-7,107,NA,19,NA,1,18,round,small,pink,14.5,2.5,8,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-7,107,NA,14,NA,0,14,oval,large,pink,12.6,3.6,14,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-7,107,NA,15,NA,0,15,oval,large,pink,23,2.6,15,6,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-8,107,NA,9,NA,0,9,oval,small,white,2.2,0.9,1,6,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-8,107,NA,18,NA,8,10,oval,large,pink,4.5,2,8,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-8,107,NA,8,NA,0,8,oval,large,pink,2.8,1.6,5,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-9,107,NA,6,NA,2,4,oval,large,pink,19,3,10,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-9,107,NA,19,NA,0,19,round,small,pink,13.5,3,10,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,107-9,107,NA,13,NA,0,13,round,small,pink,15.5,3,8,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-7,108,NA,14,NA,3,11,oval,large,pink,22.5,5,16,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-7,108,NA,13,NA,4,9,oval,large,pink,17.9,2.7,16,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-7,108,NA,33,NA,9,24,round,large,pink,16.4,3.4,9,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-9,108,NA,19,NA,0,19,oval,large,pink,8.6,2.4,6,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-9,108,NA,4,NA,0,4,oval,large,pink,6.3,2.1,5,8,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,108-9,108,NA,41,NA,2,39,round,small,white,4,2.7,10,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-7,602,NA,13,NA,0,13,oval,large,pink,19.5,2.8,9,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-7,602,NA,17,NA,0,17,oval,large,pink,12.9,3.3,12,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-7,602,NA,14,NA,0,14,oval,large,pink,15.5,4,5,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-8,602,NA,32,NA,5,27,oval,large,white,2.1,1.3,8,5,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-8,602,NA,26,NA,7,19,round,large,pink,16.05,1.8,6,7,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-9,602,NA,21,NA,3,18,round,small,pink,18.009999999999998,0.8,4,5,NA,NA,NA
+elevation,low elevation,L2,L2M4R1,g11,Chang_Q5C_11,sativa,N-,NA,NA,NA,602-9,602,NA,9,NA,7,2,oval,large,pink,15.02,1.7,4,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,103-6,103,NA,11,NA,7,4,oval,large,pink,16.5,1.6,9,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,103-6,103,NA,7,NA,1,6,oval,large,white,8.9,2.2,10,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,103-6,103,NA,5,NA,3,2,oval,large,pink,15.2,2.3,5,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,104-6,104,NA,1,NA,0,1,round,small,white,20.5,2.5,6,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,104-6,104,NA,9,NA,1,8,oval,large,pink,15.5,2.4,11,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,104-6,104,NA,9,NA,0,9,NA,small,pink,17.5,1.7,10,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,106-6,106,NA,1,NA,1,0,oval,small,white,10,2.2,8,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,106-6,106,NA,6,NA,2,4,oval,small,pink,19.2,3.3,11,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,106-6,106,NA,1,NA,0,1,oval,large,pink,11.5,4,7,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,110-6,110,NA,4,NA,3,1,oval,large,white,12,3.1,11,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,110-6,110,NA,0,NA,0,0,NA,NA,NA,17.2,2.8,14,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N+,NA,NA,NA,110-6,110,NA,0,NA,0,0,NA,NA,NA,13.1,3.5,8,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,103-5,103,NA,8,NA,4,4,oval,large,pink,2.5,1.4,4,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,103-5,103,NA,11,NA,0,11,oval,large,pink,1.6,1.7,3,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,103-5,103,NA,5,NA,0,5,oval,large,pink,7.2,2.3,5,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,104-5,104,NA,13,NA,5,8,round,small,white,42,2.5,6,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,104-5,104,NA,6,NA,1,5,oval,small,pink,20,3,4,5,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,104-5,104,NA,12,NA,0,12,round,small,pink,30,2.4,5,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,105-5,105,NA,6,NA,1,5,oval,small,white,1.5,1.4,4,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,105-5,105,NA,0,NA,0,0,NA,NA,NA,6,1,1,1,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,105-5,105,NA,7,NA,0,7,oval,large,white,3,2,7,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,106-5,106,NA,16,NA,4,12,oval,large,pink,10.5,2.5,9,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,106-5,106,NA,20,NA,0,20,oval,large,pink,21.8,2,8,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,106-5,106,NA,7,NA,0,7,oval,small,pink,2.6,1.8,5,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,109-10,109,NA,21,NA,3,18,round,large,white,20.2,3.5,14,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,109-10,109,NA,37,NA,2,35,oval,large,white,18.3,3.5,11,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,110-5,110,NA,6,NA,6,0,oval,large,pink,14.5,2,6,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,110-5,110,NA,5,NA,5,0,oval,large,pink,7.5,3.5,4,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,110-5,110,NA,16,NA,3,13,round,small,pink,3,2.5,4,5,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-5,111,NA,13,NA,2,12,round,small,white,1.7,1.6,2,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-5,111,NA,10,NA,4,6,oval,large,pink,7.4,1.9,4,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-5,111,NA,14,NA,2,12,oval,large,pink,3.5,1.9,3,5,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-6,111,NA,10,NA,0,10,oval,large,pink,24.1,2,10,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-6,111,NA,15,NA,0,15,round,large,pink,8.5,3.3,13,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,111-6,111,NA,14,NA,0,14,round,large,pink,10.8,2.9,12,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,112-5,112,NA,15,NA,0,15,oval,large,pink,10,1.8,6,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,112-5,112,NA,11,NA,0,11,oval,large,white,2.1,0.6,3,5,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,112-5,112,NA,10,NA,2,8,oval,large,pink,1.5,0.4,2,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,112-6,112,NA,24,NA,0,24,round,large,pink,12.8,3.7,11,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,112-6,112,NA,14,NA,0,14,oval,small,pink,12.7,2.5,13,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-3,603,NA,4,NA,0,4,oval,large,pink,18,2.4,12,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-3,603,NA,6,NA,0,6,oval,large,pink,15.3,6.2,16,8,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-3,603,NA,18,NA,0,18,oval,large,pink,19,3,9,7,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-4,603,NA,14,NA,3,11,round,small,white,3.7,1.5,2,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-4,603,NA,9,NA,0,9,oval,large,pink,1.7,1.2,3,6,NA,NA,NA
+elevation,low elevation,L3,L3M5R1,g13,Chang_Q5C_13,sativa,N-,NA,NA,NA,603-4,603,NA,10,NA,0,10,round,large,pink,1.8,1.8,6,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,103-8,103,NA,10,NA,0,10,oval,large,pink,16,2.5,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,103-8,103,NA,0,NA,0,0,NA,NA,NA,11.5,1.5,10,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,103-8,103,NA,2,NA,2,0,oval,large,pink,18.5,4.3,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,105-6,105,NA,5,NA,0,5,oval,large,pink,15.6,4,8,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,105-6,105,NA,7,NA,1,6,oval,large,pink,17,4.5,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,105-8,105,NA,0,NA,0,0,NA,NA,NA,12.7,2.7,12,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,105-8,105,NA,11,NA,3,8,oval,large,pink,10.6,8.4,12,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,105-8,105,NA,11,NA,1,10,oval,large,pink,12.1,3.4,14,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,106-8,106,NA,6,NA,0,6,oval,large,pink,15,4.2,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,106-8,106,NA,6,NA,0,6,oval,large,pink,13.5,3.8,8,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,110-8,110,NA,0,NA,0,0,NA,NA,NA,7.8,3.81,9,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,110-8,110,NA,0,NA,0,0,NA,NA,NA,10.16,2.54,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N+,NA,NA,NA,110-8,110,NA,0,NA,0,0,NA,NA,NA,12.7,2.54,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,103-7,103,NA,4,NA,0,4,oval,large,pink,2.2,2.9,4,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,103-7,103,NA,12,NA,5,7,oval,large,pink,9,2,12,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,103-7,103,NA,8,NA,1,7,oval,large,pink,1.2,1.6,3,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-7,104,NA,14,NA,0,14,oval,large,pink,12.1,4.9,10,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-7,104,NA,12,NA,0,12,oval,small,pink,18.9,2.5,8,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-7,104,NA,10,NA,0,10,round,large,pink,11.6,2.6,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-8,104,NA,20,NA,9,11,oval,large,pink,7.6,2.3,8,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-8,104,NA,55,NA,12,43,oval,small,white,3,2.4,4,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,104-8,104,NA,7,NA,7,0,oval,large,pink,5.4,4,7,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,105-7,105,NA,7,NA,5,2,oval,large,pink,4.5,1.5,7,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,105-7,105,NA,1,NA,1,0,oval,large,pink,2,0.8,13,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,105-7,105,NA,12,NA,6,6,oval,large,pink,9.9,2.6,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-10,106,NA,6,NA,2,4,oval,small,pink,15,2,7,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-10,106,NA,4,NA,1,3,oval,large,pink,6.8,1.6,8,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-10,106,NA,9,NA,0,9,oval,large,pink,8.4,2.4,7,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-7,106,NA,17,NA,0,17,oval,large,pink,2.5,2.7,5,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-7,106,NA,8,NA,1,7,oval,large,pink,8,1.8,5,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,106-7,106,NA,6,NA,2,4,oval,large,pink,7.7,2.4,6,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,110-7,110,NA,8,NA,4,4,oval,small,pink,12,2.5,8,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,110-7,110,NA,7,NA,5,2,oval,small,pink,8.5,1.5,6,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,110-7,110,NA,4,NA,0,4,oval,small,pink,3.2,2,3,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-7,111,NA,13,NA,3,10,oval,large,pink,21.5,2.1,11,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-7,111,NA,11,NA,1,10,NA,large,pink,20.8,4,12,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-7,111,NA,120,NA,47,24,oval,large,pink,12,4.7,10,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-8,111,NA,4,NA,3,1,oval,large,pink,8,2.3,6,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-8,111,NA,11,NA,0,11,oval,large,pink,8.2,1,5,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,111-8,112,NA,6,NA,1,5,oval,large,pink,2.2,2.8,6,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,112-7,112,NA,34,NA,0,34,round,small,pink,23.6,4,10,6,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,112-7,112,NA,12,NA,2,10,oval,large,pink,16.1,3.8,10,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,112-7,112,NA,34,NA,0,34,round,large,pink,9.6,2.2,8,8,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,112-8,112,NA,3,NA,2,1,oval,large,pink,3.5,1.3,3,7,NA,NA,NA
+elevation,low elevation,L4,L4M3R3,g16,Chang_Q5C_16,sativa,N-,NA,NA,NA,112-8,112,NA,14,NA,0,14,oval,large,pink,8,2.6,5,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,103-10,103,NA,0,NA,0,0,NA,NA,NA,12,4,12,8,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,103-10,103,NA,0,NA,0,0,NA,NA,NA,17,3,9,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,103-10,103,NA,0,NA,0,0,NA,NA,NA,13,3.5,10,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,104-10,104,NA,0,NA,0,0,NA,NA,NA,3.6,3,8,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,104-10,104,NA,0,NA,0,0,NA,NA,NA,16.5,2,13,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,104-10,104,NA,0,NA,0,0,NA,NA,NA,14,7.5,10,8,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,105-9,105,NA,4,NA,1,3,oval,small,white,15,2.4,10,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,105-9,105,NA,3,NA,0,3,oval,small,white,12.5,4.2,11,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,105-9,105,NA,4,NA,1,3,oval,small,white,15,3,10,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,109-8,109,NA,0,NA,0,0,NA,NA,NA,14,3.6,14,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,109-8,109,NA,0,NA,0,0,NA,NA,NA,23.2,4.3,14,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,109-8,109,NA,0,NA,0,0,NA,NA,NA,15.4,3.5,13,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,110-10,110,NA,0,NA,0,0,NA,NA,NA,9.398,3.81,8,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,110-10,110,NA,0,NA,0,0,NA,NA,NA,10.16,2.794,10,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,110-10,110,NA,0,NA,0,0,NA,NA,NA,11.176,2.54,11,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,111-10,111,NA,0,NA,0,0,NA,NA,NA,15,1.9,13,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,111-10,111,NA,0,NA,0,0,NA,NA,NA,10.3,2.2,12,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,111-10,111,NA,0,NA,0,0,NA,NA,NA,9.4,2.2,15,8,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,112-10,112,NA,13,NA,3,10,oval,large,white,12.5,5.9,12,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,112-10,112,NA,9,NA,2,7,oval,large,white,12,4,13,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,112-10,112,NA,14,NA,0,14,oval,large,white,10,7,14,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,603-6,603,NA,3,NA,0,3,oval,small,white,12.5,4.2,11,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N+,NA,NA,NA,603-6,603,NA,4,NA,1,3,oval,small,white,15,2.4,10,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,103-9,103,NA,0,NA,0,0,NA,NA,NA,0.9,1.6,3,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,103-9,103,NA,0,NA,0,0,NA,NA,NA,1,1.7,5,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,103-9,103,NA,0,NA,0,0,NA,NA,NA,2.2,2,4,3,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,104-9,104,NA,0,NA,0,0,NA,NA,NA,3.5,1.9,2,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,104-9,104,NA,0,NA,0,0,NA,NA,NA,1.2,1.2,4,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,104-9,104,NA,0,NA,0,0,NA,NA,NA,1.6,1.7,3,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,106-9,106,NA,0,NA,0,0,NA,NA,NA,4.5,0.8,3,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,106-9,106,NA,0,NA,0,0,NA,NA,NA,3.9,2,3,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,106-9,106,NA,0,NA,0,0,NA,NA,NA,1.5,0.4,3,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-7,108,NA,0,NA,0,0,NA,NA,NA,2,1.3,4,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-7,109,NA,0,NA,0,0,NA,NA,NA,2.1,1.5,5,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-7,109,NA,0,NA,0,0,NA,NA,NA,3,1,4,3,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-9,109,NA,0,NA,0,0,NA,NA,NA,3.5,1.6,4,3,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-9,109,NA,0,NA,0,0,NA,NA,NA,2.5,2.5,5,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,109-9,109,NA,0,NA,0,0,NA,NA,NA,1.5,1.7,3,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,110-9,110,NA,4,NA,0,4,oval,small,white,25,10,4,6,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,110-9,110,NA,35,NA,0,35,oval,small,white,16,11,5,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,110-9,110,NA,7,NA,0,7,oval,small,white,19,24,7,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,111-9,111,NA,0,NA,0,0,NA,NA,NA,2.4,1.5,6,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,111-9,111,NA,1,NA,1,0,oval,large,white,2,1.7,6,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,111-9,111,NA,0,NA,0,0,NA,NA,NA,1.7,2.2,4,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,112-9,112,NA,0,NA,0,0,NA,NA,NA,0.7,2.7,2,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,112-9,112,NA,0,NA,0,0,NA,NA,NA,0.5,1.5,2,5,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,112-9,112,NA,0,NA,0,0,NA,NA,NA,1.7,1.8,3,7,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,113-10,113,NA,0,NA,0,0,NA,NA,NA,2.4,1.6,3,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,113-10,113,NA,0,NA,0,0,NA,NA,NA,2.6,1.9,4,3,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,113-10,113,NA,0,NA,0,0,NA,NA,NA,2.8,1.9,5,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,603-5,603,NA,0,NA,0,0,NA,NA,NA,5.6,3,2,3,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,603-5,603,NA,0,NA,0,0,NA,NA,NA,5.8,1.6,3,4,NA,NA,NA
+elevation,control,control,control,control,control,sativa,N-,NA,NA,NA,603-5,603,NA,0,NA,0,0,NA,NA,NA,3.7,1.9,2,4,NA,NA,NA
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,101-2,NA,NA,6,NA,NA,NA,NA,NA,NA,0.7,NA,4,1.5,10.1,3,0.1
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,101-2,NA,NA,6,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,9.8,7,0.05
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,101-2,NA,NA,5,NA,NA,NA,NA,NA,NA,2,NA,4,2,10.9,5,0.8
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,101-2,NA,NA,3,NA,NA,NA,NA,NA,NA,0.8,NA,4,2,10.8,5,0.06
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,7,NA,NA,NA,NA,NA,NA,2,NA,3,1.5,6.5,7,2
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,3,NA,NA,NA,NA,NA,NA,1,NA,4,2,10,6,1.5
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,2,NA,NA,NA,NA,NA,NA,1,NA,4,1.5,8,9,2
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,8,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,7,5,0.5
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,AS + DB,NA,NA,3,NA,NA,NA,NA,NA,NA,1.2,NA,4,1.5,8,8,1.5
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,AS + DB,NA,NA,4,NA,NA,NA,NA,NA,NA,1.2,NA,4,2,15,5,3.5
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,AS + DB,NA,NA,3,NA,NA,NA,NA,NA,NA,1.4,NA,4,2,8,5,1
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,AS + DB,NA,NA,5,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,6.5,12,4
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,104-1,NA,NA,7,NA,NA,NA,NA,NA,NA,4.5,NA,4,1.5,12.5,13,2.1
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,104-1,NA,NA,13,NA,NA,NA,NA,NA,NA,1.3,NA,4,1.5,10.5,12,4
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,104-1,NA,NA,4,NA,NA,NA,NA,NA,NA,3,NA,3,1.5,12.1,9,2
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,104-1,NA,NA,9,NA,NA,NA,NA,NA,NA,4.5,NA,5,1.5,14.4,6,1.8
+urbanization,suburban,fp,fp1-2,g22,Chang_W8S_3,sativa,N-,NA,NA,NA,104-1,NA,NA,5,NA,NA,NA,NA,NA,NA,4.2,NA,4,1.5,13.5,6,1.5
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,101-3,NA,NA,2,NA,NA,NA,NA,NA,NA,3.5,NA,6,2,14,8,1
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,101-3,NA,NA,6,NA,NA,NA,NA,NA,NA,4.5,NA,6,2,10.5,7,0.5
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,101-3,NA,NA,4,NA,NA,NA,NA,NA,NA,4.25,NA,5,2,11,4,1.2
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,101-3,NA,NA,9,NA,NA,NA,NA,NA,NA,5,NA,5,2,12,17,1.5
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,102_A,NA,NA,14,NA,NA,NA,NA,NA,NA,1,NA,4,1.5,9.6,13,4.6
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,102_A,NA,NA,6,NA,NA,NA,NA,NA,NA,2.3,NA,4,2,10.4,4,1.1
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,102_A,NA,NA,5,NA,NA,NA,NA,NA,NA,1.7,NA,5,1.5,11.2,5,1.8
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,102_A,NA,NA,1,NA,NA,NA,NA,NA,NA,0.9,NA,5,1.5,12,3,1.1
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,0,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,11,10,2
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,6,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,11,11,2.5
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,2,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,10,7,2
+urbanization,suburban,crp,crp1-2,g25,Chang_W8S_6,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,3,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,12,10,1.5
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,101-4,NA,NA,4,NA,NA,NA,NA,NA,NA,1.8,NA,4,1.5,12.5,11,3.9
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,101-4,NA,NA,5,NA,NA,NA,NA,NA,NA,2.1,NA,5,1.5,12,5,4.2
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,101-4,NA,NA,4,NA,NA,NA,NA,NA,NA,2.3,NA,6,1.5,11.5,4,1.1
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,101-4,NA,NA,4,NA,NA,NA,NA,NA,NA,3.1,NA,6,1.5,12.1,10,2.6
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,12,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,10.5,6,1.4
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,19,NA,NA,NA,NA,NA,NA,1.6,NA,4,1.5,12,15,3.5
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,21,NA,NA,NA,NA,NA,NA,2.4,NA,5,1.5,13.2,16,1.5
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,17,NA,NA,NA,NA,NA,NA,1.7,NA,4,1.5,12,12,4
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,A+R,NA,NA,2,NA,NA,NA,NA,NA,NA,2,NA,4,2,10.5,8,3.1
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,A+R,NA,NA,3,NA,NA,NA,NA,NA,NA,1.1,NA,3,2,11,8,3.6
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,A+R,NA,NA,1,NA,NA,NA,NA,NA,NA,1.1,NA,4,2,10.5,5,4.5
+urbanization,suburban,gp,gp1-2,g29,Chang_W8S_10,sativa,N-,NA,NA,NA,A+R,NA,NA,5,NA,NA,NA,NA,NA,NA,0.7,NA,4,1.5,10.5,7,1.8
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,101-6,NA,NA,6,NA,NA,NA,NA,NA,NA,3,NA,4,1.5,13,8,2
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,101-6,NA,NA,1,NA,NA,NA,NA,NA,NA,1,NA,3,1.5,10,2,1
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,101-6,NA,NA,3,NA,NA,NA,NA,NA,NA,2,NA,4,2,9,7,4
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,101-6,NA,NA,2,NA,NA,NA,NA,NA,NA,3,NA,4,2,12,9,2
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,102-6 ,NA,NA,4,NA,NA,NA,NA,NA,NA,2.6,NA,4,1.5,9.5,5,2.3
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,102-6 ,NA,NA,4,NA,NA,NA,NA,NA,NA,3,NA,5,1.5,11,5,1
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,102-6 ,NA,NA,5,NA,NA,NA,NA,NA,NA,3.5,NA,4,1.5,9,0,0
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,102-6 ,NA,NA,5,NA,NA,NA,NA,NA,NA,3.2,NA,5,1.5,13,7,2.2
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,SPGG,NA,NA,5,NA,NA,NA,NA,NA,NA,0.7,NA,4,1.5,12.3,9,3.2
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,SPGG,NA,NA,7,NA,NA,NA,NA,NA,NA,2.1,NA,3,1.5,10,5,2.3
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,SPGG,NA,NA,3,NA,NA,NA,NA,NA,NA,1.6,NA,3,1.5,12,7,1.2
+urbanization,urban,pms,pms-1,g33,Chang_W8S_14,sativa,N-,NA,NA,NA,SPGG,NA,NA,4,NA,NA,NA,NA,NA,NA,1.8,NA,4,1.5,12,9,4.1
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,101-7,NA,NA,4,NA,NA,NA,NA,NA,NA,1.9,NA,4,2,10.5,7,2.1
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,101-7,NA,NA,5,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,9.5,8,3
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,101-7,NA,NA,2,NA,NA,NA,NA,NA,NA,2.2,NA,4,2,11.5,4,2
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,101-7,NA,NA,4,NA,NA,NA,NA,NA,NA,1.6,NA,4,1.5,10,6,2.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,102_B,NA,NA,3,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,11,1,0.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,102_B,NA,NA,3,NA,NA,NA,NA,NA,NA,4,NA,4,1.5,9,4,1
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,102_B,NA,NA,2,NA,NA,NA,NA,NA,NA,2.4,NA,3,1.5,10.5,11,1.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,102_B,NA,NA,3,NA,NA,NA,NA,NA,NA,2,NA,5,1.5,12.5,6,1.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,1,NA,NA,NA,NA,NA,NA,2.3,NA,4,1.5,10.7,7,1.3
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,0,NA,NA,NA,NA,NA,NA,2.4,NA,4,2,9.6,8,1.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,15,NA,NA,NA,NA,NA,NA,1.8,NA,4,1.5,7.8,4,3.5
+urbanization,urban,ppf,ppf-1,g36,Chang_W8S_17,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,4,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,11,6,2.2
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,9,NA,NA,NA,NA,NA,NA,1.4,NA,6,1.5,12,7,2
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,6,NA,NA,NA,NA,NA,NA,3,NA,6,1.5,10,10,1.9
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,2,NA,NA,NA,NA,NA,NA,1.5,NA,6,2,11,4,0.9
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,9,NA,NA,NA,NA,NA,NA,2.7,NA,4,1.5,10,8,2.75
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,102-8,NA,NA,6,NA,NA,NA,NA,NA,NA,2.7,NA,4,1.5,8,9,3
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,102-8,NA,NA,5,NA,NA,NA,NA,NA,NA,1.1,NA,4,2,10,1,0.4
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,102-8,NA,NA,3,NA,NA,NA,NA,NA,NA,1.4,NA,5,2,14,3,1
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,102-8,NA,NA,5,NA,NA,NA,NA,NA,NA,2.2,NA,4,2,12,4,1.7
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,6,NA,NA,NA,NA,NA,NA,1,NA,4,1.5,6,8,2
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,7,NA,NA,NA,NA,NA,NA,0.75,NA,4,1.5,11,10,2.5
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,5,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,10,9,0.6
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,0,NA,NA,NA,NA,NA,NA,1.75,NA,4,1.5,11,8,3
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,104-2,NA,NA,4,NA,NA,NA,NA,NA,NA,4.5,NA,4,1.5,11.3,8,1.9
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,104-2,NA,NA,3,NA,NA,NA,NA,NA,NA,2.7,NA,6,1.5,11,11,1.8
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,104-2,NA,NA,7,NA,NA,NA,NA,NA,NA,6.3,NA,4,1.5,10.3,16,1.8
+urbanization,urban,40th,40th-1,g37,Chang_W8S_18,sativa,N-,NA,NA,NA,104-2,NA,NA,5,NA,NA,NA,NA,NA,NA,2.8,NA,6,1.5,10.5,4,1
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,101-1,NA,NA,6,NA,NA,NA,NA,NA,NA,3.7,NA,5,1.5,9.44,6,1.01
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,101-1,NA,NA,7,NA,NA,NA,NA,NA,NA,4.12,NA,6,1.5,12.12,5,2.81
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,101-1,NA,NA,9,NA,NA,NA,NA,NA,NA,3.37,NA,6,2,12.56,22,2.24
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,101-1,NA,NA,6,NA,NA,NA,NA,NA,NA,3.81,NA,6,1.5,14.53,14,1.71
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,102-1,NA,NA,3,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,11.7,10,2
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,102-1,NA,NA,4,NA,NA,NA,NA,NA,NA,1.4,NA,5,1.5,9,4,4.1
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,102-1,NA,NA,2,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,12,10,2.5
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,102-1,NA,NA,1,NA,NA,NA,NA,NA,NA,1.5,NA,5,1.5,11.5,7,1.5
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,OA/rS,NA,NA,5,NA,NA,NA,NA,NA,NA,1.5,NA,4,1,10.2,6,1
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,OA/rS,NA,NA,5,NA,NA,NA,NA,NA,NA,4,NA,4,1.5,10,7,2.6
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,OA/rS,NA,NA,5,NA,NA,NA,NA,NA,NA,4,NA,4,1.5,10.5,4,2.5
+urbanization,suburban,src,src-1,g_src1,NA,sativa,N-,NA,NA,NA,OA/rS,NA,NA,2,NA,NA,NA,NA,NA,NA,1.75,NA,4,1.5,12,10,2.2
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,101-5,NA,NA,8,NA,NA,NA,NA,NA,NA,3.55,NA,6,1.5,11,11,3.4
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,101-5,NA,NA,3,NA,NA,NA,NA,NA,NA,4.5,NA,6,1.5,10.5,4,0.9
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,101-5,NA,NA,1,NA,NA,NA,NA,NA,NA,3.5,NA,6,1.5,11.5,9,3.5
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,101-5,NA,NA,1,NA,NA,NA,NA,NA,NA,4.5,NA,6,2,11,5,0.7
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,102-5,NA,NA,14,NA,NA,NA,NA,NA,NA,2.5,NA,4,2,11.5,8,2.5
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,102-5,NA,NA,8,NA,NA,NA,NA,NA,NA,1,NA,4,1.5,13.5,4,1
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,102-5,NA,NA,5,NA,NA,NA,NA,NA,NA,1.5,NA,4,2,12,10,2
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,102-5,NA,NA,6,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,6,6,3
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,SH/SS,NA,NA,14,NA,NA,NA,NA,NA,NA,0.5,NA,4,1.5,9.4,15,3
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,SH/SS,NA,NA,20,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,13.3,8,1.5
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,SH/SS,NA,NA,10,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,9.3,7,5
+urbanization,urban,bg,bg-1,g_bg1,NA,sativa,N-,NA,NA,NA,SH/SS,NA,NA,7,NA,NA,NA,NA,NA,NA,2.5,NA,8,1.5,9,9,5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-1,NA,NA,0,NA,NA,NA,NA,NA,NA,3.22,NA,6,1.5,10.52,12,0.95
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-1,NA,NA,0,NA,NA,NA,NA,NA,NA,4.22,NA,6,1.5,13.22,9,2.12
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-2,NA,NA,0,NA,NA,NA,NA,NA,NA,1.8,NA,4,2,9.3,4,1.8
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-2,NA,NA,0,NA,NA,NA,NA,NA,NA,1.9,NA,4,1.5,9.4,7,0.3
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-3,NA,NA,0,NA,NA,NA,NA,NA,NA,4,NA,6,1.5,10,6,6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-3,NA,NA,0,NA,NA,NA,NA,NA,NA,3.5,NA,6,1.5,14,4,6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-4,NA,NA,0,NA,NA,NA,NA,NA,NA,2.5,NA,6,2,13,13,3.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-4,NA,NA,0,NA,NA,NA,NA,NA,NA,1.2,NA,6,2,11.3,20,2.3
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-5,NA,NA,0,NA,NA,NA,NA,NA,NA,1,NA,3,1.5,11.5,17,2.4
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-5,NA,NA,0,NA,NA,NA,NA,NA,NA,3,NA,5,2,7,5,1.1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-6,NA,NA,0,NA,NA,NA,NA,NA,NA,2.5,NA,4,1.5,11,7,2.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-6,NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,7,3,2.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-7,NA,NA,0,NA,NA,NA,NA,NA,NA,1.25,NA,4,2,11.5,2,2.2
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,101-7,NA,NA,0,NA,NA,NA,NA,NA,NA,1.1,NA,3,2,9.6,6,1.6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,11.5,3,2.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,Evie and Annie,NA,NA,0,NA,NA,NA,NA,NA,NA,1.2,NA,3,2,11,4,2.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-1,NA,NA,0,NA,NA,NA,NA,NA,NA,1.7,NA,4,1.5,13,8,6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-1,NA,NA,0,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,12.5,7,2
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,0,NA,NA,NA,NA,NA,NA,1.3,NA,3,1.5,12,7,3
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,fp 1-2,NA,NA,0,NA,NA,NA,NA,NA,NA,3,NA,4,1.5,14,3,6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102_A,NA,NA,0,NA,NA,NA,NA,NA,NA,2.1,NA,4,1.5,10.8,7,1.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102_A,NA,NA,0,NA,NA,NA,NA,NA,NA,2.1,NA,4,2,10.8,5,1.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,0,NA,NA,NA,NA,NA,NA,2.1,NA,4,1.5,11.8,6,1.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,Nikolai and Quinn,NA,NA,0,NA,NA,NA,NA,NA,NA,1.7,NA,4,1.5,12.2,6,2.1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-5,NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,13,11,2.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-5,NA,NA,0,NA,NA,NA,NA,NA,NA,1.3,NA,4,1.5,12,7,3.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-6 ,NA,NA,0,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,14,6,2.1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-6 ,NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,14,7,4.1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102_B,NA,NA,0,NA,NA,NA,NA,NA,NA,1.8,NA,4,1.5,13,6,1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102_B,NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,3,1.5,10.5,6,4.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-8,NA,NA,0,NA,NA,NA,NA,NA,NA,1.5,NA,4,1.5,10.5,7,5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,102-8,NA,NA,0,NA,NA,NA,NA,NA,NA,1.1,NA,4,2,9.5,7,2
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,OA/rS,NA,NA,0,NA,NA,NA,NA,NA,NA,1.2,NA,4,1.5,9.9,10,0.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,OA/rS,NA,NA,0,NA,NA,NA,NA,NA,NA,2.5,NA,3,1,14.9,5,2
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,AS + DB,NA,NA,0,NA,NA,NA,NA,NA,NA,1.3,NA,4,1.5,14,11,4.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,AS + DB,NA,NA,0,NA,NA,NA,NA,NA,NA,1.1,NA,4,1.5,11.5,7,4
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,0,NA,NA,NA,NA,NA,NA,1.75,NA,4,1.5,13,4,3.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,"Nikita Bharati, Ariadni (103-3)",NA,NA,0,NA,NA,NA,NA,NA,NA,2,NA,4,1.5,10,0,0.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,A+R,NA,NA,0,NA,NA,NA,NA,NA,NA,0.8,NA,4,1.5,9,9,0.9
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,A+R,NA,NA,1,NA,NA,NA,NA,NA,NA,1.5,NA,4,2,10,8,1.6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SH/SS,NA,NA,0,NA,NA,NA,NA,NA,NA,1.4,NA,4,1.5,10.5,7,6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SH/SS,NA,NA,0,NA,NA,NA,NA,NA,NA,1.5,NA,3,1.5,11.4,10,0.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SPGG,NA,NA,0,NA,NA,NA,NA,NA,NA,1.1,NA,3,1.5,12.1,12,2.8
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SPGG,NA,NA,0,NA,NA,NA,NA,NA,NA,1.6,NA,3,1.5,9.5,4,1.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,0,NA,NA,NA,NA,NA,NA,3.2,NA,4,1.5,12.2,6,6.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,103-7 JGMB,NA,NA,0,NA,NA,NA,NA,NA,NA,2.3,NA,4,1.5,13.4,7,7.2
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,0,NA,NA,NA,NA,NA,NA,1,NA,4,1.5,10.5,5,3.5
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,SM SG 103-8,NA,NA,0,NA,NA,NA,NA,NA,NA,1.75,NA,3,1.5,12,6,3.6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,104-1,NA,NA,0,NA,NA,NA,NA,NA,NA,1.7,NA,4,1.5,13.2,7,3.7
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,104-1,NA,NA,0,NA,NA,NA,NA,NA,NA,3.3,NA,4,1.5,13.6,10,3.6
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,104-2,NA,NA,0,NA,NA,NA,NA,NA,NA,5.9,NA,4,1.5,10.1,10,3.1
+urbanization,control,control,control,control,control,sativa,N-,NA,NA,NA,104-2,NA,NA,0,NA,NA,NA,NA,NA,NA,3.7,NA,4,1.5,10,8,4

@@ -1,3 +1,33 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:75ecd1884702e2a8cf6f133207a8843e50e2edab104a68fea0031f275584e210
-size 1317
+genome_id,species,strain,contig_id,contig_length
+g2,canadensis,T173,g2_contig_1,3889131
+g3,canadensis,T173,g3_contig_2,4184339
+g4,medicae,SU277,g4_contig_4,3463497
+g5,medicae,SU277,g5_contig_3,4017999
+g6,medicae,SU277,g6_contig_8,3012466
+g8,medicae,SU277,g8_contig_5,3996302
+g9,medicae,WSM419,g9_contig_4,3931736
+g10,meliloti,USDA1021,g10_contig_2,4312801
+g11,medicae,WSM419,g11_contig_3,3901018
+g13,medicae,WSM419,g13_contig_6,3935928
+g15,adhaerens,Corn53,g15_contig_5,4036216
+g16,medicae,WSM419,g16_contig_3,3927202
+g17,medicae,WSM419,g17_contig_7,3978245
+g19,medicae,WSM419,g19_contig_3,3943792
+g20,meliloti,USDA1106,g20_contig_3,1876071
+g21,meliloti,1021,g21_contig_3,3715414
+g22,meliloti,USDA1021,g22_contig_3,3775387
+g23,meliloti,USDA1021,g23_contig_3,3775404
+g24,meliloti,USDA1106,g24_contig_7,1614423
+g25,meliloti,1021,g25_contig_5,3818409
+g26,meliloti,1021,g26_contig_3,3818417
+g27,meliloti,1021,g27_contig_3,3747451
+g28,medicae,SU277,g28_contig_19,4254493
+g29,medicae,SU277,g29_contig_1,4144345
+g30,medicae,SU277,g30_contig_2,4133951
+g31,meliloti,1021,g31_contig_1,3703244
+g32,meliloti,1021,g32_contig_1,3703255
+g33,meliloti,1021,g33_contig_5,3648612
+g34,meliloti,1021,g34_contig_3,3781582
+g35,meliloti,1021,g35_contig_3,3785483
+g36,meliloti,1021,g36_contig_3,3721623
+g37,meliloti,1021,g37_contig_3,3633966

@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e3e507c4732fde8ba7aaa47bc8718badbf7025cfc1973e68e06a23745ffdadfd
-size 1041
+ii,gradient,trait_type,trait_pre,st,term,statistic,p_value,siglab
+1,elevation,nodule,nodule shape,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",(Intercept),0,1,p=1 n.s.
+1,elevation,nodule,nodule shape,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",population,28.1,0.038,p=0.038 *
+2,elevation,nodule,nodule size,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",(Intercept),0.03,0.985,p=0.985 n.s.
+2,elevation,nodule,nodule size,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",population,22.22,0.017,p=0.017 *
+3,elevation,nodule,nodule color,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",(Intercept),0.1,0.998,p=0.998 n.s.
+3,elevation,nodule,nodule color,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_labgroup), family = 'binomial', data = d)",population,22.06,0.084,p=0.084 n.s.

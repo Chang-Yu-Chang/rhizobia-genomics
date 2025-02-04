@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:66a539396b766d028082d9ccd8be0f7ef86b631599a9e7a1c0b8ae1fe08d1356
-size 193
+trait_pre,value,high elevation,low elevation
+nodule color,pink,10,113
+nodule color,white,59,15
+nodule shape,oval,13,103
+nodule shape,round,56,24
+nodule size,large,19,95
+nodule size,small,50,33

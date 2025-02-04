@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:d5cc03d3a45b29ab13b68e3e33ef87a7082921a5107f859b2ac30c7f92b1c806
-size 1904
+category,go_id,term,annotated,significant,expected,classic_fisher
+BP,GO:0072329,monocarboxylic acid catabolic process,10,7,0.67,3.8e-07
+BP,GO:0019439,aromatic compound catabolic process,14,7,0.94,8.9e-06
+BP,GO:0044248,cellular catabolic process,49,12,3.3,2.5e-05
+BP,GO:0070887,cellular response to chemical stimulus,16,7,1.08,2.7e-05
+BP,GO:0046395,carboxylic acid catabolic process,28,9,1.89,3.0e-05
+BP,GO:1901361,organic cyclic compound catabolic proces...,17,7,1.15,4.3e-05
+BP,GO:0044282,small molecule catabolic process,44,11,2.96,4.8e-05
+BP,GO:0032787,monocarboxylic acid metabolic process,31,9,2.09,7.7e-05
+BP,GO:0019752,carboxylic acid metabolic process,107,17,7.21,0.00015
+BP,GO:0016054,organic acid catabolic process,34,9,2.29,0.00017
+CC,GO:0005622,intracellular anatomical structure,144,12,6.41,0.007
+CC,GO:0005737,cytoplasm,140,10,6.23,0.054
+CC,GO:0043226,organelle,15,2,0.67,0.139
+CC,GO:0043229,intracellular organelle,15,2,0.67,0.139
+CC,GO:0042597,periplasmic space,41,3,1.82,0.271
+CC,GO:0032991,protein-containing complex,63,3,2.8,0.551
+CC,GO:0005829,cytosol,28,1,1.25,0.732
+CC,GO:0043190,ATP-binding cassette (ABC) transporter c...,37,1,1.65,0.828
+CC,GO:0098533,ATPase dependent transmembrane transport...,37,1,1.65,0.828
+CC,GO:1902495,transmembrane transporter complex,37,1,1.65,0.828
+MF,GO:0016209,antioxidant activity,14,4,0.84,0.0073
+MF,GO:1901681,sulfur compound binding,10,3,0.6,0.0180
+MF,GO:0016667,"oxidoreductase activity, acting on a sul...",11,3,0.66,0.0237
+MF,GO:0016491,oxidoreductase activity,214,19,12.8,0.0332
+MF,GO:0016836,hydro-lyase activity,13,3,0.78,0.0377
+MF,GO:0016829,lyase activity,53,6,3.17,0.0892
+MF,GO:0016810,"hydrolase activity, acting on carbon-nit...",19,3,1.14,0.0993
+MF,GO:0004601,peroxidase activity,11,2,0.66,0.1367
+MF,GO:0016684,"oxidoreductase activity, acting on perox...",11,2,0.66,0.1367
+MF,GO:0046983,protein dimerization activity,11,2,0.66,0.1367

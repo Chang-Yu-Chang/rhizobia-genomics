@@ -1,3 +1,415 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:798ea9a3a5eb35bccd71e0415a4cb3d5d92afcd353f85afa54d3ccdc71f03a12
-size 43453
+﻿RhizobiaStrain,Elevation,NitrogenTreatment,NoduleNumber,PrimaryRootNoduleNumber,LateralRootNoduleNumber,NoduleShape,NoduleSize,NoduleColor,StemHeight,LongestPetioleLength,LeafNumber,LeafColor,Notes
+G9,low elevation,with nitrogen,13,2,11,round,small,pink,95,40,6,4,
+G9,low elevation,with nitrogen,0,7,2,round,small,white,152,45,8,5,
+G9,low elevation,with nitrogen,8,1,7,round,small,white,130,28,9,7,N/A
+G11,low elevation,with nitrogen,0,0,0,,,,141,28,10,8,
+G4,high elevation,with nitrogen,0,0,0,,,,155,30,14,7,the roots were very tangled and it looked like a healthy dark green plant. The agar solution was all dried up.
+G11,low elevation,with nitrogen,1,0,1,round,small,pink,89,38,7,7,"for all three groups, the darker leaf color might have occurred because it was wilted."
+G11,low elevation,with nitrogen,2,2,0,oval,small,pink,106,28,6,7,"Super long roots, over 200mm"
+G2,high elevation,with nitrogen,0,0,0,,,,70,25,6,8,"We observed 0 nodules underneath the dissection microscope, there was 0 nodular growth. However we noticed two cotyledons and a darker green color with leaves towards the top of the plant."
+G4,high elevation,with nitrogen,0,0,0,,,,165,35,10,7,the agar solution was not as consumed as the other plants
+G4,high elevation,with nitrogen,0,0,0,,,,95,35,6,7,All of our leaves were dark green
+G2,high elevation,with nitrogen,0,0,0,,,,125,24,6,7,We observed 0 root nodules however we saw two cotyledons. The color of the leaves appeared to be much lighter than plant #1.
+G2,high elevation,with nitrogen,0,0,0,,,,92,12,5,7,We observed dead cotyledons towards the end of the plant. We also observed 0 root nodules.
+G11,low elevation,with nitrogen,6,0,6,oval,small,pink,120,22,11,8,There were both pink and red nodules present.
+G2,high elevation,with nitrogen,0,0,0,,,,108,17,9,7,"Our lab instructor told us this vial might have had it's nitrogen tag fall off, so it may not be representative"
+G11,low elevation,with nitrogen,7,0,7,oval,small,pink,190,47,11,7,N/A
+G11,low elevation,with nitrogen,12,0,12,oval,small,pink,160,32,12,8,There were pink and white nodules present.
+G4,high elevation,with nitrogen,6,0,6,oval,small,white,135,40,13,7,#NAME?
+G9,low elevation,with nitrogen,0,0,0,,,,130,15,9,7,roots were straight; 1's stem was longer than 2's stem but root was shorter than 2's root
+G2,high elevation,with nitrogen,0,0,0,,,,185,27,10,8,Curling and tangling of the roots. 
+G9,low elevation,with nitrogen,3,2,1,round,small,white,96,31,7,7,roots were curled; 2's root was longer than 1's root but 2's stem was shorter than 1's stem
+G2,high elevation,with nitrogen,0,0,0,,,,152,36,11,8,
+G2,high elevation,with nitrogen,0,0,0,,,,131,19,11,7,
+G9,low elevation,with nitrogen,4,0,4,round,small,pink,210,23.5,9,7,many more lateral roots compared to other 2 plants; longest root; longest stem; thickest stem; straight root
+G4,high elevation,with nitrogen,0,0,0,,,,180,25,15,7,#NAME?
+G4,high elevation,with nitrogen,0,0,0,,,,175,25,9,7,#NAME?
+G16,low elevation,with nitrogen,10,0,10,oval,large,pink,160,25,11,7,
+G16,low elevation,with nitrogen,0,0,0,,,,115,15,10,6,
+G6,high elevation,with nitrogen,10,3,7,round,small,white,173,23,11,7,
+G6,high elevation,with nitrogen,0,0,0,,,,156,29,9,7,"nodules are all pink, one large nodule and the others are small, leaves are all pretty dark and darkest one is a 7 on scale"
+G6,high elevation,with nitrogen,0,0,0,,,,152,37,11,7,"Roots also look unhealthy, leaves are less dark. No nodules."
+G13,low elevation,with nitrogen,11,7,4,oval,large,pink,165,16,9,8,
+G13,low elevation,with nitrogen,7,1,6,oval,large,white,89,22,10,8,
+G13,low elevation,with nitrogen,5,3,2,oval,large,pink,152,23,5,8,
+G6,high elevation,with nitrogen,10,3,7,round,small,white,173,23,11,7,
+G5,high elevation,with nitrogen,13,3,10,round,large,pink,134,30,9,7,
+G5,high elevation,with nitrogen,8,0,8,oval,small,pink,143,32,10,7,
+G5,high elevation,with nitrogen,4,0,4,oval,small,white,173,28,7,7,"plant is health, good green color, leaves are health yet kind small in length, root are very long and developed  "
+control,control,with nitrogen,0,0,0,,,,120,40,12,8,This one had a lot less nodules with a very large singular nodule that was pink. Also the petiole length was longer than the stem shoot length
+control,control,with nitrogen,0,0,0,,,,170,30,9,7,Petioles are quite long. 
+control,control,with nitrogen,0,0,0,,,,130,35,10,7,
+G5,high elevation,with nitrogen,3,0,3,round,small,white,134,35,8,7,The plant outgrew the containment. Most of the leaves were at a 7 on the darkness scale. 
+G5,high elevation,with nitrogen,0,0,0,,,,111,28,13,8,N/A
+G13,low elevation,with nitrogen,1,0,1,round,small,white,205,25,6,7,"Most of the leaves were on a scale of 7. Again, this one outgrew the tube it was in. No nodules were observed. "
+control,control,with nitrogen,0,0,0,,,,36,30,8,7,"pink nodules, 2 large nodules and the rest are small"
+control,control,with nitrogen,0,0,0,,,,165,20,13,7,
+control,control,with nitrogen,0,0,0,,,,140,75,10,8,
+G6,high elevation,with nitrogen,2,0,2,round,small,white,240,30,8,7,"The plant has some leaves that don't have color, maybe due to insufficient nutrients. "
+G5,high elevation,with nitrogen,0,0,0,,,,135,34,9,7,"For this alfalfa plant, the stem of the plant was extremely red in color. Some of the leaves also were red. Finally, there were noticeably more nodules on this plant than there were for the other plants in our group. "
+G16,low elevation,without nitrogen,14,0,14,oval,large,pink,121,49,10,7,This one outgrew the tubule. One fo the leaves were colored at a 4 on the scale. No observed root nodules.  
+G16,low elevation,without nitrogen,12,0,12,oval,small,pink,189,25,8,6,
+G16,low elevation,without nitrogen,10,0,10,round,large,pink,116,26,11,7,"Primary root curls on bottom, very long primary root, most nodules present on non-primary roots"
+G6,high elevation,with nitrogen,11,1,10,round,large,white,80,15,13,7,"This plant grew the most out of our 3, unsure of why"
+G13,low elevation,with nitrogen,9,1,8,oval,large,pink,155,24,11,8,there are two plants in one tubing 
+G13,low elevation,with nitrogen,9,0,9,,small,pink,175,17,10,7,"Plant 2 grew a lot, however, it is a lighter color and has less leaves and roots than plant 1."
+G6,high elevation,with nitrogen,0,0,0,,,,136,25,8,7,
+G16,low elevation,with nitrogen,0,0,0,,,,127,27,12,7,N/A
+G16,low elevation,with nitrogen,11,3,8,oval,large,pink,106,84,12,7,n/a
+G16,low elevation,with nitrogen,11,1,10,oval,large,pink,121,34,14,7,
+G6,high elevation,with nitrogen,0,0,0,,,,28,21,8,7,
+G6,high elevation,with nitrogen,0,0,0,,,,68,41,7,6,Had the most nodules out of our three seedlings. 
+G13,low elevation,with nitrogen,1,1,0,oval,small,white,100,22,8,7,
+G13,low elevation,with nitrogen,6,2,4,oval,small,pink,192,33,11,7,
+G13,low elevation,with nitrogen,1,0,1,oval,large,pink,115,40,7,7,
+G5,high elevation,with nitrogen,0,0,0,,,,193,29,9,7,super coiled with long root
+G5,high elevation,with nitrogen,0,0,0,,,,170,27,9,7,agar dried out
+G5,high elevation,with nitrogen,0,0,0,,,,135,25,11,6,
+control,control,with nitrogen,4,1,3,oval,small,white,150,24,10,7,
+control,control,with nitrogen,3,0,3,oval,small,white,125,42,11,7,Looks like a dead plant - largest leaf and petiole fell off
+control,control,with nitrogen,4,1,3,oval,small,white,150,30,10,7,
+G6,high elevation,with nitrogen,0,0,0,,,,25,52,8,7,"Best looking plant of all three, most length and colour in leaves - fewer non primary roots than others "
+G6,high elevation,with nitrogen,0,0,0,,,,33,24,10,7,
+G6,high elevation,with nitrogen,0,0,0,,,,30,28,11,7,"leaves relatively large, roots not that curly, alive"
+G16,low elevation,with nitrogen,5,0,5,oval,large,pink,156,40,8,8,Noticeably short stem length compared to the other two. 
+G16,low elevation,with nitrogen,7,1,6,oval,large,pink,170,45,11,7,
+G5,high elevation,with nitrogen,0,0,0,,,,113,26,8,5,
+G16,low elevation,with nitrogen,6,0,6,oval,large,pink,150,42,11,7,Some nodules were clumped together. 
+G13,low elevation,without nitrogen,16,4,12,oval,large,pink,105,25,9,7,"long stringy roots that interweave and form some circles, some leaves seem dead and are barely hanging onto the primary root, pale brown leaves. Green leaves are also present, had the longest stem"
+G13,low elevation,without nitrogen,20,0,20,oval,large,pink,218,20,8,7,
+G13,low elevation,without nitrogen,10,0,10,oval,large,pink,241,20,10,7,there was two plants
+control,control,with nitrogen,3,0,3,oval,small,white,125,42,11,7,
+control,control,with nitrogen,4,1,3,oval,small,white,150,24,10,7,
+G5,high elevation,with nitrogen,12,0,12,round,small,white,76,26,12,7,
+G5,high elevation,with nitrogen,8,0,8,round,small,white,110,25,14,7,N/A
+G4,high elevation,without nitrogen,17,0,17,round,small,white,145,31,12,7,Stem was white
+G4,high elevation,without nitrogen,4,0,4,round,small,white,144,36,8,7,the stem was pink
+G9,low elevation,with nitrogen,9,0,9,round,large,pink,125,25,9,7,
+G9,low elevation,with nitrogen,12,1,11,oval,large,pink,195,70,12,8,Only one leaf was present
+G4,high elevation,without nitrogen,40,0,40,oval,small,white,210,29,11,7,curly stems
+G11,low elevation,without nitrogen,19,1,18,round,small,pink,145,25,8,7,"stems are curly, leaves are small and green, seedlings are alive"
+G9,low elevation,with nitrogen,10,0,10,oval,large,white,160,28,12,7,"curly roots; long, tangled and skinny petioles"
+G11,low elevation,without nitrogen,6,2,4,oval,large,pink,190,30,10,7,The primary root and steam are really long compared to the other plants.
+G11,low elevation,without nitrogen,19,0,19,round,small,pink,135,30,10,7,
+G11,low elevation,without nitrogen,14,0,14,oval,large,pink,126,36,14,7,tangled roots
+G11,low elevation,without nitrogen,13,0,13,round,small,pink,155,30,8,7,"many roots, leaves tangled"
+G11,low elevation,without nitrogen,15,0,15,oval,large,pink,230,26,15,6,
+G2,high elevation,with nitrogen,0,0,0,,,,148,26,10,7,there was one really red nodule 
+G2,high elevation,with nitrogen,0,0,0,,,,149,33,11,7,very long stem
+G2,high elevation,with nitrogen,3,3,0,oval,small,white,139,42,11,6,
+G16,low elevation,with nitrogen,6,0,6,oval,large,pink,135,38,8,6,The agar was completely dried out. 
+G2,high elevation,with nitrogen,0,0,0,,,,155,35,9,7,
+G2,high elevation,with nitrogen,0,0,0,,,,109,29,9,7,
+G2,high elevation,with nitrogen,0,0,0,oval,,,110,40,11,7,
+G11,low elevation,with nitrogen,2,0,2,oval,small,pink,175,18,8,7,one leaf significantly lighter in color than the others; significantly smaller stem height compared to seedlings #2 and #3 in our group
+G9,low elevation,with nitrogen,4,0,4,round,small,white,265,30,10,7,"one lower leaf is yellow, much more concentrated curly roots"
+G11,low elevation,with nitrogen,13,0,13,oval,small,white,185,30,12,7,
+G9,low elevation,with nitrogen,10,4,6,oval,large,pink,155,30,10,7,
+G9,low elevation,with nitrogen,11,1,10,round,small,white,165,23,11,7,
+G11,low elevation,without nitrogen,14,3,11,oval,large,pink,225,50,16,8,
+G4,high elevation,with nitrogen,7,3,4,round,small,white,230,45,8,7,
+G11,low elevation,with nitrogen,7,1,6,oval,large,white,159,23,13,8,
+G4,high elevation,with nitrogen,3,1,2,round,small,white,170,35,9,8,
+G11,low elevation,without nitrogen,13,4,9,oval,large,pink,179,27,16,7,perfect
+G11,low elevation,without nitrogen,33,9,24,round,large,pink,164,34,9,7,curly roots at bottom of agar
+G9,low elevation,with nitrogen,13,0,13,oval,large,pink,230,25,11,7,
+G2,high elevation,with nitrogen,0,0,0,,,,134,32,9,7,
+G2,high elevation,with nitrogen,0,0,0,,,,100,55,10,7,
+G9,low elevation,with nitrogen,7,0,7,oval,large,pink,245,30,13,7,a lot of the leaves had died and were no longer green
+G2,high elevation,with nitrogen,0,0,0,,,,105,15,11,7,"Curly roots, large leaves"
+control,control,with nitrogen,0,0,0,,,,140,36,14,7,
+G4,high elevation,with nitrogen,9,0,9,round,large,white,150,33,12,8,
+control,control,with nitrogen,0,0,0,,,,232,43,14,7,
+control,control,with nitrogen,0,0,0,,,,154,35,13,7,Our plant grew through the form stopper
+G4,high elevation,with nitrogen,15,0,15,round,large,white,172,24,14,8,#NAME?
+G4,high elevation,with nitrogen,19,0,19,round,large,white,200,26,16,7,
+G9,low elevation,with nitrogen,12,0,12,oval,large,pink,160,27,15,7,"The leaves are again wilted and discolored. The leaves are aslo very small. The roots themselves and thin and appear to be straight. Most of the roots, except for the main root, are very short as well."
+G13,low elevation,with nitrogen,4,3,1,oval,large,white,120,31,11,7,"roots are curly at the bottom of seeding 1. leaves are of varying colors, one leaf dying from lack of agar. leaves are very small, nodules are small and are sometimes found in clusters. "
+G13,low elevation,with nitrogen,0,0,0,,,,172,28,14,7,"The plant grew root nodules that appeared white. The stem was tall, and the leaves were dark."
+G5,high elevation,with nitrogen,0,0,0,,,,150,40,8,7,
+G5,high elevation,with nitrogen,0,0,0,,,,175,40,11,7,
+G5,high elevation,with nitrogen,0,0,0,,,,165,35,10,7,
+G16,low elevation,with nitrogen,0,0,0,,,,78,38.1,9,7,
+G16,low elevation,with nitrogen,0,0,0,,,,101.6,25.4,11,7,
+G13,low elevation,with nitrogen,0,0,0,,,,131,35,8,6,
+G16,low elevation,with nitrogen,0,0,0,,,,127,25.4,11,7,
+G6,high elevation,with nitrogen,0,0,0,,,,115,65,10,6,
+G6,high elevation,with nitrogen,0,0,0,,,,135,35,8,6,
+G6,high elevation,with nitrogen,3,3,0,oval,small,white,150,27,9,8,
+control,control,with nitrogen,0,0,0,,,,93.98,38.1,8,7,
+control,control,with nitrogen,0,0,0,,,,101.6,27.94,10,7,
+control,control,with nitrogen,0,0,0,,,,111.76,25.4,11,7,the agar came out during extraction
+control,control,with nitrogen,13,3,10,oval,large,white,125,59,12,7,
+control,control,with nitrogen,9,2,7,oval,large,white,120,40,13,7,
+control,control,with nitrogen,14,0,14,oval,large,white,100,70,14,7,"the leaves were purple, so was a little difficult to score its darkness"
+G13,low elevation,without nitrogen,15,0,15,round,large,pink,85,33,13,7,
+G13,low elevation,without nitrogen,14,0,14,round,large,pink,108,29,12,7,
+G13,low elevation,without nitrogen,24,0,24,round,large,pink,128,37,11,7,
+G5,high elevation,with nitrogen,0,0,0,,,,142,22,10,6,"seedling 1: the roots were ""stringy"" in appearance, but interwoven which required much plying"
+G5,high elevation,with nitrogen,0,0,0,,,,112,35,8,7,seedling 2:particularly long primary root and fewer non-primary roots
+G5,high elevation,with nitrogen,43,13,30,round,small,white,70,35,10,7,seedling 3: the roots were curling in on themselves and provide difficult to separate
+G16,low elevation,without nitrogen,13,3,10,oval,large,pink,215,21,11,7,"could not measure modules, agar was very dried out (got okay from TA-Jessica)"
+G16,low elevation,without nitrogen,11,1,10,,large,pink,208,40,12,8,"nodules were observed, roots were curly"
+G16,low elevation,without nitrogen,120,47,24,oval,large,pink,120,47,10,8,"First seedling was very, very long (and even broke off from the top of the stopper)"
+G6,high elevation,with nitrogen,0,0,0,,,,56,38,9,7,"No agar left in the tubule, the plant shows extensive root growth, with the secondary roots curling together at the bottom. The nodules are pink but as you travel down the roots they become a lighter link-white in color. The leaves and cotyledons near the bottom are wilted and dying, making them a yellow and pink color."
+G6,high elevation,with nitrogen,0,0,0,,,,14.7,20,5,7,
+G6,high elevation,with nitrogen,5,0,5,oval,small,white,137,31,12,7,
+G13,low elevation,without nitrogen,14,0,14,oval,small,pink,127,25,13,7,
+control,control,with nitrogen,0,0,0,,,,150,19,13,7,n/a
+control,control,with nitrogen,0,0,0,,,,103,22,12,7,The leaf died.
+control,control,with nitrogen,0,0,0,,,,94,22,15,8,
+G13,low elevation,without nitrogen,21,3,18,round,large,white,202,35,14,7,2 shoots
+G13,low elevation,without nitrogen,37,2,35,oval,large,white,183,35,11,7,
+G6,high elevation,with nitrogen,2,0,2,round,small,white,160,24,10,8,
+G6,high elevation,with nitrogen,6,0,6,oval,large,pink,180,31,10,7,
+G6,high elevation,with nitrogen,6,0,6,round,small,white,135,28,9,7,
+G16,low elevation,with nitrogen,2,2,0,oval,large,pink,185,43,11,7,n/a
+G5,high elevation,with nitrogen,0,0,0,,,,125,30,9,8,
+G5,high elevation,with nitrogen,18,0,18,round,large,white,140,40,14,7,"roots are curling around the diameter of the tubule, w/extensive, prominent and long root growth, there is still a lot of agar present. Most of the leaves are on the small side and are slimmer in size and turned inward"
+G5,high elevation,with nitrogen,17,0,17,round,large,pink,137,40,16,7,a leaf has dried up and fallen off
+G16,low elevation,without nitrogen,34,0,34,round,small,pink,236,40,10,6,no nodules observed
+G16,low elevation,without nitrogen,12,2,10,oval,large,pink,161,38,10,7,
+G4,high elevation,with nitrogen,4,0,4,oval,small,pink,230,29,11,7,"The plant had a short stem height and varying colors from purple, yellow, and green. There also were only a few leaves. "
+G2,high elevation,with nitrogen,0,0,0,,,,160,20,6,6,"Very short compared to other plants in the class, no nodules, very long roots, leaves are very dry towards the bottom of the stem (small and shriveled, colors 1-2), darkest green is still on the lighter side (3-5), small and few leaves, stem is a very light white/pinik color, roots are completely white"
+G2,high elevation,with nitrogen,0,0,0,,,,140,35,9,6,
+G2,high elevation,with nitrogen,0,0,0,,,,140,35,14,5,
+G4,high elevation,with nitrogen,0,0,0,,,,132,22,7,7,
+G9,low elevation,with nitrogen,4,0,4,oval,large,white,170,25,10,7,
+G4,high elevation,with nitrogen,0,0,0,,,,153,21,8,7,Consistently green stem. Larger color variance in leafs.
+G9,low elevation,with nitrogen,2,0,2,round,small,pink,175,17.5,10,7,"root is more curly than seedling 1, leaves are smaller than seedling 1 "
+G9,low elevation,with nitrogen,9,2,7,round,small,pink,185,20,11,6,"Long root system, healthy leaves, looks great!"
+G11,low elevation,without nitrogen,13,0,13,oval,large,pink,195,28,9,7,
+G11,low elevation,without nitrogen,17,0,17,oval,large,pink,129,33,12,7,"leaves are relatively small, root is not too curly "
+G4,high elevation,with nitrogen,6,2,4,oval,small,white,150,20,10,7,"Very short compared to other plants in the class, no nodules, very long roots, leaves are very dry towards the bottom of the stem (small and shriveled, colors 1-2), darkest green is still on the lighter side (3-5), small and few leaves, stem is a very light white/pinik color, roots are completely white"
+G4,high elevation,with nitrogen,6,2,4,oval,small,white,180,30,12,6,
+G9,low elevation,without nitrogen,21,0,21,round,small,pink,156,35,8,7,
+G9,low elevation,without nitrogen,33,4,29,oval,large,pink,234,20,12,8,
+G11,low elevation,without nitrogen,14,0,14,oval,large,pink,155,40,5,7,
+G4,high elevation,with nitrogen,4,1,3,oval,small,white,140,20,11,6,we got two plants in one test tube; medium length with the same amount of nodules as seedling 1; roots are slightly less damp than the other two 
+G9,low elevation,without nitrogen,14,3,11,oval,large,pink,111,23,11,8,sickly looking
+G2,high elevation,with nitrogen,7,0,7,oval,small,white,172,30,16,7,"leaves are the largest, roots are just as curly as seedling 2 "
+G2,high elevation,with nitrogen,7,1,6,oval,small,white,195,29,12,7,Seedling 1 notes: A lot of growth was present.There was also a lot of stem growth. The stem was very green. The roots were very curly. The leaves were very large indicating a lot of growth as well. The root nodules are extremely opaque giving it a light opaque/white appearance.   
+G2,high elevation,with nitrogen,4,4,0,oval,small,white,158,32,8,8,"dead, whitish plant"
+G5,high elevation,with nitrogen,0,0,0,,,,141,24,10,7,
+G5,high elevation,with nitrogen,0,0,0,,,,158,36,10,7,
+G5,high elevation,with nitrogen,0,0,0,,,,128,36,8,7,Seedling had no nodules
+G13,low elevation,without nitrogen,4,0,4,oval,large,pink,180,24,12,7,No nodules formed
+G13,low elevation,without nitrogen,6,0,6,oval,large,pink,153,62,16,8,"There were ""nodule-like"" looking bubbles in the agar but no nodules were observed on the roots. "
+G13,low elevation,without nitrogen,18,0,18,oval,large,pink,190,30,9,7,
+G11,low elevation,without nitrogen,11,5,6,oval,large,pink,55,15.7,3,6,"Cotyledon is yellowish green, and most of the nodules have a pinkish tint. "
+G11,low elevation,without nitrogen,0,0,0,,,,215.9,35,6,7,#NAME?
+G11,low elevation,without nitrogen,12,0,12,oval,small,pink,272,40,7,7,#NAME?
+G11,low elevation,without nitrogen,10,6,4,round,large,pink,60,10,3,5,Nodules were very low into the roots. 
+G11,low elevation,without nitrogen,8,0,8,oval,small,pink,233,32,5,7,#NAME?
+G2,high elevation,without nitrogen,0,0,0,,,,34,21,3,4,"roots are curly and tan, has 3 leaves (2 are green and 1 is pink), there are 2 cotydelons "
+G4,high elevation,without nitrogen,2,0,2,oval,small,pink,10,30,6,6,
+G11,low elevation,without nitrogen,9,8,1,oval,large,pink,100,25,7,7,Many of these nodules are bunched together. 
+G4,high elevation,without nitrogen,0,0,0,,,,10,25,7,6,
+G4,high elevation,without nitrogen,20,0,20,oval,small,white,10,30,7,5,
+G9,low elevation,without nitrogen,15,5,10,oval,large,pink,50,15,5,7,
+G9,low elevation,without nitrogen,17,6,11,oval,large,pink,150,20,5,7,
+G9,low elevation,without nitrogen,18,7,11,oval,large,pink,100,25,6,7,
+G4,high elevation,without nitrogen,14,7,7,round,small,white,12,21,2,3,
+G4,high elevation,without nitrogen,11,5,6,round,small,white,17,21,3,3,
+G2,high elevation,without nitrogen,0,0,0,,,,15,25,2,3,
+G2,high elevation,without nitrogen,0,0,0,,,,108,17,9,7,
+G11,low elevation,without nitrogen,6,2,4,oval,large,pink,85,25,5,8,"roots curly at the bottom, very long primary root,leaves vary in size, some large ones"
+G9,low elevation,without nitrogen,8,1,7,oval,large,pink,106,20,6,7,roots very curly
+G11,low elevation,without nitrogen,21,2,19,oval,large,pink,115,25,10,7,"Curly and white roots, white splotches on leaves, lots of white nodules and pink nodules"
+G9,low elevation,without nitrogen,13,1,12,oval,large,pink,42,15,4,7,1 dead leaf
+G9,low elevation,without nitrogen,15,13,2,oval,large,pink,85,23,5,7,"1 dead cotyledon, 1 dying leaf"
+G11,low elevation,without nitrogen,13,2,11,oval,large,pink,58,22,6,5,
+G11,low elevation,without nitrogen,9,2,7,oval,large,pink,25,22,5,6,"There were both red/pink and white nodules. Most of them were large and oblong, but a couple of the white nodules were white and round"
+G11,low elevation,without nitrogen,12,5,7,oval,large,pink,87,27,7,7,We had a couple white nodules and a couple small nodules in addition to the majority pink/red and large nodules.
+G11,low elevation,without nitrogen,6,2,4,oval,large,pink,70,21,4,7,"2 white leaves towards the bottom, white roots, wavy roots not as curly, white splotches, only pink nodules"
+G4,high elevation,without nitrogen,33,1,32,round,large,pink,40,17,5,7,
+control,control,without nitrogen,0,0,0,,,,9,16,3,4,"No nodules, roots are dried out, plant is wilting. "
+G16,low elevation,without nitrogen,6,2,4,oval,small,pink,150,20,7,8,
+control,control,without nitrogen,0,0,0,,,,10,17,5,6,
+G16,low elevation,without nitrogen,4,1,3,oval,large,pink,68,16,8,7,"nodules are pink and short, darkest leaf is the darkest green"
+control,control,without nitrogen,0,0,0,,,,22,20,4,3,
+G16,low elevation,without nitrogen,9,0,9,oval,large,pink,84,24,7,8,Agarose is dried out
+G6,high elevation,without nitrogen,22,0,22,round,large,white,49,16,5,7,"yellow leaves, wilted, dying, redness on petiole "
+G6,high elevation,without nitrogen,18,1,17,round,large,white,46,21,6,7,The plant did not look healthy
+G6,high elevation,without nitrogen,69,13,56,round,small,white,34,15,8,6,The plant did not look healthy
+G5,high elevation,without nitrogen,0,0,0,,,,16,17,3,6,This one had a lot more nodules than the others
+G13,low elevation,without nitrogen,8,4,4,oval,large,pink,25,14,4,7,"Plant 1 grew a lot, resulting in dry agar and long, curly roots. "
+G5,high elevation,without nitrogen,7,1,6,round,small,white,8,13,3,5,
+G13,low elevation,without nitrogen,11,0,11,oval,large,pink,16,17,3,6,Cotyledons were dry and small. Petioles have uneven lengths. Some of the leaves are white.
+G5,high elevation,without nitrogen,10,0,10,round,small,white,16,9,2,4,
+G13,low elevation,without nitrogen,5,0,5,oval,large,pink,72,23,5,7,"Plant 3 grew less than plant 1 and plant 2. Additionally, it was extremely dry, resulting in root breakage. "
+G11,low elevation,without nitrogen,19,0,19,oval,large,pink,86,24,6,7,
+G13,low elevation,without nitrogen,13,5,8,round,small,white,420,25,6,7,N/A
+G13,low elevation,without nitrogen,6,1,5,oval,small,pink,200,30,4,5,N/A
+G13,low elevation,without nitrogen,12,0,12,round,small,pink,300,24,5,7,"No nodules, plant appears slightly healthier than seedling one. More leaves are present."
+G5,high elevation,without nitrogen,30,4,26,round,large,pink,15,4,3,7,
+G6,high elevation,without nitrogen,10,3,7,oval,large,pink,54,12,4,5,"The plant is very small, likely due to high elevation"
+G5,high elevation,without nitrogen,31,4,27,round,small,pink,12,9,4,7,"some leaves were yellow, some roots curl "
+G6,high elevation,without nitrogen,25,3,22,round,small,pink,39,24,3,5,"tall in height, leaves not as healthy looking, but was the tallest plant out of the three tubes, and roots were very long and developed"
+G6,high elevation,without nitrogen,8,1,7,round,large,pink,41,17,2,5,"Plant 3: roots are very developed and long, has a brown petiole (indicate development)?, small leaves but plenty, dark leaves"
+control,control,without nitrogen,0,0,0,,,,35,19,2,7,
+control,control,without nitrogen,0,0,0,,,,12,12,4,6,"very long root; nodules were most present on non-primary roots closest to the stem, some nodes come in a pair (bunched together)"
+control,control,without nitrogen,0,0,0,,,,16,17,3,6,The plant did not look healthy
+G16,low elevation,without nitrogen,20,9,11,oval,large,pink,76,23,8,7,Agar was depleted; plant dehydrated
+G5,high elevation,without nitrogen,40,3,37,round,large,pink,18,12,5,5,
+G16,low elevation,without nitrogen,55,12,43,oval,small,white,30,24,4,7,N/A
+G16,low elevation,without nitrogen,4,0,4,oval,large,pink,22,29,4,6,"2 dead leaves, primary root curls on the bottom, high number of nodes on non-primary roots, primary root is shorter than the first two seedlings"
+G16,low elevation,without nitrogen,12,5,7,oval,large,pink,90,20,12,7,N/A
+G16,low elevation,without nitrogen,8,1,7,oval,large,pink,12,16,3,6,"leaves relatively large, roots not that curly, alive"
+G16,low elevation,without nitrogen,7,7,0,oval,large,pink,54,40,7,7,Many of the leaves were dead in all of the seedlings.
+G16,low elevation,without nitrogen,17,0,17,oval,large,pink,25,27,5,7,"leaves relatively large, roots not that curly, alive"
+G16,low elevation,without nitrogen,7,5,2,oval,large,pink,45,15,7,7,
+G6,high elevation,without nitrogen,45,2,43,round,small,white,15,21,2,3,
+G6,high elevation,without nitrogen,30,6,24,round,small,white,40,19,2,3,different shapes of nodules
+G6,high elevation,without nitrogen,32,4,28,round,small,white,31,21,3,5,
+G13,low elevation,without nitrogen,7,0,7,oval,small,pink,26,18,5,7,
+G13,low elevation,without nitrogen,6,1,5,oval,small,white,15,14,4,6,N/A
+G13,low elevation,without nitrogen,0,0,0,,,,60,10,1,1,
+G16,low elevation,without nitrogen,1,1,0,oval,large,pink,20,8,13,7,
+G5,high elevation,without nitrogen,26,4,22,round,small,white,42,14,3,6,
+G5,high elevation,without nitrogen,69,4,65,round,small,white,10,13,3,3,"no roots besides the primary, one nodule that is higher up on the primary root"
+G5,high elevation,without nitrogen,24,3,21,round,small,white,19,22,4,7,no
+G6,high elevation,without nitrogen,64,0,64,round,small,white,139,21,4,5,Very small petioles.
+G16,low elevation,without nitrogen,12,6,6,oval,large,pink,99,26,11,7,
+G16,low elevation,without nitrogen,8,1,7,oval,large,pink,80,18,5,6,
+G16,low elevation,without nitrogen,6,2,4,oval,large,pink,77,24,6,6,Plant did not grow out of tube and height across trials is consistent 
+G6,high elevation,without nitrogen,22,0,22,round,small,white,143,9,4,2,
+control,control,without nitrogen,0,0,0,,,,45,8,3,5,
+G6,high elevation,without nitrogen,20,0,20,round,small,white,172,18,5,5,
+control,control,without nitrogen,0,0,0,,,,39,20,3,5,
+G5,high elevation,without nitrogen,28,12,16,round,small,white,60,10,2,4,"Longest stem out of the three, but average in all other aspects relative to other seedlings. "
+G5,high elevation,without nitrogen,17,13,4,round,large,white,50,5,2,3,N/A
+G5,high elevation,without nitrogen,8,7,1,round,small,white,15,7,3,7,
+control,control,without nitrogen,0,0,0,,,,15,4,3,5,N/A
+G13,low elevation,without nitrogen,7,0,7,oval,large,white,30,20,7,6,
+G11,low elevation,without nitrogen,4,0,4,oval,large,pink,63,21,5,8,N/A
+G2,high elevation,without nitrogen,0,0,0,,,,20,21,2,5,"mixture of light green and darker green leaves, long stringy leaves that are curly"
+G2,high elevation,without nitrogen,0,0,0,,,,5,10,3,6,"Curly roots, long and stringy towards bottom of tube, leaves are a dark green color, many three-lobed leaves grew, one leaf seemed to be starting to die however as a part of it was light brown/tan."
+G2,high elevation,without nitrogen,0,0,0,,,,15,17,2,4,"All leaves are 3-lobed, and all leaf colors were either a 7 or an 8"
+G9,low elevation,without nitrogen,11,0,11,oval,large,pink,56,13,5,7,
+G9,low elevation,without nitrogen,13,1,12,round,small,white,21,18,2,3,Seedling 1 was much smaller overall than our other seedlings
+G4,high elevation,without nitrogen,29,4,25,round,small,white,14,15,3,7,
+G9,low elevation,without nitrogen,6,0,6,oval,large,pink,128,16,6,7,"nodules very darkly colored, very long primary root"
+G4,high elevation,without nitrogen,16,3,13,round,small,white,18,8,3,7,"shoots very small, nodules different than seedling 1 - small and white"
+G4,high elevation,without nitrogen,19,1,18,round,small,white,9,12,2,5,"very oblong and dark red nodules, all closer to top of root"
+G11,low elevation,without nitrogen,41,2,39,round,small,white,40,27,10,7,"pink stem, all leaves intact and green"
+G11,low elevation,without nitrogen,9,0,9,oval,small,white,22,9,1,6,
+G11,low elevation,without nitrogen,18,8,10,oval,large,pink,45,20,8,7,roots were tangled but not curly
+G11,low elevation,without nitrogen,8,0,8,oval,large,pink,28,16,5,7,"stems are curly, leaves are average size and green, seedlings are alive"
+G11,low elevation,without nitrogen,12,7,5,oval,large,pink,40,20,2,6,"had an enormous leaf of 15 mm, curly leaves"
+G11,low elevation,without nitrogen,19,0,19,oval,large,white,44,24,8,7,"the stem was the longest out of all three seedlings, and some leaves are slowly starting to turn yellow"
+G9,low elevation,without nitrogen,3,0,3,oval,small,pink,60,20,4,7,curly roots
+G9,low elevation,without nitrogen,5,2,3,oval,small,pink,150,22,6,8,"curly roots, roots are clumped and numerous, gel in tube is not foggy"
+G9,low elevation,without nitrogen,3,0,3,oval,small,pink,55,10,1,7,
+G11,low elevation,without nitrogen,5,5,0,oval,large,pink,110,20,11,7,some darker bigger leaves near top 
+G2,high elevation,without nitrogen,0,0,0,,,,20,14,2,4,
+G11,low elevation,without nitrogen,32,5,27,oval,large,white,21,13,8,5,
+G2,high elevation,without nitrogen,0,0,0,,,,18,4,2,6,
+G2,high elevation,without nitrogen,4,0,4,round,large,white,38,18,2,5,
+G4,high elevation,without nitrogen,12,4,8,oval,small,white,149,4,2,4,N/A
+G4,high elevation,without nitrogen,55,3,52,round,small,white,223,4,2,5,"seedling is dying, has no non-primary roots compared to the rest "
+G4,high elevation,without nitrogen,15,2,13,oval,large,white,118,12,1,4,N/A
+G2,high elevation,without nitrogen,1,0,1,oval,small,pink,23,15,2,3,
+G2,high elevation,without nitrogen,0,0,0,,,,14,11,2,3,
+G2,high elevation,without nitrogen,0,0,0,,,,25,15,3,5,
+control,control,without nitrogen,0,0,0,,,,21,15,5,6,
+control,control,without nitrogen,0,0,0,,,,30,10,4,3,very small leaves 
+control,control,without nitrogen,0,0,0,,,,20,13,4,5,Plant appeared to be dying. It had very light colored leaves and was relatively undersized 
+control,control,without nitrogen,0,0,0,,,,35,16,4,3,"curly roots that are stranded together, clumps of nodules, sucked up a lot of water from bottom, grew outside of glass tube; doesn't seem to be dried but would dry in a couple days due to lack of agar; long/lots of roots"
+control,control,without nitrogen,0,0,0,,,,25,25,5,5,
+G4,high elevation,without nitrogen,18,1,17,round,small,white,36,16,3,3,"curly roots, medium-sized leaves"
+control,control,without nitrogen,0,0,0,,,,15,17,3,6,Plant looks like its on the verge of death due to lack of nutrients as the leaves colors are light. 
+G4,high elevation,without nitrogen,17,3,14,round,small,white,35,20,3,5,#NAME?
+G9,low elevation,without nitrogen,6,0,6,oval,large,pink,120,29,9,7,Plant had few leaves but the leaves looked healthy. Plant was relatively undersized
+G9,low elevation,without nitrogen,12,2,10,round,large,pink,24,20,5,7,The roots are curly and the plant is becoming withered.
+G9,low elevation,without nitrogen,7,0,7,oval,large,pink,55,13,5,7,"There are very few leaves present, and one of them is brown/wilted, with a few light green, and a few a bright, normal shade of green.  For the most part, the leaves appear to be small, yet intact and whole, and form a distinct shape."
+G6,high elevation,without nitrogen,11,0,11,round,small,white,45,12,9,6,"roots are curly at the bottom of seeding 1. leaves are of varying colors, one leaf dying from lack of agar. leaves are very small, nodules are small and are sometimes found in clusters. Some nodules are round, but a slightly larger majority of them were oval. "
+G6,high elevation,without nitrogen,4,0,4,round,small,white,24,2,3,3,"roots are curly at the bottom of seeding 1. leaves are of varying colors, one leaf dying from lack of agar. leaves are very small, nodules are small and are sometimes found in clusters. "
+G6,high elevation,without nitrogen,5,1,4,round,small,white,41,23,6,6,
+control,control,without nitrogen,4,0,4,oval,small,white,250,100,4,6,
+control,control,without nitrogen,35,0,35,oval,small,white,160,110,5,5,
+control,control,without nitrogen,7,0,7,oval,small,white,190,240,7,5,
+G13,low elevation,without nitrogen,6,6,0,oval,large,pink,145,20,6,7,
+G13,low elevation,without nitrogen,5,5,0,oval,large,pink,75,35,4,6,
+G13,low elevation,without nitrogen,16,3,13,round,small,pink,30,25,4,5,
+G16,low elevation,without nitrogen,8,4,4,oval,small,pink,120,25,8,7,
+G16,low elevation,without nitrogen,7,5,2,oval,small,pink,85,15,6,7,
+G16,low elevation,without nitrogen,4,0,4,oval,small,pink,32,20,3,7,
+G5,high elevation,without nitrogen,22,5,17,oval,large,white,16,7,2,6,"seedling 1- no nodules, no rhizobia seen, slightly curly roots, big leaves, shortest plant, most leaves"
+G5,high elevation,without nitrogen,20,2,18,oval,large,white,18,10,1,5,"seedling 2- no nodules, no rhizobia seen, big leaves, top of plant had baby leaves, slightly curly roots, leaves slightly darker than seedling 1"
+G5,high elevation,without nitrogen,52,6,46,oval,large,white,22,15,3,4,"seedling 3- 3 nodules are ovular and white, big leaves, thriving plant, curly roots, some wilting leaves (maybe got smushed), dark green leaves "
+G6,high elevation,without nitrogen,8,3,5,round,large,white,5,20,1,3,This plant had a significantly larger amount of nodules 
+control,control,without nitrogen,0,0,0,,,,24,15,6,5,
+control,control,without nitrogen,1,1,0,oval,large,white,20,17,6,4,
+G6,high elevation,without nitrogen,21,0,21,round,small,white,10,25,2,4,"the leaves were purple, so was a little difficult to score its darkness"
+control,control,without nitrogen,0,0,0,,,,17,22,4,5,"the leaves were purple, so was a little difficult to score its darkness"
+G6,high elevation,without nitrogen,9,1,8,round,large,pink,14,10,4,7,N/A
+G16,low elevation,without nitrogen,3,2,1,oval,large,pink,35,13,3,7,
+G5,high elevation,without nitrogen,36,0,36,round,large,white,21,19,4,6,N/A
+G13,low elevation,without nitrogen,15,0,15,oval,large,pink,100,18,6,7,N/A
+G16,low elevation,without nitrogen,34,0,34,round,large,pink,96,22,8,8,
+G13,low elevation,without nitrogen,11,0,11,oval,large,white,21,6,3,5,Lot more root nodules than the other 2 plants
+G16,low elevation,without nitrogen,14,0,14,oval,large,pink,80,26,5,7,n/a
+G13,low elevation,without nitrogen,10,2,8,oval,large,pink,15,4,2,6,
+G5,high elevation,without nitrogen,17,0,17,round,large,white,35,20,4,4,n/a
+G5,high elevation,without nitrogen,10,0,10,round,large,white,14,15,4,5,Very little growth
+control,control,without nitrogen,0,0,0,,,,7,27,2,4,
+control,control,without nitrogen,0,0,0,,,,5,15,2,5,
+control,control,without nitrogen,0,0,0,,,,17,18,3,7,
+G5,high elevation,without nitrogen,48,11,37,round,small,white,15,25,2,5,3 shoots
+G5,high elevation,without nitrogen,15,0,15,round,small,white,12,18,2,4,
+G5,high elevation,without nitrogen,17,1,16,round,small,white,33,18,2,5,n/a
+G13,low elevation,without nitrogen,13,2,12,round,small,white,17,16,2,7,"potentially infected, white leaves"
+G13,low elevation,without nitrogen,10,4,6,oval,large,pink,74,19,4,8,curly roots
+G13,low elevation,without nitrogen,14,2,12,oval,large,pink,35,19,3,5,curly roots
+G6,high elevation,without nitrogen,27,4,23,round,small,white,12,10,2,6,
+G16,low elevation,without nitrogen,4,3,1,oval,large,pink,80,23,6,8,
+G6,high elevation,without nitrogen,30,0,30,round,small,white,22,21,2,5,There was one cotyledon that was somewhat submerged in agar and had a color of 3
+G6,high elevation,without nitrogen,50,0,50,round,small,white,9,7,3,6,
+G16,low elevation,without nitrogen,6,1,5,oval,large,pink,22,28,6,7,
+G16,low elevation,without nitrogen,11,0,11,oval,large,pink,82,10,5,7,
+G9,low elevation,without nitrogen,10,6,4,oval,small,pink,108.5,29.1,6,7,
+G9,low elevation,without nitrogen,9,3,6,oval,small,white,77.9,30.8,6,7,"the roots are long and white in color, curling down in the bottom of the agar. There is still agar at the bottom. The nodules are oblong but get smaller down the root. The cotyledons are a little wilted and the leaves at the top are very small. The other leaves in the middle of the shoot are large and round."
+G9,low elevation,without nitrogen,9,1,8,oval,small,pink,71.9,28.5,6,7,
+G2,high elevation,without nitrogen,0,0,0,,,,29,17,6,5,
+G2,high elevation,without nitrogen,0,0,0,,,,33,17,6,4,"root is more curly than seedling 1, leaves are smaller than seedling 1 "
+G2,high elevation,without nitrogen,0,0,0,,,,32,22,4,5,
+control,control,without nitrogen,0,0,0,,,,24,16,3,4,it was healthy looking
+G9,low elevation,without nitrogen,19,8,11,oval,small,pink,110,20,6,6,"No nodules were found, even when using a microscope. The darkest leaf color of seedling 1 was in between 6 and 7 but it looks slightly more similar to 7. There were not many leaves on the seedlings. The stems and leaves of the seedlings were quite short and small."
+control,control,without nitrogen,0,0,0,,,,26,19,4,3,"the longest plant with most nodules, drier than the other plants"
+control,control,without nitrogen,0,0,0,,,,28,19,5,4,"Very short compared to other plants in the class, no nodules, very long roots, leaves are very dry towards the bottom of the stem (small and shriveled, colors 1-2), darkest green is still on the lighter side (3-5), small and few leaves, stem is a very light white/pinik color, roots are completely white"
+G9,low elevation,without nitrogen,19,8,11,oval,large,pink,100,25,6,7,
+G2,high elevation,without nitrogen,0,0,0,,,,50,21,2,4,"long straight spider like roots with dark green and light green leaves; a few leaves are dead, the stem had a white color that is brown towards the top"
+G9,low elevation,without nitrogen,4,2,2,oval,large,pink,90,18,9,7,Long thin roots. Seedling 3 has more color in the leaves and grew taller than the others.
+G4,high elevation,without nitrogen,0,0,0,,,,28,19,3,6,"leaves are relatively small, root is not too curly "
+G4,high elevation,without nitrogen,14,0,14,round,small,white,21,18,2,6,"seedling 2 notes: A lot of growth was present. The roots were curly. There was a lot of stem growth. The stem was very green. The leaves were very large, in addition there were pink nodules.   "
+G4,high elevation,without nitrogen,1,0,1,oval,large,white,26,13,3,6,"Dead, plant is very white, straight stem, not many leaves, one green leaf very curly non primary roots"
+G4,high elevation,without nitrogen,17,1,16,round,small,white,13,15.5,2,5,seedling 3 notes: the best grwoth out of the three. There were a lot of nodules! The roots at some points were curly and at others where straight.The straight roots were towards the bottom. The leaves were very large as well.   
+G4,high elevation,without nitrogen,6,2,4,round,small,white,20,15,2,6,"dead, whitish"
+G4,high elevation,without nitrogen,12,1,11,round,small,white,19,17,3,6,
+G2,high elevation,without nitrogen,0,0,0,,,,35,19,2,5,
+G2,high elevation,without nitrogen,0,0,0,,,,16,21,3,5,this one was healthy looking!
+G2,high elevation,without nitrogen,0,0,0,,,,15,22,3,7,
+G4,high elevation,without nitrogen,13,6,7,round,small,white,14,18,1,5,
+G9,low elevation,without nitrogen,10,2,8,oval,large,pink,80,21,5,7,
+G4,high elevation,without nitrogen,5,1,4,round,small,white,9,15,2,5,"Some dead leaves, almost ran out of agar, grew out of the test tube"
+G9,low elevation,without nitrogen,14,5,9,oval,large,pink,120,18,6,7,The seedling was dried out 
+G4,high elevation,without nitrogen,9,2,7,round,small,white,37,17,2,2,
+G9,low elevation,without nitrogen,17,0,17,oval,large,pink,122,24,6,7,
+G2,high elevation,without nitrogen,0,0,0,,,,33,19,1,6,"leaves shriveled, circular roots"
+G2,high elevation,without nitrogen,0,0,0,,,,36,16,2,5,Gnarled stem
+G11,low elevation,without nitrogen,26,7,19,round,large,pink,160.5,18,6,7,"very tall compared to the others, fairly straight, brown stem at the top"
+G11,low elevation,without nitrogen,21,3,18,round,small,pink,180.1,8,4,5,"Long, thin roots. Roots have a biege color near the bottom of the test tube. Towards the top of the test tube, the stem has a purple/brown color. The leaves appear wilted at the top, with only a few still having a green color. "
+G11,low elevation,without nitrogen,9,7,2,oval,large,pink,150.2,17,4,6,"has more leaves but fewer, larger nodules; roots are slightly more damp than seedling one but less damp than seedling 2"
+control,control,without nitrogen,0,0,0,,,,56,30,2,3,
+control,control,without nitrogen,0,0,0,,,,58,16,3,4,
+control,control,without nitrogen,0,0,0,,,,37,19,2,4,
+G5,high elevation,without nitrogen,9,0,9,oval,small,white,63,14,2,6,
+G5,high elevation,without nitrogen,15,0,15,oval,small,white,18,20,4,5,
+G13,low elevation,without nitrogen,14,3,11,round,small,white,37,15,2,6,
+G13,low elevation,without nitrogen,9,0,9,oval,large,pink,17,12,3,6,
+G13,low elevation,without nitrogen,10,0,10,round,large,pink,18,18,6,7,"this plant didn't have a leaf with just one lobe, it's nodules were very small and formed close togeather "
+G2,high elevation,without nitrogen,0,0,0,,,,23,13,2,3,"the first one lobe leaf feel off in the agar, the cotyledon appeared a purple color, and the roots were much longer on this plant"
+G2,high elevation,without nitrogen,0,0,0,,,,11,16,3,4,"The third plant was dead, it looked suspended in agar, but did not grow at all. No roots were visiable, only small brown seed. "
+G2,high elevation,without nitrogen,0,0,0,,,,33,19,1,6,
+G2,high elevation ,without nitrogen,0,0,0,,,,36,16,2,5,

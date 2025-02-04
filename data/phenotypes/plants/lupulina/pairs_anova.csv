@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6e20c1b0e339e5b72a976f8549d0b27a663247f87b46d80e81c89b918b7e1adb
-size 2216
+ii,gradient,trait_type,trait_pre,st,term,statistic,df,p.value,ast
+1,elevation,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), family = 'poisson', data = d)",(Intercept),9.88,1,0.0016686670472920299,**
+1,elevation,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), family = 'poisson', data = d)",population,0.23,1,0.6303505129269322,n.s.
+2,elevation,root,"root
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), data = d)",(Intercept),152.25,1,5.584783379771433e-35,***
+2,elevation,root,"root
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), data = d)",population,0.84,1,0.3598522720964722,n.s.
+3,elevation,shoot,"shoot
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), data = d)",(Intercept),36.87,1,1.264495428858666e-9,***
+3,elevation,shoot,"shoot
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_plantmaternal) + (1|exp_waterblock), data = d)",population,0.08,1,0.7784955681725344,n.s.
+4,urbanization,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_waterblock), family = 'poisson', data = d)",(Intercept),1204.69,1,5.8262674105485045e-264,***
+4,urbanization,nodule,nodule number,"mod <- glmer(value ~ population + (1|exp_id) + (1|exp_waterblock), family = 'poisson', data = d)",population,6.36,1,0.011678828247120292,*
+5,urbanization,root,"root
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_waterblock), data = d)",(Intercept),143.22,1,5.27277819332182e-33,***
+5,urbanization,root,"root
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_waterblock), data = d)",population,3.04,1,0.08142032673914124,n.s.
+6,urbanization,shoot,"shoot
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_waterblock), data = d)",(Intercept),136.02,1,1.9774946156796697e-31,***
+6,urbanization,shoot,"shoot
+biomass (mg)","mod <- lmer(value ~ population + (1|exp_id) + (1|exp_waterblock), data = d)",population,1.16,1,0.2824755179516574,n.s.

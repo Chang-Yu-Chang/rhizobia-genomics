@@ -1,3 +1,39 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a4a44946bd900879df37e4cb0603e6cabea2d5fab75ed1e18a5078cdf27ea77c
-size 3531
+gradient,population,exp_id,genome_id,exp_plant,exp_nitrogen,shoot_biomass_mg,shoot_height,nodule_number
+elevation,high elevation,H2M3R1,g2,lupulina,without nitrogen,5.788888888888889,NA,1.0555555555555556
+elevation,high elevation,H2M3R1,g2,sativa,with nitrogen,NA,13.531818181818181,0.9545454545454543
+elevation,high elevation,H2M3R1,g2,sativa,without nitrogen,NA,2.868,0.19999999999999998
+elevation,high elevation,H3M1R1,g4,lupulina,without nitrogen,10.87560975609756,NA,10.634146341463415
+elevation,high elevation,H3M1R1,g4,sativa,with nitrogen,NA,16.541176470588237,4.647058823529411
+elevation,high elevation,H3M1R1,g4,sativa,without nitrogen,NA,5.334615384615385,15.346153846153847
+elevation,high elevation,H3M3R2,g5,sativa,with nitrogen,NA,13.625,5.25
+elevation,high elevation,H3M3R2,g5,sativa,without nitrogen,NA,2.382608695652174,23.956521739130434
+elevation,high elevation,H3M4R1,g6,sativa,with nitrogen,NA,11.317619047619047,2.6190476190476195
+elevation,high elevation,H3M4R1,g6,sativa,without nitrogen,NA,4.690476190476191,25.238095238095237
+elevation,high elevation,H4M5R1,g8,lupulina,without nitrogen,11.135294117647058,NA,9.235294117647058
+elevation,low elevation,L1M2R2,g9,sativa,with nitrogen,NA,16.905555555555555,7.277777777777778
+elevation,low elevation,L1M2R2,g9,sativa,without nitrogen,NA,9.567777777777778,12.25925925925926
+elevation,low elevation,L2M2R1,g10,lupulina,without nitrogen,9.99189189189189,NA,11.864864864864867
+elevation,low elevation,L2M4R1,g11,sativa,with nitrogen,NA,14.722222222222221,5.555555555555555
+elevation,low elevation,L2M4R1,g11,sativa,without nitrogen,NA,11.874864864864865,14.324324324324325
+elevation,low elevation,L3M5R1,g13,lupulina,without nitrogen,11.38888888888889,NA,16.38888888888889
+elevation,low elevation,L3M5R1,g13,sativa,with nitrogen,NA,14.758333333333333,4.5
+elevation,low elevation,L3M5R1,g13,sativa,without nitrogen,NA,10.78823529411765,11.970588235294118
+elevation,low elevation,L4M2R2,g15,lupulina,without nitrogen,4.55,NA,1.8333333333333333
+elevation,low elevation,L4M3R3,g16,sativa,with nitrogen,NA,13.32,4.461538461538462
+elevation,low elevation,L4M3R3,g16,sativa,without nitrogen,NA,9.15625,15.40625
+urbanization,suburban,crp1-2,g25,lupulina,without nitrogen,25.775,NA,13.5
+urbanization,suburban,crp1-2,g25,sativa,without nitrogen,NA,2.5125,4.833333333333334
+urbanization,suburban,fp1-2,g22,lupulina,without nitrogen,20.457142857142856,NA,12.285714285714286
+urbanization,suburban,fp1-2,g22,sativa,without nitrogen,NA,1.9823529411764704,5.470588235294118
+urbanization,suburban,gp1-1,g40,lupulina,without nitrogen,24.575,NA,11.75
+urbanization,suburban,gp1-2,g29,sativa,without nitrogen,NA,1.7833333333333332,8.083333333333334
+urbanization,suburban,src-1,g_src1,sativa,without nitrogen,NA,2.720833333333333,4.583333333333333
+urbanization,suburban,src-2,g21,lupulina,without nitrogen,29.275,NA,17.25
+urbanization,urban,40th-1,g37,sativa,without nitrogen,NA,2.33125,5.125
+urbanization,urban,40th-2,NA,lupulina,without nitrogen,23.5,NA,11.875
+urbanization,urban,bg-1,g_bg1,sativa,without nitrogen,NA,2.4041666666666663,8.083333333333334
+urbanization,urban,bg-2,g31,lupulina,without nitrogen,16.15,NA,8.25
+urbanization,urban,pms-1,g33,sativa,without nitrogen,NA,2.2916666666666665,4.083333333333333
+urbanization,urban,pms-2,g34,lupulina,without nitrogen,25.05714285714286,NA,12
+urbanization,urban,ppf-1,g36,sativa,without nitrogen,NA,2.0833333333333335,3.833333333333333
+urbanization,urban,ppf-2,g42,lupulina,without nitrogen,18.622222222222224,NA,6.888888888888889

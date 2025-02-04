@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:869b64af7931aa27ca63ddc77c2f5625841a99b5d77257e2ea806ebf5b7f241f
-size 2767
+ii,trait_type,trait_pre,st,term,statistic,p_value,siglab
+1,shoot,shoot height (cm),"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",(Intercept),635.09,0,p<0.001***
+1,shoot,shoot height (cm),"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",population,22.64,0,p<0.001***
+1,shoot,shoot height (cm),"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",exp_nitrogen,72.06,0,p<0.001***
+1,shoot,shoot height (cm),"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",population:exp_nitrogen,9.39,0.002,p=0.002 **
+2,nodule,nodule number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),35.67,0,p<0.001***
+2,nodule,nodule number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,2.34,0.568,p=0.568 n.s.
+2,nodule,nodule number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",exp_nitrogen,4.37,0.002,p=0.002 **
+2,nodule,nodule number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population:exp_nitrogen,0.04,0.938,p=0.938 n.s.
+3,leaf,leaf color,"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",(Intercept),10380.57,0,p<0.001***
+3,leaf,leaf color,"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",population,47.83,0,p<0.001***
+3,leaf,leaf color,"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",exp_nitrogen,73.91,0,p<0.001***
+3,leaf,leaf color,"mod <- lmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), data = d)",population:exp_nitrogen,41.81,0,p<0.001***
+4,leaf,leaf number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",(Intercept),3787.56,0,p<0.001***
+4,leaf,leaf number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population,36.12,0,p<0.001***
+4,leaf,leaf number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",exp_nitrogen,147.07,0,p<0.001***
+4,leaf,leaf number,"mod <- glmer(value ~ population*exp_nitrogen + (1|exp_nitrogen:exp_id) + (1|exp_labgroup), family = 'poisson', data = d)",population:exp_nitrogen,35.8,0,p<0.001***

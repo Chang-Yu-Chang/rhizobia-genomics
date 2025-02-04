@@ -1,3 +1,23 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:95401908c2ae5ba36c61c89e2395904375f11277f7574d965b18bf8b269398a6
-size 3278
+ii,gradient,trait_pre,st,temperature,t.ratio,p_value,siglab
+1,elevation,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,1.28,0.088,p=0.088 n.s.
+1,elevation,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,1.09,0.11275,p=0.113 n.s.
+1,elevation,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,-0.48,0.27475000000000005,p=0.275 n.s.
+1,elevation,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",40c,-1,0.12749999999999995,p=0.127 n.s.
+2,elevation,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,-0.05,0.4676666666666667,p=0.468 n.s.
+2,elevation,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,0.86,0.17266666666666666,p=0.173 n.s.
+2,elevation,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,1.5,0.08466666666666667,p=0.085 n.s.
+3,elevation,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,1.73,0.04725,p=0.047 *
+3,elevation,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,0.56,0.26325,p=0.263 n.s.
+3,elevation,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,-0.16,0.43100000000000005,p=0.431 n.s.
+3,elevation,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",40c,-1.27,0.08325000000000005,p=0.083 n.s.
+4,urbanization,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,0.47,0.318,p=0.318 n.s.
+4,urbanization,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,-0.56,0.275,p=0.275 n.s.
+4,urbanization,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,-1.68,0.04674999999999996,p=0.047 *
+4,urbanization,growth rate (1/hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",40c,-1.25,0.10399999999999998,p=0.104 n.s.
+5,urbanization,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,1.73,0.052,p=0.052 n.s.
+5,urbanization,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,0.03,0.467,p=0.467 n.s.
+5,urbanization,lag time (hr),"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,1.51,0.058333333333333334,p=0.058 n.s.
+6,urbanization,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",25c,-0.73,0.23424999999999996,p=0.234 n.s.
+6,urbanization,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",30c,-2.38,0.00924999999999998,p=0.009 **
+6,urbanization,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",35c,-2.56,0.005499999999999949,p=0.005 **
+6,urbanization,yield [OD],"mod <- lmer(value ~ population*temperature + (1|temperature:exp_id), data = d)",40c,-2.54,0.00649999999999995,p=0.006 **

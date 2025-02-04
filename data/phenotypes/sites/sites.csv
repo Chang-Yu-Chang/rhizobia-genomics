@@ -1,3 +1,18 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:4ab3e149acd4746d64f1e8f9364496164e874ed2a39f96453422ec28ede7e4ef
-size 832
+gradient,population,site,latitude_dec,longitude_dec,elevation_m
+elevation,high elevation,H1,37.4,-80.06,1091.18
+elevation,high elevation,H2,37.39,-80.51,1136.9
+elevation,high elevation,H3,37.38,-80.53,1179.58
+elevation,high elevation,H4,37.36,-80.54,1185.67
+elevation,low elevation,L1,37.32,-80.64,505.97
+elevation,low elevation,L2,37.32,-80.64,493.78
+elevation,low elevation,L3,37.31,-80.5,563.88
+elevation,low elevation,L4,37.3,-80.48,573.02
+elevation,mid elevation,S5,37.28,-80.46,678.79
+urbanization,suburban,src,39.9,-75.34,36.82
+urbanization,suburban,fp,39.9,-75.37,51.02
+urbanization,suburban,crp,39.91,-75.33,38.66
+urbanization,suburban,gp,39.9,-75.29,31.04
+urbanization,urban,bg,39.93,-75.21,20.25
+urbanization,urban,pms,39.95,-75.19,10.63
+urbanization,urban,ppf,39.95,-75.19,5.16
+urbanization,urban,40th,39.95,-75.2,24.01

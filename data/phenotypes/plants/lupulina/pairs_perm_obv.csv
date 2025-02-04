@@ -1,3 +1,11 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:afc1f873aefe87542d02f52d50eaae87950919a80af8589e8f5edd63c633c6d6
-size 492
+gradient,trait_pre,trait,term,statistic
+elevation,"shoot
+biomass (mg)",shoot_biomass_mg,population,0.0791184976938467
+elevation,nodule number,nodule_number,population,0.23158573730166895
+elevation,"root
+biomass (mg)",root_biomass_mg,population,0.8384087287229637
+urbanization,"shoot
+biomass (mg)",shoot_biomass_mg,population,1.1551410984870396
+urbanization,nodule number,nodule_number,population,6.358985793424251
+urbanization,"root
+biomass (mg)",root_biomass_mg,population,3.036319500408141

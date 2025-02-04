@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:890f865280a187f7abba10c2bcd48773c7352d4802824bc6dbb89650a63ae81f
-size 587
+gradient,trait_pre,trait,term,statistic
+elevation,shoot height (cm),shoot_height,population,32.511657101489526
+elevation,nodule number,nodule_number,population,0.5151795480172501
+elevation,leaf color,leaf_color,population,87.87425022436165
+elevation,leaf number,leaf_number,population,52.85989505983223
+urbanization,shoot height (cm),shoot_height,population,0.041268300374759294
+urbanization,nodule number,nodule_number,population,0.04192756705653619
+urbanization,leaf color,leaf_color,population,0.021050515005246018
+urbanization,leaf number,leaf_number,population,0.004291430316305809

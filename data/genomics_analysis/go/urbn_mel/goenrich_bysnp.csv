@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:716dd1677052f6f79540c360812a19ade75f7293652a24656486287b10e1eef3
-size 1796
+category,go_id,term,annotated,significant,expected,classic_fisher
+BP,GO:0009448,gamma-aminobutyric acid metabolic proces...,11,7,1.28,0.0048
+BP,GO:0006935,chemotaxis,12,5,1.4,0.1234
+BP,GO:0040011,locomotion,12,5,1.4,0.1234
+BP,GO:0042330,taxis,12,5,1.4,0.1234
+BP,GO:0042398,cellular modified amino acid biosyntheti...,17,6,1.99,0.1836
+BP,GO:0006119,oxidative phosphorylation,18,6,2.1,0.2246
+BP,GO:0034309,primary alcohol biosynthetic process,11,4,1.28,0.2401
+BP,GO:0015833,peptide transport,34,10,3.97,0.2516
+BP,GO:0042886,amide transport,34,10,3.97,0.2516
+BP,GO:0009110,vitamin biosynthetic process,38,11,4.44,0.2543
+CC,GO:0019898,extrinsic component of membrane,12,4,1.39,0.29
+CC,GO:0031090,organelle membrane,13,4,1.51,0.35
+CC,GO:0031967,organelle envelope,13,4,1.51,0.35
+CC,GO:0005739,mitochondrion,10,3,1.16,0.42
+CC,GO:0005740,mitochondrial envelope,10,3,1.16,0.42
+CC,GO:0005743,mitochondrial inner membrane,10,3,1.16,0.42
+CC,GO:0019866,organelle inner membrane,10,3,1.16,0.42
+CC,GO:0031966,mitochondrial membrane,10,3,1.16,0.42
+CC,GO:0070469,respirasome,10,3,1.16,0.42
+CC,GO:1990204,oxidoreductase complex,13,3,1.51,0.61
+MF,GO:0016725,"oxidoreductase activity, acting on CH or...",10,6,1.31,0.024
+MF,GO:0000156,phosphorelay response regulator activity,10,5,1.31,0.090
+MF,GO:0004497,monooxygenase activity,12,5,1.57,0.179
+MF,GO:0016857,"racemase and epimerase activity, acting ...",13,5,1.7,0.232
+MF,GO:0016903,"oxidoreductase activity, acting on the a...",36,11,4.7,0.325
+MF,GO:0016620,"oxidoreductase activity, acting on the a...",26,8,3.4,0.360
+MF,GO:0004029,aldehyde dehydrogenase (NAD+) activity,12,4,1.57,0.384
+MF,GO:0004030,aldehyde dehydrogenase [NAD(P)+] activit...,12,4,1.57,0.384
+MF,GO:0020037,heme binding,23,7,3.01,0.390
+MF,GO:0016758,hexosyltransferase activity,16,5,2.09,0.407

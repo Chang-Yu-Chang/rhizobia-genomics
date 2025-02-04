@@ -1,3 +1,45 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b4b087131fda4d887f41c1ba5ada0a4f8fd61222a665193d4b6b7fa16a9f8706
-size 5519
+ii,gradient,temperature,trait_pre,st,term,statistic,p_value,siglab
+1,elevation,25c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),31.86,0.109,p=0.109 n.s.
+1,elevation,25c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,1.16,0.292,p=0.292 n.s.
+2,elevation,30c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),70.98,0.38,p=0.38 n.s.
+2,elevation,30c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.93,0.373,p=0.373 n.s.
+3,elevation,35c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),118.23,0.91,p=0.91 n.s.
+3,elevation,35c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.43,0.544,p=0.544 n.s.
+4,elevation,40c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),1.28,1,p=1 n.s.
+4,elevation,40c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,1.28,0.225,p=0.225 n.s.
+5,elevation,25c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),307.47,0.96,p=0.96 n.s.
+5,elevation,25c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0,1,p=1 n.s.
+6,elevation,30c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),625.97,0.014,p=0.014 *
+6,elevation,30c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,2.75,0.107,p=0.107 n.s.
+7,elevation,35c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),342,0.04,p=0.04 *
+7,elevation,35c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,3.33,0.095,p=0.095 n.s.
+8,elevation,25c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),40.63,0.004,p=0.004 **
+8,elevation,25c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,2.48,0.152,p=0.152 n.s.
+9,elevation,30c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),75.59,0.967,p=0.967 n.s.
+9,elevation,30c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.35,0.566,p=0.566 n.s.
+10,elevation,35c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),77.39,0.968,p=0.968 n.s.
+10,elevation,35c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.03,0.864,p=0.864 n.s.
+11,elevation,40c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),1.48,1,p=1 n.s.
+11,elevation,40c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,1.48,0.215,p=0.215 n.s.
+12,urbanization,25c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),93.85,0.966,p=0.966 n.s.
+12,urbanization,25c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.67,0.451,p=0.451 n.s.
+13,urbanization,30c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),106.6,0.975,p=0.975 n.s.
+13,urbanization,30c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.31,0.569,p=0.569 n.s.
+14,urbanization,35c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),156.13,0.013,p=0.013 *
+14,urbanization,35c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,2.51,0.144,p=0.144 n.s.
+15,urbanization,40c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),37.91,0.087,p=0.087 n.s.
+15,urbanization,40c,growth rate (1/hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,1.03,0.342,p=0.342 n.s.
+16,urbanization,25c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),146.68,0.886,p=0.886 n.s.
+16,urbanization,25c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,1.37,0.256,p=0.256 n.s.
+17,urbanization,30c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),579.48,0.996,p=0.996 n.s.
+17,urbanization,30c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0,1,p=1 n.s.
+18,urbanization,35c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),211.73,0.003,p=0.003 **
+18,urbanization,35c,lag time (hr),"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,3.99,0.049,p=0.049 *
+19,urbanization,25c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),211.99,0.63,p=0.63 n.s.
+19,urbanization,25c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,0.96,0.34,p=0.34 n.s.
+20,urbanization,30c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),221.28,0,p<0.001***
+20,urbanization,30c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,6.32,0.026,p=0.026 *
+21,urbanization,35c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),269.87,0,p<0.001***
+21,urbanization,35c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,7.62,0.014,p=0.014 *
+22,urbanization,40c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",(Intercept),68.62,0,p<0.001***
+22,urbanization,40c,yield [OD],"mod <- lmer(value ~ population + (1|exp_id), data = d)",population,3.84,0.064,p=0.064 n.s.

@@ -1,3 +1,28 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:ebee96ba5922e80985d507fc52223b9b9494888811a97da8c72d9943fa6858fc
-size 3571
+gradient,exp_plant,exp_nitrogen,trait,trait_abbr,contrast,effect_size,lower_cl,upper_cl
+elevation,lupulina,N-,nodule_number,NN  ,high elevation - low elevation,-0.40784984321707074,-1.9204496220648994,1.104749935630758
+elevation,lupulina,N-,shoot_biomass_mg,SB  ,high elevation - low elevation,0.08029335319547753,-2.629331976392458,2.7899186827834135
+elevation,lupulina,N-,root_biomass_mg,RB  ,high elevation - low elevation,0.05542885992057915,-1.4612264305583667,1.5720841503995249
+urbanization,lupulina,N-,nodule_number,NN  ,suburban - urban,0.6606192379872793,-0.06497722734087374,1.3862157033154323
+urbanization,lupulina,N-,shoot_biomass_mg,SB  ,suburban - urban,0.41870322736667476,-0.29468619404538615,1.1320926487787357
+urbanization,lupulina,N-,root_biomass_mg,RB  ,suburban - urban,0.8101613656174185,-0.14071589580232308,1.7610386270371599
+elevation,sativa,N-,nodule_number,NN  ,high elevation - low elevation,0.5582727067646179,0.03854924224571506,1.0779961712835209
+elevation,sativa,N-,primary_root_nodule_number,PRNN,high elevation - low elevation,-0.05546984507464316,-0.5418713901909454,0.43093170004165904
+elevation,sativa,N-,lateral_root_nodule_number,LRNN,high elevation - low elevation,0.7604595107560925,0.18346295697642356,1.3374560645357614
+elevation,sativa,N-,shoot_height,SH  ,high elevation - low elevation,-0.9660698140987755,-1.4444678530195054,-0.4876717751780452
+elevation,sativa,N-,longest_petiole_length,LPL ,high elevation - low elevation,-0.865416638512332,-1.379247652229405,-0.35158562479525896
+elevation,sativa,N-,leaf_number,LN  ,high elevation - low elevation,-1.1273852958878343,-1.621103440283881,-0.6336671514917874
+elevation,sativa,N-,leaf_color,LC  ,high elevation - low elevation,-1.457878970961154,-1.9612492023079733,-0.9545087396143347
+elevation,sativa,N+,nodule_number,NN  ,high elevation - low elevation,-0.23488279921114544,-0.8423527456251331,0.37258714720284214
+elevation,sativa,N+,primary_root_nodule_number,PRNN,high elevation - low elevation,-0.20595269701658558,-0.8059964212463278,0.39409102721315653
+elevation,sativa,N+,lateral_root_nodule_number,LRNN,high elevation - low elevation,-0.2304575407193945,-0.9031533833917053,0.4422383019529163
+elevation,sativa,N+,shoot_height,SH  ,high elevation - low elevation,-0.28020530145669365,-1.2875924860565975,0.7271818831432101
+elevation,sativa,N+,longest_petiole_length,LPL ,high elevation - low elevation,-0.011093900968051884,-0.6964759338687969,0.6742881319326931
+elevation,sativa,N+,leaf_number,LN  ,high elevation - low elevation,0.03711291618765097,-0.633198327997595,0.7074241603728969
+elevation,sativa,N+,leaf_color,LC  ,high elevation - low elevation,-0.12746599104769454,-0.923906535042933,0.6689745529475438
+urbanization,sativa,N-,nodule_number,NN  ,suburban - urban,0.1136567679690882,-0.6354837647250167,0.8627973006631932
+urbanization,sativa,N-,shoot_height,SH  ,suburban - urban,-0.048399761602323656,-0.5359458131757945,0.4391462899711471
+urbanization,sativa,N-,leaf_number,LN  ,suburban - urban,0.031829932594568636,-0.9087139200727292,0.9723737852618665
+urbanization,sativa,N-,leaf_color,LC  ,suburban - urban,0.03187669557462253,-0.45562749328320995,0.519380884432455
+urbanization,sativa,N-,primary_root_length,PRL ,suburban - urban,0.20997495721407136,-0.31117152714480845,0.7311214415729511
+urbanization,sativa,N-,lateral_root_number,LRN ,suburban - urban,0.34575776360136895,-0.145473319371474,0.8369888465742119
+urbanization,sativa,N-,longest_lateral_root_length,LLRL,suburban - urban,0.025032837354665223,-0.7368872377780334,0.7869529124873639

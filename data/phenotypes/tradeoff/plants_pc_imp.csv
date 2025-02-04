@@ -1,3 +1,4 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:187b4a764f1b674b641efe5a5fe8ced196f6a31218d8a2da5364d3bcf8ff221a
-size 150
+exp_plant,exp_nitrogen,PC1,PC2
+lupulina,without nitrogen,0.82716,0.17284
+sativa,with nitrogen,0.82807,0.17193
+sativa,without nitrogen,0.69835,0.30165

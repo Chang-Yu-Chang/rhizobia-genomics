@@ -1,3 +1,182 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:cd71d7f605ca88b271629c79a5549c974d6c403c553895f0cd6dd704ac18cf30
-size 26298
+genome_id,species,strain,replicon,qseqid,scomment,sseqid,pident,length,bitscore
+g2,canadensis,T173,chromosome,contig_1,"Ensifer canadensis strain T173 chromosome, complete genome",NZ_CP083370.1,92.704,79076,113800
+g2,canadensis,T173,plasmid pT173e,contig_2,"Ensifer canadensis strain T173 plasmid pT173e, complete sequence",NZ_CP083371.1,90.143,53577,69466
+g2,canadensis,T173,plasmid pT173d,contig_3,"Ensifer canadensis strain T173 plasmid pT173d, complete sequence",NZ_CP083374.1,92.33,29806,42265
+g3,canadensis,T173,chromosome,contig_2,"Ensifer canadensis strain T173 chromosome, complete genome",NZ_CP083370.1,91.386,59670,81547
+g4,medicae,WSM1115,plasmid pWSM1115_2,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.802,105698,194000
+g4,meliloti,USDA1021,plasmid accessoryA,contig_16,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.859,11338,20847
+g4,medicae,WSM1115,plasmid pWSM1115_1,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.467,459594,834900
+g4,medicae,WSM419,plasmid pSMED03,contig_3,"Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence",NC_009622.1,99.255,27400,49441
+g4,medicae,SU277,chromosome,contig_4,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.875,770618,1418000
+g4,canadensis,T173,plasmid pT173b,contig_8,"Ensifer canadensis strain T173 plasmid pT173b, complete sequence",NZ_CP083372.1,99.217,27198,48955
+g4,medicae,WSM1115,chromosome,contig_9,"Sinorhizobium medicae WSM1115 chromosome, complete genome",NZ_CP088109.1,99.718,162575,297600
+g5,medicae,WSM1115,plasmid pWSM1115_1,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.463,459607,834800
+g5,meliloti,USDA1021,plasmid accessoryA,contig_13,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.832,11340,20833
+g5,canadensis,T173,plasmid pT173b,contig_14,"Ensifer canadensis strain T173 plasmid pT173b, complete sequence",NZ_CP083372.1,99.217,27198,48955
+g5,medicae,WSM1115,plasmid pWSM1115_2,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.796,105703,194000
+g5,medicae,SU277,chromosome,contig_3,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.877,770602,1418000
+g5,medicae,WSM419,plasmid pSMED03,contig_4,"Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence",NC_009622.1,98.87,27443,48881
+g6,medicae,SU277,plasmid pSU277_3,contig_1,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,94.996,7893,12362
+g6,medicae,WSM419,chromosome,contig_11,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.812,326155,598800
+g6,canadensis,T173,plasmid pT173b,contig_3,"Ensifer canadensis strain T173 plasmid pT173b, complete sequence",NZ_CP083372.1,99.213,27199,48952
+g6,meliloti,USDA1021,plasmid accessoryA,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.859,11337,20847
+g6,medicae,WSM1115,plasmid pWSM1115_3,contig_5,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,98.072,21424,37244
+g6,medicae,SU277,plasmid pSU277_2,contig_6,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",NZ_CP104149.1,99.449,181647,329800
+g6,medicae,SU277,chromosome,contig_8,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.883,456140,839300
+g6,medicae,WSM419,plasmid pSMED01,contig_9,"Sinorhizobium medicae WSM419 plasmid pSMED01, complete sequence",NC_009620.1,99.885,300696,553300
+g8,medicae,WSM1115,plasmid pWSM1115_2,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.774,111469,204400
+g8,medicae,WSM419,plasmid pSMED03,contig_2,"Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence",NC_009622.1,99.241,27398,49413
+g8,meliloti,USDA1021,plasmid accessoryA,contig_3,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.85,11339,20844
+g8,medicae,WSM1115,plasmid pWSM1115_1,contig_4,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.471,459548,834900
+g8,medicae,SU277,chromosome,contig_5,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.876,770934,1418000
+g8,canadensis,T173,plasmid pT173b,contig_6,"Ensifer canadensis strain T173 plasmid pT173b, complete sequence",NZ_CP083372.1,99.221,27197,48961
+g9,medicae,WSM419,plasmid pSMED03,contig_1,"Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence",NC_009622.1,99.333,30453,55090
+g9,medicae,WSM1115,plasmid pWSM1115_1,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.464,459594,834800
+g9,medicae,WSM1115,plasmid pWSM1115_2,contig_3,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.796,135242,248200
+g9,medicae,WSM419,chromosome,contig_4,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.867,381182,701000
+g10,meliloti,USDA1021,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.665,110730,202400
+g10,meliloti,USDA1021,chromosome,contig_2,"Sinorhizobium meliloti strain USDA1021 chromosome, complete genome",NZ_CP021800.1,99.593,188279,343400
+g10,meliloti,USDA1106,plasmid psymB,contig_3,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.312,261367,472600
+g11,medicae,WSM1115,plasmid pWSM1115_1,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.954,445013,820600
+g11,medicae,WSM419,plasmid pSMED02,contig_2,"Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",NC_009621.1,99.776,151237,277400
+g11,medicae,WSM419,chromosome,contig_3,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.904,744277,1370000
+g11,meliloti,USDA1021,plasmid accessoryA,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,98.525,9693,17088
+g11,medicae,SU277,plasmid pSU277_3,contig_5,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,94.787,7884,12255
+g13,medicae,WSM1115,plasmid pWSM1115_3,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,95.244,16841,26629
+g13,medicae,WSM419,plasmid pSMED02,contig_3,"Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",NC_009621.1,99.771,151757,278200
+g13,medicae,WSM1115,plasmid pWSM1115_1,contig_4,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.949,402759,742500
+g13,medicae,SU277,plasmid pSU277_3,contig_5,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,98.35,13150,23073
+g13,medicae,WSM419,chromosome,contig_6,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.971,613192,1131000
+g15,adhaerens,Casida,plasmid pCasidaAA,contig_3,"Ensifer adhaerens strain Casida A plasmid pCasidaAA, complete sequence",NZ_CP015881.1,99.068,279720,501900
+g15,adhaerens,Corn53,plasmid AB,contig_4,"Ensifer adhaerens strain Corn53 plasmid AB, complete sequence",NZ_CP030264.1,99.292,117168,211700
+g15,adhaerens,Corn53,chromosome,contig_5,"Ensifer adhaerens strain Corn53 chromosome, complete genome",NZ_CP030262.1,98.975,408117,730200
+g16,medicae,WSM1115,plasmid pWSM1115_3,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,96.117,15066,24567
+g16,medicae,SU277,plasmid pSU277_2,contig_2,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",NZ_CP104149.1,99.588,101986,186000
+g16,medicae,WSM419,chromosome,contig_3,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.843,690549,1269000
+g16,medicae,WSM1115,plasmid pWSM1115_3,contig_4,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,99.827,34750,63836
+g16,medicae,WSM1115,plasmid pWSM1115_1,contig_5,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.956,445008,820600
+g17,medicae,SU277,plasmid pSU277_2,contig_10,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",NZ_CP104149.1,99.588,101989,186000
+g17,medicae,WSM1115,plasmid pWSM1115_3,contig_3,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,99.81,34754,63806
+g17,medicae,WSM419,chromosome,contig_7,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.843,690555,1269000
+g17,medicae,WSM1115,plasmid pWSM1115_3,contig_8,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,96.123,15065,24570
+g17,medicae,WSM1115,plasmid pWSM1115_1,contig_9,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.955,445005,820600
+g19,medicae,WSM1115,plasmid pWSM1115_2,contig_1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.76,111444,204300
+g19,medicae,WSM1115,plasmid pWSM1115_3,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,99.822,34752,63826
+g19,medicae,WSM419,chromosome,contig_3,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.971,598517,1104000
+g19,medicae,WSM419,plasmid pSMED01,contig_8,"Sinorhizobium medicae WSM419 plasmid pSMED01, complete sequence",NC_009620.1,99.635,296695,541800
+g20,meliloti,USDA1021,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.669,110730,202400
+g20,meliloti,USDA1106,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.582,152433,277900
+g20,meliloti,USDA1021,chromosome,contig_3,"Sinorhizobium meliloti strain USDA1021 chromosome, complete genome",NZ_CP021800.1,99.945,325467,600000
+g21,medicae,SU277,plasmid pSU277_3,contig_1,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,94.989,11016,17226
+g21,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.697,99475,182000
+g21,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.927,393811,725500
+g21,meliloti,USDA1021,plasmid psymB,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,99.375,145394,263400
+g21,medicae,SU277,plasmid pSU277_3,contig_5,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,96.472,7057,11631
+g22,meliloti,USDA1106,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.49,119866,217900
+g22,meliloti,USDA1106,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.807,248718,456600
+g22,meliloti,USDA1021,chromosome,contig_3,"Sinorhizobium meliloti strain USDA1021 chromosome, complete genome",NZ_CP021800.1,99.788,197338,362000
+g23,meliloti,USDA1106,plasmid psymB,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.806,248723,456600
+g23,meliloti,USDA1106,plasmid psymA,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.482,119875,217900
+g23,meliloti,USDA1021,chromosome,contig_3,"Sinorhizobium meliloti strain USDA1021 chromosome, complete genome",NZ_CP021800.1,99.789,197337,362000
+g24,meliloti,USDA1021,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.194,95389,171800
+g24,meliloti,USDA1106,chromosome,contig_10,"Sinorhizobium meliloti strain USDA1106 chromosome, complete genome",NZ_CP021797.1,99.881,239486,440600
+g24,meliloti,USDA1021,plasmid psymB,contig_3,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,98.714,143810,255200
+g25,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,97.273,14923,25287
+g25,meliloti,USDA1106,plasmid psymA,contig_3,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.234,133635,241000
+g25,meliloti,1021,chromosome,contig_5,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.952,392666,724000
+g25,meliloti,USDA1106,plasmid psymB,contig_6,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.235,279498,504100
+g26,meliloti,USDA1106,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.228,133642,241000
+g26,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,97.299,14920,25305
+g26,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.957,392655,724100
+g26,meliloti,USDA1106,plasmid psymB,contig_4,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.27,273992,494700
+g27,meliloti,1021,plasmid pSymA,contig_1,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.175,99490,179100
+g27,meliloti,USDA1021,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,99.116,196214,352600
+g27,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.952,282333,520600
+g27,meliloti,USDA1021,plasmid accessoryA,contig_5,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.674,11057,20214
+g27,medicae,WSM1115,plasmid pWSM1115_3,contig_6,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,94.864,16024,24951
+g29,medicae,SU277,chromosome,contig_1,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.874,770524,1417000
+g29,medicae,WSM419,chromosome,contig_13,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.852,74493,136900
+g29,medicae,WSM1115,plasmid pWSM1115_1,contig_14,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.202,168577,303700
+g29,medicae,WSM419,plasmid pSMED02,contig_2,"Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",NC_009621.1,99.8,151751,278500
+g29,medicae,WSM1115,plasmid pWSM1115_3,contig_3,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,98.133,29946,52163
+g30,medicae,SU277,chromosome,contig_2,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.874,770531,1417000
+g30,medicae,WSM1115,plasmid pWSM1115_3,contig_3,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,98.346,27996,49101
+g30,medicae,WSM419,chromosome,contig_5,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.85,74495,136900
+g30,medicae,WSM419,plasmid pSMED02,contig_6,"Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",NC_009621.1,99.796,151758,278500
+g30,medicae,WSM1115,plasmid pWSM1115_1,contig_8,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.196,168586,303700
+g31,meliloti,1021,chromosome,contig_1,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.946,347722,641000
+g31,meliloti,USDA1021,plasmid accessoryA,contig_2,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.665,11056,20209
+g31,meliloti,USDA1021,plasmid accessoryA,contig_3,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,97.065,17479,29383
+g31,meliloti,1021,plasmid pSymA,contig_4,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.408,99481,180400
+g31,meliloti,USDA1106,plasmid psymB,contig_5,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,98.987,240092,429700
+g32,meliloti,1021,chromosome,contig_1,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.951,347711,641100
+g32,meliloti,USDA1106,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,98.988,240092,429700
+g32,meliloti,USDA1021,plasmid accessoryA,contig_3,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.638,11059,20194
+g32,meliloti,1021,plasmid pSymA,contig_4,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.413,99478,180400
+g32,meliloti,USDA1021,plasmid accessoryA,contig_5,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,95.941,25427,41153
+g33,meliloti,USDA1021,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.428,170407,309200
+g33,americanum,CCGM7,plasmid A,contig_3,"Sinorhizobium americanum CCGM7 plasmid A, complete sequence",NZ_CP013052.1,94.63,16666,25789
+g33,meliloti,USDA1106,plasmid psymB,contig_4,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.093,188174,338000
+g33,meliloti,1021,chromosome,contig_5,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.96,473698,873600
+g34,meliloti,1021,plasmid pSymA,contig_1,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.411,99478,180400
+g34,meliloti,USDA1106,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,98.989,239273,428300
+g34,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.954,237861,438600
+g34,meliloti,USDA1021,plasmid accessoryA,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,95.055,18241,28631
+g34,meliloti,USDA1021,plasmid accessoryA,contig_5,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.656,11057,20203
+g35,meliloti,USDA1021,plasmid psymB,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,99.109,196217,352600
+g35,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.412,99479,180400
+g35,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.949,426605,786500
+g35,meliloti,USDA1021,plasmid accessoryA,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.656,11057,20203
+g36,meliloti,USDA1106,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.224,133639,240900
+g36,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,97.279,14921,25290
+g36,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.954,392665,724000
+g36,meliloti,USDA1106,plasmid psymB,contig_4,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.245,278621,502700
+g37,meliloti,USDA1106,plasmid psymB,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.246,279493,504300
+g37,meliloti,USDA1106,plasmid psymA,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.087,130561,234400
+g37,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.953,392654,724000
+g39,meliloti,USDA1106,chromosome,contig_1,"Sinorhizobium meliloti strain USDA1106 chromosome, complete genome",NZ_CP021797.1,99.929,280615,517000
+g39,meliloti,USDA1021,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,99.384,145353,263400
+g39,meliloti,1021,plasmid pSymA,contig_3,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.696,99474,182000
+g39,medicae,SU277,plasmid pSU277_3,contig_4,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,94.989,11016,17226
+g39,medicae,SU277,plasmid pSU277_3,contig_5,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,96.472,7057,11631
+g40,meliloti,USDA1021,plasmid psymA,contig_18,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.929,43842,80786
+g40,medicae,WSM1115,plasmid pWSM1115_1,contig_22,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.2,155584,280300
+g40,medicae,SU277,plasmid pSU277_1,contig_24,"Sinorhizobium medicae strain SU277 plasmid pSU277_1, complete sequence",NZ_CP104148.1,99.357,52391,94856
+g40,medicae,WSM419,chromosome,contig_26,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.873,305463,561900
+g40,medicae,SU277,plasmid pSU277_2,contig_3,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",NZ_CP104149.1,99.436,108858,197600
+g40,medicae,WSM1115,plasmid pWSM1115_1,contig_37,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.76,67081,123000
+g40,medicae,SU277,chromosome,contig_4,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.638,380410,694700
+g40,medicae,WSM1115,plasmid pWSM1115_1,contig_40,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",NZ_CP088110.1,99.729,121410,222400
+g40,medicae,WSM419,chromosome,contig_42,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.852,131921,242500
+g40,medicae,SU277,plasmid pSU277_2,contig_5,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",NZ_CP104149.1,99.818,93791,172200
+g40,medicae,WSM1115,plasmid pWSM1115_2,contig_6,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",NZ_CP088111.1,99.758,89384,163800
+g40,medicae,WSM1115,plasmid pWSM1115_3,contig_67,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,94.858,16024,24945
+g40,medicae,WSM419,chromosome,contig_69,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.846,212603,390700
+g40,meliloti,USDA1021,plasmid psymA,contig_7,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.357,43576,78838
+g40,meliloti,USDA1021,plasmid psymA,contig_70,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.125,24692,44370
+g40,meliloti,USDA1021,plasmid psymA,contig_71,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",NZ_CP021801.1,99.278,37694,68074
+g40,medicae,SU277,chromosome,contig_72,"Sinorhizobium medicae strain SU277 chromosome, complete genome",NZ_CP104147.1,99.834,283569,520900
+g40,medicae,WSM1115,plasmid pWSM1115_3,contig_8,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,97.822,27592,47532
+g40,medicae,WSM419,chromosome,contig_83,"Sinorhizobium medicae WSM419, complete sequence",NC_009636.1,99.848,74496,136900
+g41,meliloti,1021,plasmid pSymA,contig_1,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.41,99481,180400
+g41,meliloti,USDA1021,plasmid accessoryA,contig_2,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,95.949,25426,41164
+g41,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.952,347706,641100
+g41,meliloti,USDA1021,plasmid accessoryA,contig_4,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.656,11057,20203
+g41,meliloti,USDA1106,plasmid psymB,contig_5,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.025,234584,420300
+g42,meliloti,USDA1021,plasmid accessoryA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.177,10935,19686
+g42,medicae,WSM1115,plasmid pWSM1115_3,contig_2,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",NZ_CP088112.1,94.87,16023,24956
+g42,meliloti,1021,plasmid pSymA,contig_3,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.177,99488,179100
+g42,meliloti,USDA1106,chromosome,contig_4,"Sinorhizobium meliloti strain USDA1106 chromosome, complete genome",NZ_CP021797.1,99.954,217637,401300
+g43,meliloti,USDA1106,plasmid psymA,contig_1,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",NZ_CP021798.1,99.095,130551,234400
+g43,meliloti,USDA1106,plasmid psymB,contig_2,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,99.245,279492,504300
+g43,meliloti,1021,chromosome,contig_3,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.953,392651,724000
+g44,meliloti,1021,chromosome,contig_1,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.933,393788,725600
+g44,medicae,SU277,plasmid pSU277_3,contig_2,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,96.458,7058,11627
+g44,medicae,SU277,plasmid pSU277_3,contig_3,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",NZ_CP104150.1,94.524,8619,13263
+g44,meliloti,1021,plasmid pSymA,contig_4,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.701,99471,182000
+g44,meliloti,USDA1021,plasmid psymB,contig_5,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",NZ_CP021802.1,99.375,145396,263400
+g45,meliloti,USDA1021,plasmid accessoryA,contig_1,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,95.945,25427,41159
+g45,meliloti,1021,plasmid pSymA,contig_2,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",NC_003037.1,99.412,99481,180400
+g45,meliloti,USDA1106,plasmid psymB,contig_3,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",NZ_CP021799.1,98.989,240094,429700
+g45,meliloti,1021,chromosome,contig_4,"Sinorhizobium meliloti 1021, complete sequence",NC_003047.1,99.955,347698,641200
+g45,meliloti,USDA1021,plasmid accessoryA,contig_5,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",NZ_CP021803.1,99.656,11057,20203

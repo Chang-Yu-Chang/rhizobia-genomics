@@ -1,3 +1,63 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8744a8c7e5c6399f0890fc4dbd153304dd6758deaaed91039df9ec2b98bfe93d
-size 6895
+accession,scomment,species,strain,replicon
+NZ_CP021797.1,"Sinorhizobium meliloti strain USDA1106 chromosome, complete genome",meliloti,USDA1106,chromosome
+NZ_CP021798.1,"Sinorhizobium meliloti strain USDA1106 plasmid psymA, complete sequence",meliloti,USDA1106,plasmid psymA
+NZ_CP021799.1,"Sinorhizobium meliloti strain USDA1106 plasmid psymB, complete sequence",meliloti,USDA1106,plasmid psymB
+NC_003047.1,"Sinorhizobium meliloti 1021, complete sequence",meliloti,1021,chromosome
+NC_003037.1,"Sinorhizobium meliloti 1021 plasmid pSymA, complete sequence",meliloti,1021,plasmid pSymA
+NC_003078.1,"Sinorhizobium meliloti 1021 plasmid pSymB, complete sequence",meliloti,1021,plasmid pSymB
+NZ_CP021800.1,"Sinorhizobium meliloti strain USDA1021 chromosome, complete genome",meliloti,USDA1021,chromosome
+NZ_CP021803.1,"Sinorhizobium meliloti strain USDA1021 plasmid accessoryA, complete sequence",meliloti,USDA1021,plasmid accessoryA
+NZ_CP021801.1,"Sinorhizobium meliloti strain USDA1021 plasmid psymA, complete sequence",meliloti,USDA1021,plasmid psymA
+NZ_CP021802.1,"Sinorhizobium meliloti strain USDA1021 plasmid psymB, complete sequence",meliloti,USDA1021,plasmid psymB
+NC_009636.1,"Sinorhizobium medicae WSM419, complete sequence",medicae,WSM419,chromosome
+NC_009620.1,"Sinorhizobium medicae WSM419 plasmid pSMED01, complete sequence",medicae,WSM419,plasmid pSMED01
+NC_009621.1,"Sinorhizobium medicae WSM419 plasmid pSMED02, complete sequence",medicae,WSM419,plasmid pSMED02
+NC_009622.1,"Sinorhizobium medicae WSM419 plasmid pSMED03, complete sequence",medicae,WSM419,plasmid pSMED03
+NZ_CP088109.1,"Sinorhizobium medicae WSM1115 chromosome, complete genome",medicae,WSM1115,chromosome
+NZ_CP088110.1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_1, complete sequence",medicae,WSM1115,plasmid pWSM1115_1
+NZ_CP088111.1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_2, complete sequence",medicae,WSM1115,plasmid pWSM1115_2
+NZ_CP088112.1,"Sinorhizobium medicae WSM1115 plasmid pWSM1115_3, complete sequence",medicae,WSM1115,plasmid pWSM1115_3
+NZ_CP104147.1,"Sinorhizobium medicae strain SU277 chromosome, complete genome",medicae,SU277,chromosome
+NZ_CP104148.1,"Sinorhizobium medicae strain SU277 plasmid pSU277_1, complete sequence",medicae,SU277,plasmid pSU277_1
+NZ_CP104149.1,"Sinorhizobium medicae strain SU277 plasmid pSU277_2, complete sequence",medicae,SU277,plasmid pSU277_2
+NZ_CP104150.1,"Sinorhizobium medicae strain SU277 plasmid pSU277_3, complete sequence",medicae,SU277,plasmid pSU277_3
+NZ_CP104151.1,"Sinorhizobium medicae strain SU277 plasmid pSU277_4, complete sequence",medicae,SU277,plasmid pSU277_4
+NZ_CP015880.1,"Ensifer adhaerens strain Casida A chromosome, complete genome",adhaerens,Casida,chromosome
+NZ_CP015881.1,"Ensifer adhaerens strain Casida A plasmid pCasidaAA, complete sequence",adhaerens,Casida,plasmid pCasidaAA
+NZ_CP015882.1,"Ensifer adhaerens strain Casida A plasmid pCasidaAB, complete sequence",adhaerens,Casida,plasmid pCasidaAB
+NZ_CP030262.1,"Ensifer adhaerens strain Corn53 chromosome, complete genome",adhaerens,Corn53,chromosome
+NZ_CP030263.1,"Ensifer adhaerens strain Corn53 plasmid AA, complete sequence",adhaerens,Corn53,plasmid AA
+NZ_CP030264.1,"Ensifer adhaerens strain Corn53 plasmid AB, complete sequence",adhaerens,Corn53,plasmid AB
+NZ_CP083343.1,"Ensifer adhaerens strain W2-A chromosome 1, complete sequence",adhaerens,W2-A,chromosome
+NZ_CP083344.1,"Ensifer adhaerens strain W2-A chromosome 2, complete sequence",adhaerens,W2-A,chromosome
+NZ_CP083345.1,"Ensifer adhaerens strain W2-A plasmid p1, complete sequence",adhaerens,W2-A,plasmid p1
+NZ_CP083346.1,"Ensifer adhaerens strain W2-B chromosome 1, complete sequence",adhaerens,W2-B,chromosome
+NZ_CP083347.1,"Ensifer adhaerens strain W2-B chromosome 2, complete sequence",adhaerens,W2-B,chromosome
+NZ_CP083348.1,"Ensifer adhaerens strain W2-B plasmid p1, complete sequence",adhaerens,W2-B,plasmid p1
+NZ_CP041238.1,"Sinorhizobium mexicanum strain ITTG R7 chromosome, complete genome",mexicanum,ITTG,chromosome
+NZ_CP041239.1,"Sinorhizobium mexicanum strain ITTG R7 plasmid pEmeITTGR7a, complete sequence",mexicanum,ITTG,plasmid pEmeITTGR7a
+NZ_CP041240.1,"Sinorhizobium mexicanum strain ITTG R7 plasmid pEmeITTGR7b, complete sequence",mexicanum,ITTG,plasmid pEmeITTGR7b
+NZ_CP041241.1,"Sinorhizobium mexicanum strain ITTG R7 plasmid pEmeITTGR7c, complete sequence",mexicanum,ITTG,plasmid pEmeITTGR7c
+NZ_CP083370.1,"Ensifer canadensis strain T173 chromosome, complete genome",canadensis,T173,chromosome
+NZ_CP083375.1,"Ensifer canadensis strain T173 plasmid pT173a, complete sequence",canadensis,T173,plasmid pT173a
+NZ_CP083372.1,"Ensifer canadensis strain T173 plasmid pT173b, complete sequence",canadensis,T173,plasmid pT173b
+NZ_CP083373.1,"Ensifer canadensis strain T173 plasmid pT173c, complete sequence",canadensis,T173,plasmid pT173c
+NZ_CP083374.1,"Ensifer canadensis strain T173 plasmid pT173d, complete sequence",canadensis,T173,plasmid pT173d
+NZ_CP083371.1,"Ensifer canadensis strain T173 plasmid pT173e, complete sequence",canadensis,T173,plasmid pT173e
+NC_012587.1,"Sinorhizobium fredii NGR234, complete sequence",fredii,NGR234,chromosome
+NC_000914.2,"Sinorhizobium fredii NGR234 plasmid pNGR234a, complete sequence",fredii,NGR234,plasmid pNGR234a
+NC_012586.1,"Sinorhizobium fredii NGR234 plasmid pNGR234b, complete sequence",fredii,NGR234,plasmid pNGR234b
+NZ_CP137016.1,"Sinorhizobium fredii GR64 chromosome, complete genome",fredii,GR64,chromosome
+NZ_CP137019.1,"Sinorhizobium fredii GR64 plasmid pSfreGR64a, complete sequence",fredii,GR64,plasmid pSfreGR64a
+NZ_CP137018.1,"Sinorhizobium fredii GR64 plasmid pSfreGR64b, complete sequence",fredii,GR64,plasmid pSfreGR64b
+NZ_CP137017.1,"Sinorhizobium fredii GR64 plasmid pSfreGR64c, complete sequence",fredii,GR64,plasmid pSfreGR64c
+NZ_CP013051.1,"Sinorhizobium americanum CCGM7 chromosome, complete genome",americanum,CCGM7,chromosome
+NZ_CP013052.1,"Sinorhizobium americanum CCGM7 plasmid A, complete sequence",americanum,CCGM7,plasmid A
+NZ_CP013053.1,"Sinorhizobium americanum CCGM7 plasmid B, complete sequence",americanum,CCGM7,plasmid B
+NZ_CP013054.1,"Sinorhizobium americanum CCGM7 plasmid C, complete sequence",americanum,CCGM7,plasmid C
+NZ_CP023067.1,"Sinorhizobium sojae CCBAU 05684 chromosome, complete genome",sojae,CCBAU,chromosome
+NZ_CP023069.1,"Sinorhizobium sojae CCBAU 05684 plasmid pSJ05684a, complete sequence",sojae,CCBAU,plasmid pSJ05684a
+NZ_CP023068.1,"Sinorhizobium sojae CCBAU 05684 plasmid pSJ05684b, complete sequence",sojae,CCBAU,plasmid pSJ05684b
+NZ_CP034909.1,"Sinorhizobium alkalisoli strain YIC4027 chromosome 1, complete sequence",alkalisoli,YIC4027,chromosome
+NZ_CP034910.1,"Sinorhizobium alkalisoli strain YIC4027 chromosome 2, complete sequence",alkalisoli,YIC4027,chromosome
+NZ_CP034911.1,"Sinorhizobium alkalisoli strain YIC4027 plasmid unnamed, complete sequence",alkalisoli,YIC4027,plasmid unnamed
