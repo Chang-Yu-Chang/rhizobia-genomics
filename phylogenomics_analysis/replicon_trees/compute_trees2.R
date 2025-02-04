@@ -24,6 +24,7 @@ for (set_name in c("elev_med", "urbn_mel")) {
         mutate(tr = map(data, compute_gpa_tree))
 
     for (replicon in c("chromosome", "pSymA", "pSymB", "pAcce")) {
+        if (set_name == "urbn_mel" & replicon == "pAcce") next # Skip urbanizatio Acce because it does not have core genes
         tr_gpa <- gpac$tr[[which(gpac$replicon_type == replicon)]]
         write.tree(tr_gpa, paste0(folder_data, "phylogenomics_analysis/replicon_trees/", set_name, "/", replicon, "/tr_gpa.tree"))
     }

@@ -21,7 +21,7 @@ cp $folder_genomics/pangenome/$set_name/combined_sccg_alignment.fas $folder_data
 
 set_name='urbn_mel'
 mkdir -p $folder_data/phylogenomics_analysis/trees/$set_name
-echo -e "g21\ng22\ng23\ng24\ng25\ng26\ng27\ng31\ng32\ng33\ng34\ng35\ng36\ng37\ng39\ng41\ng42\ng43\ng44\ng45" > $folder_data/phylogenomics_analysis/trees/urbn_mel/list_genomes.csv
+echo -e "g21\ng22\ng23\ng24\ng25\ng26\ng27\ng31\ng32\ng33\ng34\ng35\ng36\ng37\ng39\ng41\ng43\ng44\ng45" > $folder_data/phylogenomics_analysis/trees/urbn_mel/list_genomes.csv
 # single copy gene list
 cp $folder_data/genomics_analysis/gene_content/$set_name/list_sccg.csv $folder_data/phylogenomics_analysis/trees/$set_name/list_sccg.csv
 

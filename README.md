@@ -85,6 +85,99 @@ The shell scripts were executed on a 2021 iMac with Apple M1 chip 16GB memory an
 
 The scripts included in this repository can reproduce the figures from raw reads, trait data, and map data.
 
+```
+# Assembly
+cd genomics/assembly/
+zsh assess_reads.sh # Filter and output the filtered read txt
+zsh denovo_assembly.sh # Assembly
+zsh assess_assemblies.sh # Quality control (quast and busco); the busco mamba env binary needs to be specified in zshrc
+zsh consolidate_genomes.sh # Move genome fasta to one folder
+zsh manual_concat.sh # Manually concatenate the two genomes g20 and g24
+
+## OPTIONAL
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('genomics_analysis/raw_reads/aggregate_reads.R'); # Aggregate the raw read data for plotting and 
+source('genomics_analysis/raw_reads/plot_reads.R'); # Plot the raw read data
+"
+
+# Annotation
+cd genomics/annotation/
+zsh annotate_genomes.sh
+zsh consolidate_annotations.sh 
+
+# Taxonomy
+cd genomics/misc 
+zsh download_ncbi_genomes.sh  # Download the Sinorhizobium/Ensifer genomes from NCBI. The list is stored in raw/ensifer_ncbi.csv
+
+cd genomics/taxonomy/
+zsh make_database.sh # Render the genomes into a custom blast database
+zsh blast.sh # Perform blast on rRNA and contigs
+
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('genomics_analysis/taxonomy/aggregate_results.R'); # Aggregate the blast results
+source('genomics_analysis/taxonomy/identify_taxa.R'); # Identify taxonomy
+"
+
+# Genome-wide distance
+cd genomics/distances/
+zsh ani.sh
+zsh kmers.sh 
+
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('genomics_analysis/distances/aggregate_distances.R') # Aggregate ANI and kmer results
+"
+
+# Pangenomics
+cd genomics/pangenome/
+zsh pangenome.sh 
+
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('genomics_analysis/gene_content/clean_gpa.R'); # Clean up panaroo outputs, mostly gene presence/absence; output csv files are noted in the R script
+source('genomics_analysis/gene_content/check_gene_names.R'); # Prepare the list of genes for Uniprot search
+"
+
+# Fst and dxy and go
+Rscript -e "renv::activate('.'); 
+source('genomics_analysis/fst/compute_fst.R'); # Compute Fst for SNPs in core genes
+source('genomics_analysis/gcv_fst/compute_gcv_fst.R'); # Compute Fst for accessory gene content variation (presence/absence)
+source('genomics_analysis/dxy/compute_dxy.R'); 
+source('genomics_analysis/gcv_dxy/compute_gcv_dxy.R');
+source('genomics_analysis/go/go.R');
+source('genomics_analysis/gcv_go/gcv_go.R);
+"
+
+# Trees
+## Whole-genome trees
+cd phylogenomics_analysis/trees/
+zsh concatenate_alignment.sh
+zsh compute_trees1.sh # Compute single-copy core-gene trees
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('phylogenomics_analysis/trees/compute_trees2.R'); # Compute trees based on GCV, ANI and kmers
+source('phylogenomics_analysis/trees/curate_trees.R'); # Curate and save the trees into one Rdata
+"
+
+## Replicon trees
+cd phylogenomics_analysis/replicon_trees/
+zsh concatenate_alignment.sh # Note this shell script is different from tree
+zsh compute_trees1.sh
+cd ../../
+Rscript -e "renv::activate('.'); 
+source('phylogenomics_analysis/replicon_trees/compute_trees2.R'); 
+source('phylogenomics_analysis/replicon_trees/curate_trees.R');
+"
+
+## Tree distance
+Rscript -e "renv::activate('.'); 
+source('phylogenomics_analysis/tree_distance/rf_tree.R');
+"
+```
+
+
 
 ## Visualization
 
