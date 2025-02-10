@@ -7,11 +7,3 @@ This folder contains scripts for analyzing the genomics data including:
 5. `fst`, `gcv_fst`: compute fst for SNPs and GCV (gene content variation)
 6. `dxy`, `gcv_dxy`: compute dxy for SNPs and GCV
 7. `go`, `gcv_go`: perform GO enrichment analysis for SNPs and GCV
-
-To reproduce the intermediate files without invoking the exploratory plots
-
-```
-zsh concatenate_alignment.sh
-zsh compute_trees1.sh
-Rscript -e "renv::activate(here::here()); source('compute_trees2.R'); source('curate_trees.R')"
-```

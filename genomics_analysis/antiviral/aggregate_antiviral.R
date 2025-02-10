@@ -12,8 +12,8 @@ for (i in 1:nrow(isolates)) {
     list_def[[isolates$genome_id[i]]] <- read_tsv(paste0(folder_data, "genomics/antiviral/", isolates$genome_id[i], "/defense_finder/", isolates$genome_id[i], "_defense_finder_genes.tsv"), show_col_types = F)
     #read_tsv(paste0(folder_data, "genomics/antiviral/", isolates$genome_id[i], "/defense_finder/", isolates$genome_id[i], "_defense_finder_systems.tsv"), show_col_types = F)
 }
-defense_finder <- bind_rows(list_def, .id = "genome_id")
-write_csv(defense_finder, paste0(folder_data, "genomics_analysis/antiviral/defense_finder.csv"))
+defensefinder <- bind_rows(list_def, .id = "genome_id")
+write_csv(defensefinder, paste0(folder_data, "genomics_analysis/antiviral/defensefinder.csv"))
 
 
 # padloc
