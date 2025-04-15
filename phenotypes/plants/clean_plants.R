@@ -25,9 +25,13 @@ nrow(treatments_cyc) # 167 plants
 # Clean up
 treatments_ttb <- treatments_ttb %>%
     select(-location) %>%
-    rename(id = plant, waterblock = block,
-           exp_id = rhizobia_strain,
-           dry_weight_mg = shoot_weight, nodule_number = nodules, root_weight_mg = root_weight) %>%
+    rename(
+        id = plant, waterblock = block,
+        exp_id = rhizobia_strain,
+        shoot_biomass_mg = shoot_weight,
+        nodule_number = nodules,
+        root_biomass_mg = root_weight
+    ) %>%
     # Clean the expid name
     mutate(exp_id = str_replace(exp_id, "b_", "_")) %>%
     mutate(exp_id = str_remove(exp_id, "_c\\d")) %>%
@@ -38,7 +42,7 @@ treatments_ttb <- treatments_ttb %>%
     mutate(site = str_remove(exp_id, "-\\d")) %>%
     mutate(site = str_remove(site, "\\d$")) %>%
     # Correct unit
-    mutate(dry_weight_mg = dry_weight_mg*10^3, root_weight_mg = root_weight_mg*10^3) %>%
+    #mutate(shoot_biomass_mg = shoot_biomass_mg*10^3, root_biomass_mg = root_biomass_mg*10^3) %>%
     # Plant unique id
     mutate(id = id + nrow(treatments_cyc)) %>%
     arrange(id) %>%
@@ -48,7 +52,13 @@ treatments_ttb <- treatments_ttb %>%
     select(id, gradient, exp_id, everything())
 
 treatments_cyc <- treatments_cyc %>%
-    rename(exp_id = rhizobia, site = rhizobia_site) %>%
+    rename(
+        exp_id = rhizobia,
+        site = rhizobia_site,
+        shoot_biomass_mg = dry_weight_mg,
+        root_biomass_mg = root_weight_mg
+    ) %>%
+    mutate(shoot_biomass_mg = shoot_biomass_mg/1000, root_biomass_mg = root_biomass_mg /1000) %>%
     select(-treatment_id, -label, -nodule_weight_mg) %>%
     replace_na(list(exp_id = "control")) %>%
     mutate(site = str_sub(exp_id, 1, 2)) %>%
@@ -60,8 +70,9 @@ lupulinas <- bind_rows(treatments_cyc, treatments_ttb) %>%
     # Make sure the variable names are correct
     clean_names() %>%
     rename(
-        exp_waterblock = waterblock, exp_plantsite = plant_site, exp_plantmaternal = plant,
-        shoot_biomass_mg = dry_weight_mg, root_biomass_mg = root_weight_mg
+        exp_waterblock = waterblock,
+        exp_plantsite = plant_site,
+        exp_plantmaternal = plant
     ) %>%
     # Join the site and isolate information
     left_join(select(sites, gradient, population, site)) %>%
