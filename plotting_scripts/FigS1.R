@@ -1,160 +1,115 @@
-#' This script plots the difference in the daily tmax in elevation sites
+#' Plots the maps
 
 library(tidyverse)
 library(cowplot)
+library(tigris) # for getting the US state map
+library(sf) # for handling the simple features
+library(geodata) # for getting the elevation data
+library(stars) # for converting st to sf
+library(ggspatial) # for scale bar
+#library(geosphere) # for computing the distance between sites
+library(grid) # add polygons
+#' On MacOS, sf depends on gdal so do this in terminal
+#' brew install pkg-config
+#' brew install gdal
+# then in R > renv::install("sf", type = "source", configure.args = "--with-proj-lib=$(brew --prefix)/lib/")
+#Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj") # for crs
 source(here::here("metadata.R"))
 
-dml <- read_csv(paste0(folder_data, "phenotypes/sites/dml.csv"))
-sites <- read_csv(paste0(folder_data, "phenotypes/sites/sites.csv"))
-diff_vars <- read_csv(paste0(folder_data, "phenotypes/sites/diff_vars.csv"))
-tb_month <- read_csv(paste0(folder_data, "phenotypes/sites/tb_month.csv")) %>% mutate(ymonth = factor(ymonth))
+# Read data
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+sites <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>% filter(population != "mid elevation") %>%
+    # Use sites where the isolates were from
+    filter(site %in% isolates$site)
+us_states <- states() # us state map
+us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
 
-site_colors <- rep(c("#0C6291", "#BF4342", "#0cc45f", "#a642bf"), each = 4) %>% setNames(sites$site[-9])
-site_alphas <- rep(seq(1, 0.4, length.out = 4), 4) %>% setNames(sites$site[-9])
-month_fills <- setNames(grey(rep(c(0,1),6)), 1:12)
+# Make the center. This is to use the same map range for both populations
+sites_center <- sites %>%
+    group_by(population) %>%
+    summarize(lat_mean = mean(latitude_dec), lon_mean = mean(longitude_dec), lat_max = max(latitude_dec), lat_min = min(latitude_dec), lon_max = max(longitude_dec), lon_min = min(longitude_dec)) %>%
+    mutate(hjust = c(0.8, 0.8)) %>%
+    mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
 
-plot_composites <- function (dml_i, diff_var, diff_var_i, p1_title, p2_title, show_legend = T) {
-    # Panel A ----
-    p1 <- dml_i %>%
+# 1. Plot the states ----
+plot_states <- function (us_states) {
+    us_states %>%
+        filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
         ggplot() +
-        geom_rect(data = tb_month, aes(xmin = start, xmax = end, fill = ymonth), ymin = -Inf, ymax = Inf, alpha = 0.1) +
-        geom_hline(yintercept = 0, color = "black", linetype = 2, linewidth = 1) +
-        geom_line(aes(x = yday, y = {{diff_var}}, color = site, alpha = site)) +
-        scale_fill_manual(values = month_fills) +
-        scale_color_manual(values = site_colors, name = "site") +
-        scale_alpha_manual(values = site_alphas, name = "site") +
-        scale_x_reverse(expand = c(0,0), breaks = (tb_month$start + tb_month$end)/2, labels = month.abb) +
-        scale_y_continuous(expand = c(0,0), limits = c(-20, 35), breaks = seq(-20, 30, 10), position = "right") +
-        coord_flip() +
-        theme_classic() +
+        geom_sf(fill = NA, color = "grey10", linewidth = .5) +
+        geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("#FFC857", 0.5), linewidth = 0.5) +
+        annotation_scale(location = "bl", width_hint = .2, ) +
+        coord_sf(expand = F, xlim = c(-87, -70), ylim = c(35, 42.5)) +
+        theme_light() +
         theme(
-            panel.border = element_rect(color = "black", fill = NA),
-            panel.grid.major.x = element_line(color = "black", linewidth = 0.1, linetype = 2),
-            panel.grid.minor.x = element_line(color = "black", linewidth = 0.1, linetype = 2),
-            legend.position = "right",
-            legend.direction = "horizontal",
-            legend.title = element_text(size = 10),
-            legend.text = element_text(size = 10),
-            legend.key.height = unit("10", "mm"),
-            legend.box.margin = margin(0,0,10,0, unit = "mm"),
-            legend.box.background = element_blank(),
-            legend.background = element_rect(color = NA, fill = NA)
+            panel.background = element_rect(color = NA, fill = NA, linewidth = 1),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+            plot.background = element_rect(color = NA, fill = NA, linewidth = .5),
+            legend.position = "bottom",
+            panel.grid.major = element_blank(),
+            axis.line = element_line(linewidth = .5),
+            axis.ticks = element_line(color = "black", linewidth = .5),
+            axis.text = element_text(color = "black")
         ) +
-        guides(fill = "none", color = guide_legend(byrow = T, nrow = 2, override.aes = list(linewidth = 2), title.position = "left")) +
-        labs(x = "", y = p1_title)
+        guides(fill = "none", color = "none") +
+        labs(x = "Longitude", y = "Latitude")
+}
+p1 <- plot_states(us_states)
 
-    # Panel B the bootstrapped temperature ----
-    dvs <- diff_var_i %>%
-        group_by(yday) %>%
-        summarize(diff_var = mean(diff_var))
-    dv_mean <- mean(dvs$diff_var)
-    dv_rng <- range(dvs$diff_var); dv_rng <- c(floor(dv_rng[1]), ceiling(dv_rng[2]))
-    p2 <- dvs %>%
+# 2. Elevation ----
+get_elev_sf <- function (us_elev, sites_center, pop) {
+    scc <- unlist(filter(sites_center, population == pop)[,-1])
+    center_coord <- scc[c("lon_mean", "lat_mean")]
+    edge_length <- scc["width_max"]/2
+    extent_area <- ext(center_coord[1] - edge_length, center_coord[1] + edge_length, center_coord[2] - edge_length, center_coord[2] + edge_length)
+    elev1 <- crop(us_elev, extent_area)
+    r_points <- as.data.frame(elev1, xy = TRUE) %>% as_tibble
+    sf <- st_as_sf(r_points, coords = c("x", "y"), crs = 4326)
+    return(sf)
+}
+plot_elev_map <- function (elev_sf, sites_center, pop, midp = 1000) {
+    # pop = "VA"
+    # midp = 1000
+    sc <- filter(sites_center, population == pop)
+    elev_sf %>%
         ggplot() +
-        geom_rect(data = tb_month, aes(xmin = start, xmax = end, fill = ymonth), ymin = -Inf, ymax = Inf, alpha = 0.1) +
-        geom_hline(yintercept = 0, color = "black", linetype = 2, linewidth = 1) +
-        geom_hline(yintercept = dv_mean, color = "maroon", linetype = 2, linewidth = 1) +
-        geom_line(aes(x = yday, y = diff_var)) +
-        scale_fill_manual(values = month_fills) +
-        scale_x_reverse(expand = c(0,0), breaks = (tb_month$start + tb_month$end)/2, labels = month.abb) +
-        scale_y_continuous(expand = c(0,0), limits = dv_rng, breaks = seq(dv_rng[1], dv_rng[2], 1), position = "right") +
-        coord_flip() +
-        theme_classic() +
+        geom_sf(aes(color = USA_elv_msk), alpha = .9) +
+        geom_point(data = filter(sites, population == pop), aes(x = longitude_dec, y = latitude_dec, fill = population), color = "black", size = 2, shape = 21, stroke = 1) +
+        scale_color_gradient2(low = "#db7272", high = "steelblue", mid = "snow", midpoint = midp, name = "elevation (m)") +
+        scale_fill_manual(values = population_colors) +
+        scale_x_continuous(limits = c(sc$lon_mean[1] - sc$width_max[1]/2, sc$lon_mean[1] + sc$width_max[1]/2), expand = c(0,0)) +
+        scale_y_continuous(limits = c(sc$lat_mean[1] - sc$width_max[1]/2, sc$lat_mean[1] + sc$width_max[1]/2), expand = c(0,0)) +
+        annotation_scale(width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
+        coord_sf() +
+        theme_void() +
         theme(
-            panel.border = element_rect(color = "black", fill = NA),
-            panel.grid.major.x = element_line(color = "black", linewidth = 0.1, linetype = 2)
+            plot.background = element_rect(color = "black", fill = "snow", linewidth = 1),
+            legend.text = element_text(size = 8) ,
+            legend.title = element_text(size = 8),
+            legend.key.width = unit(5, "mm"),
+            legend.key.height = unit(8, "mm"),
+            legend.box.margin = unit(c(0,0,0,0), "mm"),
+            plot.margin = unit(c(2,3,3,3), "mm"),
+            plot.title = element_text(size = 8, hjust = .5, margin = unit(c(0,0,1,0), "mm"))
         ) +
-        guides(fill = "none") +
-        labs(x = "", y = p2_title)
-
-
-    # Padding legend for panel A ----
-    p_legend <- get_legend(p1)
-
-    # Panel C histogram
-    p3 <- dvs %>%
-        ggplot() +
-        geom_histogram(aes(x = diff_var), color = "black", fill = "white") +
-        geom_vline(xintercept = 0, color = "black", linetype = 2, linewidth = 1) +
-        geom_vline(xintercept = dv_mean, color = "maroon", linetype = 2, linewidth = 1) +
-        scale_x_continuous(expand = c(0,0), limits = dv_rng, breaks = seq(dv_rng[1], dv_rng[2], 1)) +
-        theme_classic() +
-        theme(
-            panel.border = element_rect(color = "black", fill = NA)
-        ) +
-        guides() +
-        labs(x = p2_title)
-
-    #
-    p_top <- plot_grid(p1 + guides(color = "none", alpha = "none"), p2, nrow = 1, labels = c("", ""), align = "hv", axis = "lrtb", scale = 0.95)
-    p_bottom <- plot_grid(NULL, p3, labels = c("", ""), rel_widths = c(1.05, 1), scale = 0.95)
-    if (show_legend) p_bottom <- plot_grid(p_legend, p3, labels = c("", ""), rel_widths = c(1.05, 1), scale = 0.95)
-    p <- plot_grid(p_top, p_bottom, nrow = 2, rel_heights = c(3,1)) + theme(plot.background = element_rect(fill = "white", color = NA))
-    return(p)
-
+        guides(fill = "none", color = guide_colorbar(barwidth = .8, barheight = 5)) +
+        labs(x = "Longitude", y = "Latitude", title = "Elevation")
 }
 
-compute_mean <- function (diff_var_i) {
-    dvs <- diff_var_i %>% group_by(yday) %>% summarize(diff_var = mean(diff_var))
-    return(list(
-        mean = mean(dvs$diff_var),
-        ttest = t.test(dvs$diff_var)
-        ))
-}
+p2 <- get_elev_sf(us_elev, sites_center, "VA") %>% plot_elev_map(sites_center, "VA", 1000)
+p3 <- get_elev_sf(us_elev, sites_center, "PA") %>% plot_elev_map(sites_center, "PA", 50)
 
-get_dmli <- function (gra) dml %>% filter(gradient == gra, population != "mid elevation") %>% mutate(site = factor(site, sites$site))
-get_diff_vari <- function (gra, t_deg_c) diff_vars %>% filter(gradient == gra, variable == t_deg_c)
+# 4. combine ----
+zoom_polygon1 <- polygonGrob(x = c(.17,.42,.435,.43), y = c(.65,.608,.608,.65), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
+zoom_polygon2 <- polygonGrob(x = c(.648,.595,.85,.658), y = c(.77,.75,.75,.77), gp = gpar(fill = "grey", alpha = 0.3, col = NA))
 
+p <- ggdraw() +
+    #draw_image(here::here("plots/cartoons/Fig1.png"), scale = 1) +
+    draw_plot(p1, x = .01, y = .37, width = .95, height = .6) +
+    draw_grob(zoom_polygon1) +
+    draw_grob(zoom_polygon2) +
+    draw_plot(p2, x = .1, y = .65, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .3, height = .4, hjust = 0, halign = 0) +
+    draw_plot(p3, x = .52, y = .45, width = .4, height = .3, hjust = 0, vjust = 0) + #width = .7, height = .4, hjust = 0, halign = 0) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
-# elevation tmax
-p1 <- plot_composites(
-    get_dmli("elevation"), tmax_deg_c, get_diff_vari("elevation", "tmax_deg_c"),
-    expression(t[a](degree*C)),
-    expression(mean ~ "[" ~ t[a] ~ "("~L~")" - t[a]~ "("~H~")" ~ "]"(degree*C))
-)
-
-# elevation tmin
-p2 <- plot_composites(
-    get_dmli("elevation"), tmin_deg_c, get_diff_vari("elevation", "tmin_deg_c"),
-    expression(t[i](degree*C)),
-    expression(mean ~ "[" ~ t[i] ~ "("~L~")" - t[i]~ "("~H~")" ~ "]"(degree*C)),
-    show_legend = F
-)
-
-# urbanization tmax
-p3 <- plot_composites(
-    get_dmli("urbanization"), tmax_deg_c, get_diff_vari("urbanization", "tmax_deg_c"),
-    expression(t[a](degree*C)),
-    expression(mean ~ "[" ~ t[a] ~ "("~L~")" - t[a]~ "("~H~")" ~ "]"(degree*C))
-)
-
-# urbanization tmin
-p4 <- plot_composites(
-    get_dmli("urbanization"), tmin_deg_c, get_diff_vari("urbanization", "tmin_deg_c"),
-    expression(t[i](degree*C)),
-    expression(mean ~ "[" ~ t[i] ~ "("~L~")" - t[i]~ "("~H~")" ~ "]"(degree*C)),
-    show_legend = F
-)
-
-p <- plot_grid(p1, p2, p3, p4, ncol = 2, align = "h", labels = LETTERS[1:4])
-
-ggsave(here::here("plots/FigS1.png"), p, width = 12, height = 12)
-
-
-# Stat ----
-compute_mean(get_diff_vari("elevation", "tmax_deg_c"))
-# 2.94137
-# t = 45.844, df = 364, p-value < 2.2e-16
-
-compute_mean(get_diff_vari("elevation", "tmin_deg_c"))
-# 0.8360737
-# t = 9.9063, df = 364, p-value < 2.2e-16
-
-compute_mean(get_diff_vari("urbanization", "tmax_deg_c"))
-# 0.4041381
-# t = 29.515, df = 364, p-value < 2.2e-16
-
-compute_mean(get_diff_vari("urbanization", "tmin_deg_c"))
-# 0.28186
-# t = 14.812, df = 364, p-value < 2.2e-16
-
+ggsave(here::here("plots/FigS1.png"), p, width = 9, height = 7)

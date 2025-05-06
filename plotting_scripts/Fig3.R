@@ -1,95 +1,115 @@
-#' This script plots the reaction norm of nitrogen treatments
-#' 1. Prepare the table
-#' 2. Plot
-#' 3. permanova
+#' This script plots the growth traits
 
 library(tidyverse)
 library(cowplot)
 library(ggh4x) # for nested facets
-library(vegan) # for PERMANOVA
 source(here::here("metadata.R"))
 
-# 1. Prepare the data ----
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv"))
-nitrogen_rn_perm <- read_csv(paste0(folder_phenotypes, "nitrogen_rn/nitrogen_rn_perm.csv"))
+# Prepare the data ----
+iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
+    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
+gc_summs <- read_csv(paste0(folder_data, "phenotypes/growth/gc_summs.csv"))
+gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
+gc_summs <- left_join(gc_summs, select(iso, exp_id, genome_id, contig_species))
 
-isolates <- isolates %>%
-    arrange(population) %>%
-    mutate(genome_id = factor(genome_id))
+gtsl <- gts %>%
+    replace_na(list(maxOD = 0)) %>%
+    mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
+    select(temperature, exp_id, r, lag, maxOD) %>%
+    pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
+    left_join( select(iso, exp_id, genome_id, contig_species)) %>%
+    drop_na(value)
 
-plants_n <- plants %>%
-    filter(population != "control", exp_plant == "sativa", gradient == "elevation") %>%
-    select(
-        -nodule_shape, -nodule_size, -nodule_color, -exp_labgroup,
-        -primary_root_nodule_number, -lateral_root_nodule_number,
-        -longest_petiole_length, -longest_lateral_root_length,
-        -lateral_root_number, -primary_root_length
-    ) %>%
-    group_by(gradient, population, exp_plant) %>%
-    filter(nodule_number <100) %>%
-    pivot_longer(cols = -c(1:12), names_to = "trait", values_drop_na = T) %>%
-    left_join(traits) %>%
-    ungroup()
+# Panel A
+p1 <- ggdraw()
 
-plants_n_summ <- plants_n %>%
-    group_by(exp_nitrogen, trait_type, trait_pre, population) %>%
-    summarize(trait_mean = mean(value), trait_sem = sd(value)/sqrt(n())) %>%
-    mutate(lower = trait_mean-qnorm(0.975)*trait_sem, upper = trait_mean+qnorm(0.975)*trait_sem) %>%
-    mutate(trait_type = factor(trait_type, unique(traits$trait_type)), trait_pre = factor(trait_pre, traits$trait_pre))
+# Panel growth curve
+p2 <- gc_summs %>%
+    ggplot() +
+    geom_line(aes(x = t, y = mean_abs, group = exp_id, color = contig_species), linewidth = .3) +
+    geom_text(aes(label = temperature), x = 5, y = .45) +
+    scale_color_manual(values = species_colors) +
+    scale_x_continuous(breaks = seq(0, 48, 12)) +
+    coord_cartesian(clip = "off") +
+    facet_wrap2(~temperature, nrow = 1) +
+    theme_bw() +
+    theme(
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(color = "grey95", linewidth = .5),
+        panel.border = element_rect(color = "black", fill = NA),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 10),
+        strip.placement = "outside",
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        legend.key = element_blank(),
+        legend.key.size = unit(5, "mm"),
+        legend.box.margin = margin(0,0,0,0, "mm"),
+        plot.background = element_blank()
+    ) +
+    guides() +
+    labs(x = "Time (hour)", y = "O.D.[600nm]")
 
+# Panel C
+gtwlm <- gtsl %>%
+    group_by(temperature, contig_species, trait) %>%
+    summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value))) %>%
+    group_by(temperature, trait) %>%
+    mutate(max_mean_value = max(mean_value, na.rm = T)) %>%
+    replace_na(list(ci_value = 0)) %>%
+    mutate(trait = case_when(
+        trait == "r" ~ "growth rate (1/hr)",
+        trait == "lag" ~ "lag time (hr)",
+        trait == "maxOD" ~ "yield [OD]"
+    ))
 
-# 2. Plot the reaction norm ----
-# Stat
-tb_stat_perm <- nitrogen_rn_perm %>%
-    mutate(ast = map_chr(p_value, turn_p_to_asteriks)) %>%
-    filter(!str_detect(term, "Intercept")) %>%
-    select(ii, trait_type, trait_pre, term, ast) %>%
-    group_by(ii, trait_type, trait_pre) %>%
-    pivot_wider(names_from = term, values_from = ast) %>%
-    mutate(trait_type = factor(trait_type, unique(traits$trait_type)), trait_pre = factor(trait_pre, traits$trait_pre)) %>%
-    mutate(astlabs = paste0("population:nitrogen ", `population:exp_nitrogen`, "\npopulation ", population, "\nnitrogen ", exp_nitrogen))
-
-p <- plants_n %>%
-    group_by(gradient, population, exp_plant, exp_nitrogen, trait_type, trait_pre, value) %>%
-    mutate(trait_type = factor(trait_type, unique(traits$trait_type)), trait_pre = factor(trait_pre, traits$trait_pre)) %>%
-    count() %>%
-    ggplot(aes(x = exp_nitrogen, y = value)) +
-    geom_point(aes(color = population, size = n), alpha = .5, shape = 16, position = position_dodge(width = .4)) +
-    geom_linerange(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, ymin = lower, ymax = upper), linewidth = 1, position = position_dodge2(width = .4)) +
-    geom_line(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean, group = population), linewidth = 1, position = position_dodge(width = .4)) +
-    geom_point(data = plants_n_summ, aes(x = exp_nitrogen, y = trait_mean), size = 2, shape = 21, stroke = 1, fill = "white", position = position_dodge2(width = .4)) +
-    # Stats per panel
-    geom_text(data = tb_stat_perm, aes(label = astlabs), x = 0.5, y = Inf, hjust = 0, vjust = 1.1, size = 2) +
-    scale_color_manual(values = population_colors) +
-    scale_size_continuous(range = c(.5, 10)) +
-    scale_y_continuous(expand = c(0.1, 2)) +
-    facet_nested(
-        ~trait_type+trait_pre, switch = "y", scales = "free", independent = "all", render_empty = F,
-        axes = "x", remove_labels = "none", nest_line = element_line(color = "grey30", linetype = 1, linewidth = 1), solo_line = T,
-        strip = strip_nested(bleed=T , clip = "off", size = "variable", text_x = element_text(size = 10), background_x = elem_list_rect(color = NA, fill = c(rep("white", 3), rep("white", 7))))) +
+p3 <- gtsl %>%
+    mutate(trait = case_when(
+        trait == "r" ~ "growth rate (1/hr)",
+        trait == "lag" ~ "lag time (hr)",
+        trait == "maxOD" ~ "yield [OD]"
+    )) %>%
+    ggplot() +
+    # Each strain
+    geom_line(aes(x = temperature, y = value, group = exp_id, color = contig_species), alpha = .1) +
+    # Mean value
+    geom_ribbon(data = gtwlm, aes(x = temperature, ymin = mean_value-ci_value, ymax =  mean_value+ci_value, fill = contig_species, group = contig_species), inherit.aes = FALSE, alpha = 0.2) +
+    geom_line(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
+    geom_point(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
+    scale_color_manual(values = species_colors) +
+    scale_fill_manual(values = species_colors) +
+    facet_wrap2(~trait, scales = "free_y", nrow = 1, strip.position = "left") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(color = "grey95", linewidth = .5),
+        panel.border = element_rect(color = "black", fill = NA),
+        strip.background = element_blank(),
+        strip.text.y = element_text(size = 10),
         strip.placement = "outside",
-        strip.background = element_rect(color = NA, fill = NA)
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        legend.key = element_blank(),
+        legend.key.size = unit(5, "mm"),
+        legend.box.margin = margin(0,0,0,0, "mm"),
+        plot.background = element_blank()
     ) +
-    guides(
-        color = guide_legend(title = "population", override.aes = list(size = 5)),
-        size = guide_legend(title = "num. of plants")
-    ) +
-    labs(x = "Nitrogen treatment", y = "")
+    guides(fill = guide_legend(override.aes = list(color = NA), nrow = 2, direction = "vertical")) +
+    labs(x = expression(paste("Temperature (", degree, "C)")))
 
-ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 4)
+#p_left <- plot_grid(p1, p2, ncol = 1, rel_heights = c(1,3))
+p <- plot_grid(
+    p2, p3,
+    ncol = 1, align = "v", axis = "lr",
+    labels = c("A", "B"), scale = .95
+) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-
-# 3. PERMANOVA ----
-set.seed(1)
-
-dat <- plants %>%
-    filter(population != "control", gradient == "elevation", exp_plant == "sativa") %>%
-    drop_na(shoot_height, nodule_number, leaf_color, leaf_number) %>%
-    select(gradient, population, site, exp_id, exp_nitrogen, shoot_height, nodule_number, leaf_color, leaf_number)
-m <- select(dat, shoot_height, nodule_number, leaf_color, leaf_number)
-adonis2(m ~ exp_nitrogen, data = dat, permutation = 1000)
-
+ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 6)

@@ -124,3 +124,22 @@ mamba install --yes -c conda_forge pandas
 mamba create -n gffread
 mamba activate gffread
 mamba install --yes -c bioconda gffread=0.12.7
+
+# Install defense finder v1.3.0
+mamba create -n defense-finder
+mamba activate defense-finder
+mamba install --yes -c bioconda defense-finder=1.3.0
+# Install the model from macsyfinder
+pip install -U mdmparis-defense-finder
+defense-finder update
+
+# Install padloc v2.0.0
+mamba create --yes -n padloc -c conda-forge -c bioconda -c padlocbio padloc=2.0.0
+mamba activate padloc
+# Download the latest database
+padloc --db-update
+
+# Install clonalframml
+mamba create -n clonalframeml
+mamba activate clonalframeml
+mamba install --yes -c bioconda clonalframeml=1.13

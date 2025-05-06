@@ -17,7 +17,8 @@ pops_colors <- c(
     `suburban-urban` = "grey50",
     `urban-urban` = "#a642bf"
 )
-species_colors <- c(adhaerens = "grey", canadensis = "grey", medicae = "steelblue", meliloti = "maroon")
+sp_colors <- c(adhaerens = "grey80", canadensis = "grey20", medicae = "steelblue", meliloti = "maroon")
+species_colors <- c(`S. adhaerens` = "grey80", `S. canadensis` = "grey20", `S. medicae` = "steelblue", `S. meliloti` = "maroon")
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
 plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 
