@@ -5,15 +5,12 @@ library(cowplot)
 library(ggh4x) # for nested facets
 source(here::here("metadata.R"))
 
-# Prepare the data ----
+# Prepare the data
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
     mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
-gc_summs <- read_csv(paste0(folder_data, "phenotypes/growth/gc_summs.csv"))
+gcl_smooth <- read_csv(paste0(folder_phenotypes, 'growth/gcl_smooth.csv')) # Growth traits per well
 gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
-gc_summs <- left_join(gc_summs, select(iso, exp_id, genome_id, contig_species))
-
 gtsl <- gts %>%
-    replace_na(list(maxOD = 0)) %>%
     mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
     select(temperature, exp_id, r, lag, maxOD) %>%
     pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
@@ -24,7 +21,10 @@ gtsl <- gts %>%
 p1 <- ggdraw()
 
 # Panel growth curve
-p2 <- gc_summs %>%
+p2 <- gcl_smooth %>% # Compute mean
+    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
+    group_by(temperature, exp_id, t) %>%
+    mutate(mean_abs = mean(abs_fit)) %>%
     ggplot() +
     geom_line(aes(x = t, y = mean_abs, group = exp_id, color = contig_species), linewidth = .3) +
     geom_text(aes(label = temperature), x = 5, y = .45) +
@@ -56,6 +56,7 @@ p2 <- gc_summs %>%
 
 # Panel C
 gtwlm <- gtsl %>%
+    #filter(value > 0) %>%
     group_by(temperature, contig_species, trait) %>%
     summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value))) %>%
     group_by(temperature, trait) %>%
@@ -73,6 +74,7 @@ p3 <- gtsl %>%
         trait == "lag" ~ "lag time (hr)",
         trait == "maxOD" ~ "yield [OD]"
     )) %>%
+    #filter(value > 0) %>%
     ggplot() +
     # Each strain
     geom_line(aes(x = temperature, y = value, group = exp_id, color = contig_species), alpha = .1) +
@@ -105,7 +107,6 @@ p3 <- gtsl %>%
     guides(fill = guide_legend(override.aes = list(color = NA), nrow = 2, direction = "vertical")) +
     labs(x = expression(paste("Temperature (", degree, "C)")))
 
-#p_left <- plot_grid(p1, p2, ncol = 1, rel_heights = c(1,3))
 p <- plot_grid(
     p2, p3,
     ncol = 1, align = "v", axis = "lr",

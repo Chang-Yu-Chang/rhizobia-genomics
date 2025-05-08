@@ -69,17 +69,6 @@ mamba create -n blast
 mamba activate blast
 mamba install --yes -c bioconda blast=2.14.1
 
-# Install sourmash v4.8.4
-# Sourmash is a quickly search, compare, and analyze genomic and metagenomic data sets
-mamba create -n sourmash
-mamba activate sourmash
-mamba install --yes -c bioconda sourmash=4.6.1
-# Download a prefetch GTDB R8 genomic database for k=31
-mkdir -p ~/bioinformatics/sourmash
-cd ~/bioinformatics/sourmash/
-# Install zip that is used for sourmash gather
-wget https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.zip -O gtdb-rs214-k31.zip
-
 # Install barrnap v0.9
 # Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
 mamba create -n barrnap

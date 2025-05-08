@@ -1,13 +1,11 @@
 #' This script fits the growth curve data
 
 library(tidyverse)
-library(janitor)
 library(data.table)
 library(mgcv) # For smoothing
 source(here::here("metadata.R"))
 
-gc_plate <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve2/gc_plate.csv"))
-
+gc_plate <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve2/gc_plate.csv")) # plate layout
 list_gcs <- rep(list(NA), 4)
 list_gcs[[1]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve2/rhizobia_growth_curve.csv")) # 30C
 list_gcs[[2]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve3/rhizobia_growth_curve.csv")) # 35C
@@ -15,10 +13,10 @@ list_gcs[[3]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve4/r
 list_gcs[[4]] <- read_csv(paste0(folder_data, "raw/growth_curves/growth_curve5/rhizobia_growth_curve.csv")) # 40C
 names(list_gcs) <- c("30c", "35c", "25c", "40c")
 
-# Tidy up time series
-clean_well_names <- function (x) paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
 wide_to_long <- function (gc) {
     #' This function clean up the variable names and pivot the wide form to long
+    clean_well_names <- function (x) paste0(str_sub(x, 1, 1), str_sub(x, 2, 3) %>% as.numeric %>% sprintf("%02d", .))
+
     gc %>%
         # Calculate the time interval in minutes
         mutate(t = as.numeric(difftime(Time, Time[1], units = "hours"))) %>%
@@ -31,7 +29,7 @@ wide_to_long <- function (gc) {
 extract_blank <- function (gc) {
     #' This function takes the long format of gc to calculate the average abs of blank at each time point
     gc %>%
-    filter(exp_id == "blank") %>%
+        filter(exp_id == "blank") %>%
         group_by(t) %>%
         summarize(abs_blank = mean(abs))
 }
@@ -43,67 +41,43 @@ subtract_blank <- function (gc, gc_blank) {
         mutate(abs = ifelse(abs < 0, 0, abs)) %>%
         filter(exp_id != "blank")
 }
-summarize_gc <- function (gc) {
-    #' This function takes the gc (after blank) and average across replicates
-    gc %>%
-        group_by(t, exp_id) %>%
-        summarize(mean_abs = mean(abs), sd_abs = sd(abs)) %>%
-        ungroup()
-}
-# Smooth and fit GAM to growth curves
-compute.gam <- function(x) {
-    # Remove "blank"
-    x <- x[order(t)]
-    x[, abs := abs-0.034]
-    blk <- x$abs[1]
+# gc <- list_gcs[[2]]
+# x <- gcl %>% filter(well == "G03")
+compute_gam <- function(x) {
+    #' Smooth and fit GAM to a growth curve
+    x <- x %>%
+        mutate(abs = ifelse(abs<0.01, 0.01, abs)) %>% # Avoid 0 value
+        mutate(lod = log(abs))
 
-    if (any(x$abs>.05, na.rm=TRUE)) {
-
-        x[, abs := ifelse(abs<0.006, 0.006, abs)]
-        x[, lOD := log(abs)]
+    if (any(x$abs > 0.01, na.rm = T)) {
 
         # First smooth the raw data, which is needed for the lag phase
-        gam0 <- gam(abs ~ s(t, bs = 'ad'), data=x)
+        gam0 <- gam(abs ~ s(t, bs = "ad"), data = x)
 
-        t <- unique(x$t)
-        newd <- data.frame(t = t)
-        pred0 <- predict(gam0, newd,
-                         se.fit = TRUE) %>%
-            as_tibble() %>%
-            mutate(t = t)
-
+        ut <- unique(x$t)
+        newd <- tibble(t = ut)
         X0 <- predict(gam0, newd, type="lpmatrix")
-
         eps <- 1e-7 ## finite difference interval
-        newd <- data.frame(t = t+eps)
+        newd <- tibble(t = ut + eps)
         X1 <- predict(gam0, newd, type="lpmatrix")
-
         Xp <- (X1-X0)/eps ## maps coefficients to (fd approx.) derivatives
 
         df <- Xp%*%coef(gam0)              ## ith smooth derivative
         df.sd <- rowSums(Xp%*%gam0$Vp*Xp)^.5 ## cheap diag(Xi%*%b$Vp%*%t(Xi))^.5
 
-        pred0 <- pred0 %>%
-            mutate(deriv.fit = df[,1], deriv.sd = df.sd,
-                   csource = x$csource[1],
-                   isolate = x$seq[1])
+        pred0 <- predict(gam0, newd, se.fit = T) %>%
+            as_tibble() %>% mutate(t = ut) %>%
+            mutate(deriv.fit = df[,1], deriv.sd = df.sd)
 
         # Now model the log OD for getting the growth rate
-        gam1 <- try(gam(lOD ~ s(t, bs = 'ad'), data=x), silent=TRUE)
+        gam1 <- gam(lod ~ s(t, bs = 'ad'), data = x)
 
-        t <- unique(x$t)
-        newd <- data.frame(t = t)
-        pred <- predict(gam1, newd,
-                        se.fit = TRUE) %>%
-            as_tibble() %>%
-            mutate(t = t)
-
+        newd <- tibble(t = ut)
+        pred <- predict(gam1, newd, se.fit = TRUE) %>% as_tibble() %>% mutate(t = ut)
         X0 <- predict(gam1, newd, type="lpmatrix")
-
         eps <- 1e-5 ## finite difference interval
-        newd <- data.frame(t = t+eps)
+        newd <- tibble(t = ut+eps)
         X1 <- predict(gam1, newd, type="lpmatrix")
-
         Xp <- (X1-X0)/eps ## maps coefficients to (fd approx.) derivatives
 
         df <- Xp%*%coef(gam1)              ## ith smooth derivative
@@ -111,74 +85,60 @@ compute.gam <- function(x) {
 
         # GET THE DATA
         pred <- pred %>%
-            mutate(deriv.fit = df[,1], deriv.sd = df.sd,
-                   csource = x$csource[1],
-                   seq = x$seq[1],
-                   OD.frac = pred0$fit/max(pred0$fit),
-                   lOD = x$lOD,
-                   well=x$well
-                   # date=as.character(x$date)
+            mutate(
+                deriv.fit = df[,1],
+                deriv.sd = df.sd,
+                OD.frac = pred0$fit/max(pred0$fit),
+                lod = x$lod
             )
 
         # GET GROWTH PARAMETERS
-
-        # discard all the first X points with OD lower than 0.015 or t<1h
-        aux <- rle(pred$lOD<log(0.015))
+        # discard all the first X points with OD lower than 0.001 or t<1h
+        aux <- rle(pred$lod<log(0.001))
         aux <- ifelse(aux$values[1], pred$t[aux$lengths[1]], 0)
         aux <- ifelse(aux<1, 1, aux)
 
         ## compute lag
-        maxgr <- pred %>%
-            filter(t>aux) %>%
-            filter(deriv.fit==max(deriv.fit))
+        # Max growth rate
+        rmax <- pred %>%
+            filter(t > aux) %>%
+            filter(deriv.fit == max(deriv.fit))
+        t_rmax <- rmax$t[1] # time at which max gorwth rate
+        od_rmax <- exp(rmax$fit[1]) # od at which max growth rate
+        p0 <- pred0 %>% filter(t == t_rmax)
+        slope <- p0$deriv.fit # slope at the absolute od scale
 
-        t.maxGr <- maxgr$t[1]
+        # At time t1 when r is max: y1 = y0 + slope * t1, where y1 is the od at time t1, the slope is at absolute od not log od
+        # The intercept is then
+        y0 <- od_rmax - (slope*rmax$t[1])
 
-        OD.maxGr <- exp(maxgr$fit[1])
+        # I take lag as the intersection with y = min (OD)
+        # Find the intersection with y = slope * t + y0
+        t_lag <- (min(pred0$fit)-y0)/slope # lag
 
-        p0 <- setDT(pred0)[t==t.maxGr]
-        slope.maxGr <- p0$deriv.fit
-
-        ## y = y_0 + slope * t, so:
-        y_0 <- OD.maxGr - (slope.maxGr*t.maxGr)
-
-        # I take as lag the intersection with y = min (OD)
-        t_lag <- (min(pred0$fit)-y_0)/slope.maxGr # lag
-
-        prm <- tibble(seq = x$seq[1],
-                      well = x$well[1],
-                      csource = x$csource[1],
-                      exp_id = x$exp_id[1],
-                      # date = as.character(x$date[1]),
-                      r = maxgr$deriv.fit[1],
-                      t.r = t.maxGr,
-                      lag = t_lag,
-                      maxOD = max(pred0$fit),
-                      startOD = blk )
-        return(list('data' = pred,
-                    'params' = prm))
+        prm <- tibble(
+            r = rmax$deriv.fit,
+            t_rmax = t_rmax, # time at which read the maximum growth rate
+            lag = t_lag,
+            maxOD = max(pred0$fit)
+        )
     } else {
-        prm <- tibble(seq = x$seq[1],
-                      well = x$well[1],
-                      csource = x$csource[1],
-                      exp_id = x$exp_id[1],
-                      # date = as.character(x$date[1]),
-                      r = 0,
-                      t.r = NA,
-                      lag = NA,
-                      maxOD = NA,
-                      startOD = blk)
-        return(list('data' = NA,
-                    'params' = prm))
+        pred <- NA
+        prm <- tibble(
+            r = NA,
+            t_rmax = NA,
+            lag = NA,
+            maxOD = NA
+        )
     }
+    return(list(data = pred, params= prm))
 }
-calculate_prm <- function (gc) {
-    #' This function takes the gc time series and calculate the gc parameters
-    gc <- as.data.table(gc)
-    gc <- split(gc, by = c('well', 'exp_id'))
-    gc_fits <- lapply(gc, compute.gam)
-    gc_prm <- do.call(rbind, lapply(gc_fits, function(x) x[[2]]))
-    return(gc_prm)
+summarize_gc <- function (gc) {
+    #' This function takes the  (after blank) and average across replicates
+    gc %>%
+        group_by(t, exp_id) %>%
+        summarize(mean_abs = mean(abs), sd_abs = sd(abs)) %>%
+        ungroup()
 }
 summarize_prm <- function (gc_prm) {
     #' This function gets the statistics over replicates
@@ -193,24 +153,53 @@ summarize_prm <- function (gc_prm) {
 
 
 list_gcs <- list_gcs %>% lapply(function(gc) {
-        gc <- wide_to_long(gc)
-        gc_blank <- extract_blank(gc)
-        gc <- subtract_blank(gc, gc_blank)
-        gc_summ <- summarize_gc(gc)
-        gc_prm <- calculate_prm(gc)
-        gc_prm_summ <- summarize_prm(gc_prm)
-        #
-        gc <- gc %>% filter(t <= 48)
-        gc_summ <- gc_summ %>% filter(t <= 48)
-        return(list(gc = gc, gc_blank = gc_blank, gc_summ = gc_summ, gc_prm = gc_prm, gc_prm_summ = gc_prm_summ))
-    })
-gcs <- list_gcs %>% lapply(function(x) `[[`(x, "gc")) %>% bind_rows(.id = "temperature")
-gc_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_summ")) %>% bind_rows(.id = "temperature")
-gc_prms <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm")) %>% bind_rows(.id = "temperature")
-gc_prm_summs <- list_gcs %>% lapply(function(x) `[[`(x, "gc_prm_summ")) %>% bind_rows(.id = "temperature")
+    # Format
+    gcl <- wide_to_long(gc) # to long format
+    gcl <- gcl %>% filter(t <= 48)
+
+    # Blank
+    gcl_blank <- extract_blank(gcl)
+    gcl <- subtract_blank(gcl, gcl_blank)
+
+    # Smooth growth curves
+    gc_smooth <- gcl %>%
+        nest(data = c(-well, -exp_id)) %>%
+        mutate(prm = map(data, compute_gam))
+
+    # Smoothed curve
+    gcl_smooth <- gc_smooth %>%
+        unnest(prm) %>%
+        slice(seq(1, n(), 2)) %>%
+        select(well, exp_id, prm) %>%
+        unnest(prm) %>%
+        mutate(abs_fit = exp(fit)) %>%
+        select(t, well, exp_id, abs_fit)
+
+    gcl_smooth$abs_fit <- as.vector(gcl_smooth$abs_fit)
+
+    # Parameter
+    gtw <- gc_smooth %>%
+        unnest(prm) %>%
+        slice(seq(2, n(), 2)) %>%
+        select(well, exp_id, prm) %>%
+        unnest(prm)
 
 
-write_csv(gcs, paste0(folder_phenotypes, 'growth/gcs.csv')) # Raw growth curves
-write_csv(gc_summs, paste0(folder_phenotypes, 'growth/gc_summs.csv')) # Mean growth curves
-write_csv(gc_prms, paste0(folder_phenotypes, 'growth/gtw.csv')) # Growth traits per well
-write_csv(gc_prm_summs, paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
+    gts <- gtw %>%
+        group_by(exp_id) %>%
+        summarize(r.sem = sd(r)/sqrt(n()), r = mean(r),
+                  lag.sem = sd(lag)/sqrt(n()), lag = mean(lag),
+                  maxOD.sem = sd(maxOD)/sqrt(n()), maxOD = mean(maxOD))
+
+    return(list(gcl = gcl, gcl_smooth = gcl_smooth, gcl_blank = gcl_blank, gtw = gtw, gts = gts))
+})
+
+gcl <- list_gcs %>% lapply(function(x) `[[`(x, "gcl")) %>% bind_rows(.id = "temperature")
+gcl_smooth <- list_gcs %>% lapply(function(x) `[[`(x, "gcl_smooth")) %>% bind_rows(.id = "temperature")
+gtw <- list_gcs %>% lapply(function(x) `[[`(x, "gtw")) %>% bind_rows(.id = "temperature")
+gts <- list_gcs %>% lapply(function(x) `[[`(x, "gts")) %>% bind_rows(.id = "temperature")
+
+write_csv(gcl, paste0(folder_phenotypes, 'growth/gcl.csv')) # Raw growth curves
+write_csv(gcl_smooth, paste0(folder_phenotypes, 'growth/gcl_smooth.csv')) # Smooth growth curves
+write_csv(gtw, paste0(folder_phenotypes, 'growth/gtw.csv')) # Growth traits per well
+write_csv(gts, paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
