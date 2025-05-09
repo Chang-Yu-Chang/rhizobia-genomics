@@ -76,8 +76,11 @@ mamba activate barrnap
 mamba install --yes -c bioconda barrnap=0.9
 # Downalod the RefSeq 16S database
 #https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
-# Make it into a database
-#makeblastdb -in $refseq_16s_db -dbtype nucl
+# Store it at ~/bioinformatics/16s/refseq_16s.fasta. Make it into a database using blast
+mkdir -p ~/bioinformatics/16s/
+mv ~/Downloads/sequence.fasta ~/bioinformatics/16s/refseq_16s.fasta
+mamba activate blast
+makeblastdb -in ~/bioinformatics/16s/refseq_16s.fasta -dbtype nucl
 
 # Install minimap2 v2.26
 # minimap2 is a versatile pairwise aligner for genomic and spliced nucleotide sequences

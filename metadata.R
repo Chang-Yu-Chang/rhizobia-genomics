@@ -52,27 +52,21 @@ traits <- bind_rows(traits, tibble(
 
 
 # utils
-read_gpas <- function (set_name) {
-    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpa.csv"))
-    gpar <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpar.csv"))
-    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/list_sccg.csv"), col_names = "gene")
-    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/sml.csv"))
-    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/spa.csv"))
-    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gene_order.csv"))
-    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpatl.csv")) %>%
+read_gpas <- function () {
+    gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
+    gpar <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpar.csv"))
+    list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/list_sccg.csv"), col_names = "gene")
+    sml <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/sml.csv"))
+    spa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/spa.csv"))
+    gene_order <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gene_order.csv"))
+    gpatl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpatl.csv")) %>%
         mutate(genome_id = factor(genome_id, rev(isolates$genome_id)))
-    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gd.csv"))
-    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gpacl.csv")) %>%
+    gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
+    gpacl <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpacl.csv")) %>%
         mutate(genome_id = factor(genome_id, rev(isolates$genome_id)))
-    gcn <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/gcn.csv"))
-    cleaned_gene_names <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/", set_name, "/cleaned_gene_names.csv"))
+    gcn <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gcn.csv"))
+    cleaned_gene_names <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/cleaned_gene_names.csv"))
     return(list(gpa = gpa, gpar = gpar, list_sccg = list_sccg, sml = sml, spa = spa, gpatl = gpatl, gene_order = gene_order, gd = gd, gpacl = gpacl, gcn = gcn, cleaned_gene_names = cleaned_gene_names))
-}
-read_fsts <- function (set_name) {
-    per_gene_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_gene_fst.csv"))
-    per_locus_fst <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/per_locus_fst.csv"))
-    gene_lengths <- read_csv(paste0(folder_data, "genomics_analysis/fst/", set_name,"/gene_lengths.csv"))
-    return(list(per_gene_fst = per_gene_fst, per_locus_fst = per_locus_fst, gene_lengths = gene_lengths))
 }
 turn_p_to_asteriks <- function (p_value) {
     if (p_value < 0.001) {

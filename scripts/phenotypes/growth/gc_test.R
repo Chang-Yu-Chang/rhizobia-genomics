@@ -38,7 +38,8 @@ tb_mod <- tibble(
         mod = map(formula, ~lmer(as.formula(.x), data = gtw)),
         mod_tidied = map(mod, ~Anova(.x, type = 3)),
         em = map(mod, ~emmeans(.x, ~contig_species+temperature)),
-        p_em = map2(em, trait, plot_emmeans)
+        p_em = map2(em, trait, plot_emmeans),
+        empair = map(em, ~broom::tidy(pairs(.x)))
     )
 
 p <- plot_grid(plotlist = tb_mod$p_em, ncol = 1)
@@ -49,4 +50,18 @@ tb_mod$mod_tidied[[1]]
 tb_mod$mod_tidied[[2]]
 tb_mod$mod_tidied[[3]]
 
-#check_model(tb_mod$mod[[3]])
+tb_mod$empair[[1]] %>%
+    #filter(contrast == "S. meliloti 25c - S. medicae 25c")
+    #filter(contrast == "S. meliloti 30c - S. medicae 30c")
+    #filter(contrast == "S. meliloti 35c - S. medicae 35c")
+    filter(contrast == "S. meliloti 40c - S. medicae 40c")
+
+tb_mod$empair[[3]] %>%
+    filter(contrast == "S. meliloti 35c - S. canadensis 35c")
+
+
+tb_mod$empair[[3]] %>%
+    #filter(contrast == "S. meliloti 25c - S. medicae 25c")
+    #filter(contrast == "S. meliloti 30c - S. medicae 30c")
+    #filter(contrast == "S. meliloti 35c - S. medicae 35c")
+    filter(contrast == "S. meliloti 40c - S. medicae 40c")
