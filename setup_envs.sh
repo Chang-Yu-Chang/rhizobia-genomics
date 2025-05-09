@@ -111,6 +111,7 @@ mamba create -n biopython
 mamba activate biopython
 mamba install --yes -c conda_forge biopython=1.84
 mamba install --yes -c conda_forge pandas
+mamba install --yes matplotlib
 
 # Install gffread v0.12.7
 mamba create -n gffread
