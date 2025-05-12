@@ -85,9 +85,18 @@ snpd %>%
 snpd %>%
     left_join(seql) %>%
     filter(!str_detect(gene, "group")) %>%
-    #filter(value > 10, seql < 2000) %>%
-    filter(genome_id1 %in% c("g10", "g20"), genome_id2 %in% c("g20", "g10")) %>%
+    filter(species1 == "S. medicae", species2 == "S. medicae") %>%
+    filter(value > 10, seql < 2000)
+    #filter(genome_id1 %in% c("g10", "g20"), genome_id2 %in% c("g20", "g10")) %>
+
+
+snpd %>%
+    left_join(seql) %>%
+    filter(!str_detect(gene, "group")) %>%
+    filter(species1 == "S. medicae", species2 == "S. medicae") %>%
+    filter(genome_id1 == "g4", genome_id2 == "g17") %>%
     view
+    #filter(value > 10, seql < 2000)
 
 
 # snpd %>%

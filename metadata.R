@@ -8,17 +8,10 @@ folder_phenotypes <- paste0(folder_data, "phenotypes/")
 
 # Palettes for plotting
 gradient_colors <- c("PA" = "gold2", "VA" = "olivedrab")
-population_colors <- c(`high elevation` = "#0C6291", `low elevation` = "#BF4342", `suburban` = "#0cc45f", `urban` = "#a642bf", control = "grey")
-pops_colors <- c(
-    `high-high` = "#0C6291",
-    `high-low` = "grey50",
-    `low-low` = "#BF4342",
-    `suburban-suburban` = "#0cc45f",
-    `suburban-urban` = "grey50",
-    `urban-urban` = "#a642bf"
-)
-sp_colors <- c(adhaerens = "grey80", canadensis = "grey20", medicae = "steelblue", meliloti = "maroon")
-species_colors <- c(`S. adhaerens` = "grey80", `S. canadensis` = "grey20", `S. medicae` = "steelblue", `S. meliloti` = "maroon")
+
+sp_colors <- c(adhaerens = "#B67C66", canadensis = "grey20", medicae = "#4DCCBD", meliloti = "#B07BAC")
+species_colors <- c(`S. adhaerens` = "#B67C66", `S. canadensis` = "grey20", `S. medicae` = "#4DCCBD", `S. meliloti` = "#B07BAC")
+#species_colors <- c(`S. adhaerens` = "grey80", `S. canadensis` = "grey20", `S. medicae` = "steelblue", `S. meliloti` = "maroon")
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
 plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 
