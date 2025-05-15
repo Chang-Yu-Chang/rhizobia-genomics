@@ -3,14 +3,16 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x)
-library(ggrepel)
-library(waffle)
-library(tigris)
+library(ggrepel) # for annotating dots
+library(waffle) # for waffle plots
+#library(tigris) # for elevation data
 library(sf) # for handling the simple features
 library(geodata) # for getting the elevation data
 library(stars) # for converting st to sf
+library(usdata) # for temperature. data
 library(ggspatial) # for scale bar
 source(here::here("metadata.R"))
+
 
 # Read data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
@@ -25,56 +27,25 @@ sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
     bind_rows(tibble(population = "VA", longitude_dec = c(-80.75, -80.35), elevation_m = 0, show = F))
 dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv"))
 tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv"))
-us_elev <- elevation_30s(country = "USA", path = tempdir()) # elevation data
-
-# Make the center. This is to use the same map range for both gradients
-sites_center <- sites %>%
-    drop_na() %>%
-    group_by(population) %>%
-    summarize(lat_mean = mean(latitude_dec), lon_mean = mean(longitude_dec), lat_max = max(latitude_dec), lat_min = min(latitude_dec), lon_max = max(longitude_dec), lon_min = min(longitude_dec)) %>%
-    mutate(hjust = c(0.8, 0.8)) %>%
-    mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
+# Daily max in the map region
+map_range <- read_csv(paste0(folder_phenotypes, "sites/map_range.csv")) %>%
+    mutate(population = rep(c("PA", "VA"), each = 31*41))
+dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>%
+    left_join(map_range)
 
 # Panel A. map ----
-get_elev_sf <- function (sc, us_elev) {
-    scc <- unlist(sc[,-1])
-    center_coord <- scc[c("lon_mean", "lat_mean")]
-    edge_length <- scc["width_max"]/2
-    extent_area <- ext(center_coord[1] - edge_length, center_coord[1] + edge_length, center_coord[2] - edge_length, center_coord[2] + edge_length)
-    elev1 <- crop(us_elev, extent_area)
-    r_points <- as.data.frame(elev1, xy = TRUE) %>% as_tibble
-    sf <- st_as_sf(r_points, coords = c("x", "y"), crs = 4326)
-    tbsf <- as.data.frame(sf, xy = TRUE, cells = TRUE) %>%
-        as_tibble() %>%
-        mutate(
-            lon = st_coordinates(geometry)[,1],
-            lat = st_coordinates(geometry)[,2]
-        )
-    return(tbsf)
-}
-
-sftb1 <- sites_center %>%
-    filter(population == "PA") %>%
-    get_elev_sf(us_elev) %>%
-    mutate(population = "PA")
-
-sftb2 <- sites_center %>%
-    filter(population == "VA") %>%
-    get_elev_sf(us_elev) %>%
-    mutate(population = "VA")
-
-midp = 500
-p1 <- bind_rows(sftb1, sftb2) %>%
-    mutate(USA_elv_msk = USA_elv_msk) %>%
+p1 <- dcl %>%
+    filter(yday >= 182, yday <= 273) %>%
+    group_by(population, grid, longitude, latitude) %>%
+    summarize(tmax = max(tmax_deg_c)) %>%
     ggplot() +
-    geom_tile(aes(x = lon, y = lat, fill = USA_elv_msk)) +
+    geom_tile(aes(x = longitude, y = latitude, fill = tmax)) +
     geom_point(data = sites, aes(x = longitude_dec, y = latitude_dec, color = show), fill = "white",  size = 2, shape = 21, stroke = 1) +
+    scale_fill_gradient2(low = "steelblue", high = "#db7272", mid = "snow", midpoint = 32, breaks = seq(10, 40, 2), name = "Daily maximum") +
     scale_color_manual(values = c(`TRUE` = "black", `FALSE` = "white")) +
-    scale_fill_gradient2(low = "#db7272", high = "steelblue", mid = "snow", midpoint = midp, name = "elevation (m)") +
-    #annotation_scale(plot_unit = "m", width_hint = .6, location = "br", line_width = .5, text_cex = .8, height = unit(3, "mm"), pad_y = unit(1, "mm")) +
     scale_x_continuous(expand = c(0,0), breaks = seq(-82, -71, .1)) +
     scale_y_continuous(expand = c(0,0)) +
-    facet_wrap(~population, scales = "free") +
+    facet_wrap2(~population, scales = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
@@ -86,8 +57,9 @@ p1 <- bind_rows(sftb1, sftb2) %>%
         legend.position = "right",
         strip.background = element_blank(),
         panel.spacing.x = unit(3, "mm"),
-        panel.grid.major = element_blank(),
-        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.minor = element_blank(),
+        #panel.border = element_rect(color = "black", fill = NA),
+        panel.border = element_rect(color = NA, fill = NA),
         axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         plot.margin = unit(c(0,0,0,0), "mm")
@@ -95,11 +67,12 @@ p1 <- bind_rows(sftb1, sftb2) %>%
     guides(fill = guide_colorbar(barwidth = .8, barheight = 5), color = "none") +
     labs(x = "Longitude", y = "Latitude", title = "")
 
+
 # Panel B elevation ----
 p2 <- sites %>%
     ggplot() +
     geom_segment(aes(x = longitude_dec, xend = longitude_dec, y = 0, yend = elevation_m), alpha = .3) +
-    geom_point(aes(x = longitude_dec, y = elevation_m, color = show), fill = NA, shape = 21, stroke = 1, size = 2) +
+    geom_point(aes(x = longitude_dec, y = elevation_m, color = show), fill = "white", shape = 21, stroke = 1, size = 2) +
     geom_text_repel(aes(label = site, x = longitude_dec, y = elevation_m), nudge_x = 0) +
     scale_color_manual(values = c(`TRUE` = "black", `FALSE` = "white")) +
     scale_x_continuous(expand = c(0,0), breaks = seq(-82, -71, .1)) +
@@ -115,7 +88,7 @@ p2 <- sites %>%
     ) +
     guides(color = "none") +
     labs(x = "Longitude", y = "Elevation (m)")
-p2
+
 # Panel C. site temperature ----
 tb_tmax <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
@@ -137,7 +110,7 @@ p3 <- dml %>%
         strip.background = element_blank(),
         strip.text = element_blank(),
         panel.spacing.x = unit(6, "mm"),
-        panel.grid.minor.x = element_blank()
+        panel.grid.minor = element_blank()
     ) +
     guides() +
     labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")

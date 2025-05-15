@@ -10,9 +10,10 @@ library(daymetr) # for extracting climate data
 #' and set env variable in R `Sys.setenv(NC_CONFIG = "/opt/homebrew/bin/nc-config")` before installing daymetr
 library(elevatr) # for getting elevation
 library(sf) # for handing simple features
-#Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj") # for crs
+#' set env variable in R `Sys.setenv(PROJ_LIB = "/opt/homebrew/Cellar/proj/9.5.0/share/proj")` for crs
 source(here::here("metadata.R"))
 
+# 1. Clean up the site coordinates ----
 dms2dec <- function(x) {
     #' convert degree-minute-second coordinate to decimal
     str_split(x, " ") %>%
@@ -23,15 +24,14 @@ dms2dec <- function(x) {
         }) %>%
         return
 }
-sites_mlbs <- readxl::read_excel(paste0(folder_data, "raw/plants/High and low elevation sites_Sept 2022.xlsx"))
-sites_phila <- read_csv(paste0(folder_data, "raw/plants/sites_phila.csv"), show_col_types = F) %>%
+sites_va <- readxl::read_excel(paste0(folder_data, "raw/plants/High and low elevation sites_Sept 2022.xlsx"))
+sites_pa <- read_csv(paste0(folder_data, "raw/plants/sites_phila.csv"), show_col_types = F) %>%
     drop_na() %>%
     mutate(description = tolower(description) %>% str_remove("'")) %>%
     separate(col = coord, into = c("latitude_dec", "longitude_dec"), sep = ",\\s", convert = T)
 
-# 1. Clean up the site coordinates ----
-# mlbs
-sites_mlbs <- sites_mlbs %>%
+# VA
+sites_va <- sites_va %>%
     clean_names() %>%
     mutate(latitude_dec = dms2dec(latitude_degrees_minutes_seconds)) %>%
     mutate(longitude_dec = dms2dec(longitude_degrees_minutes_seconds)) %>%
@@ -39,19 +39,18 @@ sites_mlbs <- sites_mlbs %>%
     mutate(site = str_remove(site, "-")) %>%
     select(site, latitude_dec, longitude_dec, elevation_m)
 
-# phila
-temp <- sites_phila %>%
+# PA
+elev_pa <- sites_pa %>%
     st_as_sf(coords = c("longitude_dec", "latitude_dec"), crs = 4326) %>%
     get_elev_point()
-
-sites_phila <- sites_phila %>%
-    mutate(elevation_m = temp$elevation) %>%
+sites_pa <- sites_pa %>%
+    mutate(elevation_m = elev_pa$elevation) %>%
     select(site, latitude_dec, longitude_dec, elevation_m)
 
 # bind rows
 sites <- bind_rows(
-    mutate(sites_mlbs, population = "VA"),
-    mutate(sites_phila, population = "PA")
+    mutate(sites_va, population = "VA"),
+    mutate(sites_pa, population = "PA")
 ) %>%
     select(population, everything()) %>%
     mutate(across(c(latitude_dec, longitude_dec, elevation_m), function (x) {round(x, 2)}))
@@ -75,12 +74,14 @@ write_csv(sites_dist, paste0(folder_phenotypes, "sites/sites_dist.csv"))
 # 2. Extract the climatology data from Daymet ----
 list_dm <- rep(list(NA), nrow(sites))
 for (i in 1:nrow(sites)) {
-    dm <- download_daymet(site = sites$site[i],
-                          lat = sites$latitude_dec[i],
-                          lon = sites$longitude_dec[i],
-                          start = 2022,
-                          end = 2022,
-                          internal = TRUE)
+    dm <- download_daymet(
+        site = sites$site[i],
+        lat = sites$latitude_dec[i],
+        lon = sites$longitude_dec[i],
+        start = 2022,
+        end = 2022,
+        internal = TRUE
+    )
     list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], population = sites$population[i])
 
 }
@@ -106,3 +107,49 @@ tb_month <- dml %>%
     ungroup()
 
 write_csv(tb_month, paste0(folder_phenotypes, "sites/tb_month.csv"))
+
+
+# 4. get climatology data from daymet for all grids within the plotting range ----
+## Save the thermal data for grids within the map range
+map_range <- bind_rows(
+    # PA
+    expand_grid(
+        latitude = seq(39.7, 40.1, by = 0.01),
+        longitude = seq(-75.4, -75.1, by = 0.01)
+    ),
+    # VA
+    expand_grid(
+        latitude = seq(37.1, 37.5, by = 0.01),
+        longitude = seq(-80.7, -80.4, by = 0.01)
+    )
+) %>%
+    mutate(grid = 1:n()) %>%
+    select(grid, everything())
+
+write_csv(map_range, paste0(folder_phenotypes, "sites/map_range.csv"))
+
+## Batch download. This may take a while
+dcs <- download_daymet_batch(
+    file_location = paste0(folder_phenotypes, "sites/map_range.csv"),
+    start = 2022,
+    end = 2022,
+    internal = TRUE
+)
+
+## Consolidate the data
+list_dc <- rep(list(NA), nrow(map_range))
+names(list_dc) <- map_range$grid
+
+for (i in 1:length(dcs)) {
+    if (class(dcs[[i]]) == "try-error") {
+        list_dc[[i]] <- NA
+    } else {
+        list_dc[[i]] <- as_tibble(dcs[[i]][["data"]])
+    }
+}
+
+dcl <- list_dc[!is.na(list_dc)] %>%
+    bind_rows(.id = "grid") %>%
+    clean_names() %>%
+    mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
+    mutate(ymonth = month(ydate))
