@@ -54,11 +54,7 @@ contigs <- genomes %>%
 contigs <- contigs %>%
     drop_na(species) %>%
     filter(contig_length > 1e4) %>%
-    left_join(plasmids) %>%
-    #drop_na(replicon_type) %>%
-    # remove odd contigs
-    filter(!contig_id %in% c("g28_contig_15"))
-# g20_contig_3  and g20_contig7 together is chromosome
+    left_join(plasmids)
 
 
 write_csv(contigs, paste0(folder_data, "genomics_analysis/genomes/contigs.csv"))

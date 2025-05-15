@@ -30,6 +30,7 @@ p1 <- tr %>%
     geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
     # geom_nodepoint(aes(fill = highlight), alpha = .5, size = 3, shape = 21, color = "white") +
     # scale_fill_manual(values = c(`TRUE` = "black", `FALSE` = "white")) +
+    scale_color_manual(values = species_colors) +
     scale_x_continuous(limits = c(0, 0.008)) +
     geom_treescale(x = .004, y = 30) +
     facet_grid2(~` `) +
@@ -62,10 +63,10 @@ p2 <- tbtr$tr[[2]] %>%
     geom_tiplab(aes(label = label, color = contig_species), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
     geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
     scale_x_continuous(limits = c(0, 130)) +
+    scale_color_manual(values = species_colors) +
     geom_treescale(x = 65, y = 30) +
     facet_grid2(~` `) +
     coord_cartesian(clip = "off") +
-
     theme_tree() +
     theme(
         legend.position = "none",
@@ -95,7 +96,7 @@ p3 <- tt$gpacl %>%
     geom_tile(aes(x = rep_gene, y = genome_id, fill = contig_species)) +
     scale_y_discrete(expand = c(0,0)) +
     scale_fill_manual(values = species_colors) +
-    facet_grid2(~replicon_type, scales = "free", space = "free_x", switch = "y", strip = strip_vanilla(clip = "off")) +
+    #facet_grid2(~replicon_type, scales = "free", space = "free_x", switch = "y", strip = strip_vanilla(clip = "off")) +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
@@ -111,7 +112,7 @@ p3 <- tt$gpacl %>%
         axis.title = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        #axis.text.y = element_blank(),
+        axis.text.y = element_blank(),
         plot.margin = unit(c(0,0,0,0), "mm")
     ) +
     guides(fill = "none") +
@@ -122,7 +123,27 @@ p3 <- tt$gpacl %>%
 p <- plot_grid(
     p1, p2, p3, nrow = 1,
     scale = .9, rel_widths = c(1,1,1.5),
+    align = "h", axis = "tb",
     labels = LETTERS[1:3]
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig2.png"), p, width = 12, height = 5 )
+ggsave(here::here("plots/Fig2.png"), p, width = 12, height = 6)
+
+
+#
+nrow(tt$gpa) # 26544
+
+core <- tt$gpatl %>%
+    group_by(gene) %>%
+    filter(value == 1) %>%
+    count() %>%
+    ungroup() %>%
+    filter(n == max(n))
+nrow(core) / nrow(tt$gpa) *100
+
+
+
+tt$gpacl %>%
+    filter(str_detect(gene, "nod")) %>%
+    filter(genome_id %in% paste0("g", c(2,3,15)))
+

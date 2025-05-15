@@ -160,3 +160,10 @@ p <- ggdraw() +
 
 ggsave(here::here("plots/Fig1.png"), p, width = 9, height = 9)
 
+# Chisquare
+x <- iso %>%
+    group_by(population, contig_species) %>%
+    count() %>%
+    pivot_wider(names_from = population, values_from = n, values_fill = 0)
+
+chisq.test(x[,2:3])

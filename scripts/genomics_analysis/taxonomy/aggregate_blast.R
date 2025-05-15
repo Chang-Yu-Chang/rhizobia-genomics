@@ -63,7 +63,7 @@ for (i in 1:nrow(isolates)) {
 list_b_genome <- list_b_genome[!is.na(list_b_genome)]
 
 blast_genome <- bind_rows(list_b_genome) %>%
-    filter(pident > 90, bitscore > 10000) %>%
+    #filter(pident > 90, bitscore > 10000) %>%
     mutate(accession = sseqid) %>%
     left_join(ref_genome) %>%
     ungroup() %>%
@@ -71,11 +71,10 @@ blast_genome <- bind_rows(list_b_genome) %>%
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
     arrange(genome_id, desc(bitscore)) %>%
     # Remove those that are symbiotic species but blast to nonsymbiotic plasmids
-    filter(!(!genome_id %in% c("g2", "g3", "g15") & species %in% c("canadensis", "adhaerens"))) %>%
+    #filter(!(!genome_id %in% c("g2", "g3", "g15") & species %in% c("canadensis", "adhaerens"))) %>%
     rename(contig_id = qseqid) %>%
     mutate(contig_id = paste0(genome_id, "_", contig_id)) %>%
     select(genome_id, contig_id, species, strain, replicon, pident, length, bitscore)
-
 
 top_genome <- blast_genome %>%
     group_by(genome_id, contig_id) %>%

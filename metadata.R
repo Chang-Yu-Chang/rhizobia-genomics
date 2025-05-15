@@ -46,6 +46,7 @@ traits <- bind_rows(traits, tibble(
 
 # utils
 read_gpas <- function () {
+    isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
     gpa <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
     gpar <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gpar.csv"))
     list_sccg <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/list_sccg.csv"), col_names = "gene")
