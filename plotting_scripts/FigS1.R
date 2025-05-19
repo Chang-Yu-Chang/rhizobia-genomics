@@ -7,7 +7,6 @@ library(sf) # for handling the simple features
 library(geodata) # for getting the elevation data
 library(stars) # for converting st to sf
 library(ggspatial) # for scale bar
-#library(geosphere) # for computing the distance between sites
 library(grid) # add polygons
 #' On MacOS, sf depends on gdal so do this in terminal
 #' brew install pkg-config

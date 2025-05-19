@@ -5,7 +5,6 @@ library(cowplot)
 library(ggh4x)
 library(ggrepel) # for annotating dots
 library(waffle) # for waffle plots
-#library(tigris) # for elevation data
 library(sf) # for handling the simple features
 library(geodata) # for getting the elevation data
 library(stars) # for converting st to sf

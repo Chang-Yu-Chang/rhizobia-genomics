@@ -76,7 +76,7 @@ p2 <- tbtr$tr[[2]] %>%
         axis.ticks.x = element_blank(),
         axis.title.x = element_blank(),
         plot.title = element_text(size = 8),
-        plot.margin = unit(c(0,5,0,0), "mm")
+        plot.margin = unit(c(0,0,0,0), "mm")
     ) +
     guides(fill = "none") +
     labs()
@@ -109,20 +109,20 @@ p3 <- tt$gpacl %>%
         panel.spacing.x = unit(1, "mm"),
         panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
         #panel.background = element_rect(color = NA, fill = "black"),
-        axis.title = element_blank(),
+        axis.title.y = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_blank(),
-        plot.margin = unit(c(0,0,0,0), "mm")
+        plot.margin = unit(c(0,0,0,-1), "mm")
     ) +
     guides(fill = "none") +
-    labs(x = "gene cluster", y = "genome")
+    labs(x = "Cluster of orthologous genes", y = "genome")
 
 
 # ----
 p <- plot_grid(
     p1, p2, p3, nrow = 1,
-    scale = .9, rel_widths = c(1,1,1.5),
+    scale = .95, rel_widths = c(1,1,1.5),
     align = "h", axis = "tb",
     labels = LETTERS[1:3]
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))

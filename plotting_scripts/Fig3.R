@@ -13,15 +13,16 @@ gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per
 gtsl <- gts %>%
     mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
     select(temperature, exp_id, r, lag, maxOD) %>%
+    mutate(loglag = -log(lag)) %>%
     pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
     left_join( select(iso, exp_id, genome_id, contig_species)) %>%
     drop_na(value)
 
 # Panel A
-p1 <- ggdraw()
+#p1 <- ggdraw()
 
-# Panel growth curve
-p2 <- gcl_smooth %>% # Compute mean
+# Panel A growth curve ----
+p1 <- gcl_smooth %>% # Compute mean
     left_join(select(iso, exp_id, genome_id, contig_species)) %>%
     group_by(temperature, exp_id, t) %>%
     mutate(mean_abs = mean(abs_fit)) %>%
@@ -51,10 +52,10 @@ p2 <- gcl_smooth %>% # Compute mean
         legend.box.margin = margin(0,0,0,0, "mm"),
         plot.background = element_blank()
     ) +
-    guides() +
+    guides(color = guide_legend(nrow = 1, override.aes = list(linewidth = 1))) +
     labs(x = "Time (hour)", y = "O.D.[600nm]")
 
-# Panel C
+# Panel B growth traits ----
 gtwlm <- gtsl %>%
     #filter(value > 0) %>%
     group_by(temperature, contig_species, trait) %>%
@@ -62,19 +63,22 @@ gtwlm <- gtsl %>%
     group_by(temperature, trait) %>%
     mutate(max_mean_value = max(mean_value, na.rm = T)) %>%
     replace_na(list(ci_value = 0)) %>%
-    mutate(trait = case_when(
+    filter(trait %in% c("r", "loglag", "maxOD")) %>%
+    mutate(trait = factor(case_when(
         trait == "r" ~ "growth rate (1/hr)",
         trait == "lag" ~ "lag time (hr)",
-        trait == "maxOD" ~ "yield [OD]"
-    ))
+        trait == "loglag" ~ "lag time (-log(hr))",
+        trait == "maxOD" ~ "yield (O.D.[600nm])"
+    ), c("growth rate (1/hr)", "lag time (-log(hr))", "yield (O.D.[600nm])")))
 
-p3 <- gtsl %>%
-    mutate(trait = case_when(
+p2 <- gtsl %>%
+    filter(trait %in% c("r", "loglag", "maxOD")) %>%
+    mutate(trait = factor(case_when(
         trait == "r" ~ "growth rate (1/hr)",
         trait == "lag" ~ "lag time (hr)",
-        trait == "maxOD" ~ "yield [OD]"
-    )) %>%
-    #filter(value > 0) %>%
+        trait == "loglag" ~ "lag time (-log(hr))",
+        trait == "maxOD" ~ "yield (O.D.[600nm])"
+    ), c("growth rate (1/hr)", "lag time (-log(hr))", "yield (O.D.[600nm])"))) %>%
     ggplot() +
     # Each strain
     geom_line(aes(x = temperature, y = value, group = exp_id, color = contig_species), alpha = .1) +
@@ -96,7 +100,7 @@ p3 <- gtsl %>%
         strip.placement = "outside",
         axis.title.x = element_text(size = 10),
         axis.title.y = element_blank(),
-        legend.position = "top",
+        legend.position = "none",
         legend.title = element_blank(),
         legend.background = element_blank(),
         legend.key = element_blank(),
@@ -108,7 +112,7 @@ p3 <- gtsl %>%
     labs(x = expression(paste("Temperature (", degree, "C)")))
 
 p <- plot_grid(
-    p2, p3,
+    p1, p2,
     ncol = 1, align = "v", axis = "lr",
     labels = c("A", "B"), scale = .95
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
