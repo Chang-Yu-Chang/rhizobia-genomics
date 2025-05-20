@@ -3,14 +3,14 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x)
-library(tigris) # for getting the US state map
-library(sf) # for handling the simple features
-library(geodata) # for getting the elevation data
-library(stars) # for converting st to sf
-library(usdata) # for temperature. data
-library(ggspatial) # for scale bar
-library(ggrepel) # for annotating dots
-library(waffle) # for waffle plots
+library(grid)
+library(tigris)     # for getting the US state map
+library(sf)         # for handling the simple features
+library(stars)      # for converting st to sf
+library(usdata)     # for temperature data
+library(ggspatial)  # for scale bar
+library(ggrepel)    # for annotating dots
+library(waffle)     # for waffle plots
 source(here::here("metadata.R"))
 
 # Read data ----
@@ -18,22 +18,18 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
     mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
 sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
-    filter(population != "mid elevation") %>%
     # Use sites where the isolates were from
-    filter(site %in% isolates$site) %>%
-    mutate(show = T)
-    # bind_rows(tibble(population = "PA", longitude_dec = c(-75.45, -75.05), elevation_m = 0, show = F)) %>%
-    # bind_rows(tibble(population = "VA", longitude_dec = c(-80.75, -80.35), elevation_m = 0, show = F))
-dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv"))
-tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv"))
+    filter(site %in% isolates$site)
+dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) # daily max t at sampling sites
+tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv")) # month by day
 us_states <- states() # us state map
-# Daily max in the map region
 map_range <- read_csv(paste0(folder_phenotypes, "sites/map_range.csv")) %>%
     mutate(population = rep(c("PA", "VA"), each = 31*41))
-dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>%
+dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>% # Daily max in the map region
     left_join(map_range)
 
 # Panel A. map ----
+## Regional map
 sites_center <- sites %>%
     drop_na(site) %>%
     group_by(population) %>%
@@ -63,45 +59,25 @@ p1 <- us_states %>%
     labs(x = "Longitude", y = "Latitude")
 
 # Panel A inset map
-plot_temp_map <- function (dcl, sites, pop) {
-    #pop = "VA"
+plot_temp_map <- function (dcl, sites) {
+
     tb <- dcl %>%
         filter(yday >= 182, yday <= 273) %>%
-        filter(population == pop) %>%
         group_by(longitude, latitude) %>%
         summarize(tmax = max(tmax_deg_c))
-    cell_size = .1
 
-    sf_map <- tb %>%
-        rowwise() %>%
-        mutate(
-            xmin = longitude - cell_size / 2,
-            xmax = longitude + cell_size / 2,
-            ymin = latitude - cell_size / 2,
-            ymax = latitude + cell_size / 2,
-            # Construct the polygon for each grid cell
-            geometry = list(st_polygon(list(rbind(
-                c(xmin, ymin),
-                c(xmax, ymin),
-                c(xmax, ymax),
-                c(xmin, ymax),
-                c(xmin, ymin)
-            ))))
-        ) %>%
-        ungroup() %>%
-        st_as_sf() %>%
-        st_set_crs(4326)
+    # Create a sf point object
+    sf_points <- st_as_sf(tb, coords = c("longitude", "latitude"), crs = 4326)
 
-    sf_map %>%
+    sf_points %>%
         ggplot() +
-        geom_sf(aes(fill = tmax), color = NA) +
-        #geom_tile(aes(x = longitude, y = latitude, fill = tmax)) +
-        geom_point(data = filter(sites, population == pop), aes(x = longitude_dec, y = latitude_dec, color = show), fill = "white",  size = 2, shape = 21, stroke = 1) +
-        scale_fill_gradient2(low = "steelblue", high = "#db7272", mid = "snow", midpoint = 32, breaks = seq(28, 38, 2), limits = c(26, 38), name = "Daily maximum") +
-        scale_color_manual(values = c(`TRUE` = "black", `FALSE` = "white")) +
+        geom_sf(aes(color = tmax)) +
+        geom_point(data = sites, aes(x = longitude_dec, y = latitude_dec), fill = NA, size = 1, shape = 21, stroke = .6) +
+        geom_text_repel(data = sites, aes(label = site, x = longitude_dec, y = latitude_dec), size = 3) +
+        scale_color_gradient2(low = "steelblue", high = "#db7272", mid = "snow", midpoint = 32, breaks = seq(26, 38, 2), limits = c(26, 38), name = "Daily maximum") +
         scale_x_continuous(expand = c(0,0)) +
         scale_y_continuous(expand = c(0,0)) +
-        annotation_scale(location = "bl", width_hint = .2) +
+        annotation_scale(location = "bl", width_hint = .5) +
         coord_sf(expand = F) +
         theme_bw() +
         theme(
@@ -114,19 +90,27 @@ plot_temp_map <- function (dcl, sites, pop) {
             strip.background = element_blank(),
             panel.spacing.x = unit(3, "mm"),
             panel.grid.minor = element_blank(),
-            panel.border = element_rect(color = "black", fill = NA),
-            #axis.title.x = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
             axis.title = element_blank(),
             axis.text = element_blank(),
             axis.ticks = element_blank(),
             plot.margin = unit(c(0,0,0,0), "mm"),
-            plot.background = element_blank()
+            plot.background = element_blank(),
+            plot.title = element_text(hjust = 0.1, size = 8, vjust = -10, face = "bold")
         ) +
-        guides(fill = guide_colorbar(barwidth = .8, barheight = 5), color = "none") +
-        labs(x = "Longitude", y = "Latitude", title = "")
+        guides(color = guide_colorbar(barwidth = 1.2, barheight = 6)) +
+        labs(x = "Longitude", y = "Latitude")
 }
-p1_1 <- plot_temp_map(dcl, sites, "VA")
-p1_2 <- plot_temp_map(dcl, sites, "PA")
+p1_1 <- dcl %>%
+    filter(population == "VA") %>%
+    filter(latitude > 37.2) %>%
+    plot_temp_map(filter(sites, population == "VA")) +
+    labs(title = "VA")
+p1_2 <- dcl %>%
+    filter(population == "PA") %>%
+    filter(latitude > 39.8) %>%
+    plot_temp_map(filter(sites, population == "PA")) +
+    labs(title = "PA")
 
 
 # Panel B. site temperature ----
@@ -144,7 +128,6 @@ p2 <- dml %>%
     drop_na(site) %>%
     ggplot() +
     geom_histogram(aes(x = tmax_deg_c), position = "identity", alpha = .5, color = "black", fill = "white", binwidth = 1) +
-    #geom_vline(data = tb_tmax, aes(xintercept = mean_tmax), linetype = 2) +
     facet_nested(~population+site, nest_line = element_line(colour = "black")) +
     scale_y_continuous(breaks = c(0, 10)) +
     scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
@@ -194,6 +177,8 @@ p3 <- iso %>%
     guides(fill = guide_legend(ncol = 1)) +
     labs()
 
+
+
 # ----
 p_main <- plot_grid(
     p1, p2, p3,
@@ -205,13 +190,16 @@ p_main <- plot_grid(
 
 p <- ggdraw() +
     draw_plot(p_main) +
-    draw_plot(p1_1 + guides(fill = "none"), x = .1, y = .7, scale = .2, halign = 0, valign = 0) +
-    draw_plot(p1_2 + guides(fill = "none"), x = .45, y = .6, scale = .2, halign = 0, valign = 0) +
+    draw_grob(polygonGrob(x = c(.29,.29,.326,.326), y = c(.705,.9,.736,.718), gp = gpar(fill = "grey", alpha = 0.3, col = NA))) +
+    draw_grob(polygonGrob(x = c(.54,.54,.566,.566), y = c(.86,.864,.82,.635), gp = gpar(fill = "grey", alpha = 0.3, col = NA))) +
+    draw_plot(p1_1 + guides(color = "none"), x = .1, y = .7, scale = .22, halign = 0, valign = 0) +
+    draw_plot(p1_2 + guides(color = "none"), x = .53, y = .62, scale = .22, halign = 0, valign = 0) +
+    draw_plot(get_legend(p1_1), x = .72, y = .65, scale = .2, halign = 0, valign = 0) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig1.png"), p, width = 8, height = 8)
 
-# Chisquare
+  # Chisquare
 x <- iso %>%
     group_by(population, contig_species) %>%
     count() %>%
