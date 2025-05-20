@@ -136,3 +136,8 @@ padloc --db-update
 mamba create -n clonalframeml
 mamba activate clonalframeml
 mamba install --yes -c bioconda clonalframeml=1.13
+
+# Install networkx
+mamba create -n networkx
+mamba activate networkx
+mamba install --yes networkx
