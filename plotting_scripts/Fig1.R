@@ -74,7 +74,7 @@ plot_temp_map <- function (dcl, sites) {
         geom_sf(aes(color = tmax)) +
         geom_point(data = sites, aes(x = longitude_dec, y = latitude_dec), fill = NA, size = 1, shape = 21, stroke = .6) +
         geom_text_repel(data = sites, aes(label = site, x = longitude_dec, y = latitude_dec), size = 3) +
-        scale_color_gradient2(low = "steelblue", high = "#db7272", mid = "snow", midpoint = 32, breaks = seq(26, 38, 2), limits = c(26, 38), name = "Daily maximum") +
+        scale_color_gradient2(low = "steelblue", high = "#db7272", mid = "snow", midpoint = 32, breaks = seq(26, 38, 2), limits = c(26, 38), name = expression("Daily maximum "(degree*C))) +
         scale_x_continuous(expand = c(0,0)) +
         scale_y_continuous(expand = c(0,0)) +
         annotation_scale(location = "bl", width_hint = .5) +
@@ -115,8 +115,13 @@ p1_2 <- dcl %>%
 
 # Panel B. site temperature ----
 tb_tmax <- dml %>%
+    mutate(
+        population = factor(population, c("VA", "PA")),
+        site = factor(site, sites$site)
+    ) %>%
+    filter(site %in% isolates$site) %>%
     filter(yday >= 182 & yday <= 273) %>%
-    group_by(population) %>%
+    group_by(population, site) %>%
     summarize(mean_tmax = mean(tmax_deg_c))
 
 p2 <- dml %>%
@@ -127,8 +132,10 @@ p2 <- dml %>%
     ) %>%
     drop_na(site) %>%
     ggplot() +
-    geom_histogram(aes(x = tmax_deg_c), position = "identity", alpha = .5, color = "black", fill = "white", binwidth = 1) +
+    geom_histogram(aes(x = tmax_deg_c, fill = population), position = "identity", alpha = .5, color = "black", binwidth = 1) +
+    geom_vline(data = tb_tmax, aes(xintercept = mean_tmax), linewidth = .5, linetype = 2, color = "black") +
     facet_nested(~population+site, nest_line = element_line(colour = "black")) +
+    scale_fill_manual(values = c(VA = "steelblue", PA = "#db7272")) +
     scale_y_continuous(breaks = c(0, 10)) +
     scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
     coord_flip(clip = "off") +
@@ -139,6 +146,38 @@ p2 <- dml %>%
         panel.spacing.x = unit(2, "mm"),
         panel.grid.major.y = element_line(color = "grey90", linewidth = .5),
         panel.grid.minor.y = element_line(color = "grey90", linewidth = .3)
+    ) +
+    guides(fill = "none") +
+    labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
+
+p2_1 <- dml %>%
+    filter(yday >= 182 & yday <= 273) %>%
+    mutate(
+        population = factor(population, c("VA", "PA")),
+        site = factor(site, sites$site)
+    ) %>%
+    drop_na(site) %>%
+    ggplot() +
+    geom_histogram(aes(x = tmax_deg_c, fill = population), position = "identity", alpha = .6, color = "black", binwidth = 1) +
+    scale_fill_manual(values = c(VA = "steelblue", PA = "#db7272")) +
+    scale_y_continuous(breaks = seq(0, 150, 20)) +
+    scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
+    coord_flip(clip = "off") +
+    theme_classic() +
+    theme(
+        axis.title = element_text(size = 10),
+        axis.title.y = element_blank(),
+        strip.background = element_blank(),
+        panel.spacing.x = unit(2, "mm"),
+        panel.grid.major.y = element_line(color = "grey90", linewidth = .5),
+        panel.grid.minor.y = element_line(color = "grey90", linewidth = .3),
+        legend.position = "inside",
+        legend.position.inside = c(.8, .2),
+        legend.background = element_rect(color = "black", fill = "white"),
+        legend.text = element_text(size = 5),
+        legend.title = element_blank(),
+        legend.key.size = unit(3, "mm"),
+        plot.background = element_rect(fill = NA, color = NA)
     ) +
     guides() +
     labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
@@ -168,7 +207,6 @@ p3 <- iso %>%
         axis.ticks.x = element_blank(),
         strip.clip = "off",
         strip.background = element_blank(),
-        #strip.text = element_blank(),
         legend.position = "right",
         legend.title = element_blank(),
         legend.background = element_rect(color = "black", fill = NA),
@@ -195,11 +233,12 @@ p <- ggdraw() +
     draw_plot(p1_1 + guides(color = "none"), x = .1, y = .7, scale = .22, halign = 0, valign = 0) +
     draw_plot(p1_2 + guides(color = "none"), x = .53, y = .62, scale = .22, halign = 0, valign = 0) +
     draw_plot(get_legend(p1_1), x = .72, y = .65, scale = .2, halign = 0, valign = 0) +
+    draw_plot(p2_1, x = .74, y = .25, width = .2, height = .228, halign = 0, valign = 0) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig1.png"), p, width = 8, height = 8)
 
-  # Chisquare
+# Chisquare
 x <- iso %>%
     group_by(population, contig_species) %>%
     count() %>%

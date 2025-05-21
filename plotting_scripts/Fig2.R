@@ -13,7 +13,7 @@ isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 iso <- read_csv(paste0(folder_data, "output/iso.csv"))
 seqs <- read_csv(paste0(folder_data, "phylogenomics_analysis/comparative/seqs.csv"))
 gens <- read_csv(paste0(folder_data, "phylogenomics_analysis/comparative/gens.csv"))
-
+gens_oriented <- read_csv(paste0(folder_data, "phylogenomics_analysis/comparative/gens_oriented.csv"))
 
 # Panel A. core gene ----
 nodes_to_scale <- c(38, 40, 1, 2, 41, 42, 54)
@@ -132,14 +132,16 @@ p2_1 <- isolates %>%
     labs()
 
 # Panel C. pangenome ----
+
 p3 <- gggenomes(
     seqs = mutate(seqs, bin_id = factor(bin_id, get_taxa_name(p2))) %>%
         mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "others"))),
-    genes = filter(gens, str_detect(name, "nif|nod|fix"))
+    genes = gens_oriented %>% filter(str_detect(name, "nif|nod|fix"))
 ) +
     geom_bin_label() +
     geom_seq(aes(color = replicon_type), linewidth = 1) +
     geom_gene(aes(fill = name)) +
+    #geom_gene_tag(aes(label = name), check_overlap = T) +
     scale_color_manual(values = c(chromosome = "black", pSymA = "darkred", pSymB = "darkblue", others = "grey80"), name = "Replicon") +
     scale_y_continuous(expand = c(0,0)) +
     coord_cartesian(clip = "off") +
@@ -151,6 +153,7 @@ p3 <- gggenomes(
     ) +
     guides(fill = "none") +
     labs()
+
 
 # ----
 p <- plot_grid(
@@ -171,6 +174,7 @@ ggsave(here::here("plots/Fig2.png"), p, width = 12, height = 6)
 
 
 #
+tt <- read_gpas()
 nrow(tt$gpa) # 26544
 
 core <- tt$gpatl %>%

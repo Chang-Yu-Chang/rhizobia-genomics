@@ -52,6 +52,10 @@ write_csv(seqs, paste0(folder_data, "phylogenomics_analysis/comparative/seqs.csv
 write_csv(gens, paste0(folder_data, "phylogenomics_analysis/comparative/gens.csv"))
 
 # Orient the genes ----
+seqs <- read_csv(paste0(folder_data, "phylogenomics_analysis/comparative/seqs.csv"))
+gens <- read_csv(paste0(folder_data, "phylogenomics_analysis/comparative/gens.csv"))
+
+# single copy core genes on psymA shared by all symbiotic genomes
 gens %>%
     select(file_id, seq_id, gene) %>%
     left_join(select(contigs, seq_id = contig_id, replicon, replicon_type)) %>%
@@ -62,68 +66,143 @@ gens %>%
     count %>%
     filter(n == 35) %>%
     view
-    #distinct(name) %>%
 
-gens %>%
-    filter(gene == "arg") %>% view
+orient_replicon <- function (gens, repl, ge) {
+    # Target gene to set at position 0
+    target_info <- gens %>%
+        left_join(select(contigs, seq_id = contig_id, replicon_type)) %>%
+        filter(replicon_type == repl) %>%
+        group_by(file_id) %>%
+        mutate(contig_len = max(end)) %>%
+        filter(gene == ge) %>%
+        select(file_id, target_start = start, target_end = end, target_strand = strand, contig_len)
+
+    list_orient <- list()
+
+    for (i in 1:nrow(target_info)) {
+        cat(i)
+        gensi <- gens %>%
+            left_join(select(contigs, seq_id = contig_id, replicon_type), by = join_by(seq_id)) %>%
+            filter(file_id == target_info$file_id[i], replicon_type == repl) %>%
+            select(-replicon_type)
+
+        if (target_info$target_strand[i] == "+") {
+            list_orient[[i]] <- gensi %>%
+                # Orientate
+                mutate(
+                    new_start = start - target_info$target_start[i],
+                    new_end = end - target_info$target_start[i],
+                    new_start = ifelse(new_start < 0, new_start + target_info$contig_len[i], new_start),
+                    new_end = ifelse(new_end < 0, new_end + target_info$contig_len[i], new_end),
+                    new_strand = strand
+                ) %>%
+                arrange(new_start) %>%
+                select(-start, -end, -strand) %>%
+                select(file_id, seq_id, start = new_start, end = new_end, strand = new_strand, everything())
+
+        } else if (target_info$target_strand[i] == "-") {
+            list_orient[[i]] <- gensi %>%
+                # Flip
+                mutate(
+                    new_start = target_info$contig_len[i] - end,
+                    new_end = target_info$contig_len[i] - start,
+                    new_strand = ifelse(strand == "+", "-", "+")
+                ) %>%
+                # Orientate
+                mutate(
+                    new_start = new_start - (target_info$contig_len[i] - target_info$target_end[i]), # the new target locus is also moved
+                    new_end = new_end - (target_info$contig_len[i] - target_info$target_end[i]),
+                    new_start = ifelse(new_start < 0, new_start + target_info$contig_len[i], new_start),
+                    new_end = ifelse(new_end < 0, new_end + target_info$contig_len[i], new_end)
+                ) %>%
+                arrange(new_start) %>%
+                select(-start, -end, -strand) %>%
+                select(file_id, seq_id, start = new_start, end = new_end, strand = new_strand, everything())
+        }
+    }
+
+
+    return(bind_rows(list_orient))
+}
+gens_pa <- orient_replicon(gens, "pSymA", "nifD_1")
+gens_oriented <- gens %>%
+    left_join(select(contigs, seq_id = contig_id, replicon_type), by = join_by(seq_id)) %>%
+    # # All nonchr and non psyma contigs
+    filter(replicon_type != "pSymA" | is.na(replicon_type)) %>%
+    bind_rows(gens_pa) %>%
+    select(file_id, seq_id, start, end, strand, type, name, gene)
+
+write_csv(gens_oriented, paste0(folder_data, "phylogenomics_analysis/comparative/gens_oriented.csv"))
+
+if (F) {
+
 
 target_info <- gens %>%
     left_join(select(contigs, seq_id = contig_id, replicon_type)) %>%
     filter(replicon_type == "pSymA") %>%
-    filter(gene == "arg") %>%
-    select(file_id, target_start = start, target_strand = strand)
-
-# It's a mess to orginet the genome....
-gens_new <- gens %>%
-    left_join(target_info, by = "file_id") %>%
-    filter(!is.na(target_start)) %>%
     group_by(file_id) %>%
-    left_join(select(contigs, seq_id = contig_id, replicon_type)) %>%
-    filter(replicon_type == "pSymA") %>%
-    # For each genome...
-    mutate(
-        genome_length = max(end),
-        # If target gene is on minus strand, invert all coordinates
-        orientation_flipped = (target_strand == "-"),
+    mutate(contig_len = max(end)) %>%
+    filter(gene == "nifD_1") %>%
+    select(file_id, target_start = start, target_end = end, target_strand = strand, contig_len)
 
-        # Reorient, reassign positions
-        new_start = if_else(
-            orientation_flipped,
-            genome_length - end,  # inverted positions
-            start - target_start   # shift so target is at 0
-        ),
-        new_end = if_else(
-            orientation_flipped,
-            genome_length - start,
-            end - target_start
-        ),
+list_orient <- list()
 
-        # Wrap around for circular genome
-        new_start = if_else(new_start < 0, new_start + genome_length, new_start),
-        new_end = if_else(new_end < 0, new_end + genome_length, new_end),
+for (i in 1:nrow(target_info)) {
+    cat(i)
+    gensi <- gens %>%
+        left_join(select(contigs, seq_id = contig_id, replicon_type), by = join_by(seq_id)) %>%
+        filter(file_id == target_info$file_id[i], replicon_type == "pSymA") %>%
+        select(-replicon_type)
 
-        # Set strand: all target genes should be on + strand
-        new_strand = if_else(orientation_flipped, "+", "+")
-    ) %>%
-    ungroup() %>%
-    # For genes in flipped genomes, invert the strand of other genes
-    mutate(
-        # For flipped genomes, invert strand of all genes
-        final_strand = if_else(orientation_flipped, if_else(strand == "+", "-", "+"), strand)
-    ) %>%
-    select(-start, -end, -strand) %>%
-    # Keep original strand
-    select(file_id, seq_id, start = new_start, end = new_end, strand = final_strand, everything())
+    if (target_info$target_strand[i] == "+") {
+        list_orient[[i]] <- gensi %>%
+            # Orientate
+            mutate(
+                new_start = start - target_info$target_start[i],
+                new_end = end - target_info$target_start[i],
+                new_start = ifelse(new_start < 0, new_start + target_info$contig_len[i], new_start),
+                new_end = ifelse(new_end < 0, new_end + target_info$contig_len[i], new_end),
+                new_strand = strand
+            ) %>%
+            arrange(new_start) %>%
+            select(-start, -end, -strand) %>%
+            select(file_id, seq_id, start = new_start, end = new_end, strand = new_strand, everything())
+
+    } else if (target_info$target_strand[i] == "-") {
+        list_orient[[i]] <- gensi %>%
+            # Flip
+            mutate(
+                new_start = target_info$contig_len[i] - end,
+                new_end = target_info$contig_len[i] - start,
+                new_strand = ifelse(strand == "+", "-", "+")
+            ) %>%
+            # Orientate
+            mutate(
+                new_start = new_start - (target_info$contig_len[i] - target_info$target_end[i]), # the new target locus is also moved
+                new_end = new_end - (target_info$contig_len[i] - target_info$target_end[i]),
+                new_start = ifelse(new_start < 0, new_start + target_info$contig_len[i], new_start),
+                new_end = ifelse(new_end < 0, new_end + target_info$contig_len[i], new_end)
+            ) %>%
+            arrange(new_start) %>%
+            select(-start, -end, -strand) %>%
+            select(file_id, seq_id, start = new_start, end = new_end, strand = new_strand, everything())
+    }
+}
+}
+
 
 # Plot ----
 p <- gggenomes(
     seqs = seqs,
-    genes = gens_new %>% filter(str_detect(name, "nif|nod|fix"))
+    genes = gens_oriented %>% filter(str_detect(name, "nod|nif|fix"))
 ) +
     geom_bin_label() +
     geom_seq(aes(color = replicon_type), linewidth = 1) +
     geom_gene(aes(fill = name)) +
-    scale_color_manual(values = c(chromosome = "black", pSymA = "darkred", pSymB = "darkblue", others = "grey80"), name = "Replicon")
-p
+    geom_gene_tag(aes(label = name), nudge_y=0.1, check_overlap = T, size = 2) +
+    scale_color_manual(values = c(chromosome = "black", pSymA = "darkred", pSymB = "darkblue", others = "grey80"), name = "Replicon") +
+    guides() +
+    labs()
+
 ggsave(paste0(folder_data, "phylogenomics_analysis/comparative/01-genomes.png"), p, width = 10, height = 10)
 
