@@ -14,6 +14,12 @@ compute_gpa_tree <- function () {
     tr <- hclust(d, method = "ward.D2") %>% as.phylo()
     return(tr)
 }
+compute_spa_tree <- function () {
+    tt <- read_gpas()
+    d <- dist(t(tt$spa[,-1]))
+    tr <- hclust(d, method = "ward.D2") %>% as.phylo()
+    return(tr)
+}
 get_distl_gra <- function () {
     tt <- read_gpas()
     gids <- names(tt$gpa[,-1])
@@ -42,9 +48,12 @@ compute_kmer_tree <- function (distl_gra) {
 
 
 tr_gpa <- compute_gpa_tree()
+tr_spa <- compute_spa_tree()
+
 distl_gra <- get_distl_gra()
 tr_ani <- compute_ani_tree(distl_gra)
 tr_kmer <- compute_kmer_tree(distl_gra)
 write.tree(tr_gpa, paste0(folder_data, "phylogenomics_analysis/trees/tr_gpa.tree"))
+write.tree(tr_spa, paste0(folder_data, "phylogenomics_analysis/trees/tr_spa.tree"))
 write.tree(tr_ani, paste0(folder_data, "phylogenomics_analysis/trees/tr_ani.tree"))
 write.tree(tr_kmer, paste0(folder_data, "phylogenomics_analysis/trees/tr_kmer.tree"))

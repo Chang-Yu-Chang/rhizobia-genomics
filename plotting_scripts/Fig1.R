@@ -4,6 +4,9 @@ library(tidyverse)
 library(cowplot)
 library(ggh4x)
 library(grid)
+library(lme4)
+library(car)
+library(emmeans)
 library(tigris)     # for getting the US state map
 library(sf)         # for handling the simple features
 library(stars)      # for converting st to sf
@@ -181,6 +184,24 @@ p2_1 <- dml %>%
     ) +
     guides() +
     labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
+## Stat
+xx <- dml %>%
+    filter(yday >= 182 & yday <= 273) %>%
+    mutate(
+        population = factor(population, c("VA", "PA")),
+        site = factor(site, sites$site)
+    ) %>%
+    drop_na(site) %>%
+    select(population, site, tmax_deg_c, tmin_deg_c)
+
+mod <- lmer(tmax_deg_c ~ population + (1|site), data = xx)  # daily min
+Anova(mod, type = 3)
+emmeans(mod, ~ population)
+mod <- lmer(tmin_deg_c ~ population + (1|site), data = xx) # daily max
+Anova(mod, type = 3)
+emmeans(mod, ~ population)
+
+
 
 # Panel C. strain composition ----
 p3 <- iso %>%

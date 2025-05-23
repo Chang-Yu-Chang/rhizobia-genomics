@@ -5,7 +5,6 @@ library(cowplot)
 library(ggh4x)
 library(tidytree)
 library(ggtree)
-library(gggenomes)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
@@ -31,7 +30,7 @@ p1 <- tr %>%
     geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
     scale_color_manual(values = species_colors) +
     scale_x_continuous(limits = c(0, 0.0075)) +
-    geom_treescale(x = .004, y = 30) +
+    geom_treescale(x = .001, y = 15) +
     facet_grid2(~` `) +
     coord_cartesian(clip = "off") +
     theme_tree() +
@@ -57,7 +56,7 @@ p1_1 <- isolates %>%
     geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_manual(values = species_colors) +
+    scale_fill_manual(values = species_colors, breaks = c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")) +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
@@ -91,7 +90,7 @@ p2 <- tbtr$tr[[2]] %>%
     geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
     scale_x_reverse() +
     scale_color_manual(values = species_colors) +
-    #geom_treescale(x = 65, y = 30) +
+    geom_treescale(x = -18, y = 22) +
     coord_cartesian(clip = "off") +
     #theme_bw() +
     theme_tree() +
