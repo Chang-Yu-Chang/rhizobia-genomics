@@ -1,20 +1,27 @@
-#' This script plots the tradeoff figure
+#
 
 library(tidyverse)
-library(janitor)
-library(broom)
 library(cowplot)
+library(ggh4x)
 source(here::here("metadata.R"))
+set.seed(42)
 
 iso <- read_csv(paste0(folder_data, "output/iso.csv"))
 plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv")) %>%
     left_join(select(iso, exp_id, contig_species)) %>%
-    mutate(exp_id = case_when(exp_id == "control"~str_sub(exp_waterblock, 1,3), T ~ exp_id)) %>%
-    filter(exp_plant == "lupulina") %>%
-    mutate(contig_species = ifelse(is.na(contig_species), "control", contig_species)) %>%
-    filter(population == "VA" | exp_id == "cyc") %>%
+    filter(exp_plant == "lupulina", population == "VA" | exp_id == "control") %>%
     drop_na(shoot_biomass_g) %>%
-    mutate(total_biomass = shoot_biomass_g + root_biomass_g)
+    mutate(
+        total_biomass = shoot_biomass_g + root_biomass_g,
+        exp_id = case_when(exp_id == "control"~str_sub(exp_waterblock, 1,3), T ~ exp_id),
+        contig_species = ifelse(is.na(contig_species), "control", contig_species),
+        contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
+    )
+
+tb_bg <- distinct(plants, contig_species, genome_id)
+
+
+# Panel A. shoot biomass----
 plants_mean <- plants %>%
     group_by(contig_species, genome_id) %>%
     summarize(
@@ -24,86 +31,74 @@ plants_mean <- plants %>%
         mean_nodules = mean(nodules), sem_nodules = sd(nodules) / sqrt(n())
     )
 
-gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
-gtsl <- gts %>%
-    mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
-    select(temperature, exp_id, r, lag, maxOD) %>%
-    mutate(loglag = -log(lag)) %>%
-    pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
-    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
-    drop_na(value) %>%
-    select(-exp_id)
-gtsl_mean <- gtsl %>%
-    unite(trait, c(trait, temperature), sep = "_") %>%
-    pivot_wider(names_from = trait)
 
-
-traits_mean <- plants_mean %>%
-    left_join(gtsl_mean) %>%
-    select(!starts_with("sem_")) %>%
-    pivot_longer(-c(contig_species, genome_id)) %>%
-    group_by(name) %>%
-    mutate(value = (value - min(value, na.rm = T))/(max(value, na.rm = T) - min(value, na.rm = T))) %>%
-    mutate(trait_type = ifelse(str_detect(name, "\\dc"), "growth", "symbiosis"))
-
-# Panel A. heatmap ----
-p1 <- traits_mean %>%
-    # Clean the trait name
-    filter(!str_detect(name, "^lag")) %>%
-    mutate(trait = str_remove(name, "mean_|_\\d+c$")) %>%
-    mutate(name = str_remove(name, "r_|loglag_|maxOD_|mean_")) %>%
-    filter(!trait %in% c("root", "shoot")) %>%
-    filter(!str_detect(name, "^lag")) %>%
-    mutate(trait = factor(trait, c("r", "loglag", "maxOD", ""))) %>%
-    replace_na(list(trait = "")) %>%
+p1 <- plants %>%
     ggplot() +
-    geom_tile(aes(x = name, y = genome_id, fill = value), color = "black", linewidth = .5) +
-    scale_x_discrete(position = "top", expand = c(0,0)) +
-    scale_y_discrete(expand = c(0,0)) +
-    scale_fill_gradient2(mid = "snow", high = "maroon", low = "steelblue", midpoint = .5, breaks = c(0,.5,1)) +
+    geom_rect(data = tb_bg, aes(fill = contig_species), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .1) +
+    geom_jitter(aes(x = genome_id, y = nodules), width = .1, height = 0, alpha = .3, shape = 16) +
+    geom_point(data = plants_mean, aes(x = genome_id, y = mean_nodules)) +
+    geom_errorbar(data = plants_mean, aes(x = genome_id, ymin = mean_nodules - qnorm(0.975) * sem_nodules, ymax = mean_nodules + qnorm(0.975) * sem_nodules), width = .1) +
+    scale_fill_manual(values = species_colors) +
     facet_nested(
-        contig_species+genome_id~trait_type+trait, scales = "free", space = "free",
-        switch = "y",
-        strip = strip_nested(text_y = element_text(angle = 0)),
-        nest_line = element_line(color = "grey80", linewidth = 1)
+        contig_species+genome_id~., scales = "free_y", space = "free_y",
+        nest_line = element_line(color = "grey90", linewidth = 1, lineend = "square"),
+        strip = strip_nested(
+            text_y = elem_list_text(
+                angle = rep(0, 12), hjust = rep(0.5, 10),
+                color = c(rev(species_colors), "grey40", species_colors[c(4, 3, 3, 3, 2, 1)], "grey40"),
+                face = rep("bold", 5)
+            ),
+            by_layer_y = FALSE,
+        ),
+        switch = "y"
     ) +
-    coord_cartesian(clip = "off") +
+    coord_flip(clip = "off") +
     theme_classic() +
     theme(
-        axis.text.x = element_text(angle = 45, hjust = 0),
         axis.text.y = element_blank(),
-        strip.background = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.clip = "off",
+        strip.placement = "outside",
+        strip.background = element_rect(color = NA),
+        panel.grid.major.x = element_line(color = "gray95"),
         panel.spacing.y = unit(0, "mm"),
         panel.border = element_rect(color = "black", fill = NA),
-        strip.placement = "outside",
-        legend.position = "bottom",
-        legend.title = element_blank(),
-        plot.margin = unit(c(0, 5, 0, 2), "mm")
+        plot.margin = unit(c(5,0,0,5), "mm")
     ) +
-    guides() +
-    labs(x = "", y = "")
+    guides(fill = "none") +
+    labs(x = "", y = "Num. of nodules")
 p1
-# # Panel B correlation ----
-# p2 <- traits_mean %>%
-#     select(-trait_type) %>%
-#     filter(name %in% c("r_30c", "mean_biomass")) %>%
-#     pivot_wider() %>%
-#     ggplot() +
-#     geom_point(aes(x = r_30c, y = mean_biomass, color = contig_species)) +
-#     scale_color_manual(values = species_colors) +
-#     coord_cartesian(clip = "off") +
-#     theme_bw() +
-#     theme() +
-#     guides() +
-    # labs()
+p2 <- plants %>%
+    ggplot() +
+    geom_rect(data = tb_bg, aes(fill = contig_species), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .1) +
+    geom_jitter(aes(x = genome_id, y = total_biomass), width = .1, height = 0, alpha = .2, shape = 16) +
+    geom_point(data = plants_mean, aes(x = genome_id, y = mean_biomass)) +
+    geom_errorbar(data = plants_mean, aes(x = genome_id, ymin = mean_biomass - qnorm(0.975) * sem_biomass, ymax = mean_biomass + qnorm(0.975) * sem_biomass), width = .1) +
+    scale_fill_manual(values = species_colors) +
+    facet_nested(contig_species+genome_id~., scales = "free_y", space = "free_y") +
+    coord_flip(clip = "off") +
+    theme_classic() +
+    theme(
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.background = element_blank(),
+        panel.grid.major.x = element_line(color = "gray95"),
+        panel.spacing.y = unit(0, "mm"),
+        panel.border = element_rect(color = "black", fill = NA),
+        plot.margin = unit(c(5,0,0,0), "mm"),
+        strip.text = element_blank()
+    ) +
+    guides(fill = "none") +
+    labs(x = "Strain", y = "Biomass (g)")
 
-
-
-#  ----
 p <- plot_grid(
-    p1,
-    nrow = 1, rel_widths = c(2, 1)
+    p1, p2, nrow = 1,
+    labels = LETTERS[1:2], rel_widths = c(2, 1),
+    scale = .9,
+    align = "h", axis = "tb"
 ) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
-ggsave(here::here("plots/Fig5.png"), p, width = 7, height = 4)
 
+ggsave(here::here("plots/Fig5.png"), p, width = 6, height = 3)

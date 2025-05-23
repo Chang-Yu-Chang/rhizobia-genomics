@@ -54,5 +54,5 @@ ft <- en %>%
     style(part = "header", pr_t = fp_text_default(bold = T)) %>%
     fix_border_issues()
 
-save_as_html(ft, path = here::here("plots/TabS1.html"))
+#save_as_html(ft, path = here::here("plots/TabS1.html"))
 save_as_image(ft, path = here::here("plots/TabS1.png"), res = 300)

@@ -1,120 +1,221 @@
-#' This script plots the growth traits
+#' This script plots the figures
 
 library(tidyverse)
 library(cowplot)
-library(ggh4x) # for nested facets
+library(ggh4x)
+library(tidytree)
+library(ggtree)
+library(gggenomes)
 source(here::here("metadata.R"))
 
-# Prepare the data
-iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
-gcl_smooth <- read_csv(paste0(folder_phenotypes, 'growth/gcl_smooth.csv')) # Growth traits per well
-gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
-gtsl <- gts %>%
-    mutate(temperature = factor(temperature, c("25c", "30c", "35c", "40c"))) %>%
-    select(temperature, exp_id, r, lag, maxOD) %>%
-    mutate(loglag = -log(lag)) %>%
-    pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
-    left_join( select(iso, exp_id, genome_id, contig_species)) %>%
-    drop_na(value)
+load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+tb2 <- read_csv(paste0(folder_data, "phylogenomics_analysis/tree_distance/tb2.csv"))
 
-# Panel A
-#p1 <- ggdraw()
+# Panel A. core gene ----
+nodes_to_scale <- c(38, 40, 1, 2, 41, 42, 54)
+tr <- tbtr$tr[[1]]
+tr <- root(tr, outgroup = "g2")
+edges_to_scale <- which(tr$edge[,2] %in% nodes_to_scale)
+tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.01
 
-# Panel A growth curve ----
-p1 <- gcl_smooth %>% # Compute mean
-    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
-    group_by(temperature, exp_id, t) %>%
-    mutate(mean_abs = mean(abs_fit)) %>%
-    ggplot() +
-    geom_line(aes(x = t, y = mean_abs, group = exp_id, color = contig_species), linewidth = .3) +
-    geom_text(aes(label = temperature), x = 5, y = .45) +
+p1 <- tr %>%
+    as_tibble() %>%
+    left_join(rename(iso, label = genome_id)) %>%
+    mutate(` ` = "") %>%
+    mutate(highlight = ifelse(node %in% nodes_to_scale, T, F)) %>%
+    as.treedata() %>%
+    ggtree(layout = "ellipse") +
+    geom_tiplab(aes(label = label, color = contig_species), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
     scale_color_manual(values = species_colors) +
-    scale_x_continuous(breaks = seq(0, 48, 12)) +
+    scale_x_continuous(limits = c(0, 0.0075)) +
+    geom_treescale(x = .004, y = 30) +
+    facet_grid2(~` `) +
     coord_cartesian(clip = "off") +
-    facet_wrap2(~temperature, nrow = 1) +
-    theme_bw() +
+    theme_tree() +
     theme(
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_line(color = "grey95", linewidth = .5),
-        panel.border = element_rect(color = "black", fill = NA),
-        strip.background = element_blank(),
-        strip.text.x = element_blank(),
-        strip.text.y = element_text(size = 10),
-        strip.placement = "outside",
-        axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10),
-        legend.position = "top",
         legend.title = element_blank(),
-        legend.background = element_blank(),
-        legend.key = element_blank(),
-        legend.key.size = unit(5, "mm"),
-        legend.box.margin = margin(0,0,0,0, "mm"),
-        plot.background = element_blank()
+        legend.background = element_rect(color = "black", fill = "white"),
+        legend.position = "inside",
+        legend.position.inside = c(.2, .8),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.margin = unit(c(0,-3,0,0), "mm")
     ) +
-    guides(color = guide_legend(nrow = 1, override.aes = list(linewidth = 1))) +
-    labs(x = "Time (hour)", y = "O.D.[600nm]")
+    guides(color = "none") +
+    labs()
 
-# Panel B growth traits ----
-gtwlm <- gtsl %>%
-    #filter(value > 0) %>%
-    group_by(temperature, contig_species, trait) %>%
-    summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value))) %>%
-    group_by(temperature, trait) %>%
-    mutate(max_mean_value = max(mean_value, na.rm = T)) %>%
-    replace_na(list(ci_value = 0)) %>%
-    filter(trait %in% c("r", "loglag", "maxOD")) %>%
-    mutate(trait = factor(case_when(
-        trait == "r" ~ "growth rate (1/hr)",
-        trait == "lag" ~ "lag time (hr)",
-        trait == "loglag" ~ "lag time (-log(hr))",
-        trait == "maxOD" ~ "yield (O.D.[600nm])"
-    ), c("growth rate (1/hr)", "lag time (-log(hr))", "yield (O.D.[600nm])")))
-
-p2 <- gtsl %>%
-    filter(trait %in% c("r", "loglag", "maxOD")) %>%
-    mutate(trait = factor(case_when(
-        trait == "r" ~ "growth rate (1/hr)",
-        trait == "lag" ~ "lag time (hr)",
-        trait == "loglag" ~ "lag time (-log(hr))",
-        trait == "maxOD" ~ "yield (O.D.[600nm])"
-    ), c("growth rate (1/hr)", "lag time (-log(hr))", "yield (O.D.[600nm])"))) %>%
+p1_1 <- isolates %>%
+    left_join(select(iso, genome_id, contig_species)) %>%
+    select(genome_id, population, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p1)))) %>%
     ggplot() +
-    # Each strain
-    geom_line(aes(x = temperature, y = value, group = exp_id, color = contig_species), alpha = .1) +
-    # Mean value
-    geom_ribbon(data = gtwlm, aes(x = temperature, ymin = mean_value-ci_value, ymax =  mean_value+ci_value, fill = contig_species, group = contig_species), inherit.aes = FALSE, alpha = 0.2) +
-    geom_line(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
-    geom_point(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
-    scale_color_manual(values = species_colors) +
+    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
     scale_fill_manual(values = species_colors) +
-    facet_wrap2(~trait, scales = "free_y", nrow = 1, strip.position = "left") +
     coord_cartesian(clip = "off") +
-    theme_bw() +
+    theme_classic() +
     theme(
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_line(color = "grey95", linewidth = .5),
+        legend.position = "right",
+        legend.title = element_blank(),
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(1, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        strip.clip = "off",
+        panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+        panel.background = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        plot.margin = unit(c(0,0,0,-1), "mm")
+    ) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    labs()
+
+
+# Panel B. gene content ----
+p2 <- tbtr$tr[[2]] %>%
+    as_tibble() %>%
+    left_join(rename(iso, label = genome_id)) %>%
+    mutate(` ` = "") %>%
+    as.treedata() %>%
+    ggtree(layout = "ellipse") +
+    geom_tiplab(aes(label = label, color = contig_species), hjust = 1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    scale_x_reverse() +
+    scale_color_manual(values = species_colors) +
+    #geom_treescale(x = 65, y = 30) +
+    coord_cartesian(clip = "off") +
+    #theme_bw() +
+    theme_tree() +
+    theme(
+        legend.position = "none",
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.margin = unit(c(0,0,0,0), "mm")
+    ) +
+    guides(fill = "none") +
+    labs()
+
+p2_1 <- isolates %>%
+    left_join(select(iso, genome_id, contig_species)) %>%
+    select(genome_id, population, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
+    ggplot() +
+    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_manual(values = species_colors) +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
+        legend.position = "right",
+        legend.title = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        strip.clip = "off",
+        panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+        panel.background = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        plot.margin = unit(c(0,0,0,-1), "mm")
+    ) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    labs()
+
+# Panel C. tree distance ----
+tb_obv <- tb2 %>%
+    select(-rfds) %>%
+    distinct(tr_type1, tr_type2, .keep_all = T) %>%
+    filter(tr_type1 == "gpa", tr_type2 == "core")
+
+p3 <- tb2 %>%
+    filter(tr_type1 == "gpa", tr_type2 == "core") %>%
+    ggplot() +
+    geom_histogram(aes(x = rfds), binwidth = .05, color = "black", fill = NA, boundary = 0) +
+    geom_vline(data = tb_obv, aes(xintercept = rfd), color = "red", linetype = 2) +
+    #facet_grid2(tr_type1 ~ tr_type2, switch = "y", render_empty = F) +
+    scale_x_continuous(breaks = seq(0,1,.2), limits = c(0,1)) +
+    scale_y_continuous(position = "right") +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
         panel.border = element_rect(color = "black", fill = NA),
         strip.background = element_blank(),
-        strip.text.y = element_text(size = 10),
-        strip.placement = "outside",
-        axis.title.x = element_text(size = 10),
-        axis.title.y = element_blank(),
-        legend.position = "none",
-        legend.title = element_blank(),
-        legend.background = element_blank(),
-        legend.key = element_blank(),
-        legend.key.size = unit(5, "mm"),
-        legend.box.margin = margin(0,0,0,0, "mm"),
-        plot.background = element_blank()
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.background = element_rect(fill = NA, color = NA)
     ) +
-    guides(fill = guide_legend(override.aes = list(color = NA), nrow = 2, direction = "vertical")) +
-    labs(x = expression(paste("Temperature (", degree, "C)")))
+    guides() +
+    labs(x = "Robinson–Foulds distances")
 
+
+# Connecting lines ----
+tips1 <- get_taxa_name(p1)
+tips2 <- get_taxa_name(p2)
+
+p4 <- tibble(genome_id = iso$genome_id) %>%
+    mutate(
+        x1 = 1,
+        x2 = 2,
+        y1 = match(genome_id, rev(get_taxa_name(p1))),
+        y2 = match(genome_id, rev(get_taxa_name(p2)))
+    ) %>%
+    ggplot() +
+    geom_segment(aes(x = x1, xend = x2, y = y1, yend = y2), linewidth = .2, color = "grey10") +
+    scale_y_continuous(expand = c(0,0), limits = c(0.5, 38.5)) +
+    coord_cartesian(clip = "off") +
+    theme_void() +
+    theme() +
+    guides() +
+    labs()
+
+
+
+# ----
 p <- plot_grid(
-    p1, p2,
-    ncol = 1, align = "v", axis = "lr",
-    labels = c("A", "B"), scale = .95
-) + theme(plot.background = element_rect(color = NA, fill = "white"))
+    p1, p1_1 + guides(fill = "none"),
+    p4,
+    p2_1 + guides(fill = "none"), p2,
+    nrow = 1,
+    scale = .95, rel_widths = c(1,.1,.15,.1,1),
+    align = "h", axis = "tb",
+    labels = c("A", "", "B", "")
+) +
+    draw_text("Single-copy core gene", x = .27, y = .95, size = 10, hjust = 0) +
+    draw_text("Gene content variation", x = .6, y = .95, size = 10, hjust = 0) +
+    draw_label("C", x = .8, y = .97, fontface = "bold") +
+    draw_plot(get_legend(p1_1), x = -.4, y = .25) +
+    draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig3.png"), p, width = 8, height = 6)
+
+ggsave(here::here("plots/Fig3.png"), p, width = 10, height = 6)
+
+
+#
+tt <- read_gpas()
+nrow(tt$gpa) # 26544
+
+core <- tt$gpatl %>%
+    group_by(gene) %>%
+    filter(value == 1) %>%
+    count() %>%
+    ungroup() %>%
+    filter(n == max(n))
+nrow(core) / nrow(tt$gpa) *100
+
+tt$gpacl %>%
+    filter(str_detect(gene, "nod")) %>%
+    filter(genome_id %in% paste0("g", c(2,3,15)))
+
