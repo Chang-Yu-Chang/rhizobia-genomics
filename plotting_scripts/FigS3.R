@@ -157,3 +157,8 @@ p <- plot_grid(
 ) + theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/FigS3.png"), p, width = 8, height = 6)
+
+
+# Fraction of core ----
+tb1$tbp$core[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] / tb1$tbp$total[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] * 100
+tb2$tbp$core[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] / tb2$tbp$total[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] * 100
