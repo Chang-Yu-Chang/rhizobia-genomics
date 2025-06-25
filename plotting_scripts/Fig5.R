@@ -3,6 +3,10 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x)
+library(lme4)
+library(glmmTMB)
+library(car)
+library(emmeans)
 source(here::here("metadata.R"))
 set.seed(42)
 
@@ -16,12 +20,16 @@ plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv")) %>%
         exp_id = case_when(exp_id == "control"~str_sub(exp_waterblock, 1,3), T ~ exp_id),
         contig_species = ifelse(is.na(contig_species), "control", contig_species),
         contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
-    )
+    ) %>%
+    mutate(symb = case_when(
+        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
+        T ~ "non-symbiotic"
+    ))
 
 tb_bg <- distinct(plants, contig_species, genome_id)
 
 
-# Panel A. shoot biomass----
+# Panel A. n of nodules----
 plants_mean <- plants %>%
     group_by(contig_species, genome_id) %>%
     summarize(
@@ -46,7 +54,7 @@ p1 <- plants %>%
             text_y = elem_list_text(
                 angle = rep(0, 12), hjust = rep(0.5, 10),
                 color = c(rev(species_colors), "grey40", species_colors[c(4, 3, 3, 3, 2, 1)], "grey40"),
-                face = rep("bold", 5)
+                face = rep("italic", 5)
             ),
             by_layer_y = FALSE,
         ),
@@ -68,7 +76,9 @@ p1 <- plants %>%
     ) +
     guides(fill = "none") +
     labs(x = "", y = "Num. of nodules")
-p1
+
+
+# Panel B. total biomass ----
 p2 <- plants %>%
     ggplot() +
     geom_rect(data = tb_bg, aes(fill = contig_species), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .1) +
@@ -93,6 +103,7 @@ p2 <- plants %>%
     guides(fill = "none") +
     labs(x = "Strain", y = "Biomass (g)")
 
+# ----
 p <- plot_grid(
     p1, p2, nrow = 1,
     labels = LETTERS[1:2], rel_widths = c(2, 1),
@@ -102,3 +113,37 @@ p <- plot_grid(
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig5.png"), p, width = 6, height = 3)
+
+# STat ----
+## Do species differ in nodules by whether they are symbiotic
+mod <- glmmTMB(
+    nodules ~ symb + (1|contig_species:genome_id),
+    family = poisson(),
+    data = plants
+)
+Anova(mod, type = 3)
+
+mod <- glmmTMB(
+    total_biomass ~ symb + (1|contig_species:genome_id),
+    family = gaussian(),
+    data = plants
+)
+Anova(mod, type = 3)
+
+## Do symbiotic species differ in nodules
+mod <- glmmTMB(
+    nodules ~ contig_species + (1|genome_id),
+    family = poisson(),
+    data = filter(plants, symb == "symbiotic")
+)
+Anova(mod, type = 3)
+
+mod <- glmmTMB(
+    total_biomass ~ contig_species + (1|genome_id),
+    family = gaussian(),
+    data = filter(plants, symb == "symbiotic")
+)
+Anova(mod, type = 3)
+
+
+

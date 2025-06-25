@@ -6,6 +6,9 @@ library(ggh4x)
 library(tidytree)
 library(ggtree)
 library(gggenomes)
+library(lme4)
+library(car)
+library(emmeans)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
@@ -60,6 +63,7 @@ p1_1 <- isolates %>%
         legend.title = element_blank(),
         legend.key.size = unit(3, "mm"),
         legend.key.spacing.y = unit(1, "mm"),
+        legend.text = element_text(face = "italic"),
         strip.background = element_blank(),
         strip.text = element_text(size = 10),
         strip.placement = "outside",
@@ -105,13 +109,15 @@ p2 <- gggenomes(
     labs()
 
 # Panel C.  heatmap ----
-p3 <- tt$gd %>%
+tb <- tt$gd %>%
     filter(!str_detect(gene, "group")) %>%
     filter(str_detect(gene, "nod|nif|fix")) %>%
     mutate(ge = str_sub(gene, 1, 5) %>% str_remove("\\d$|_$")) %>%
     mutate(g = str_sub(ge, 1, 3)) %>%
     select(g, ge, gene, genome_id) %>%
-    left_join(select(iso, genome_id, contig_species)) %>%
+    left_join(select(iso, genome_id, contig_species))
+
+p3 <- tb %>%
     mutate(
         genome_id = factor(genome_id, rev(get_taxa_name(p1))),
         contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
@@ -139,6 +145,16 @@ p3 <- tt$gd %>%
     guides() +
     labs()
 
+## Stat: do s meliloti and s medicate differ in their genes?
+mod <- tb %>%
+    filter(contig_species %in% c("S. medicae", "S. meliloti")) %>%
+    select(ge, genome_id, contig_species) %>%
+    group_by(ge, genome_id, contig_species) %>%
+    count() %>%
+    lmer(n ~ ge + contig_species + (1|contig_species:genome_id), data = .)
+Anova(mod, type = 3)
+emmeans(mod, ~contig_species)
+
 # ----
 p <- plot_grid(
     p1, p1_1 + guides(fill = "none"),
@@ -152,3 +168,5 @@ p <- plot_grid(
 
 ggsave(here::here("plots/Fig4.png"), p, width = 12, height = 6)
 
+
+#
