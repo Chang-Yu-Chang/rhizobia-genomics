@@ -3,10 +3,10 @@
 library(tidyverse)
 library(cowplot)
 library(ggh4x)
-library(grid)
-library(lme4)
-library(car)
-library(emmeans)
+library(grid)       # for plotting shades
+library(lme4)       # for lmer
+library(car)        # for anova
+library(emmeans)    # for emmeans
 library(tigris)     # for getting the US state map
 library(sf)         # for handling the simple features
 library(stars)      # for converting st to sf
@@ -61,7 +61,7 @@ p1 <- us_states %>%
     guides(fill = "none", color = "none") +
     labs(x = "Longitude", y = "Latitude")
 
-# Panel A inset map
+## Panel A inset map
 plot_temp_map <- function (dcl, sites) {
 
     tb <- dcl %>%
@@ -184,6 +184,7 @@ p2_1 <- dml %>%
     ) +
     guides() +
     labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
+
 ## Stat
 xx <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
@@ -194,10 +195,10 @@ xx <- dml %>%
     drop_na(site) %>%
     select(population, site, tmax_deg_c, tmin_deg_c)
 
-mod <- lmer(tmax_deg_c ~ population + (1|site), data = xx)  # daily min
+mod <- lmer(tmax_deg_c ~ population + (1|site), data = xx)  # daily max
 Anova(mod, type = 3)
 emmeans(mod, ~ population)
-mod <- lmer(tmin_deg_c ~ population + (1|site), data = xx) # daily max
+mod <- lmer(tmin_deg_c ~ population + (1|site), data = xx) # daily min
 Anova(mod, type = 3)
 emmeans(mod, ~ population)
 

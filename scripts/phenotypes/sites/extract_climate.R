@@ -2,6 +2,7 @@
 #' 1. Clean the site coordinate format and obtain elevation data
 #' 2. Extract the year 2022 climatology data from Daymet
 #' 3. Get the day for plotting the month shades
+#' 4. get climatology data from daymet for all grids within the plotting range ----
 
 library(tidyverse)
 library(janitor)

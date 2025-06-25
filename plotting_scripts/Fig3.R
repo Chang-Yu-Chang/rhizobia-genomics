@@ -189,11 +189,11 @@ p <- plot_grid(
     nrow = 1,
     scale = .95, rel_widths = c(1,.1,.15,.1,1),
     align = "h", axis = "tb",
-    labels = c("A", "", "B", "")
+    labels = c("A", "", "", "B")
 ) +
     draw_text("Single-copy core gene", x = .27, y = .95, size = 10, hjust = 0) +
     draw_text("Gene content variation", x = .6, y = .95, size = 10, hjust = 0) +
-    draw_label("C", x = .8, y = .97, fontface = "bold") +
+    draw_label("C", x = .79, y = .95, fontface = "bold") +
     draw_plot(get_legend(p1_1), x = -.4, y = .25) +
     draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
     theme(plot.background = element_rect(color = NA, fill = "white"))

@@ -2,7 +2,11 @@
 
 library(tidyverse)
 library(cowplot)
-library(ggh4x) # for nested facets
+library(ggh4x)      # for nested facets
+library(lme4)       # for lmer
+library(car)        # for anova
+library(emmeans)    # for emmeans
+
 source(here::here("metadata.R"))
 
 # Prepare the data
@@ -15,11 +19,12 @@ gtsl <- gts %>%
     select(temperature, exp_id, r, lag, maxOD) %>%
     mutate(loglag = -log(lag)) %>%
     pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
-    left_join( select(iso, exp_id, genome_id, contig_species)) %>%
-    drop_na(value)
-
-# Panel A
-#p1 <- ggdraw()
+    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
+    drop_na(value) %>%
+    mutate(symb = case_when(
+        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
+        T ~ "non-symbiotic"
+    ))
 
 # Panel A growth curve ----
 p1 <- gcl_smooth %>% # Compute mean
@@ -50,10 +55,12 @@ p1 <- gcl_smooth %>% # Compute mean
         legend.key = element_blank(),
         legend.key.size = unit(5, "mm"),
         legend.box.margin = margin(0,0,0,0, "mm"),
+        legend.text = element_text(size = 10, face = "italic"),
         plot.background = element_blank()
     ) +
     guides(color = guide_legend(nrow = 1, override.aes = list(linewidth = 1))) +
     labs(x = "Time (hour)", y = "O.D.[600nm]")
+
 
 # Panel B growth traits ----
 gtwlm <- gtsl %>%
@@ -111,6 +118,8 @@ p2 <- gtsl %>%
     guides(fill = guide_legend(override.aes = list(color = NA), nrow = 2, direction = "vertical")) +
     labs(x = expression(paste("Temperature (", degree, "C)")))
 
+
+# ----
 p <- plot_grid(
     p1, p2,
     ncol = 1, align = "v", axis = "lr",
@@ -118,3 +127,83 @@ p <- plot_grid(
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 6)
+
+
+# Stat ----
+
+
+## at 25 and 30C, non symbiotic strains have higher growth rate  than symbiotic strains
+mod <- gtsl %>%
+    filter(temperature == "25c", trait == "r") %>%
+    lmer(value ~ symb + (1|contig_species), data = .)
+Anova(mod, type = 3)
+
+mod <- gtsl %>%
+    filter(temperature == "30c", trait == "r") %>%
+    lmer(value ~ symb + (1|contig_species), data = .)
+Anova(mod, type = 3)
+
+mod <- gtsl %>%
+    filter(temperature == "35c", trait == "r") %>%
+    lmer(value ~ symb + (1|contig_species), data = .)
+Anova(mod, type = 3)
+
+mod <- gtsl %>%
+    filter(temperature == "40c", trait == "r") %>%
+    lmer(value ~ symb + (1|contig_species), data = .)
+Anova(mod, type = 3)
+
+# for S. meliloti, between 25 and 40C
+mod <- gtsl %>%
+    filter(trait == "r", contig_species == "S. meliloti") %>%
+    lm(value ~ temperature, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~temperature))
+
+mod <- gtsl %>%
+    filter(trait == "lag", contig_species == "S. meliloti") %>%
+    lm(value ~ temperature, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~temperature))
+
+mod <- gtsl %>%
+    filter(trait == "maxOD", contig_species == "S. meliloti") %>%
+    lm(value ~ temperature, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~temperature))
+
+
+## among symbiotic strains
+mod <- gtsl %>%
+    filter(trait == "r", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ contig_species + temperature, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~contig_species))
+
+mod <- gtsl %>%
+    filter(trait == "lag", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ temperature + contig_species, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~contig_species))
+
+mod <- gtsl %>%
+    filter(trait == "maxOD", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ temperature + contig_species, data = .)
+Anova(mod, type = 3)
+pairs(emmeans(mod, ~contig_species))
+
+
+mod <- gtsl %>%
+    filter(temperature == "40c", trait == "r", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ contig_species, data = .)
+summary(mod)
+
+mod <- gtsl %>%
+    filter(temperature == "40c", trait == "lag", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ contig_species, data = .)
+summary(mod)
+
+mod <- gtsl %>%
+    filter(temperature == "40c", trait == "maxOD", contig_species %in% c("S. meliloti", "S. medicae")) %>%
+    lm(value ~ contig_species, data = .)
+summary(mod)
