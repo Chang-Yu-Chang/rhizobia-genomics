@@ -170,3 +170,42 @@ ggsave(here::here("plots/Fig4.png"), p, width = 12, height = 6)
 
 
 #
+
+if (F) {
+
+tb <- tt$gd %>%
+    filter(!str_detect(gene, "group")) %>%
+    filter(str_detect(gene, "grp|htp|dnaJ|dnaK|groL")) %>%
+    mutate(ge = str_sub(gene, 1, 5) %>% str_remove("\\d$|_$")) %>%
+    mutate(g = str_sub(ge, 1, 3)) %>%
+    select(g, ge, gene, genome_id) %>%
+    left_join(select(iso, genome_id, contig_species))
+
+tb %>%
+    mutate(
+        genome_id = factor(genome_id, rev(get_taxa_name(p1))),
+        contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
+    ) %>%
+    group_by(g, contig_species, genome_id, ge) %>%
+    count() %>%
+    ggplot() +
+    geom_tile(aes(x = ge, y = genome_id, fill = n)) +
+    scale_x_discrete(position = "top", expand = c(0,0)) +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10) +
+    facet_grid2(contig_species ~ g, scales = "free", space = "free") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        axis.text.x = element_text(angle = 45, hjust = 0),
+        axis.title = element_blank(),
+        panel.grid = element_blank(),
+        panel.spacing.y = unit(0, "mm"),
+        legend.position = "right",
+        strip.placement = "outside",
+        strip.text.y = element_blank(),
+        strip.background.x = element_rect(color = NA, fill = "gray90")
+    ) +
+    guides() +
+    labs()
+}

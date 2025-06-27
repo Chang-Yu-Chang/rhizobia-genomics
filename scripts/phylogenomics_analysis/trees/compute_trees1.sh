@@ -12,3 +12,14 @@ iqtree \
     -B 1000 \
     -s $folder_data/phylogenomics_analysis/trees/combined_sccg_alignment.fas \
     --prefix $folder_data/phylogenomics_analysis/trees/combined_sccg/combined_sccg
+
+
+# Symbiosis gene phylogeny
+mamba activate iqtree
+
+mkdir -p $folder_data/phylogenomics_analysis/trees/
+iqtree \
+    -nt AUTO \
+    -B 1000 \
+    -s $folder_data/phylogenomics_analysis/trees/combined_sccg_alignment.fas \
+    --prefix $folder_data/phylogenomics_analysis/trees/genes/
