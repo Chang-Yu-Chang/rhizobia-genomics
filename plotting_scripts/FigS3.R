@@ -162,3 +162,14 @@ ggsave(here::here("plots/FigS3.png"), p, width = 8, height = 6)
 # Fraction of core ----
 tb1$tbp$core[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] / tb1$tbp$total[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] * 100
 tb2$tbp$core[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] / tb2$tbp$total[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] * 100
+
+# Openness ----
+n <- tb1$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
+P <- tb1$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
+model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
+broom::tidy(model)
+
+n <- tb2$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
+P <- tb2$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
+model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
+broom::tidy(model)

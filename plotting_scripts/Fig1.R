@@ -151,7 +151,7 @@ p2 <- dml %>%
         panel.grid.minor.y = element_line(color = "grey90", linewidth = .3)
     ) +
     guides(fill = "none") +
-    labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
+    labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep of 2022")
 
 p2_1 <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
@@ -177,13 +177,13 @@ p2_1 <- dml %>%
         legend.position = "inside",
         legend.position.inside = c(.8, .2),
         legend.background = element_rect(color = "black", fill = "white"),
-        legend.text = element_text(size = 5),
+        legend.text = element_text(size = 7),
         legend.title = element_blank(),
         legend.key.size = unit(3, "mm"),
         plot.background = element_rect(fill = NA, color = NA)
     ) +
     guides() +
-    labs(x = expression("Daily maximum "(degree*C)), y = "Num. of days in Jul-Sep")
+    labs(x = expression("Daily maximum "(degree*C)), y = "")
 
 ## Stat
 xx <- dml %>%
@@ -232,6 +232,7 @@ p3 <- iso %>%
         legend.position = "right",
         legend.title = element_blank(),
         legend.background = element_rect(color = "black", fill = NA),
+        legend.text = element_text(face = "italic"),
         plot.margin = unit(c(0, 12, 0, 15), unit = "mm")
     ) +
     guides(fill = guide_legend(ncol = 1)) +
