@@ -157,3 +157,8 @@ mamba activate cobra
 mamba install -y python=3.11
 mamba install -y -c conda-forge cobra=0.29.1 numpy=1.23.5
 
+# Install cogclassifier 2.0.0
+# Classify prokaryote protein sequences into COG functional category.
+mamba create -n cogclassifier
+mamba activate cogclassifier
+mamba install -y -c bioconda cogclassifier=2.0.0
