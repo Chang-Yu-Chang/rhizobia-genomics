@@ -1,4 +1,4 @@
-#'
+#' Sampling site climates
 
 library(tidyverse)
 library(cowplot)

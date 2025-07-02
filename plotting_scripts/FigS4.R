@@ -1,4 +1,4 @@
-#'
+#' Congruency between core and accessory tree
 
 library(tidyverse)
 library(cowplot)

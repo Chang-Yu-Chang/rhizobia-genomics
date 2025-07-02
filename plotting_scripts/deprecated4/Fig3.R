@@ -2,7 +2,9 @@
 
 library(tidyverse)
 library(cowplot)
-library(ggh4x)
+deprlibrary(ggh4x)
+library(tidytree)
+library(ggtree)
 library(vegan) # for mantel test
 library(lme4) # for lmer
 library(car) # for anova
@@ -10,12 +12,85 @@ library(broom.mixed)
 source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 
+load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 isolates <- select(isolates, -exp_id, -genome_name)
 sites_dist <- read_csv(paste0(folder_data, "phenotypes/sites/sites_dist.csv"))
 iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+tb2 <- read_csv(paste0(folder_data, "phylogenomics_analysis/tree_distance/tb2.csv"))
 
-# Figures ----
+
+# Panel A. core gene ----
+nodes_to_scale <- c(38, 40, 1, 2, 41, 42, 54)
+tr <- tbtr$tr[[1]]
+tr <- root(tr, outgroup = "g2")
+edges_to_scale <- which(tr$edge[,2] %in% nodes_to_scale)
+tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.01
+
+p1 <- tr %>%
+    as_tibble() %>%
+    left_join(rename(iso, label = genome_id)) %>%
+    mutate(` ` = "") %>%
+    mutate(highlight = ifelse(node %in% nodes_to_scale, T, F)) %>%
+    as.treedata() %>%
+    ggtree(layout = "ellipse") +
+    geom_tiplab(aes(label = label, color = contig_species), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    scale_color_manual(values = species_colors) +
+    scale_x_continuous(limits = c(0, 0.0075)) +
+    geom_treescale(x = .001, y = 15) +
+    facet_grid2(~` `) +
+    coord_cartesian(clip = "off") +
+    theme_tree() +
+    theme(
+        legend.title = element_blank(),
+        legend.background = element_rect(color = "black", fill = "white"),
+        legend.position = "inside",
+        legend.position.inside = c(.2, .8),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.margin = unit(c(0,-3,0,0), "mm")
+    ) +
+    guides(color = "none") +
+    labs()
+
+p1_1 <- isolates %>%
+    left_join(select(iso, genome_id, contig_species)) %>%
+    select(genome_id, population, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p1)))) %>%
+    ggplot() +
+    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_manual(values = species_colors, breaks = c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")) +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
+        legend.position = "right",
+        legend.title = element_blank(),
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(1, "mm"),
+        legend.text = element_text(face = "italic"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        strip.clip = "off",
+        panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+        panel.background = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        plot.margin = unit(c(0,0,0,-1), "mm")
+    ) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    labs()
+
+# Panel B.
+
+
+# Panel BC. Dxy ----
 read_gpas <- function (set_name) {
     gpa <- read_csv(paste0(folder_data, "genomics_analysis/species/gene_content/", set_name, "/gpa.csv"))
     gpar <- read_csv(paste0(folder_data, "genomics_analysis/species/gene_content/", set_name, "/gpar.csv"))
@@ -233,174 +308,35 @@ tb <- tibble(
         p_dxy = map(xx_gn, plot_genome_wide_dxy),
         p_dxy_rep = map2(xx_gn, xx_rp, plot_replicon_wide_dxy)
     )
-# ----
-
-# GCV ----
-join_gcv_dists <- function (dd) {
-    # Replicons
-    dd$rep_gcv_dxy %>%
-        left_join(dd$n_acce) %>%
-        left_join(rename_with(isolates, function (x) paste0(x, "1"))) %>%
-        left_join(rename_with(isolates, function (x) paste0(x, "2"))) %>%
-        #pivot_wider(names_from = replicon_type, values_from = gcv_dxy, names_prefix = "gcv_dxy_") %>%
-        left_join(sites_dist) %>%
-        mutate(gcv_dxy_scaled = gcv_dxy/n_accessory) %>%
-        mutate(pops = paste0(population1, "-", population2)) %>%
-        mutate(pops = case_when(
-            pops == "low elevation-high elevation" ~ "high elevation-low elevation",
-            pops == "urban-suburban" ~ "suburban-urban",
-            T ~ pops
-        )) %>%
-        mutate(pops = str_remove_all(pops, " elevation"))
-}
-make_dist_m <- function (xx_gn, dist_name) {
-    #' Pivot the long format of distance to matrix format
-    ml_gn <- xx_gn %>%
-        ungroup() %>%
-        select(genome_id1, genome_id2, {{dist_name}})
-
-    m_gn <- ml_gn %>%
-        bind_rows(rename(ml_gn, genome_id1 = genome_id2, genome_id2 = genome_id1)) %>%
-        mutate(genome_id1 = factor(genome_id1, isolates$genome_id), genome_id2 = factor(genome_id2, isolates$genome_id)) %>%
-        arrange(genome_id1, genome_id2) %>%
-        pivot_wider(names_from = genome_id2, values_from = {{dist_name}}) %>%
-        column_to_rownames(var = "genome_id1") %>%
-        select(rownames(.)[1], everything()) %>%
-        as.matrix
-
-    diag(m_gn) <- 0
-    return(m_gn)
-}
-make_genome_wide_gcv_dxy <- function (dists) {
-    dists %>%
-        group_by(pops, genome_id1, genome_id2) %>%
-        summarize(gcv_dxy_scaled = sum(gcv_dxy_scaled))
-}
-do_mantel <- function (data, genetic_d) {
-    m1 <- make_dist_m(data, dist_geo_km) # geo distance
-    m2 <- make_dist_m(data, {{genetic_d}}) # genetic distance
-    model <- mantel(m1, m2)
-    return(tibble(r_squared = model$statistic, p_value = model$signif))
-}
-clean_pop_names <- function (tb) {
-    tb %>%
-        mutate(pops = paste0(population1, "-", population2)) %>%
-        mutate(pops = case_when(
-            pops == "low elevation-high elevation" ~ "high elevation-low elevation",
-            pops == "urban-suburban" ~ "suburban-urban",
-            T ~ pops
-        )) %>%
-        mutate(pops = str_remove_all(pops, " elevation"))
-}
-plot_replicon_gcv_dxy <- function (dists) {
-    mantel_results <- dists %>%
-        group_by(replicon_type) %>%
-        nest() %>%
-        mutate(
-            mod = map(data, ~do_mantel(.x, gcv_dxy_scaled))
-            # r_squared = map_dbl(mod, ~.x$statistic),
-            # ast = map_chr(mod, ~turn_p_to_asteriks(.x$signif))
-            # model = map(data, ~lm(dxy_scaled ~ dist_geo_km, data = .x)),
-            # r_squared = map_dbl(model, ~ summary(.x)$r.squared),
-            # p_value = map_dbl(model, ~ summary(.x)$coefficients[2, 4]),
-            # ast = map_chr(p_value, ~ turn_p_to_asteriks(.x))
-        ) %>%
-        unnest(mod) %>%
-        mutate(ast = map_chr(p_value, turn_p_to_asteriks)) %>%
-        left_join(distinct(dists, replicon_type, n_accessory)) %>%
-        mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce")))
-
-
-    dists %>%
-        mutate(replicon_type = factor(replicon_type, c("chromosome", "pSymA", "pSymB", "pAcce"))) %>%
-        clean_pop_names() %>%
-        ggplot() +
-        geom_smooth(aes(x = dist_geo_km, y = gcv_dxy_scaled), method = "lm", se = F, color = "black") +
-        geom_point(aes(x = dist_geo_km, y = gcv_dxy_scaled, color = pops), shape = 21, size = 2, stroke = 1) +
-        scale_color_manual(values = pops_colors) +
-        geom_text(data = mantel_results, aes(label = paste(n_accessory, "genes, r² =", round(r_squared, 3), ast)), x = -Inf, y = Inf, hjust = -.1, vjust = 1.5, size = 3, color = "black") +
-        facet_grid2(~replicon_type) +
-        theme_classic() +
-        coord_cartesian(clip = "off") +
-        theme(
-            legend.position = "right",
-            legend.title = element_blank(),
-            panel.border = element_rect(color = "black", fill = NA),
-            strip.background = element_blank(),
-            plot.title = element_text(size = 8),
-            plot.background = element_blank()
-        ) +
-        guides() +
-        labs(x = "Geographic distance (km)", y = "GCV Dxy")
-    #ggtitle(paste(n_accessory, " accessory genes", ", r² =", round(r_squared, 3), ast))
-}
-
-
-tbg <- tibble(set_name = c("elev_med", "urbn_mel")) %>%
-    mutate(
-        tt = map(set_name, read_gpas),
-        dd = map(set_name, read_gcv_dxys),
-        dists = map(dd, ~join_gcv_dists(.x) %>% filter(replicon_type != "pAcce")),
-        xx_gn = map(dists, ~make_genome_wide_gcv_dxy(.x)),
-        p = map(dists, plot_replicon_gcv_dxy)
-    )
-
 
 # ----
-# p_right <- plot_grid(
-#     tb$p_dxy_rep[[2]], # meliloti dxy
-#     tb$p_dxy_rep[[1]], # medicae dxy
-#     nrow = 2, rel_widths = c(1,3), align = "h", axis = "tb",
-#     labels = LETTERS[2:5]
-# )
-#
-# p <- plot_grid(
-#     plot_grid(p1, labels = "A"), p1_1 + guides(fill = "none"),
-#     p_right,
-#     #p2_1 + guides(fill = "none"), p2,
-#     nrow = 1,
-#     scale = .9, rel_widths = c(1,.1, 1.5)
-#     #align = "h", axis = "tb",
-# ) +
-#     #draw_text("Single-copy core gene", x = .27, y = .95, size = 10, hjust = 0) +
-#     #draw_text("Gene content variation", x = .6, y = .95, size = 10, hjust = 0) +
-#     #draw_label("C", x = .79, y = .95, fontface = "bold") +
-#     draw_plot(get_legend(p1_1), x = -.4, y = .25) +
-#     #draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
-#     theme(plot.background = element_rect(color = NA, fill = "white"))
-theme_consist <- function () {
-    theme(
-        axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        legend.position = "inside",
-        legend.position.inside = c(.02, .65),
-        legend.justification.inside = "left",
-        legend.text = element_text(size = 8),
-        legend.background = element_rect(color = "black", fill = "snow", linewidth = .3),
-        legend.box.margin = margin(0,,0,0, "mm"),
-        legend.margin = margin(0,1,0,0, "mm"),
-        legend.key = element_blank()
-    )
-}
-p_combined <- plot_grid(
-    tb$p_dxy_rep[[1]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) ,
-    tb$p_dxy_rep[[2]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02),
-    tbg$p[[1]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7),
-    tbg$p[[2]] + xlim(0, 17) + ylim(0, .7) + theme(legend.position = "none"),
-    scale = 0.95, ncol = 1, align = "hv", axis = "trl",
-    rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4], label_x = .05
+p_right <- plot_grid(
+    tb$p_dxy_rep[[2]], # meliloti
+    tb$p_dxy_rep[[1]], # medicae
+    nrow = 2, rel_widths = c(1,3), align = "h", axis = "tb",
+    labels = LETTERS[2:5]
 )
 
-p <- ggdraw() +
-    draw_image(here::here("plots/cartoons/Fig4.png"), scale = 1) +
-    draw_plot(p_combined, x = .05, width = .95) +
-    theme(plot.background = element_rect(fill = "white", color = NA))
+p <- plot_grid(
+    plot_grid(p1, labels = "A"), p1_1 + guides(fill = "none"),
+    p_right,
+    #p2_1 + guides(fill = "none"), p2,
+    nrow = 1,
+    scale = .9, rel_widths = c(1,.1, 1.5)
+    #align = "h", axis = "tb",
+) +
+    #draw_text("Single-copy core gene", x = .27, y = .95, size = 10, hjust = 0) +
+    #draw_text("Gene content variation", x = .6, y = .95, size = 10, hjust = 0) +
+    #draw_label("C", x = .79, y = .95, fontface = "bold") +
+    draw_plot(get_legend(p1_1), x = -.4, y = .25) +
+    #draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
 
 ggsave(here::here("plots/Fig4.png"), p, width = 12, height = 6)
 
 
-# Stat ----
+#
 tt <- read_gpas()
 nrow(tt$gpa) # 26544
 

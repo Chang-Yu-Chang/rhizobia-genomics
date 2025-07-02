@@ -1,4 +1,4 @@
-#' This script plots the growth traits
+#' Growth traits
 
 library(tidyverse)
 library(cowplot)
@@ -71,7 +71,9 @@ gtwlm <- gtsl %>%
     mutate(max_mean_value = max(mean_value, na.rm = T)) %>%
     replace_na(list(ci_value = 0)) %>%
     filter(trait %in% c("r", "lag", "maxOD")) %>%
-    mutate(trait = factor(case_when(
+    mutate(
+        temperature = factor(str_remove(temperature, "c"), c(25, 30, 35, 40)),
+        trait = factor(case_when(
         trait == "r" ~ "growth rate (1/hr)",
         trait == "lag" ~ "lag time (hr)",
         trait == "loglag" ~ "lag time (-log(hr))",
@@ -80,7 +82,9 @@ gtwlm <- gtsl %>%
 
 p2 <- gtsl %>%
     filter(trait %in% c("r", "lag", "maxOD")) %>%
-    mutate(trait = factor(case_when(
+    mutate(
+        temperature = factor(str_remove(temperature, "c"), c(25, 30, 35, 40)),
+        trait = factor(case_when(
         trait == "r" ~ "growth rate (1/hr)",
         trait == "lag" ~ "lag time (hr)",
         trait == "loglag" ~ "lag time (-log(hr))",

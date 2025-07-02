@@ -14,8 +14,7 @@ ft <- iso %>%
     set_header_labels(
         `...1` = "",
         exp_id = "Strain",
-        #gradient = "Gradient",
-        population = "Population",
+        population = "Region",
         genome_id = "Genome ID",
         contig_species = "Species", rrna_species = "Species",
         rrna_pident = "Identity (%)", contig_pident = "Identity (%)",
@@ -31,7 +30,7 @@ ft <- iso %>%
     align(align = "center", part = "all") %>%
     autofit() %>%
     # Lines and background
-    hline(i = c(6,15,27), j = 2:10) %>%
+    hline(i = 15, j = 2:10) %>%
     bg(bg = "white", part = "all") %>%
     bg(bg = "grey90", i = seq(1, nrow_part(.), 2), j = 3:10) %>%
     fix_border_issues()

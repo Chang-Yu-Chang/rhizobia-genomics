@@ -1,4 +1,4 @@
-#
+#' Symbiosis assay
 
 library(tidyverse)
 library(cowplot)
@@ -112,7 +112,7 @@ p <- plot_grid(
 ) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig5.png"), p, width = 6, height = 3)
+ggsave(here::here("plots/FigS5.png"), p, width = 6, height = 3)
 
 # STat ----
 ## Do species differ in nodules by whether they are symbiotic

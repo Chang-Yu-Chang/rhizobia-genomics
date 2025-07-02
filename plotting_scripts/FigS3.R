@@ -1,5 +1,4 @@
-#' This script plots the pangenome composition: gene frequency spectrum and sampling regime
-#' Within species
+#' pangenome composition within species: gene frequency spectrum and sampling regime
 
 library(tidyverse)
 library(cowplot)
