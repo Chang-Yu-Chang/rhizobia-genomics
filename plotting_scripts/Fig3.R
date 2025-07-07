@@ -153,7 +153,7 @@ tb <- tt$gd %>%
     #filter(!str_detect(gene, "group")) %>%
     #filter(str_detect(gene, "nod|nif|fix|noe|exo|nol|fdx")) %>%
     filter(str_detect(gene, "dna|grp|gro|rpo|clp|rec|uvr")) %>%
-    mutate(ge = str_sub(gene, 1, 5) %>% str_remove("\\d$|_$")) %>%
+    mutate(ge = str_sub(gene, 1, 5) %>% str_remove("_\\d$|_$")) %>%
     mutate(g = str_sub(ge, 1, 3)) %>%
     select(g, ge, gene, genome_id) %>%
     left_join(select(iso, genome_id, contig_species))
