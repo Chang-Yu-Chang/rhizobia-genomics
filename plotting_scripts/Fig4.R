@@ -360,14 +360,14 @@ theme_consist <- function () {
         # legend.box.margin = margin(0,1,0,0, "mm"),
         # legend.margin = margin(0,1,0,0, "mm"),
         legend.key = element_blank(),
-        plot.title = element_text(size = 15, face = "italic")
+        plot.title = element_text(size = 13, face = "italic")
     )
 }
 p_combined <- plot_grid(
-    tb$p_dxy_rep[[2]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) + ggtitle("S. meliloti"),
-    tb$p_dxy_rep[[1]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) + ggtitle("S. medicae"),
-    tbg$p[[2]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7) + ggtitle("S. meliloti"),
-    tbg$p[[1]] + xlim(0, 17) + ylim(0, .7) + theme(legend.position = "none", plot.title = element_text(size = 15, face = "italic")) + ggtitle("S. medicae"),
+    tb$p_dxy_rep[[2]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) + ggtitle("S. meliloti in Pennsylvania"),
+    tb$p_dxy_rep[[1]] + theme_consist() + xlim(0, 17) + ylim(0, 0.02) + ggtitle("S. medicae in Virginia"),
+    tbg$p[[2]] + theme_consist() + theme(legend.position = "none") + xlim(0, 17) + ylim(0, .7) + ggtitle("S. meliloti in Pennsylvania"),
+    tbg$p[[1]] + xlim(0, 17) + ylim(0, .7) + theme(legend.position = "none", plot.title = element_text(size = 13, face = "italic")) + ggtitle("S. medicae in Virginia"),
     scale = 0.95, ncol = 1, align = "hv", axis = "trl",
     rel_heights = c(1,1,1,1.2), labels = LETTERS[1:4], label_x = .05
 )

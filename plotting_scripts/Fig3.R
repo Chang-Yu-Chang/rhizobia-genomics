@@ -11,8 +11,10 @@ library(car)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
 tt <- read_gpas()
 
 
@@ -80,7 +82,6 @@ p2_1 <- isolates %>%
         legend.title = element_blank(),
         legend.key.size = unit(3, "mm"),
         legend.direction = "horizontal",
-        # legend.key.spacing.y = unit(1, "mm"),
         legend.text = element_text(face = "italic", size = 8),
         strip.background = element_blank(),
         strip.text = element_text(size = 10),
@@ -91,7 +92,7 @@ p2_1 <- isolates %>%
         axis.title = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
-        #plot.margin = unit(c(0,0,0,-1), "mm")
+        axis.text.x = element_text(angle = 45, hjust = 0)
     ) +
     guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
     labs()
@@ -124,7 +125,6 @@ p3 <- tb %>%
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
-        #axis.text.x = element_text(angle = 45, hjust = 0),
         axis.text.x = element_blank(),
         axis.title = element_blank(),
         axis.ticks.x = element_blank(),
@@ -133,7 +133,8 @@ p3 <- tb %>%
         legend.position = "right",
         strip.placement = "outside",
         strip.text.y = element_blank(),
-        strip.background.x = element_rect(color = NA, fill = "gray90")
+        strip.background.x = element_rect(color = NA, fill = "gray90"),
+        plot.background = element_blank()
     ) +
     guides() +
     labs()
@@ -169,24 +170,19 @@ p4 <- tb %>%
     geom_tile(aes(x = ge, y = genome_id, fill = n)) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10) +
+    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10, name = "copy number") +
     facet_grid(contig_species ~ g, scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
-        #axis.text.x = element_text(angle = 45, hjust = 0),
-        #axis.text.x = element_blank(),
         axis.text.x = element_text(angle = 45, hjust = 0, size = 8),
         axis.title = element_blank(),
-        #axis.ticks.x = element_blank(),
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
         legend.position = "bottom",
         strip.placement = "outside",
         strip.clip = "off",
-        #strip.text.x = element_text(angle = 45, vjust = 0),
         strip.text.y = element_blank(),
-        #strip.background = element_blank(),
         strip.background.x = element_rect(color = NA, fill = "gray90")
     ) +
     guides() +

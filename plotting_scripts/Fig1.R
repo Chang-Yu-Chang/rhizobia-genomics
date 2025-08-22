@@ -17,17 +17,21 @@ library(waffle)     # for waffle plots
 source(here::here("metadata.R"))
 
 # Read data ----
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
 iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
+    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens"))) %>%
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
 sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
     # Use sites where the isolates were from
-    filter(site %in% isolates$site)
-dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) # daily max t at sampling sites
+    filter(site %in% isolates$site) %>%
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) %>% # daily max t at sampling sites
+    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
 tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv")) # month by day
 us_states <- states() # us state map
 map_range <- read_csv(paste0(folder_phenotypes, "sites/map_range.csv")) %>%
-    mutate(population = rep(c("PA", "VA"), each = 31*41))
+    mutate(population = rep(c("Pennsylvania", "Virginia"), each = 31*41))
 dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>% # Daily max in the map region
     left_join(map_range)
 
@@ -41,7 +45,7 @@ sites_center <- sites %>%
     mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
 
 p1 <- us_states %>%
-    filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
+    filter(STUSPS %in% c("NY", "Virginia", "WV", "Pennsylvania", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
     ggplot() +
     geom_sf(fill = NA, color = "grey10", linewidth = .5) +
     geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("#FFC857", 0.5), linewidth = 0.5) +
@@ -105,21 +109,21 @@ plot_temp_map <- function (dcl, sites) {
         labs(x = "Longitude", y = "Latitude")
 }
 p1_1 <- dcl %>%
-    filter(population == "VA") %>%
+    filter(population == "Virginia") %>%
     filter(latitude > 37.2) %>%
-    plot_temp_map(filter(sites, population == "VA")) +
-    labs(title = "VA")
+    plot_temp_map(filter(sites, population == "Virginia")) +
+    labs(title = "Virginia")
 p1_2 <- dcl %>%
-    filter(population == "PA") %>%
+    filter(population == "Pennsylvania") %>%
     filter(latitude > 39.8) %>%
-    plot_temp_map(filter(sites, population == "PA")) +
-    labs(title = "PA")
+    plot_temp_map(filter(sites, population == "Pennsylvania")) +
+    labs(title = "Pennsylvania")
 
 
 # Panel B. site temperature ----
 tb_tmax <- dml %>%
     mutate(
-        population = factor(population, c("VA", "PA")),
+        population = factor(population, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
     filter(site %in% isolates$site) %>%
@@ -130,7 +134,7 @@ tb_tmax <- dml %>%
 p2 <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
     mutate(
-        population = factor(population, c("VA", "PA")),
+        population = factor(population, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
     drop_na(site) %>%
@@ -156,13 +160,13 @@ p2 <- dml %>%
 p2_1 <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
     mutate(
-        population = factor(population, c("VA", "PA")),
+        population = factor(population, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
     drop_na(site) %>%
     ggplot() +
     geom_histogram(aes(x = tmax_deg_c, fill = population), position = "identity", alpha = .6, color = "black", binwidth = 1) +
-    scale_fill_manual(values = c(VA = "steelblue", PA = "#db7272")) +
+    scale_fill_manual(values = c(Virginia = "steelblue", Pennsylvania = "#db7272")) +
     scale_y_continuous(breaks = seq(0, 150, 20)) +
     scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
     coord_flip(clip = "off") +
@@ -189,7 +193,7 @@ p2_1 <- dml %>%
 xx <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
     mutate(
-        population = factor(population, c("VA", "PA")),
+        population = factor(population, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
     drop_na(site) %>%
@@ -209,7 +213,7 @@ p3 <- iso %>%
     left_join(select(isolates, population, site, genome_id)) %>%
     select(population, contig_species, site) %>%
     mutate(
-        population = factor(population, c("VA", "PA")),
+        population = factor(population, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
     group_by(population, site, contig_species) %>%
