@@ -111,3 +111,36 @@ p <- plot_grid(
 ) + theme(plot.background = element_rect(fill = "white", color = NA))
 
 ggsave(here::here("plots/FigS3.png"), p, width = 6, height = 6)
+
+# Number of core genes within symbiotic and within nonsymbiotic clades ----
+tt <- read_gpas()
+nrow(tt$gpa) # 26544
+
+tb2 <- tt$gpatl %>%
+    filter(value == 1) %>%
+    left_join(select(iso, genome_id, contig_species)) %>%
+    mutate(symb = case_when(
+        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
+        T ~ "non-symbiotic"
+    ))
+
+##
+xx <- tb2 %>%
+    filter(symb == "symbiotic") %>%
+    group_by(gene) %>%
+    count
+sum(xx$n == 35) # 3767 core genes
+nrow(xx) # 16166 total genes
+sum(xx$n == 35)/nrow(xx) * 100 # 23.3%
+
+
+##
+xx <- tb2 %>%
+    filter(symb == "non-symbiotic") %>%
+    group_by(gene) %>%
+    count
+sum(xx$n == 3) # 2855 core genes
+nrow(xx) # 11509 total genes
+sum(xx$n == 3)/nrow(xx) * 100 # 24.8%
+
+

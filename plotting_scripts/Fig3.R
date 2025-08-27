@@ -49,7 +49,6 @@ p2 <- tbtr$tr[[2]] %>%
     ggtree(layout = "ellipse") +
     geom_tiplab(aes(label = label, color = contig_species), hjust = 0, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
     geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
-    #scale_x_continuous(limits = c(0, 100)) +
     scale_color_manual(values = species_colors) +
     geom_treescale(x = 4, y = 25) +
     coord_cartesian(clip = "off") +
@@ -151,8 +150,6 @@ p3 <- tb %>%
 
 # Panel D. functional genes -----
 tb <- tt$gd %>%
-    #filter(!str_detect(gene, "group")) %>%
-    #filter(str_detect(gene, "nod|nif|fix|noe|exo|nol|fdx")) %>%
     filter(str_detect(gene, "dna|grp|gro|rpo|clp|rec|uvr")) %>%
     mutate(ge = str_sub(gene, 1, 5) %>% str_remove("_\\d$|_$")) %>%
     mutate(g = str_sub(ge, 1, 3)) %>%
@@ -205,29 +202,11 @@ p <- plot_grid(
 
 ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 6)
 
-
-# Difference in heat relevant gene compostiion ?----
-library(vegan)
+# PERMANOVA. Difference in heat relevant gene composition ?----
 tbm <- tb %>%
     filter(contig_species %in% c("S. meliloti", "S. medicae")) %>%
     group_by(contig_species, genome_id, ge) %>%
     count() %>%
-    #mutate(value = 1) %>%
     pivot_wider(names_from = ge, values_from = n, values_fill = 0)
 dm <- vegdist(tbm[,-c(1,2)], method = "bray")
-#dm <- vegdist(tbm[,-c(1,2)], method = "jaccard")
-mod <- adonis2(dm ~ contig_species, data = tbm, permutations = 999)
-
-library(randomForest)
-rf <- randomForest(
-    x = tbm[,-c(1,2)],
-    y = as.factor(tbm$contig_species),
-    importance = TRUE,
-    ntree = 500
-)
-
-importance(rf) %>%
-    as_tibble() %>%
-    mutate(ge = rownames(importance(rf))) %>%
-    mutate(percentage = MeanDecreaseGini / sum(MeanDecreaseGini)* 100) %>%
-    arrange(desc(MeanDecreaseGini))
+adonis2(dm ~ contig_species, data = tbm, permutations = 999)

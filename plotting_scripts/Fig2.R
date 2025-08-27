@@ -63,8 +63,43 @@ p1 <- gcl_smooth %>% # Compute mean
 
 
 # Panel B growth traits ----
+make_stars <- function(p) case_when(
+    p < 0.001 ~ "***",
+    p < 0.01  ~ "**",
+    p < 0.05  ~ "*",
+    TRUE      ~ "n.s."
+)
+get_trait_posthoc <- function(df, trait_name) {
+    dat <- df %>% filter(trait == trait_name)
+
+    # --- (1) LMM: Symbiotic vs Non-symbiotic ---
+    mod1 <- lmer(value ~ symb * temperature + (1|contig_species), data = dat)
+    emm1 <- emmeans(mod1, ~ symb | temperature)
+    res1 <- as.data.frame(pairs(emm1)) %>%
+        mutate(
+            trait = trait_name,
+            comp_type = "Sym vs NonS",
+            sig = make_stars(p.value)
+        )
+
+    # --- (2) LM: meliloti vs medicae ---
+    dat_symb <- dat %>% filter(contig_species %in% c("S. meliloti","S. medicae"))
+    mod2 <- lm(value ~ contig_species * temperature, data = dat_symb)
+    emm2 <- emmeans(mod2, ~ contig_species | temperature)
+    res2 <- as.data.frame(pairs(emm2)) %>%
+        mutate(
+            trait = trait_name,
+            comp_type = "mel vs med",
+            sig = make_stars(p.value)
+        )
+
+    bind_rows(res1, res2)
+}
+
+traits <- c("r","lag","maxOD")
+posthoc_all <- map_dfr(traits, ~ get_trait_posthoc(gtsl, .x))
+
 gtwlm <- gtsl %>%
-    #filter(value > 0) %>%
     group_by(temperature, contig_species, trait) %>%
     summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value))) %>%
     group_by(temperature, trait) %>%
@@ -74,11 +109,33 @@ gtwlm <- gtsl %>%
     mutate(
         temperature = factor(str_remove(temperature, "c"), c(25, 30, 35, 40)),
         trait = factor(case_when(
-        trait == "r" ~ "growth rate (1/hr)",
-        trait == "lag" ~ "lag time (hr)",
-        trait == "loglag" ~ "lag time (-log(hr))",
-        trait == "maxOD" ~ "yield (O.D.[600nm])"
-    ), c("growth rate (1/hr)", "lag time (hr)", "yield (O.D.[600nm])")))
+            trait == "r" ~ "growth rate (1/hr)",
+            trait == "lag" ~ "lag time (hr)",
+            trait == "loglag" ~ "lag time (-log(hr))",
+            trait == "maxOD" ~ "yield (O.D.[600nm])"
+        ), c("growth rate (1/hr)", "lag time (hr)", "yield (O.D.[600nm])"))
+    )
+
+# Asterisk
+anno <- posthoc_all %>%
+    left_join(
+        gtwlm %>%
+            group_by(trait, temperature) %>%
+            summarise(y_base = max(mean_value + ci_value, na.rm = TRUE), .groups="drop"),
+        by = c("trait","temperature")
+    ) %>%
+    mutate(
+        temperature = factor(str_remove(temperature, "c"), c(25, 30, 35, 40)),
+        trait = factor(case_when(
+            trait == "r" ~ "growth rate (1/hr)",
+            trait == "lag" ~ "lag time (hr)",
+            trait == "loglag" ~ "lag time (-log(hr))",
+            trait == "maxOD" ~ "yield (O.D.[600nm])"
+        ), c("growth rate (1/hr)", "lag time (hr)", "yield (O.D.[600nm])"))
+    ) %>%
+    select(temperature, trait, comp_type, sig)
+
+
 
 p2 <- gtsl %>%
     filter(trait %in% c("r", "lag", "maxOD")) %>%
@@ -122,15 +179,37 @@ p2 <- gtsl %>%
     guides(fill = guide_legend(override.aes = list(color = NA), nrow = 2, direction = "vertical")) +
     labs(x = expression(paste("Temperature (", degree, "C)")))
 
+# posthoc comparison
+p2_1 <- anno %>%
+    ggplot() +
+    geom_tile(aes(x = temperature, y = comp_type), color = "gray80", fill = NA, linewidth = .5) +
+    geom_text(aes(x = temperature, y = comp_type, label = sig), inherit.aes = FALSE, size = 4) +
+    scale_x_discrete(expand = c(0,0)) +
+    scale_y_discrete(expand = c(0,0)) +
+    facet_wrap2(~trait, nrow = 1, strip.position = "left") +
+    coord_cartesian(clip = "off") +
+    theme_bw() +
+    theme(
+        strip.background = element_blank(),
+        strip.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.title = element_blank(),
+        panel.spacing.x = unit(15, "mm"),
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(0,0,0,0), "mm")
+    ) +
+    guides() +
+    labs()
 
 # ----
 p <- plot_grid(
-    p1, p2,
+    p1, NULL, p2_1, p2,
     ncol = 1, align = "v", axis = "lr",
-    labels = c("A", "B"), scale = .95
+    labels = c("A", "", "B", ""), scale = .95, rel_heights = c(1, .1, .2, 1), label_y = c(1,1,1.3,1)
 ) + theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 6)
+ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 7)
 
 
 # Stat ----
