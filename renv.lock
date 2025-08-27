@@ -3020,6 +3020,17 @@
       ],
       "Hash": "0595fe5e47357111f29ad19101c7d271"
     },
+    "randomForest": {
+      "Package": "randomForest",
+      "Version": "4.7-1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "stats"
+      ],
+      "Hash": "72e840ba2949bbeb517f7a1ae04cf56c"
+    },
     "rappdirs": {
       "Package": "rappdirs",
       "Version": "0.3.3",
