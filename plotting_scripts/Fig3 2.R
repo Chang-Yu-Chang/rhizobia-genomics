@@ -138,22 +138,16 @@ p2_2 <- isolates %>%
     select(genome_id, site, contig_species) %>%
     mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
     ggplot() +
-    geom_tile(aes(x = "Site", y = genome_id), color = "black", fill = NA, linewidth = .5) +
-    geom_text(aes(x = "Site", y = genome_id, label = site), size = 3) +
+    geom_tile(aes(x = 1, y = genome_id), color = "black", fill = NA, linewidth = .5) +
+    geom_text(aes(x = 1, y = genome_id, label = site), size = 3) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
     coord_cartesian(clip = "off") +
-    theme_minimal() +
-    theme(
-        axis.title = element_blank(),
-        axis.text.x = element_text(size = 8),
-        axis.text.y = element_blank(),
-        plot.margin = unit(c(0,0,0,0), "mm"),
-        panel.grid = element_blank()
-    ) +
+    theme_void() +
+    theme(axis.title.x = element_text(size = 8)) +
     guides() +
-    labs()
-
+    labs(x = "Site")
+p2_2
 # Panel C. tree distance ----
 tb_obv <- tb2 %>%
     select(-rfds) %>%
@@ -213,7 +207,7 @@ p <- plot_grid(
     labels = c("A", "", "", "B")
 ) +
     draw_text("Single-copy core gene", x = .2, y = .95, size = 10, hjust = 0) +
-    draw_text("Gene content variation", x = .63, y = .95, size = 10, hjust = 0) +
+    draw_text("Gene content variation", x = .65, y = .95, size = 10, hjust = 0) +
     draw_label("C", x = .79, y = .95, fontface = "bold") +
     draw_plot(get_legend(p1_1), x = -.4, y = .25) +
     draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +

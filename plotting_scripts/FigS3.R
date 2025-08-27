@@ -1,4 +1,4 @@
-#' pangenome composition within species: gene frequency spectrum and sampling regime
+#' Pangenome composition: gene frequency spectrum and sampling regime
 
 library(tidyverse)
 library(cowplot)
@@ -6,73 +6,36 @@ library(ggsci)
 source(here::here("metadata.R"))
 
 iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+
+# Panel A. Gene frequency spectrum ----
 tt <- read_gpas()
-gpatls <- tt$gpatl %>% left_join(select(iso, genome_id, contig_species))
-compute_gfs <- function (gpatls) {
-    gpatls %>%
-        filter(value == 1) %>%
-        group_by(gene) %>%
-        count(name = "ngenomes") %>%
-        group_by(ngenomes) %>%
-        count() %>%
-        mutate(n = n/1000)
-}
-count_genes <- function (gpatls) {
-    gg <- gpatls %>%
-        filter(value == 1) %>%
-        group_by(gene) %>%
-        count() %>%
-        ungroup() %>%
-        pull(n) %>%
-        table()
-    return(c(singleton = gg[[1]], core = last(gg), single_core = nrow(tt$list_sccg), total = sum(gg)))
-}
-plot_gfs <- function (gfs) {
-    gfs %>%
-        ggplot() +
-        geom_hline(yintercept = 0) +
-        geom_col(aes(x = ngenomes, y = n), fill = "white", color = "black", width = .8) +
-        scale_x_continuous(breaks = seq(0, 40, 5)) +
-        scale_y_continuous(breaks = c(0:10), limits = c(0, 6)) +
-        coord_cartesian(clip = "off") +
-        theme_classic() +
-        theme(
-            panel.border = element_rect(color = "black", fill = NA),
-            panel.grid.major.y = element_line(color = "grey90")
-        ) +
-        guides() +
-        labs(x = "Number of genomes", y = "Number of genes (k)")
 
-}
+p1 <- tt$gpatl %>%
+    filter(value == 1) %>%
+    group_by(gene) %>%
+    count(name = "ngenomes") %>%
+    group_by(ngenomes) %>%
+    count() %>%
+    mutate(n = n/1000) %>%
+    ggplot() +
+    geom_hline(yintercept = 0) +
+    geom_col(aes(x = ngenomes, y = n), fill = "white", color = "black", width = .8) +
+    scale_x_continuous(breaks = seq(0, 40, 5)) +
+    scale_y_continuous(breaks = c(0:10), limits = c(0, 9)) +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major.y = element_line(color = "grey90")
+    ) +
+    guides() +
+    labs(x = "Number of genomes", y = "Number of genes (k)")
 
+# Number of core genes
+gg <- table(apply(tt$gpa[,-1], 1, sum))
+c(singleton = gg[[1]], core = last(gg), single_core = nrow(tt$list_sccg), total = sum(gg)) # 8875         987         775       26544
 
-# Gene frequency spectrum  ----
-# meliloti
-p1_1 <- gpatls %>%
-    filter(contig_species == "S. meliloti") %>%
-    compute_gfs() %>%
-    plot_gfs() +
-    labs(title = "S. meliloti")
-
-##
-gpatls %>%
-    filter(contig_species == "S. meliloti") %>%
-    count_genes()
-
-# medicae
-p1_2 <- gpatls %>%
-    filter(contig_species == "S. medicae") %>%
-    compute_gfs() %>%
-    plot_gfs() +
-    labs(title = "S. medicae")
-
-##
-gpatls %>%
-    filter(contig_species == "S. medicae") %>%
-    count_genes()
-
-
-# core vs accessory sampling ----
+# Panel B. core vs accessory sampling ----
 compute_pan <- function (mi) {
     # Single genome
     if(!is.matrix(mi)) return(tibble(core = sum(mi), total = sum(mi)))
@@ -85,10 +48,10 @@ compute_pan <- function (mi) {
         tibble(core = last(tng)[1], total = sum(tng))
     }
 }
-do_sampling <- function (gpa, n_boots = 100) {
-    #tt <- read_gpas()
-    m <- t(gpa[,-1])
-    tb <- crossing(ngenome = 1:ncol(gpa[,-1]), boot = 1:n_boots) # Each sample of ngenome is repeated 100 times
+do_sampling <- function (n_boots = 100) {
+    tt <- read_gpas()
+    m <- t(tt$gpa[,-1])
+    tb <- crossing(ngenome = 1:ncol(tt$gpa[,-1]), boot = 1:n_boots) # Each sample of ngenome is repeated 100 times
     tb$pan <- NA
 
     for (i in 1:nrow(tb)) {
@@ -119,14 +82,14 @@ plot_sampling <- function (tbp, tbpr) {
         geom_ribbon(data = tbpr, aes(x = ngenome, ymin = `0%`, ymax = `100%`, fill = name), inherit.aes = FALSE, alpha = 0.3) +
         scale_linetype_manual(values = c("0%" = 1, "5%" = 2, "50%" = 3, "95%" = 2, "100%" = 1)) +
         scale_x_continuous(breaks = seq(0, 40, 5)) +
-        scale_y_continuous(breaks = seq(0, 30, 2), limits = c(4, 12)) +
+        scale_y_continuous(breaks = seq(0, 30, 5), limits = c(0, 27)) +
         scale_color_aaas() +
         scale_fill_aaas() +
         coord_cartesian(clip = "off") +
         theme_classic() +
         theme(
             legend.title = element_blank(),
-            legend.position = "top",
+            legend.position = "right",
             legend.margin = margin(0,0,0,0, "mm"),
             legend.box.margin = margin(0,0,0,0, "mm"),
             legend.background = element_rect(color = NA, fill = NA),
@@ -138,37 +101,13 @@ plot_sampling <- function (tbp, tbpr) {
         labs(x = "Number of genomes", y = "Number of genes (k)")
 }
 
-tb1 <- tt$gpa %>%
-    select(gene, matches(paste0(iso$genome_id[iso$contig_species == "S. meliloti"], "$"))) %>%
-    do_sampling(n_boots = 100)
-p2_1 <- plot_sampling(tb1$tbp, tb1$tbpr)
-
-tb2 <- tt$gpa %>%
-    select(gene, matches(paste0(iso$genome_id[iso$contig_species == "S. medicae"], "$"))) %>%
-    do_sampling(n_boots = 100)
-p2_2 <- plot_sampling(tb2$tbp, tb2$tbpr)
-
+tb <- do_sampling()
+p2 <- plot_sampling(tb$tbp, tb$tbpr)
 
 p <- plot_grid(
-    p1_1, p1_2, p2_1, p2_2 + theme(legend.position = "none"),
-    nrow = 2, axis = "lrtb", align = "vh", scale = 0.9,
-    labels = LETTERS[1:4], rel_widths = c(22,15)
+    p1, p2,
+    nrow = 2, axis = "lr", align = "v", scale = 0.9,
+    labels = LETTERS[1:2]
 ) + theme(plot.background = element_rect(fill = "white", color = NA))
 
-ggsave(here::here("plots/FigS3.png"), p, width = 8, height = 6)
-
-
-# Fraction of core ----
-tb1$tbp$core[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] / tb1$tbp$total[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] * 100
-tb2$tbp$core[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] / tb2$tbp$total[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] * 100
-
-# Openness ----
-n <- tb1$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
-P <- tb1$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
-model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
-broom::tidy(model)
-
-n <- tb2$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
-P <- tb2$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
-model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
-broom::tidy(model)
+ggsave(here::here("plots/FigS3.png"), p, width = 6, height = 6)

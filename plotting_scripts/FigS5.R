@@ -1,149 +1,176 @@
-#' Symbiosis assay
+#' pangenome composition within species: gene frequency spectrum and sampling regime
 
 library(tidyverse)
 library(cowplot)
-library(ggh4x)
-library(lme4)
-library(glmmTMB)
-library(car)
-library(emmeans)
+library(ggsci)
 source(here::here("metadata.R"))
-set.seed(42)
 
 iso <- read_csv(paste0(folder_data, "output/iso.csv"))
-plants <- read_csv(paste0(folder_phenotypes, "plants/plants.csv")) %>%
-    left_join(select(iso, exp_id, contig_species)) %>%
-    filter(exp_plant == "lupulina", population == "VA" | exp_id == "control") %>%
-    drop_na(shoot_biomass_g) %>%
-    mutate(
-        total_biomass = shoot_biomass_g + root_biomass_g,
-        exp_id = case_when(exp_id == "control"~str_sub(exp_waterblock, 1,3), T ~ exp_id),
-        contig_species = ifelse(is.na(contig_species), "control", contig_species),
-        contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
-    ) %>%
-    mutate(symb = case_when(
-        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
-        T ~ "non-symbiotic"
-    ))
+tt <- read_gpas()
+gpatls <- tt$gpatl %>% left_join(select(iso, genome_id, contig_species))
+compute_gfs <- function (gpatls) {
+    gpatls %>%
+        filter(value == 1) %>%
+        group_by(gene) %>%
+        count(name = "ngenomes") %>%
+        group_by(ngenomes) %>%
+        count() %>%
+        mutate(n = n/1000)
+}
+count_genes <- function (gpatls) {
+    gg <- gpatls %>%
+        filter(value == 1) %>%
+        group_by(gene) %>%
+        count() %>%
+        ungroup() %>%
+        pull(n) %>%
+        table()
+    return(c(singleton = gg[[1]], core = last(gg), single_core = nrow(tt$list_sccg), total = sum(gg)))
+}
+plot_gfs <- function (gfs) {
+    gfs %>%
+        ggplot() +
+        geom_hline(yintercept = 0) +
+        geom_col(aes(x = ngenomes, y = n), fill = "white", color = "black", width = .8) +
+        scale_x_continuous(breaks = seq(0, 40, 5)) +
+        scale_y_continuous(breaks = c(0:10), limits = c(0, 6)) +
+        coord_cartesian(clip = "off") +
+        theme_classic() +
+        theme(
+            panel.border = element_rect(color = "black", fill = NA),
+            panel.grid.major.y = element_line(color = "grey90")
+        ) +
+        guides() +
+        labs(x = "Number of genomes", y = "Number of genes (k)")
 
-tb_bg <- distinct(plants, contig_species, genome_id)
-
-
-# Panel A. n of nodules----
-plants_mean <- plants %>%
-    group_by(contig_species, genome_id) %>%
-    summarize(
-        mean_biomass = mean(total_biomass), sem_biomass = sd(total_biomass) / sqrt(n()),
-        mean_shoot = mean(shoot_biomass_g), sem_shoot = sd(shoot_biomass_g) / sqrt(n()),
-        mean_root = mean(root_biomass_g), sem_root = sd(root_biomass_g) / sqrt(n()),
-        mean_nodules = mean(nodules), sem_nodules = sd(nodules) / sqrt(n())
-    )
-
-
-p1 <- plants %>%
-    ggplot() +
-    geom_rect(data = tb_bg, aes(fill = contig_species), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .1) +
-    geom_jitter(aes(x = genome_id, y = nodules), width = .1, height = 0, alpha = .3, shape = 16) +
-    geom_point(data = plants_mean, aes(x = genome_id, y = mean_nodules)) +
-    geom_errorbar(data = plants_mean, aes(x = genome_id, ymin = mean_nodules - qnorm(0.975) * sem_nodules, ymax = mean_nodules + qnorm(0.975) * sem_nodules), width = .1) +
-    scale_fill_manual(values = species_colors) +
-    facet_nested(
-        contig_species+genome_id~., scales = "free_y", space = "free_y",
-        nest_line = element_line(color = "grey90", linewidth = 1, lineend = "square"),
-        strip = strip_nested(
-            text_y = elem_list_text(
-                angle = rep(0, 12), hjust = rep(0.5, 10),
-                color = c(rev(species_colors), "grey40", species_colors[c(4, 3, 3, 3, 2, 1)], "grey40"),
-                face = rep("italic", 5)
-            ),
-            by_layer_y = FALSE,
-        ),
-        switch = "y"
-    ) +
-    coord_flip(clip = "off") +
-    theme_classic() +
-    theme(
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        strip.clip = "off",
-        strip.placement = "outside",
-        strip.background = element_rect(color = NA),
-        panel.grid.major.x = element_line(color = "gray95"),
-        panel.spacing.y = unit(0, "mm"),
-        panel.border = element_rect(color = "black", fill = NA),
-        plot.margin = unit(c(5,0,0,5), "mm")
-    ) +
-    guides(fill = "none") +
-    labs(x = "", y = "Num. of nodules")
+}
 
 
-# Panel B. total biomass ----
-p2 <- plants %>%
-    ggplot() +
-    geom_rect(data = tb_bg, aes(fill = contig_species), xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .1) +
-    geom_jitter(aes(x = genome_id, y = total_biomass), width = .1, height = 0, alpha = .2, shape = 16) +
-    geom_point(data = plants_mean, aes(x = genome_id, y = mean_biomass)) +
-    geom_errorbar(data = plants_mean, aes(x = genome_id, ymin = mean_biomass - qnorm(0.975) * sem_biomass, ymax = mean_biomass + qnorm(0.975) * sem_biomass), width = .1) +
-    scale_fill_manual(values = species_colors) +
-    facet_nested(contig_species+genome_id~., scales = "free_y", space = "free_y") +
-    coord_flip(clip = "off") +
-    theme_classic() +
-    theme(
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        strip.background = element_blank(),
-        panel.grid.major.x = element_line(color = "gray95"),
-        panel.spacing.y = unit(0, "mm"),
-        panel.border = element_rect(color = "black", fill = NA),
-        plot.margin = unit(c(5,0,0,0), "mm"),
-        strip.text = element_blank()
-    ) +
-    guides(fill = "none") +
-    labs(x = "Strain", y = "Biomass (g)")
+# Gene frequency spectrum  ----
+# meliloti
+p1_1 <- gpatls %>%
+    filter(contig_species == "S. meliloti") %>%
+    compute_gfs() %>%
+    plot_gfs() +
+    theme(plot.title = element_text(face = "italic", size = 10)) +
+    labs(title = "S. meliloti")
 
-# ----
+##
+gpatls %>%
+    filter(contig_species == "S. meliloti") %>%
+    count_genes()
+
+# medicae
+p1_2 <- gpatls %>%
+    filter(contig_species == "S. medicae") %>%
+    compute_gfs() %>%
+    plot_gfs() +
+    theme(plot.title = element_text(face = "italic", size = 10)) +
+    labs(title = "S. medicae")
+
+##
+gpatls %>%
+    filter(contig_species == "S. medicae") %>%
+    count_genes()
+
+
+# core vs accessory sampling ----
+compute_pan <- function (mi) {
+    # Single genome
+    if(!is.matrix(mi)) return(tibble(core = sum(mi), total = sum(mi)))
+    # Equal or more than two genomes
+    ngenomes <- apply(mi, 2, sum)
+    tng <- table(ngenomes)
+    if (names(tng)[1] == "0") {
+        tibble(core = last(tng)[1], total = sum(tng) - tng[1])
+    } else if (names(tng)[1] == "1"){
+        tibble(core = last(tng)[1], total = sum(tng))
+    }
+}
+do_sampling <- function (gpa, n_boots = 100) {
+    #tt <- read_gpas()
+    m <- t(gpa[,-1])
+    tb <- crossing(ngenome = 1:ncol(gpa[,-1]), boot = 1:n_boots) # Each sample of ngenome is repeated 100 times
+    tb$pan <- NA
+
+    for (i in 1:nrow(tb)) {
+        set.seed(tb$boot[i])
+        cat("", i)
+        tb$pan[i] <- list(compute_pan(m[sample(1:nrow(m), tb$ngenome[i]),]))
+    }
+
+    tbp <- tb %>%
+        unnest(cols = c(pan)) %>%
+        group_by(ngenome) %>%
+        reframe(enframe(quantile(core, c(0, 0.05, 0.5, 0.95, 1), na.rm = T), "quantile", "core"),
+                enframe(quantile(total, c(0, 0.05, 0.5, 0.95, 1)), "quantile", "total")) %>%
+        mutate(core = core/1000, total = total / 1000)
+
+    tbpr <- tbp %>%
+        filter(quantile %in% c("0%", "100%")) %>%
+        pivot_longer(cols = c(core, total)) %>%
+        pivot_wider(names_from = quantile, values_from = value)
+    return(list(tbp = tbp, tbpr = tbpr))
+}
+plot_sampling <- function (tbp, tbpr) {
+    tbp %>%
+        group_by(ngenome) %>%
+        pivot_longer(cols = c(-ngenome, -quantile)) %>%
+        ggplot(aes(x = ngenome, y = value, color = name, linetype = quantile)) +
+        geom_line() +
+        geom_ribbon(data = tbpr, aes(x = ngenome, ymin = `0%`, ymax = `100%`, fill = name), inherit.aes = FALSE, alpha = 0.3) +
+        scale_linetype_manual(values = c("0%" = 1, "5%" = 2, "50%" = 3, "95%" = 2, "100%" = 1)) +
+        scale_x_continuous(breaks = seq(0, 40, 5)) +
+        scale_y_continuous(breaks = seq(0, 30, 2), limits = c(4, 12)) +
+        scale_color_aaas() +
+        scale_fill_aaas() +
+        coord_cartesian(clip = "off") +
+        theme_classic() +
+        theme(
+            legend.title = element_blank(),
+            legend.position = "top",
+            legend.margin = margin(0,0,0,0, "mm"),
+            legend.box.margin = margin(0,0,0,0, "mm"),
+            legend.background = element_rect(color = NA, fill = NA),
+            panel.border = element_rect(color = "black", fill = NA),
+            panel.grid.major = element_line(color = "grey90"),
+            plot.margin = margin(0, 2,2,2, "mm")
+        ) +
+        guides(linetype = "none") +
+        labs(x = "Number of genomes", y = "Number of genes (k)")
+}
+
+tb1 <- tt$gpa %>%
+    select(gene, matches(paste0(iso$genome_id[iso$contig_species == "S. meliloti"], "$"))) %>%
+    do_sampling(n_boots = 100)
+p2_1 <- plot_sampling(tb1$tbp, tb1$tbpr)
+
+tb2 <- tt$gpa %>%
+    select(gene, matches(paste0(iso$genome_id[iso$contig_species == "S. medicae"], "$"))) %>%
+    do_sampling(n_boots = 100)
+p2_2 <- plot_sampling(tb2$tbp, tb2$tbpr)
+
+
 p <- plot_grid(
-    p1, p2, nrow = 1,
-    labels = LETTERS[1:2], rel_widths = c(2, 1),
-    scale = .9,
-    align = "h", axis = "tb"
-) +
-    theme(plot.background = element_rect(color = NA, fill = "white"))
+    p1_1, p1_2, p2_1, p2_2 + theme(legend.position = "none"),
+    nrow = 2, axis = "lrtb", align = "vh", scale = 0.9,
+    labels = LETTERS[1:4], rel_widths = c(22,15)
+) + theme(plot.background = element_rect(fill = "white", color = NA))
 
-ggsave(here::here("plots/FigS5.png"), p, width = 6, height = 3)
-
-# STat ----
-## Do species differ in nodules by whether they are symbiotic
-mod <- glmmTMB(
-    nodules ~ symb + (1|contig_species:genome_id),
-    family = poisson(),
-    data = plants
-)
-Anova(mod, type = 3)
-
-mod <- glmmTMB(
-    total_biomass ~ symb + (1|contig_species:genome_id),
-    family = gaussian(),
-    data = plants
-)
-Anova(mod, type = 3)
-
-## Do symbiotic species differ in nodules
-mod <- glmmTMB(
-    nodules ~ contig_species + (1|genome_id),
-    family = poisson(),
-    data = filter(plants, symb == "symbiotic")
-)
-Anova(mod, type = 3)
-
-mod <- glmmTMB(
-    total_biomass ~ contig_species + (1|genome_id),
-    family = gaussian(),
-    data = filter(plants, symb == "symbiotic")
-)
-Anova(mod, type = 3)
+ggsave(here::here("plots/FigS5.png"), p, width = 8, height = 6)
 
 
+# Fraction of core ----
+tb1$tbp$core[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] / tb1$tbp$total[tb1$tbp$ngenome == max(tb1$tbp$ngenome) & tb1$tbp$quantile == "50%"] * 100
+tb2$tbp$core[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] / tb2$tbp$total[tb2$tbp$ngenome == max(tb2$tbp$ngenome) & tb2$tbp$quantile == "50%"] * 100
 
+# Openness ----
+n <- tb1$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
+P <- tb1$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
+model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
+broom::tidy(model)
+
+n <- tb2$tbp %>% filter(quantile == "50%") %>% pull(ngenome)
+P <- tb2$tbp %>% filter(quantile == "50%") %>% pull(total)*1000
+model <- nls(P ~ k * n^g, start=list(k=P[1], g=0.1))
+broom::tidy(model)
