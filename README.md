@@ -2,7 +2,9 @@
 
 Scripts and minimal data for reproducing the anaylsis, tables, and figures presented in the manuscript
 
-Chang, Chang-Yu, Terrence Topping-Brown, Jazmine L. Rud, Mccall B. Calvert, Gerardo Bencosme, Linda J. Robinson, and Corlett Wood. 2025. “Testing for Divergence in a Plant Symbiont across Two Natural Environmental Gradients.” bioRxiv. https://doi.org/10.1101/2025.01.14.632453.
+"Biogeographic and genomic signatures of thermal adaptation in facultative rhizobia"
+
+Chang, Chang-Yu, Terrence Topping-Brown, Jazmine L. Rud, Mccall B. Calvert, Gerardo Bencosme, and Corlett Wood. 
 
 # Setup
 
@@ -20,13 +22,13 @@ The Rscripts are executed under the following R environment
 
 ```
 > sessionInfo()
-R version 4.3.2 (2023-10-31)
-Platform: aarch64-apple-darwin20 (64-bit)
-Running under: macOS Sonoma 14.7
+R version 4.4.2 (2024-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Sequoia 15.6.1
 
 Matrix products: default
 BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -38,8 +40,8 @@ attached base packages:
 [1] stats     graphics  grDevices datasets  utils     methods   base     
 
 loaded via a namespace (and not attached):
-[1] BiocManager_1.30.25 compiler_4.3.2      tools_4.3.2         rstudioapi_0.17.1  
-[5] renv_1.0.11       
+[1] compiler_4.4.2      BiocManager_1.30.25 tools_4.4.2         rstudioapi_0.17.1  
+[5] renv_1.0.9    
 ```
 
 For first time `renv` user, install renv and restore the packages recorded in `renv.lock`
@@ -86,7 +88,6 @@ Some folders are labeled with (NOT IN THIS REPO) because it exceeds the github r
     - `sites/`: field sampling sites
     - `growth/`: growth traits
     - `plants/`: symbiosis traits
-    - `tradeoff/`: trade-off between growth and symbiosis
     
 
 # Workflow
@@ -209,15 +210,5 @@ source('phenotypes/sites/extract_climate.R'); # Use DAYMET https://daymet.ornl.g
 # Plant/symbiosis experiment
 Rscript -e "renv::activate('.'); 
 source('phenotypes/plants/clean_plants.R');             # Clean the variable names and binds the lupulina/sativa data tables into one `plants.csv`
-source('phenotypes/plants/stat_trait_comparison.R');    # Stats for pairwise population comparison
-source('phenotypes/plants/stat_trait_all.R');           # Stats for pairwise population comparison, using all sativa traits, including continuous and catagorical data
-source('phenotypes/plants/clean_plants.R');             # Clean the variable names and binds the lupulina/sativa data tables into one `plants.csv`
-source('phenotypes/plants/compute_effectsize.R');       # Compute effect size for each trait. There are three metrics: Cohen's d. Hedge's g, and partial eta squared
-source('phenotypes/plants/stat_nitrogen_rn.R');         # Perform permutation for reaction norm of nitrogen X population
-"
 
-# Tradeoff
-Rscript -e "renv::activate('.'); 
-source('phenotypes/tradeoff/compute_tradeoff.R'); 
-"
 ```
