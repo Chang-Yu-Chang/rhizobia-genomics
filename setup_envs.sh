@@ -162,3 +162,8 @@ mamba install -y -c conda-forge cobra=0.29.1 numpy=1.23.5
 mamba create -n cogclassifier
 mamba activate cogclassifier
 mamba install -y -c bioconda cogclassifier=2.0.0
+
+# Install CheckM 1.0.7
+mamba create -n checkm
+mamba activate checkm
+mamba install -y -c bioconda -c conda-forge checkm-genome=1.0.7
