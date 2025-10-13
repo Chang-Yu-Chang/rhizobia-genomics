@@ -45,7 +45,7 @@ sites_center <- sites %>%
     mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
 
 p1 <- us_states %>%
-    filter(STUSPS %in% c("NY", "Virginia", "WV", "Pennsylvania", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
+    filter(STUSPS %in% c("NY", "VA", "WV", "PA", "MD", "NJ", "DE", "KY", "OH", "NC", "MI", "IN", "CT", "MA", "RI")) %>%
     ggplot() +
     geom_sf(fill = NA, color = "grey10", linewidth = .5) +
     geom_tile(data = sites_center, aes(x = lon_mean, y = lat_mean, width = width_max, height = width_max), color = "black", fill = alpha("#FFC857", 0.5), linewidth = 0.5) +

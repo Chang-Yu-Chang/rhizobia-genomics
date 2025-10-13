@@ -45,11 +45,11 @@ mamba create -n quast
 mamba activate quast
 mamba install -y -c bioconda quast=5.2.0
 
-# Install BUSCO v5.7.1
+# Install BUSCO v6.0.0
 # BUSCO: Assessment of assembly completeness using Universal Single Copy Orthologs
 mamba create -n busco
 mamba activate busco
-mamba install -y -c bioconda busco=5.7.1
+mamba install -y -c bioconda busco=6.0.0 python=3.10
 
 # Install prokka v1.14.5
 # prokka is for rapid prokaryotic genome annotation

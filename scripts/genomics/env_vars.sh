@@ -3,8 +3,8 @@ source ~/.zshrc
 
 # This script stores the environment varaibles shared by all shell scripts
 
-folder_shell=/Users/cychang2/Desktop/lab/rhizobia-genomics/scripts/genomics/genomics_cli
-folder_data=/Users/cychang2/Dropbox/lab/rhizobia-genomics/data
+folder_shell=/Users/cychang/Desktop/lab/rhizobia-genomics/scripts/genomics/genomics_cli
+folder_data=/Users/cychang/Dropbox/lab/rhizobia-genomics/data
 folder_raw=$folder_data/raw
 folder_temp=$folder_data/temp
 folder_genomics=$folder_data/genomics
