@@ -163,7 +163,7 @@ mamba create -n cogclassifier
 mamba activate cogclassifier
 mamba install -y -c bioconda cogclassifier=2.0.0
 
-# Install CheckM 1.0.7
+# Install CheckM 1.1.10
 mamba create -n checkm
 mamba activate checkm
-mamba install -y -c bioconda -c conda-forge checkm-genome=1.0.7
+pip install --force-reinstall --no-cache-dir checkm-genome

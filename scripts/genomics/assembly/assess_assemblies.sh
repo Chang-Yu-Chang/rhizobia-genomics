@@ -2,9 +2,7 @@
 source ~/.zshrc
 source ../env_vars.sh
 
-# This script assesses the quality of assembly
-
-cd $folder_shell
+# This script assesses the assembly quality using quast, busco, and checkm
 
 for i in {1..38}
 do
@@ -20,38 +18,45 @@ do
 
     # BUSCO
     # mamba activate busco
-    # busco \
-    #     -i $dir/medaka/consensus.fasta \
-    #     -m genome \
-    #     -c 10 \
-    #     -l alphaproteobacteria_odb10 \
-    #     -o "" \
-    #     --out_path $folder_genomics/assembly/$genome_ids[$i]/busco
+    # lineages=(
+    #     #"alphaproteobacteria_odb10"
+    #     "rhizobiales_odb10"
+    #     "rhizobiaceae_odb12"
+    #     "sinorhizobium_odb12"
+    # )
+    #
+    # for lineage in $lineages
+    # do
+    #     echo "  -> BUSCO lineage: $lineage"
+    #
+    #     if [ -d $dir/busco/$lineage ]; then
+    #         echo "  -> Skipping $lineage (results already exist)"
+    #         continue
+    #     fi
+    #
+    #     busco \
+    #         -i $dir/medaka/consensus.fasta \
+    #         -m genome \
+    #         -c 10 \
+    #         -l $lineage \
+    #         --out_path $dir/busco/$lineage \
+    #         -o ""
+    # done
 
-    # Define BUSCO lineages
-    mamba activate busco
-    lineages=(
-        #"alphaproteobacteria_odb10"
-        "rhizobiales_odb10"
-        "rhizobiaceae_odb12"
-        "sinorhizobium_odb12"
-    )
+    # Checkm
+    mamba activate checkm
+    mkdir -p $dir/checkm/
 
-    for lineage in $lineages
-    do
-        echo "  -> BUSCO lineage: $lineage"
+    # skip if already done
+    if [ -d $dir/checkm/ ]; then
+        echo "   ⚠️  Skipping (checkm folder exists)"
+        continue
+    fi
 
-        if [ -d $dir/busco/$lineage ]; then
-            echo "  -> Skipping $lineage (results already exist)"
-            continue
-        fi
+    checkm lineage_wf \
+        -t 8 \
+        -x fasta \
+        $dir/medaka/consensus.fasta \
+        $dir/checkm/
 
-        busco \
-            -i $dir/medaka/consensus.fasta \
-            -m genome \
-            -c 10 \
-            -l $lineage \
-            --out_path $dir/busco/$lineage \
-            -o ""
-    done
 done
