@@ -63,3 +63,9 @@ checkm lineage_wf \
     -x fasta \
     $folder_genomics/fasta/genomes/ \
     $folder_genomics/checkm
+
+# Extract summary table
+checkm qa \
+  $folder_genomics/checkm/lineage.ms \
+  $folder_genomics/checkm/ \
+  -o 2 -t 8 > $folder_genomics/checkm/checkm_summary.tsv

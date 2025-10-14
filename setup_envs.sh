@@ -61,7 +61,7 @@ mamba install -y -c bioconda prokka=1.14.5
 # ncbi-datasets is NCBI Datasets command-line tools
 mamba create -y -n ncbi-datasets
 mamba activate ncbi-datasets
-mamba install -y -c bioconda ncbi-datasets=15.27.1
+mamba install -y -c bioconda ncbi-datasets-cli=15.27.1
 
 # Install blast v2.14.1
 # blast stands for Basic Local Alignment Search Tool, and can build a BLAST database with local sequences

@@ -5,16 +5,25 @@ source ../env_vars.sh
 # This script searches and downloads the NCBI genomes
 mamba activate ncbi-datasets
 
-# Download the 18 Ensifer genomes
-table_file=$folder_data/raw/ensifer_ncbi.csv
-list_accessions=("${(@f)$(cat $table_file | cut -d ',' -f 1)}")
-list_species=("${(@f)$(cat $table_file | cut -d ',' -f 2)}")
-list_strains=("${(@f)$(cat $table_file | cut -d ',' -f 3)}")
-
-datasets download genome accession \
-    $list_accessions \
+datasets download genome taxon \
+    "Ensifer[ORGN]" \
+    --reference \
     --include genome \
     --filename $folder_genomics/ensifer_ncbi.zip
+
+
+
+
+# # Download the 18 Ensifer genomes
+# table_file=$folder_data/raw/ensifer_ncbi.csv
+# list_accessions=("${(@f)$(cat $table_file | cut -d ',' -f 1)}")
+# list_species=("${(@f)$(cat $table_file | cut -d ',' -f 2)}")
+# list_strains=("${(@f)$(cat $table_file | cut -d ',' -f 3)}")
+#
+# datasets download genome accession \
+#     $list_accessions \
+#     --include genome \
+#     --filename $folder_genomics/ensifer_ncbi.zip
 
 # GCF_002197065.1 E. meliloti usda1106
 # GCF_000006965.1 E. meliloti em1021
@@ -35,19 +44,19 @@ datasets download genome accession \
 # GCF_002288525.1 E. sojae ccbau05684
 # GCF_008932245.1 E. alkalisoli yic4027
 
-# Clean up the files and names
-cd $folder_genomics
-unzip ensifer_ncbi.zip
-rm -rf ncbi_genomes
-mv ncbi_dataset/data ncbi_genomes
-rm -rf README.md ensifer_ncbi.zip ncbi_dataset
-
-# Move the genome files
-mkdir -p $folder_genomics/fasta/genomes
-n_strains="${#list_strains}"
-for i in {1..$n_strains}; do
-    cp $folder_genomics/ncbi_genomes/$list_accessions[$i]/*_genomic.fna $folder_genomics/fasta/genomes/$list_strains[$i].fasta
-done
-
-# Remove the zip folder
-rm -rf $folder_genomics/ncbi_genomes
+# # Clean up the files and names
+# cd $folder_genomics
+# unzip ensifer_ncbi.zip
+# rm -rf ncbi_genomes
+# mv ncbi_dataset/data ncbi_genomes
+# rm -rf README.md ensifer_ncbi.zip ncbi_dataset
+#
+# # Move the genome files
+# mkdir -p $folder_genomics/fasta/genomes
+# n_strains="${#list_strains}"
+# for i in {1..$n_strains}; do
+#     cp $folder_genomics/ncbi_genomes/$list_accessions[$i]/*_genomic.fna $folder_genomics/fasta/genomes/$list_strains[$i].fasta
+# done
+#
+# # Remove the zip folder
+# rm -rf $folder_genomics/ncbi_genomes

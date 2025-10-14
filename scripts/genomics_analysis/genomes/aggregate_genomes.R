@@ -57,6 +57,8 @@ quast <- bind_rows(list_g) %>%
     pivot_wider(names_from = name, values_from = value) %>%
     clean_names()
 
+write_csv(quast, paste0(folder_data, "genomics_analysis/genomes/quast.csv"))
+
 # busco ----
 list_b <- rep(list(NA), nrow(isolates))
 lins <- tibble(taxlevel = c("class", "order", "family", "genus"), lineage = c("alphaproteobacteria_odb10", "rhizobiales_odb10", "rhizobiaceae_odb12", "sinorhizobium_odb12"))
@@ -84,8 +86,25 @@ busco <- bind_rows(list_b) %>%
     pivot_wider(names_from = name, values_from = value) %>%
     mutate(completeness = C/T)
 
-# checkm ----
+write_csv(busco, paste0(folder_data, "genomics_analysis/genomes/busco.csv"))
 
-# ----
-qcs <- left_join(quast, busco)
-write_csv(qcs, paste0(folder_data, "genomics_analysis/genomes/qcs.csv"))
+# checkm ----
+checkm <- read_lines(paste0(folder_genomics, "checkm/checkm_summary.tsv")) %>%
+    discard(~ str_detect(.x, "INFO|---|CheckM|^$")) %>%
+    # Split on one or more spaces
+    str_squish() %>%
+    str_remove(" \\(UID\\d+\\)") %>%
+    `[`(c(-1, -20)) %>%
+    str_split("\\s", simplify = TRUE) %>%
+    as_tibble(.name_repair = ~ paste0("V", seq_along(.)))
+
+checkm <- checkm %>%
+    select(V1, V2, V6, V7) %>%
+    rename(
+        bin_id = V1,
+        marker_lineage = V2,
+        completeness = V6,
+        contamination = V7
+    )
+
+write_csv(checkm, paste0(folder_data, "genomics_analysis/genomes/checkm.csv"))
