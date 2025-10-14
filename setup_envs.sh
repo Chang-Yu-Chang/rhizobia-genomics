@@ -163,7 +163,14 @@ mamba create -n cogclassifier
 mamba activate cogclassifier
 mamba install -y -c bioconda cogclassifier=2.0.0
 
-# Install CheckM 1.1.10
-mamba create -n checkm
+# Install CheckM 1.2.4
+mamba create -n checkm python=3.9
 mamba activate checkm
-pip install --force-reinstall --no-cache-dir checkm-genome
+mamba install -y -c bioconda numpy matplotlib pysam
+mamba install -y -c bioconda hmmer prodigal pplacer
+pip install checkm-genome
+# Download reference data
+curl -o ~/.checkm/checkm_data_2015_01_16.tar.gz https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
+cd ~/.checkm
+tar -xvzf checkm_data_2015_01_16.tar.gz
+checkm data setRoot ~/.checkm

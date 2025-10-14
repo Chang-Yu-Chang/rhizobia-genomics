@@ -10,53 +10,56 @@ do
     dir=$folder_genomics/assembly/$genome_ids[$i]
 
     # Quast
-    # mamba activate quast
-    # quast \
-    #     $dir/medaka/consensus.fasta \
-    #     -t 10 \
-    #     -o $folder_genomics/assembly/$genome_ids[$i]/quast
+    mamba activate quast
+    quast \
+        $dir/medaka/consensus.fasta \
+        -t 10 \
+        -o $folder_genomics/assembly/$genome_ids[$i]/quast
 
     # BUSCO
-    # mamba activate busco
-    # lineages=(
-    #     #"alphaproteobacteria_odb10"
-    #     "rhizobiales_odb10"
-    #     "rhizobiaceae_odb12"
-    #     "sinorhizobium_odb12"
-    # )
-    #
-    # for lineage in $lineages
-    # do
-    #     echo "  -> BUSCO lineage: $lineage"
-    #
-    #     if [ -d $dir/busco/$lineage ]; then
-    #         echo "  -> Skipping $lineage (results already exist)"
-    #         continue
-    #     fi
-    #
-    #     busco \
-    #         -i $dir/medaka/consensus.fasta \
-    #         -m genome \
-    #         -c 10 \
-    #         -l $lineage \
-    #         --out_path $dir/busco/$lineage \
-    #         -o ""
-    # done
+    mamba activate busco
+    lineages=(
+        #"alphaproteobacteria_odb10"
+        "rhizobiales_odb10"
+        "rhizobiaceae_odb12"
+        "sinorhizobium_odb12"
+    )
 
-    # Checkm
-    mamba activate checkm
-    mkdir -p $dir/checkm/
+    for lineage in $lineages
+    do
+        echo "  -> BUSCO lineage: $lineage"
 
-    # skip if already done
-    if [ -d $dir/checkm/ ]; then
-        echo "   ⚠️  Skipping (checkm folder exists)"
-        continue
-    fi
+        if [ -d $dir/busco/$lineage ]; then
+            echo "  -> Skipping $lineage (results already exist)"
+            continue
+        fi
 
-    checkm lineage_wf \
-        -t 8 \
-        -x fasta \
-        $dir/medaka/consensus.fasta \
-        $dir/checkm/
-
+        busco \
+            -i $dir/medaka/consensus.fasta \
+            -m genome \
+            -c 10 \
+            -l $lineage \
+            --out_path $dir/busco/$lineage \
+            -o ""
+    done
 done
+
+
+# Consolidates genome fasta files into one folder
+mamba activate seqkit
+for i in {1..38}
+do
+    dir=$folder_genomics/assembly/$genome_ids[$i]
+
+    # Remove contigs < 100k
+    seqkit seq -m 100000 -g $dir/medaka/consensus.fasta > $folder_genomics/fasta/genomes/$genome_ids[$i].fasta
+done
+
+
+# Checkm
+mamba activate checkm
+checkm lineage_wf \
+    -t 8 \
+    -x fasta \
+    $folder_genomics/fasta/genomes/ \
+    $folder_genomics/checkm

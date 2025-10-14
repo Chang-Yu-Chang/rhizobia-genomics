@@ -3,8 +3,7 @@
 1. `assess_reads.sh` performs quality control on the raw nanopore long reads. Also filter out bad quality reads
 2. `denovo_assembly.sh` assembles the genomes from raw reads following the plasmidsaurus pipeline
 3. `assess_assemblies.sh` performs quality control on the raw nanopore long reads
-4. `consolidate_genomes.sh` consolidates genome fasta files into one folder
-5. `manual_concat.sh` concatenates the contigs based on the blast result
+4. `manual_concat.sh` concatenates the contigs based on the blast result
 
 To reproduce it, do the following
 
@@ -12,7 +11,6 @@ To reproduce it, do the following
 zsh assess_reads.sh
 zsh denovo_assembly.sh
 zsh assess_assemblies.sh
-zsh consolidate_genomes.sh
 zsh manual_concat.sh
 ```
 

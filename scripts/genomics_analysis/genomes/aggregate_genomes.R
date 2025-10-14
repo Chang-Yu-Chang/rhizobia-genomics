@@ -21,29 +21,22 @@ genomes <- bind_rows(list_g_contigs) %>%
     mutate(contig_id = paste0(genome_id, "_", contig_id)) %>%
     # Arrange contigs by length
     mutate(genome_id = factor(genome_id, isolates$genome_id)) %>%
-    arrange(genome_id, desc(contig_length)) %>%
-    # Remove small contigs < 10kb
-    filter(contig_length > 10000)
+    arrange(genome_id, desc(contig_length))
 
 write_csv(genomes, paste0(folder_data, "genomics_analysis/genomes/genomes.csv"))
 
 # flye ----
 list_flye <- rep(list(NA), nrow(isolates))
-
 for (i in 1:length(list_flye)) {
     list_flye[[i]] <- read_table(paste0(folder_genomics, "assembly/", isolates$genome_id[i], "/flye/assembly_info.txt"), show_col_types = F) %>%
         mutate(genome_id = isolates$genome_id[i]) %>%
         filter(length > 10000) %>%
         select(-graph_path)
 }
-
-flye <- bind_rows(list_flye) %>%
-    filter(length > 10^6)
-
+flye <- bind_rows(list_flye) %>% filter(length > 10^6)
 flye %>%
     group_by(genome_id) %>%
     summarize(n = n()) # number of genomes with >= 3 large contigs
-
 sum(flye$circ. == "Y") / nrow(flye) # fraction of ciruclar contigs
 
 # quast ----
@@ -65,12 +58,6 @@ quast <- bind_rows(list_g) %>%
     clean_names()
 
 # busco ----
-# Check busco output files
-# tb <- expand_grid(genome_id = isolates$genome_id, lineage = lins$lineage, done = NA)
-# for (i in 1:nrow(tb)) tb$done[i] <- file.exists(paste0(folder_genomics, "assembly/", tb$genome_id[i], "/busco/", tb$lineage[[i]], "/run_", tb$lineage[[i]], "/short_summary.txt"))
-# sum(tb$done)
-# nrow(tb)
-
 list_b <- rep(list(NA), nrow(isolates))
 lins <- tibble(taxlevel = c("class", "order", "family", "genus"), lineage = c("alphaproteobacteria_odb10", "rhizobiales_odb10", "rhizobiaceae_odb12", "sinorhizobium_odb12"))
 
