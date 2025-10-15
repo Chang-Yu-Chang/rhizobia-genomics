@@ -55,6 +55,26 @@ do
     seqkit seq -m 100000 -g $dir/medaka/consensus.fasta > $folder_genomics/fasta/genomes/$genome_ids[$i].fasta
 done
 
+# Calculate percentage removed
+mamba activate seqkit
+for i in {1..38}
+do
+    id=${genome_ids[$i]}
+    dir=$folder_genomics/assembly/$id
+    infile=$dir/medaka/consensus.fasta
+    outfile=$folder_genomics/fasta/genomes/$id.fasta
+
+    # Total genome length before filtering
+    total_before=$(seqkit stats -T $infile | awk 'NR==2 {print $5}')
+    # Filter contigs shorter than 100 kb
+    seqkit seq -m 100000 -g $infile > $outfile
+    # Total genome length after filtering
+    total_after=$(seqkit stats -T $outfile | awk 'NR==2 {print $5}')
+    # Calculate % removed
+    percent_removed=$(awk -v before=$total_before -v after=$total_after 'BEGIN {printf("%.2f", (before - after)/before * 100)}')
+    echo "$id: $(printf "%'.0f" $total_before) bp → $(printf "%'.0f" $total_after) bp  (Removed: $percent_removed%)"
+done
+
 
 # Checkm
 mamba activate checkm
