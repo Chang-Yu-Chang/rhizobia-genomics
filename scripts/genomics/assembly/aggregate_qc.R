@@ -1,4 +1,4 @@
-#' This script aggregates the assembled genome fasta
+#' This script aggregates the qc results of assemblies
 
 library(tidyverse)
 library(janitor)
