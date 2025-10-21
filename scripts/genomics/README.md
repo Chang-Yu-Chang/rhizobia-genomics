@@ -7,3 +7,15 @@ This folder contains the scripts for the following steps:
 4. `pangenome`: pangenome analysis using paranoo. It requires prokka annotations
 
 `env_vars.sh` stores shell variables that specify directory.
+
+
+
+
+
+
+
+
+This folder contains scripts for analyzing the genomics data including:
+
+1. `genomes` examine assembled genome size and aggregate contig data
+2. `gene_content`: examine gene content on panaroo outputs

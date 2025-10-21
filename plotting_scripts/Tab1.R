@@ -1,50 +1,93 @@
-#' This script generates the blast results
+#' This script makes table1
 
 library(tidyverse)
 library(flextable)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+quast <- read_csv(paste0(folder_data, "genomics/qcs/quast.csv"))
+busco <- read_csv(paste0(folder_data, "genomics/qcs/busco.csv"))
+checkm <- read_csv(paste0(folder_data, "genomics/qcs/checkm.csv"))
+ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
 
-ft <- iso %>%
-    # Column cleanup
-    select(...1, population, rrna_species, rrna_pident, contig_species, contig_pident, exp_id, genome_id, exp_lup, growth_curve) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania") %>% factor(c("Virginia", "Pennsylvania"))) %>%
-    arrange(population, contig_species) %>%
-    mutate(...1 = 1:n()) %>%
-    flextable() %>%
-    # Column labels
-    set_header_labels(
-        `...1` = "",
-        exp_id = "Internal ID",
-        population = "Region",
-        genome_id = "Genome ID",
-        contig_species = "Species", rrna_species = "Species",
-        rrna_pident = "Identity (%)", contig_pident = "Identity (%)",
-        exp_lup = "Plant inoculation",
-        growth_curve = "Growth"
+isolates <- select(isolates, genome_id, exp_id, population, site, growth_curve)
+quast <- select(quast, genome_id, gc_percent, total_length_10000_bp, n50, l50)
+busco <- pivot_wider(busco, id_cols = genome_id, names_from = taxlevel, values_from = completeness, names_prefix = "busco_")
+checkm <- rename(checkm, genome_id = bin_id, checkm_completeness = completeness, checkm_contamination = contamination)
+ani <- select(ani, genome_id, organism_name, ani)
+# Replace the <95% ANI with sp.
+ani$organism_name[ani$ani<95] <- str_replace(ani$organism_name[ani$ani<95], " \\w+", " sp.")
+
+# Main table
+tb <- isolates %>%
+    left_join(checkm) %>%
+    left_join(quast) %>%
+    left_join(busco) %>%
+    left_join(ani) %>%
+    mutate(
+        region = recode(population, "VA" = "Virginia", "PA" = "Pennsylvania"),
+        region = factor(region, levels = c("Virginia", "Pennsylvania")),
+        growth_curve = ifelse(growth_curve == 1, "+", ""),
+        gc_percent = round(gc_percent, 1),
+        across(starts_with("busco_"), ~ round(.x * 100, 1)),
+        ani = round(ani, 1)
     ) %>%
-    style(part = "header", pr_t = fp_text_default(bold = T)) %>%
-    style(j = c("rrna_species", "contig_species"), pr_t = fp_text_default(italic = T)) %>%
-    add_header_row(values = c("", "BLAST rRNA gene", "BLAST genome", "Strain", "Experiment"), colwidths = c(2,2,2,2,2)) %>%
-    # Align and spacing
-    merge_v(j = c("population")) %>%
-    valign(valign = "top") %>%
+    arrange(region, organism_name, genome_id) %>%
+    mutate(ID = row_number()) %>%
+    select(
+        ID, region, genome_id, growth_curve,
+        checkm_completeness, checkm_contamination,
+        gc_percent, total_length_10000_bp, n50, l50,
+        busco_class, busco_order, busco_family, busco_genus,
+        organism_name, ani
+    )
+
+# Flextable
+ft <- tb %>%
+    flextable() %>%
+    # Header labels
+    set_header_labels(
+        ID = "",
+        region = "Region",
+        genome_id = "Strain",
+        growth_curve = "Growth assay",
+        checkm_completeness = "Completeness (%)",
+        checkm_contamination = "Contamination (%)",
+        gc_percent = "GC (%)",
+        total_length_10000_bp = "Length (≥10kb)",
+        n50 = "N50",
+        l50 = "L50",
+        busco_class = "Class (432)",
+        busco_order = "Order (639)",
+        busco_family = "Family (1041)",
+        busco_genus = "Genus (3013)",
+        organism_name = "Species",
+        ani = "ANI (%)"
+    ) %>%
+    # One clean header grouping
+    add_header_row(
+        values = c(
+            "",
+            "Isolate Information",      # population, genome_id, exp_id, growth_curve
+            "CheckM",     # completeness + contamination
+            "Quast",      # gc, length, n50, l50
+            "BUSCO",      # busco_* columns
+            "Taxonomy"                  # organism + ani
+        ),
+        colwidths = c(1, 3, 2, 4, 4, 2)   # total = 17
+    ) %>%
+    # Header styling
+    style(part = "header", pr_t = fp_text_default(bold = TRUE)) %>%
+    style(j = "organism_name", pr_t = fp_text_default(italic = TRUE)) %>%
+    border_inner_h(part = "header", border = fp_border_default(width = 0)) %>%
+    align(align = "center", part = "header") %>%
     align(align = "center", part = "all") %>%
-    autofit() %>%
-    # Font color
-    style(j = "contig_species", pr_t = fp_text_default(bold = T, italic = T)) %>%
-    color(color = species_colors["S. adhaerens"], j = "contig_species", i = ~contig_species == "S. adhaerens") %>%
-    color(color = species_colors["S. canadensis"], j = "contig_species", i = ~contig_species == "S. canadensis") %>%
-    color(color = "#32AEA0", j = "contig_species", i = ~contig_species == "S. medicae") %>%
-    color(color = "#8C5488", j = "contig_species", i = ~contig_species == "S. meliloti") %>%
-    # Lines and background
-    hline(i = 15, j = 2:10) %>%
-    bg(bg = "white", part = "all") %>%
-    bg(bg = "grey90", i = seq(1, nrow_part(.), 2), j = 3:10) %>%
-    fix_border_issues()
+    vline(j = c(4, 6, 10, 14), border = fp_border_default(color = "white", width = 3), part = "header") %>%
+    # Backgrounds and borders
+    bg(bg = "white", part = "body") %>%
+    bg(bg = "grey95", i = 1, j = 1:16, part = "header") %>%
+    bg(bg = "white", i = 2, j = 1:16, part = "header") %>%
+    bg(bg = "grey95", i = seq(1, nrow_part(.), 2), j = 1:16)
 
-#save_as_html(ft, path = here::here("plots/Tab1.html"))
+save_as_html(ft, path = here::here("plots/Tab1.html"))
 save_as_image(ft, path = here::here("plots/Tab1.png"), res = 300)
-
