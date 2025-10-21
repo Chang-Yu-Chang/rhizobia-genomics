@@ -1,7 +1,5 @@
 # Taxonomy assignment
 
-Use a ANI approach to 
-
-1. `download_ncbi_genomes.sh` downloads Sinorhizobiumm and Ensifer reference genomes
-2. `fastani.sh` compare the assemblies to the reference genomes
+1. `download_ncbi_genomes.sh` downloads Rhizobiales reference genomes
+2. `ani.sh` compare the pairwise distance between our assembled genomes and the reference genomes
 3. `aggregate_ani.R` 

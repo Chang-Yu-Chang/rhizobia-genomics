@@ -6,14 +6,6 @@
 4. `manual_concat.sh` concatenates the contigs based on the blast result
 5. `aggregate_qc.R` aggregates the qc results of assemblies
 
-```
-zsh assess_reads.sh
-zsh denovo_assembly.sh
-zsh assess_assemblies.sh
-zsh manual_concat.sh
-```
-
-
 
 ### DEPRECATED
 1. `raw_reads`: examine raw reads
