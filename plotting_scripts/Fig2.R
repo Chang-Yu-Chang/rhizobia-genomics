@@ -78,7 +78,7 @@ get_trait_posthoc <- function(df, trait_name) {
     res1 <- as.data.frame(pairs(emm1)) %>%
         mutate(
             trait = trait_name,
-            comp_type = "Sym vs NonS",
+            comp_type = "Sin vs. Ens",
             sig = make_stars(p.value)
         )
 
@@ -89,7 +89,7 @@ get_trait_posthoc <- function(df, trait_name) {
     res2 <- as.data.frame(pairs(emm2)) %>%
         mutate(
             trait = trait_name,
-            comp_type = "mel vs med",
+            comp_type = "mel vs. med",
             sig = make_stars(p.value)
         )
 
