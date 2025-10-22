@@ -15,8 +15,6 @@ quast <- select(quast, genome_id, gc_percent, total_length_10000_bp, n50, l50)
 busco <- pivot_wider(busco, id_cols = genome_id, names_from = taxlevel, values_from = completeness, names_prefix = "busco_")
 checkm <- rename(checkm, genome_id = bin_id, checkm_completeness = completeness, checkm_contamination = contamination)
 ani <- select(ani, genome_id, organism_name, ani)
-# Replace the <95% ANI with sp.
-ani$organism_name[ani$ani<95] <- str_replace(ani$organism_name[ani$ani<95], " \\w+", " sp.")
 
 # Main table
 tb <- isolates %>%

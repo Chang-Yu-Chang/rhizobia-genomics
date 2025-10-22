@@ -3,17 +3,15 @@
 # This main folder depends on your home directory and user name
 folder_data <- "~/Dropbox/lab/rhizobia-genomics/data/" # Enter the directory of data
 #folder_data <- "data/" # Enter the directory of data
-folder_genomics <- paste0(folder_data, "genomics/")
-folder_phenotypes <- paste0(folder_data, "phenotypes/")
+# folder_genomics <- paste0(folder_data, "genomics/")
+# folder_phenotypes <- paste0(folder_data, "phenotypes/")
 
 # Palettes for plotting
-gradient_colors <- c("PA" = "gold2", "VA" = "olivedrab")
-
+gradient_colors <- c("Philadelphia" = "gold2", "Virginia" = "olivedrab")
 sp_colors <- c(adhaerens = "#B67C66", canadensis = "grey20", medicae = "#4DCCBD", meliloti = "#B07BAC")
-species_colors <- c(`S. adhaerens` = "#B67C66", `S. canadensis` = "grey20", `S. medicae` = "#4DCCBD", `S. meliloti` = "#B07BAC")
+species_colors <- c(`Ensifer adhaerens` = "#B67C66", `Ensifer sp.` = "grey20", `Sinorhizobium medicae` = "#4DCCBD", `Sinorhizobium meliloti` = "#B07BAC")
 #species_colors <- c(`S. adhaerens` = "grey80", `S. canadensis` = "grey20", `S. medicae` = "steelblue", `S. meliloti` = "maroon")
 species_shapes <- c(meliloti = 21, medicae = 22, adhaerens = 15, canadensis = 16)
-plant_colors <- c(sativa = "#62216d", lupulina = "#fde900")
 
 # Traits
 clean_trait_names <- function (x) str_split(x, pattern = " ")[[1]] %>% str_sub(1,1) %>% paste(collapse = "") %>% toupper() %>% str_pad(width = 4, side = "right", pad = " ")

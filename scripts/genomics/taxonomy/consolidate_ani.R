@@ -42,4 +42,7 @@ ani <- ani %>%
     group_by(query) %>%
     slice_max(ani, n = 1)
 
+# Replace the <95% ANI with sp.
+ani$organism_name[ani$ani<95] <- str_replace(ani$organism_name[ani$ani<95], " \\w+", " sp.")
+
 write_csv(ani, paste0(folder_data, "genomics/taxonomy/ani.csv"))

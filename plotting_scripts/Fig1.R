@@ -19,27 +19,31 @@ source(here::here("metadata.R"))
 # Read data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
+# isolates <- isolates %>% left_join(ani)
 # iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
 #     mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens"))) %>%
-#     mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+#     mutate(region = ifelse(region == "VA", "Virginia", "Pennsylvania"))
 sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
-    # Use sites where the isolates were from
-    filter(site %in% isolates$site) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
-dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) %>% # daily max t at sampling sites
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+    filter(site %in% isolates$site)
+# daily max t at sampling sites
+dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) %>%
+    mutate(
+        region = factor(region, c("Virginia", "Pennsylvania")),
+        site = factor(site, sites$site)
+    )
 tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv")) # month by day
 us_states <- states() # us state map
 map_range <- read_csv(paste0(folder_phenotypes, "sites/map_range.csv")) %>%
-    mutate(population = rep(c("Pennsylvania", "Virginia"), each = 31*41))
-dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>% # Daily max in the map region
+    mutate(region = rep(c("Pennsylvania", "Virginia"), each = 31*41))
+# Daily max in the map region
+dcl <- read_csv(paste0(folder_phenotypes, "sites/dcl.csv")) %>%
     left_join(map_range)
 
 # Panel A. map ----
 ## Regional map
 sites_center <- sites %>%
     drop_na(site) %>%
-    group_by(population) %>%
+    group_by(region) %>%
     summarize(lat_mean = mean(latitude_dec), lon_mean = mean(longitude_dec), lat_max = max(latitude_dec), lat_min = min(latitude_dec), lon_max = max(longitude_dec), lon_min = min(longitude_dec)) %>%
     mutate(hjust = c(0.8, 0.8)) %>%
     mutate(width_max = max(c((lon_max-lon_min)*1.8, (lat_max-lat_min)*1.8)))
@@ -109,39 +113,31 @@ plot_temp_map <- function (dcl, sites) {
         labs(x = "Longitude", y = "Latitude")
 }
 p1_1 <- dcl %>%
-    filter(population == "Virginia") %>%
+    filter(region == "Virginia") %>%
     filter(latitude > 37.2) %>%
-    plot_temp_map(filter(sites, population == "Virginia")) +
+    plot_temp_map(filter(sites, region == "Virginia")) +
     labs(title = "Virginia")
 p1_2 <- dcl %>%
-    filter(population == "Pennsylvania") %>%
+    filter(region == "Pennsylvania") %>%
     filter(latitude > 39.8) %>%
-    plot_temp_map(filter(sites, population == "Pennsylvania")) +
+    plot_temp_map(filter(sites, region == "Pennsylvania")) +
     labs(title = "Pennsylvania")
 
 
 # Panel B. site temperature ----
 tb_tmax <- dml %>%
-    mutate(
-        population = factor(population, c("Virginia", "Pennsylvania")),
-        site = factor(site, sites$site)
-    ) %>%
     filter(site %in% isolates$site) %>%
     filter(yday >= 182 & yday <= 273) %>%
-    group_by(population, site) %>%
+    group_by(region, site) %>%
     summarize(mean_tmax = mean(tmax_deg_c))
 
 p2 <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
-    mutate(
-        population = factor(population, c("Virginia", "Pennsylvania")),
-        site = factor(site, sites$site)
-    ) %>%
     drop_na(site) %>%
     ggplot() +
-    geom_histogram(aes(x = tmax_deg_c, fill = population), position = "identity", alpha = .5, color = "black", binwidth = 1) +
+    geom_histogram(aes(x = tmax_deg_c, fill = region), position = "identity", alpha = .5, color = "black", binwidth = 1) +
     geom_vline(data = tb_tmax, aes(xintercept = mean_tmax), linewidth = .5, linetype = 2, color = "black") +
-    facet_nested(~population+site, nest_line = element_line(colour = "black")) +
+    facet_nested(~region+site, nest_line = element_line(colour = "black")) +
     scale_fill_manual(values = c(VA = "steelblue", PA = "#db7272")) +
     scale_y_continuous(breaks = c(0, 10)) +
     scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
@@ -159,13 +155,9 @@ p2 <- dml %>%
 
 p2_1 <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
-    mutate(
-        population = factor(population, c("Virginia", "Pennsylvania")),
-        site = factor(site, sites$site)
-    ) %>%
     drop_na(site) %>%
     ggplot() +
-    geom_histogram(aes(x = tmax_deg_c, fill = population), position = "identity", alpha = .6, color = "black", binwidth = 1) +
+    geom_histogram(aes(x = tmax_deg_c, fill = region), position = "identity", alpha = .6, color = "black", binwidth = 1) +
     scale_fill_manual(values = c(Virginia = "steelblue", Pennsylvania = "#db7272")) +
     scale_y_continuous(breaks = seq(0, 150, 20)) +
     scale_x_continuous(breaks = seq(0, 40, 10), limits = c(5, 40), expand = c(0,0)) +
@@ -192,37 +184,34 @@ p2_1 <- dml %>%
 ## Stat
 xx <- dml %>%
     filter(yday >= 182 & yday <= 273) %>%
-    mutate(
-        population = factor(population, c("Virginia", "Pennsylvania")),
-        site = factor(site, sites$site)
-    ) %>%
     drop_na(site) %>%
-    select(population, site, tmax_deg_c, tmin_deg_c)
+    select(region, site, tmax_deg_c, tmin_deg_c)
 
-mod <- lmer(tmax_deg_c ~ population + (1|site), data = xx)  # daily max
+mod <- lmer(tmax_deg_c ~ region + (1|site), data = xx)  # daily max
 Anova(mod, type = 3)
-emmeans(mod, ~ population)
-mod <- lmer(tmin_deg_c ~ population + (1|site), data = xx) # daily min
+emmeans(mod, ~ region)
+mod <- lmer(tmin_deg_c ~ region + (1|site), data = xx) # daily min
 Anova(mod, type = 3)
-emmeans(mod, ~ population)
+emmeans(mod, ~ region)
 
 
 
 # Panel C. strain composition ----
-p3 <- iso %>%
-    left_join(select(isolates, population, site, genome_id)) %>%
-    select(population, contig_species, site) %>%
+p3 <- isolates %>%
+    left_join(ani) %>%
+    #left_join(select(isolates, region, site, genome_id)) %>%
+    select(region, organism_name, site) %>%
     mutate(
-        population = factor(population, c("Virginia", "Pennsylvania")),
+        region = factor(region, c("Virginia", "Pennsylvania")),
         site = factor(site, sites$site)
     ) %>%
-    group_by(population, site, contig_species) %>%
+    group_by(region, site, organism_name) %>%
     count() %>%
-    ggplot(aes(fill = contig_species, values = n)) +
+    ggplot(aes(fill = organism_name, values = n)) +
     geom_waffle(n_rows = 1, flip = T, color = "white", size = 2, radius = unit(2, "mm")) +
     scale_fill_manual(values = species_colors) +
     scale_y_continuous(breaks = c(5, 10)) +
-    facet_nested(~population+site, nest_line = element_line(colour = "black")) +
+    facet_nested(~region+site, nest_line = element_line(colour = "black")) +
     theme_bw() +
     theme(
         panel.grid.minor = element_blank(),
@@ -237,11 +226,11 @@ p3 <- iso %>%
         legend.title = element_blank(),
         legend.background = element_rect(color = "black", fill = NA),
         legend.text = element_text(face = "italic"),
-        plot.margin = unit(c(0, 12, 0, 15), unit = "mm")
+        legend.key.width = unit(5, "mm"),
+        plot.margin = unit(c(0, 0, 0, 15), unit = "mm")
     ) +
     guides(fill = guide_legend(ncol = 1)) +
     labs()
-
 
 
 # ----
@@ -267,8 +256,8 @@ ggsave(here::here("plots/Fig1.png"), p, width = 8, height = 8)
 
 # Chisquare
 x <- iso %>%
-    group_by(population, contig_species) %>%
+    group_by(region, contig_species) %>%
     count() %>%
-    pivot_wider(names_from = population, values_from = n, values_fill = 0)
+    pivot_wider(names_from = region, values_from = n, values_fill = 0)
 
 chisq.test(x[,2:3])

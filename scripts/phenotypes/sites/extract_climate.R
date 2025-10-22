@@ -50,10 +50,10 @@ sites_pa <- sites_pa %>%
 
 # bind rows
 sites <- bind_rows(
-    mutate(sites_va, population = "VA"),
-    mutate(sites_pa, population = "PA")
+    mutate(sites_va, region = "Virginia"),
+    mutate(sites_pa, region = "Pennsylvania")
 ) %>%
-    select(population, everything()) %>%
+    select(region, everything()) %>%
     mutate(across(c(latitude_dec, longitude_dec, elevation_m), function (x) {round(x, 2)}))
 
 # Compute pairwise geo distance
@@ -64,8 +64,8 @@ colnames(m) <- sites$site
 sites_dist <- as_tibble(m) %>%
     mutate(site1 = sites$site) %>%
     pivot_longer(-site1, names_to = "site2", values_to = "dist_geo_m") %>%
-    left_join(select(sites, site1 = site, population1 = population)) %>%
-    left_join(select(sites, site2 = site, population2 = population)) %>%
+    left_join(select(sites, site1 = site, region1 = region)) %>%
+    left_join(select(sites, site2 = site, region2 = region)) %>%
     select(site1, site2, dist_geo_m) %>%
     mutate(dist_geo_km = dist_geo_m / 1000)
 
@@ -83,7 +83,7 @@ for (i in 1:nrow(sites)) {
         end = 2022,
         internal = TRUE
     )
-    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], population = sites$population[i])
+    list_dm[[i]] <- as_tibble(dm$data) %>% mutate(site = sites$site[i], region = sites$region[i])
 
 }
 
@@ -92,7 +92,7 @@ dml <- bind_rows(list_dm) %>%
     mutate(ydate = strptime(paste("2022", yday), format="%Y %j")) %>%
     mutate(ymonth = month(ydate)) %>%
     left_join(sites) %>%
-    select(population, site, everything())
+    select(region, site, everything())
 
 write_csv(dml, paste0(folder_phenotypes, "sites/dml.csv"))
 
