@@ -63,25 +63,6 @@ mamba create -y -n ncbi-datasets
 mamba activate ncbi-datasets
 mamba install -y -c bioconda ncbi-datasets-cli=18.9.0
 
-# Install blast v2.14.1
-# blast stands for Basic Local Alignment Search Tool, and can build a BLAST database with local sequences
-mamba create -n blast
-mamba activate blast
-mamba install -y -c bioconda blast=2.14.1
-
-# Install barrnap v0.9
-# Barrnap is BAsic Rapid Ribosomal RNA Predictor.  predicts the location of ribosomal RNA genes in genomes
-mamba create -n barrnap
-mamba activate barrnap
-mamba install -y -c bioconda barrnap=0.9
-# Downalod the RefSeq 16S database
-#https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/ # Proceed to Send to > Complete Record > File > FASTA > Sort by Default order
-# Store it at ~/bioinformatics/16s/refseq_16s.fasta. Make it into a database using blast
-mkdir -p ~/bioinformatics/16s/
-mv ~/Downloads/sequence.fasta ~/bioinformatics/16s/refseq_16s.fasta
-mamba activate blast
-makeblastdb -in ~/bioinformatics/16s/refseq_16s.fasta -dbtype nucl
-
 # Install minimap2 v2.26
 # minimap2 is a versatile pairwise aligner for genomic and spliced nucleotide sequences
 mamba create -y -n minimap2
@@ -118,52 +99,7 @@ mamba create -n gffread
 mamba activate gffread
 mamba install -y -c bioconda gffread=0.12.7
 
-# Install defense finder v1.3.0
-mamba create -n defense-finder
-mamba activate defense-finder
-mamba install -y -c bioconda defense-finder=1.3.0
-# Install the model from macsyfinder
-pip install -U mdmparis-defense-finder
-defense-finder update
-
-# Install padloc v2.0.0
-mamba create -y -n padloc -c conda-forge -c bioconda -c padlocbio padloc=2.0.0
-mamba activate padloc
-# Download the latest database
-padloc --db-update
-
-# Install clonalframml
-mamba create -n clonalframeml
-mamba activate clonalframeml
-mamba install -y -c bioconda clonalframeml=1.13
-
-# Install networkx
-mamba create -n networkx
-mamba activate networkx
-mamba install -y networkx
-
-# Install carveme 1.6.4
-# CarveMe: automated genome-scale metabolic model reconstruction
-mamba create -n carveme
-mamba activate carveme
-mamba install -y -c bioconda carveme=1.6.4
-mamba install -y -c bioconda diamond=2.1.12
-mamba install -y -c conda-forge pyscipopt=5.5.0
-mamba install -y pandas=2.2.3 # new pandas introduces syntax error
-
-# Install cobra 0.21.0
-mamba create -n cobra
-mamba activate cobra
-mamba install -y python=3.11
-mamba install -y -c conda-forge cobra=0.29.1 numpy=1.23.5
-
-# Install cogclassifier 2.0.0
-# Classify prokaryote protein sequences into COG functional category.
-mamba create -n cogclassifier
-mamba activate cogclassifier
-mamba install -y -c bioconda cogclassifier=2.0.0
-
-# Install CheckM 1.2.4
+# Install checkM 1.2.4
 mamba create -n checkm python=3.9
 mamba activate checkm
 mamba install -y -c bioconda numpy matplotlib pysam

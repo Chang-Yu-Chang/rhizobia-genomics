@@ -17,11 +17,11 @@ library(waffle)     # for waffle plots
 source(here::here("metadata.R"))
 
 # Read data ----
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
-iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens"))) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
+# iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
+#     mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens"))) %>%
+#     mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
 sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
     # Use sites where the isolates were from
     filter(site %in% isolates$site) %>%
