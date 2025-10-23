@@ -18,26 +18,28 @@ tt <- read_gpas()
 
 
 # Panel A. core gene ----
-p1_1 <- tbtr$tr[[1]] %>%
+tr <- tbtr$tr[[1]]
+edges_to_scale <- which(tr$edge[,2] %in% 44)
+tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.05
+
+p1_1 <- tr %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
+    mutate(highlight = ifelse(node == 44, T, F)) %>%
     mutate(` ` = "") %>%
     as.treedata() %>%
-    drop.tip("g2") %>%
     ggtree(layout = "ellipse", aes(color = organism_name)) +
-    geom_tippoint(aes(fill = organism_name), shape = 21, size = 3) +
+    geom_tippoint(aes(fill = organism_name), shape = 21, size = 1) +
+    geom_nodepoint(aes(color = highlight, size = highlight)) +
+    scale_color_manual(values = c(species_colors, `TRUE` = "red")) +
+    scale_size_manual(values = c(`TRUE` = 3, `FALSE` = 0)) +
     scale_fill_manual(values = species_colors) +
-    scale_color_manual(values = species_colors) +
     theme(
         plot.background = element_rect(color = "black", fill = "white", linewidth = 1)
     ) +
-    guides(fill = "none", color = "none")
+    guides(fill = "none", color = "none", size = "none")
 
 p1 <- p1_1
-    # scaleClade(node = 53, scale = .2) %>%
-    # scaleClade(node = 41, scale = .2) %>%
-    # collapse('mixed', node = 53, fill=species_colors[4]) %>%
-    # collapse('mixed', node = 41, fill=species_colors[3])
 
 # Panel B. gcv  ----
 p2 <- tbtr$tr[[2]] %>%
@@ -78,9 +80,9 @@ p2_1 <- isolates %>%
     theme(
         legend.position = "right",
         legend.title = element_blank(),
-        legend.key.size = unit(3, "mm"),
-        legend.direction = "horizontal",
-        legend.text = element_text(face = "italic", size = 8),
+        legend.key.size = unit(5, "mm"),
+        legend.text = element_text(face = "italic", size = 10),
+        legend.box.background = element_blank(),
         strip.background = element_blank(),
         strip.text = element_text(size = 10),
         strip.placement = "outside",
@@ -90,12 +92,13 @@ p2_1 <- isolates %>%
         axis.title = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 0)
+        axis.text.x = element_text(angle = 45, hjust = 0),
+        plot.background = element_blank()
     ) +
-    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2), nrow = 1)) +
     labs()
 
-# Panel B. symb genes ----
+# Panel B. genes ----
 tb <- tt$gpatl %>%
     filter(value == 1) %>%
     left_join(select(isolates, genome_id, organism_name))
@@ -124,7 +127,7 @@ p3 <- tb %>%
     theme_bw() +
     theme(
         axis.text.x = element_blank(),
-        axis.title = element_blank(),
+        axis.title.y = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
@@ -135,7 +138,7 @@ p3 <- tb %>%
         plot.background = element_blank()
     ) +
     guides() +
-    labs()
+    labs(x = "gene family")
 
 ## Stat: do s meliloti and s medicate differ in their genes?
 # mod <- tb %>%
@@ -147,7 +150,7 @@ p3 <- tb %>%
 #Anova(mod, type = 3)
 #emmeans(mod, ~organism_name)
 
-# Panel D. functional genes -----
+# Panel C. functional genes -----
 tb <- tt$gd %>%
     filter(str_detect(gene, "dna|grp|gro|rpo|clp|rec|uvr")) %>%
     mutate(ge = str_sub(gene, 1, 5) %>% str_remove("_\\d$|_$")) %>%
@@ -162,11 +165,13 @@ p4 <- tb %>%
     ) %>%
     group_by(g, organism_name, genome_id, ge) %>%
     count() %>%
+    mutate(n = factor(n)) %>%
     ggplot() +
     geom_tile(aes(x = ge, y = genome_id, fill = n)) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10, name = "copy number") +
+    scale_fill_manual(values = setNames(grey(0.1*(7:1)), 1:7), name = "copy number") +
+#    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10, name = "copy number") +
     facet_grid(organism_name ~ g, scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
@@ -176,13 +181,14 @@ p4 <- tb %>%
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
         legend.position = "bottom",
+        #legend.direction = "horizontal",
         strip.placement = "outside",
         strip.clip = "off",
         strip.text.x = element_text(face = "italic"),
         strip.text.y = element_blank(),
         strip.background.x = element_rect(color = NA, fill = "gray90")
     ) +
-    guides() +
+    guides(fill = guide_legend(nrow = 1, label.position = "bottom")) +
     labs()
 
 # ----
@@ -193,8 +199,7 @@ p <- plot_grid(
     labels = c("", "", "", "C")
 ) +
     draw_plot(p1, x = .01, y = .7, width = .13, height = .28) +
-    draw_plot(get_legend(p2_1), x = -.3, y = -.4) +
-    #draw_plot(get_legend(p2_1), x = -.33, y = .35) +
+    draw_plot(get_legend(p2_1), x = -.35, y = -.42) +
     draw_text("A", x = .015, y = .96, size = 15, hjust = 0, fontface = "bold") +
     draw_text("B", x = .15, y = .96, size = 15, hjust = 0, fontface = "bold") +
     draw_text("core", x = .05, y = .95, size = 10, hjust = 0) +
@@ -204,9 +209,9 @@ ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 6)
 
 # PERMANOVA. Difference in heat relevant gene composition ?----
 tbm <- tb %>%
-    filter(organism_name %in% c("S. meliloti", "S. medicae")) %>%
+    filter(organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
     group_by(organism_name, genome_id, ge) %>%
     count() %>%
     pivot_wider(names_from = ge, values_from = n, values_fill = 0)
-dm <- vegdist(tbm[,-c(1,2)], method = "bray")
-adonis2(dm ~ organism_name, data = tbm, permutations = 999)
+dm <- vegan::vegdist(tbm[,-c(1,2)], method = "bray")
+vegan::adonis2(dm ~ organism_name, data = tbm, permutations = 999)
