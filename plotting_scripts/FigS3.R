@@ -1,146 +1,240 @@
-#' Pangenome composition: gene frequency spectrum and sampling regime
+#' This script plots the figures
 
 library(tidyverse)
 library(cowplot)
-library(ggsci)
+library(ggh4x)
+library(tidytree)
+library(ggtree)
 source(here::here("metadata.R"))
 
-iso <- read_csv(paste0(folder_data, "output/iso.csv"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+load(paste0(folder_genomics, "pangenome/trees/trees.rdata"))
+tbb <- read_csv(paste0(folder_genomics, "pangenome/tree_distance/tbb.csv"))
 
-# Panel A. Gene frequency spectrum ----
-tt <- read_gpas()
+# Panel A. core gene ----
+#nodes_to_scale <- c(38, 40, 1, 2, 41, 42, 54)
+tr <- tbtr$tr[[1]]
+tr <- root(tr, outgroup = "g2")
+edges_to_scale <- which(tr$edge[,2] %in% nodes_to_scale)
+tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.01
 
-p1 <- tt$gpatl %>%
-    filter(value == 1) %>%
-    group_by(gene) %>%
-    count(name = "ngenomes") %>%
-    group_by(ngenomes) %>%
-    count() %>%
-    mutate(n = n/1000) %>%
+p1 <- tr %>%
+    as_tibble() %>%
+    left_join(rename(isolates, label = genome_id)) %>%
+    mutate(` ` = "") %>%
+    mutate(highlight = ifelse(node %in% nodes_to_scale, T, F)) %>%
+    as.treedata() %>%
+    ggtree(layout = "ellipse") +
+    geom_tiplab(aes(label = label, color = contig_species), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    scale_color_manual(values = species_colors) +
+    scale_x_continuous(limits = c(0, 0.0075)) +
+    geom_treescale(x = .001, y = 15) +
+    facet_grid2(~` `) +
+    coord_cartesian(clip = "off") +
+    theme_tree() +
+    theme(
+        legend.title = element_blank(),
+        legend.background = element_rect(color = "black", fill = "white"),
+        legend.position = "inside",
+        legend.position.inside = c(.2, .8),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.margin = unit(c(0,-3,0,0), "mm")
+    ) +
+    guides(color = "none") +
+    labs()
+
+p1_1 <- isolates %>%
+    left_join(select(isolates, genome_id, contig_species)) %>%
+    select(genome_id, population, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p1)))) %>%
     ggplot() +
-    geom_hline(yintercept = 0) +
-    geom_col(aes(x = ngenomes, y = n), fill = "white", color = "black", width = .8) +
-    scale_x_continuous(breaks = seq(0, 40, 5)) +
-    scale_y_continuous(breaks = c(0:10), limits = c(0, 9)) +
+    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_manual(values = species_colors, breaks = c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")) +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
+        legend.position = "right",
+        legend.title = element_blank(),
+        legend.key.size = unit(3, "mm"),
+        legend.key.spacing.y = unit(1, "mm"),
+        legend.text = element_text(face = "italic"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        strip.clip = "off",
+        panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+        panel.background = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        plot.margin = unit(c(0,0,0,-1), "mm")
+    ) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    labs()
+
+
+# Panel B. gene content ----
+p2 <- tbtr$tr[[2]] %>%
+    as_tibble() %>%
+    left_join(rename(isolates, label = genome_id)) %>%
+    mutate(` ` = "") %>%
+    as.treedata() %>%
+    ggtree(layout = "ellipse") +
+    geom_tiplab(aes(label = label, color = contig_species), hjust = 1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    scale_x_reverse() +
+    scale_color_manual(values = species_colors) +
+    geom_treescale(x = -18, y = 22) +
+    coord_cartesian(clip = "off") +
+    theme_tree() +
+    theme(
+        legend.position = "none",
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        plot.margin = unit(c(0,0,0,0), "mm")
+    ) +
+    guides(fill = "none") +
+    labs()
+
+p2_1 <- isolates %>%
+    left_join(select(isolates, genome_id, contig_species)) %>%
+    select(genome_id, population, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
+    ggplot() +
+    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_manual(values = species_colors) +
+    coord_cartesian(clip = "off") +
+    theme_classic() +
+    theme(
+        legend.position = "right",
+        legend.title = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        strip.clip = "off",
+        panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
+        panel.background = element_rect(color = "black", fill = NA),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        plot.margin = unit(c(0,0,0,-1), "mm")
+    ) +
+    guides(fill = guide_legend(override.aes = list(linewidth = .2))) +
+    labs()
+
+p2_2 <- isolates %>%
+    left_join(select(isolates, genome_id, contig_species)) %>%
+    select(genome_id, site, contig_species) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
+    ggplot() +
+    geom_tile(aes(x = "Site", y = genome_id), color = "black", fill = NA, linewidth = .5) +
+    geom_text(aes(x = "Site", y = genome_id, label = site), size = 3) +
+    scale_x_discrete(expand = c(0,0), position = "top") +
+    scale_y_discrete(expand = c(0,0)) +
+    coord_cartesian(clip = "off") +
+    theme_minimal() +
+    theme(
+        axis.title = element_blank(),
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_blank(),
+        plot.margin = unit(c(0,0,0,0), "mm"),
+        panel.grid = element_blank()
+    ) +
+    guides() +
+    labs()
+
+# Panel C. tree distance ----
+tb_obv <- tb2 %>%
+    select(-rfds) %>%
+    distinct(tr_type1, tr_type2, .keep_all = T) %>%
+    filter(tr_type1 == "gpa", tr_type2 == "core")
+
+p3 <- tb2 %>%
+    filter(tr_type1 == "gpa", tr_type2 == "core") %>%
+    ggplot() +
+    geom_histogram(aes(x = rfds), binwidth = .05, color = "black", fill = NA, boundary = 0) +
+    geom_vline(data = tb_obv, aes(xintercept = rfd), color = "red", linetype = 2) +
+    #facet_grid2(tr_type1 ~ tr_type2, switch = "y", render_empty = F) +
+    scale_x_continuous(breaks = seq(0,1,.2), limits = c(0,1)) +
+    scale_y_continuous(position = "right") +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
         panel.border = element_rect(color = "black", fill = NA),
-        panel.grid.major.y = element_line(color = "grey90")
+        strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.background = element_rect(fill = NA, color = NA)
     ) +
     guides() +
-    labs(x = "Number of genomes", y = "Number of genes (k)")
+    labs(x = "Robinson–Foulds distances")
 
-# Number of core genes
-gg <- table(apply(tt$gpa[,-1], 1, sum))
-c(singleton = gg[[1]], core = last(gg), single_core = nrow(tt$list_sccg), total = sum(gg)) # 8875         987         775       26544
 
-# Panel B. core vs accessory sampling ----
-compute_pan <- function (mi) {
-    # Single genome
-    if(!is.matrix(mi)) return(tibble(core = sum(mi), total = sum(mi)))
-    # Equal or more than two genomes
-    ngenomes <- apply(mi, 2, sum)
-    tng <- table(ngenomes)
-    if (names(tng)[1] == "0") {
-        tibble(core = last(tng)[1], total = sum(tng) - tng[1])
-    } else if (names(tng)[1] == "1"){
-        tibble(core = last(tng)[1], total = sum(tng))
-    }
-}
-do_sampling <- function (n_boots = 100) {
-    tt <- read_gpas()
-    m <- t(tt$gpa[,-1])
-    tb <- crossing(ngenome = 1:ncol(tt$gpa[,-1]), boot = 1:n_boots) # Each sample of ngenome is repeated 100 times
-    tb$pan <- NA
+# Connecting lines ----
+tips1 <- get_taxa_name(p1)
+tips2 <- get_taxa_name(p2)
 
-    for (i in 1:nrow(tb)) {
-        set.seed(tb$boot[i])
-        cat("", i)
-        tb$pan[i] <- list(compute_pan(m[sample(1:nrow(m), tb$ngenome[i]),]))
-    }
+p4 <- tibble(genome_id = isolates$genome_id) %>%
+    mutate(
+        x1 = 1,
+        x2 = 2,
+        y1 = match(genome_id, rev(get_taxa_name(p1))),
+        y2 = match(genome_id, rev(get_taxa_name(p2)))
+    ) %>%
+    ggplot() +
+    geom_segment(aes(x = x1, xend = x2, y = y1, yend = y2), linewidth = .2, color = "grey10") +
+    scale_y_continuous(expand = c(0,0), limits = c(0.5, 38.5)) +
+    coord_cartesian(clip = "off") +
+    theme_void() +
+    theme() +
+    guides() +
+    labs()
 
-    tbp <- tb %>%
-        unnest(cols = c(pan)) %>%
-        group_by(ngenome) %>%
-        reframe(enframe(quantile(core, c(0, 0.05, 0.5, 0.95, 1), na.rm = T), "quantile", "core"),
-                enframe(quantile(total, c(0, 0.05, 0.5, 0.95, 1)), "quantile", "total")) %>%
-        mutate(core = core/1000, total = total / 1000)
 
-    tbpr <- tbp %>%
-        filter(quantile %in% c("0%", "100%")) %>%
-        pivot_longer(cols = c(core, total)) %>%
-        pivot_wider(names_from = quantile, values_from = value)
-    return(list(tbp = tbp, tbpr = tbpr))
-}
-plot_sampling <- function (tbp, tbpr) {
-    tbp %>%
-        group_by(ngenome) %>%
-        pivot_longer(cols = c(-ngenome, -quantile)) %>%
-        ggplot(aes(x = ngenome, y = value, color = name, linetype = quantile)) +
-        geom_line() +
-        geom_ribbon(data = tbpr, aes(x = ngenome, ymin = `0%`, ymax = `100%`, fill = name), inherit.aes = FALSE, alpha = 0.3) +
-        scale_linetype_manual(values = c("0%" = 1, "5%" = 2, "50%" = 3, "95%" = 2, "100%" = 1)) +
-        scale_x_continuous(breaks = seq(0, 40, 5)) +
-        scale_y_continuous(breaks = seq(0, 30, 5), limits = c(0, 27)) +
-        scale_color_aaas() +
-        scale_fill_aaas() +
-        coord_cartesian(clip = "off") +
-        theme_classic() +
-        theme(
-            legend.title = element_blank(),
-            legend.position = "right",
-            legend.margin = margin(0,0,0,0, "mm"),
-            legend.box.margin = margin(0,0,0,0, "mm"),
-            legend.background = element_rect(color = NA, fill = NA),
-            panel.border = element_rect(color = "black", fill = NA),
-            panel.grid.major = element_line(color = "grey90"),
-            plot.margin = margin(0, 2,2,2, "mm")
-        ) +
-        guides(linetype = "none") +
-        labs(x = "Number of genomes", y = "Number of genes (k)")
-}
 
-tb <- do_sampling()
-p2 <- plot_sampling(tb$tbp, tb$tbpr)
-
+# ----
 p <- plot_grid(
-    p1, p2,
-    nrow = 2, axis = "lr", align = "v", scale = 0.9,
-    labels = LETTERS[1:2]
-) + theme(plot.background = element_rect(fill = "white", color = NA))
+    p1, p1_1 + guides(fill = "none"),
+    p4,
+    p2_1 + guides(fill = "none"), p2_2, p2,
+    nrow = 1,
+    scale = .95, rel_widths = c(1,.1,.15,.1,.08,1),
+    align = "h", axis = "tb",
+    labels = c("A", "", "", "B")
+) +
+    draw_text("Single-copy core gene", x = .2, y = .95, size = 10, hjust = 0) +
+    draw_text("Gene content variation", x = .63, y = .95, size = 10, hjust = 0) +
+    draw_label("C", x = .79, y = .95, fontface = "bold") +
+    draw_plot(get_legend(p1_1), x = -.4, y = .25) +
+    draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
+    theme(plot.background = element_rect(color = NA, fill = "white"))
 
-ggsave(here::here("plots/FigS3.png"), p, width = 6, height = 6)
 
-# Number of core genes within symbiotic and within nonsymbiotic clades ----
+ggsave(here::here("plots/FigS3.png"), p, width = 10, height = 6)
+
+
+#
 tt <- read_gpas()
 nrow(tt$gpa) # 26544
 
-tb2 <- tt$gpatl %>%
+core <- tt$gpatl %>%
+    group_by(gene) %>%
     filter(value == 1) %>%
-    left_join(select(iso, genome_id, contig_species)) %>%
-    mutate(symb = case_when(
-        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
-        T ~ "non-symbiotic"
-    ))
+    count() %>%
+    ungroup() %>%
+    filter(n == max(n))
+nrow(core) / nrow(tt$gpa) *100
 
-##
-xx <- tb2 %>%
-    filter(symb == "symbiotic") %>%
-    group_by(gene) %>%
-    count
-sum(xx$n == 35) # 3767 core genes
-nrow(xx) # 16166 total genes
-sum(xx$n == 35)/nrow(xx) * 100 # 23.3%
-
-
-##
-xx <- tb2 %>%
-    filter(symb == "non-symbiotic") %>%
-    group_by(gene) %>%
-    count
-sum(xx$n == 3) # 2855 core genes
-nrow(xx) # 11509 total genes
-sum(xx$n == 3)/nrow(xx) * 100 # 24.8%
-
+tt$gpacl %>%
+    filter(str_detect(gene, "nod")) %>%
+    filter(genome_id %in% paste0("g", c(2,3,15)))
 
