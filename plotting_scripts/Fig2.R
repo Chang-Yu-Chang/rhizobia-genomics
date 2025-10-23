@@ -6,12 +6,11 @@ library(ggh4x)      # for nested facets
 library(lme4)       # for lmer
 library(car)        # for anova
 library(emmeans)    # for emmeans
-
 source(here::here("metadata.R"))
 
 # Prepare the data
-iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
 gcl_smooth <- read_csv(paste0(folder_phenotypes, 'growth/gcl_smooth.csv')) # Growth traits per well
 gts <- read_csv(paste0(folder_phenotypes, 'growth/gts.csv')) # Growth traits per isolate
 gtsl <- gts %>%
@@ -19,20 +18,22 @@ gtsl <- gts %>%
     select(temperature, exp_id, r, lag, maxOD) %>%
     mutate(loglag = -log(lag)) %>%
     pivot_longer(-c(temperature, exp_id), names_to = "trait") %>%
-    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
+    left_join(select(isolates, exp_id, genome_id)) %>%
+    left_join(select(ani, genome_id, organism_name)) %>%
     drop_na(value) %>%
     mutate(symb = case_when(
-        contig_species %in% c("S. meliloti", "S. medicae") ~ "symbiotic",
+        str_detect(organism_name, "Sinorhizobium") ~ "symbiotic",
         T ~ "non-symbiotic"
     ))
 
 # Panel A growth curve ----
 p1 <- gcl_smooth %>% # Compute mean
-    left_join(select(iso, exp_id, genome_id, contig_species)) %>%
+    left_join(select(isolates, exp_id, genome_id)) %>%
+    left_join(select(ani, genome_id, organism_name)) %>%
     group_by(temperature, exp_id, t) %>%
     mutate(mean_abs = mean(abs_fit)) %>%
     ggplot() +
-    geom_line(aes(x = t, y = mean_abs, group = exp_id, color = contig_species), linewidth = .3) +
+    geom_line(aes(x = t, y = mean_abs, group = exp_id, color = organism_name), linewidth = .3) +
     geom_text(aes(label = temperature), x = 5, y = .45) +
     scale_color_manual(values = species_colors) +
     scale_x_continuous(breaks = seq(0, 48, 12)) +
@@ -73,7 +74,7 @@ get_trait_posthoc <- function(df, trait_name) {
     dat <- df %>% filter(trait == trait_name)
 
     # --- (1) LMM: Symbiotic vs Non-symbiotic ---
-    mod1 <- lmer(value ~ symb * temperature + (1|contig_species), data = dat)
+    mod1 <- lmer(value ~ symb * temperature + (1|organism_name), data = dat)
     emm1 <- emmeans(mod1, ~ symb | temperature)
     res1 <- as.data.frame(pairs(emm1)) %>%
         mutate(
@@ -83,9 +84,9 @@ get_trait_posthoc <- function(df, trait_name) {
         )
 
     # --- (2) LM: meliloti vs medicae ---
-    dat_symb <- dat %>% filter(contig_species %in% c("S. meliloti","S. medicae"))
-    mod2 <- lm(value ~ contig_species * temperature, data = dat_symb)
-    emm2 <- emmeans(mod2, ~ contig_species | temperature)
+    dat_symb <- dat %>% filter(organism_name %in% c("Sinorhizobium meliloti","Sinorhizobium medicae"))
+    mod2 <- lm(value ~ organism_name * temperature, data = dat_symb)
+    emm2 <- emmeans(mod2, ~ organism_name | temperature)
     res2 <- as.data.frame(pairs(emm2)) %>%
         mutate(
             trait = trait_name,
@@ -100,7 +101,7 @@ traits <- c("r","lag","maxOD")
 posthoc_all <- map_dfr(traits, ~ get_trait_posthoc(gtsl, .x))
 
 gtwlm <- gtsl %>%
-    group_by(temperature, contig_species, trait) %>%
+    group_by(temperature, organism_name, trait) %>%
     summarize(mean_value = mean(value, na.rm = T), ci_value = qnorm(0.975) * sd(value, na.rm = T) / sqrt(sum(!is.na(value))), n = sum(!is.na(value))) %>%
     group_by(temperature, trait) %>%
     mutate(max_mean_value = max(mean_value, na.rm = T)) %>%
@@ -149,11 +150,11 @@ p2 <- gtsl %>%
     ), c("growth rate (1/hr)", "lag time (hr)", "yield (O.D.[600nm])"))) %>%
     ggplot() +
     # Each strain
-    geom_line(aes(x = temperature, y = value, group = exp_id, color = contig_species), alpha = .1) +
+    geom_line(aes(x = temperature, y = value, group = exp_id, color = organism_name), alpha = .1) +
     # Mean value
-    geom_ribbon(data = gtwlm, aes(x = temperature, ymin = mean_value-ci_value, ymax =  mean_value+ci_value, fill = contig_species, group = contig_species), inherit.aes = FALSE, alpha = 0.2) +
-    geom_line(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
-    geom_point(data = gtwlm, aes(x = temperature, y = mean_value, color = contig_species, group = contig_species)) +
+    geom_ribbon(data = gtwlm, aes(x = temperature, ymin = mean_value-ci_value, ymax =  mean_value+ci_value, fill = organism_name, group = organism_name), inherit.aes = FALSE, alpha = 0.2) +
+    geom_line(data = gtwlm, aes(x = temperature, y = mean_value, color = organism_name, group = organism_name)) +
+    geom_point(data = gtwlm, aes(x = temperature, y = mean_value, color = organism_name, group = organism_name)) +
     scale_color_manual(values = species_colors) +
     scale_fill_manual(values = species_colors) +
     facet_wrap2(~trait, scales = "free_y", nrow = 1, strip.position = "left") +
@@ -218,39 +219,39 @@ ggsave(here::here("plots/Fig2.png"), p, width = 8, height = 7)
 ## at 25 and 30C, non symbiotic strains have higher growth rate  than symbiotic strains
 mod <- gtsl %>%
     filter(temperature == "25c", trait == "r") %>%
-    lmer(value ~ symb + (1|contig_species), data = .)
+    lmer(value ~ symb + (1|organism_name), data = .)
 Anova(mod, type = 3)
 
 mod <- gtsl %>%
     filter(temperature == "30c", trait == "r") %>%
-    lmer(value ~ symb + (1|contig_species), data = .)
+    lmer(value ~ symb + (1|organism_name), data = .)
 Anova(mod, type = 3)
 
 mod <- gtsl %>%
     filter(temperature == "35c", trait == "r") %>%
-    lmer(value ~ symb + (1|contig_species), data = .)
+    lmer(value ~ symb + (1|organism_name), data = .)
 Anova(mod, type = 3)
 
 mod <- gtsl %>%
     filter(temperature == "40c", trait == "r") %>%
-    lmer(value ~ symb + (1|contig_species), data = .)
+    lmer(value ~ symb + (1|organism_name), data = .)
 Anova(mod, type = 3)
 
-# for S. meliloti, between 25 and 40C
+# for Sinorhizobium meliloti, between 25 and 40C
 mod <- gtsl %>%
-    filter(trait == "r", contig_species == "S. meliloti") %>%
+    filter(trait == "r", organism_name == "Sinorhizobium meliloti") %>%
     lm(value ~ temperature, data = .)
 Anova(mod, type = 3)
 pairs(emmeans(mod, ~temperature))
 
 mod <- gtsl %>%
-    filter(trait == "lag", contig_species == "S. meliloti") %>%
+    filter(trait == "lag", organism_name == "Sinorhizobium meliloti") %>%
     lm(value ~ temperature, data = .)
 Anova(mod, type = 3)
 pairs(emmeans(mod, ~temperature))
 
 mod <- gtsl %>%
-    filter(trait == "maxOD", contig_species == "S. meliloti") %>%
+    filter(trait == "maxOD", organism_name == "Sinorhizobium meliloti") %>%
     lm(value ~ temperature, data = .)
 Anova(mod, type = 3)
 pairs(emmeans(mod, ~temperature))
@@ -258,35 +259,35 @@ pairs(emmeans(mod, ~temperature))
 
 ## among symbiotic strains
 mod <- gtsl %>%
-    filter(trait == "r", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ contig_species + temperature, data = .)
+    filter(trait == "r", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ organism_name + temperature, data = .)
 Anova(mod, type = 3)
-pairs(emmeans(mod, ~contig_species))
+pairs(emmeans(mod, ~organism_name))
 
 mod <- gtsl %>%
-    filter(trait == "lag", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ temperature + contig_species, data = .)
+    filter(trait == "lag", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ temperature + organism_name, data = .)
 Anova(mod, type = 3)
-pairs(emmeans(mod, ~contig_species))
+pairs(emmeans(mod, ~organism_name))
 
 mod <- gtsl %>%
-    filter(trait == "maxOD", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ temperature + contig_species, data = .)
+    filter(trait == "maxOD", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ temperature + organism_name, data = .)
 Anova(mod, type = 3)
-pairs(emmeans(mod, ~contig_species))
+pairs(emmeans(mod, ~organism_name))
 
 
 mod <- gtsl %>%
-    filter(temperature == "40c", trait == "r", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ contig_species, data = .)
+    filter(temperature == "40c", trait == "r", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ organism_name, data = .)
 summary(mod)
 
 mod <- gtsl %>%
-    filter(temperature == "40c", trait == "lag", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ contig_species, data = .)
+    filter(temperature == "40c", trait == "lag", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ organism_name, data = .)
 summary(mod)
 
 mod <- gtsl %>%
-    filter(temperature == "40c", trait == "maxOD", contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    lm(value ~ contig_species, data = .)
+    filter(temperature == "40c", trait == "maxOD", organism_name %in% c("Sinorhizobium meliloti", "Sinorhizobium medicae")) %>%
+    lm(value ~ organism_name, data = .)
 summary(mod)

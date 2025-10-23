@@ -1,16 +1,15 @@
 #' This script cleans the gene presence/absence from panaroo outputs
-#' It works all 38 genomes including non-symbiotic ensifers
 #'
-#' For each set, there will be 11 csv files
+#' There will be 11 csv files
 #'  - gpa: gene present absence
 #'  - gpar: Gene presence-absence. It has the fasta IDs instead of binary entries
 #'  - list_sccg: the list of single-copy core genes
 #'  - sml: the pairwise BC distance between genes
 #'  - spa: structural variants
 #'  - gpatl: the long list of gene presence absence
-#'  - gene_order: the order of genes for plotting the pangenome
 #'  - gd: the full gene dataset from PANAROO
-#'  - gpacl: the long list of gene presence absence and the contigs they are located
+#'  - (deprecated) gpacl: the long list of gene presence absence and the contigs they are located
+#'  - (deprecated) gene_order: the order of genes for plotting the pangenome
 #'  - gcn: a wide format of gene copy number
 #'  - cleaned_gene_names: table of annotated gene cluster with gene symbol. See the function for the criteria
 #'  - acce_fst: the fst equivalent of accessory gene content
@@ -21,13 +20,11 @@ library(vegan)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-contigs <- read_csv(paste0(folder_data, "genomics_analysis/genomes/contigs.csv")) %>% select(contig_id, replicon_type) %>% drop_na
 
 clean_gpa <- function (gpa_file) {
     #' This function cleans the raw gpa file
     # Gene presence-absence table
     gpa <- read_delim(gpa_file, show_col_types = F) %>% clean_names() # Rows are genes, columns are genomes
-    #cat(dim(gpa)) # 26504 genes in union x 37-1 genomes
     return(gpa)
 }
 get_sccg <- function (gpa_csv) {
@@ -206,66 +203,67 @@ clean_gene_names <- function (gpar) {
     return(tts)
 }
 
-dir_path <- paste0(folder_data, "genomics_analysis/gene_content/")
+dir_path <- paste0(folder_data, "genomics/pangenome/gene_content/")
 if (!dir.exists(dir_path)) dir.create(dir_path, recursive = TRUE) # Create the directory (and parent directories, if needed)
 
 # Gene presence-absence table. Rows are genes, columns are genomes. Entries are binary
-gpa <- clean_gpa(paste0(folder_data, "genomics/pangenome/gene_presence_absence.Rtab"))
+gpa <- clean_gpa(paste0(folder_genomics, "pangenome/panaroo/gene_presence_absence.Rtab"))
 dim(gpa)
-write_csv(gpa, paste0(folder_data, "genomics_analysis/gene_content/gpa.csv"))
+cat(dim(gpa)) # 16135 genes in union x 36-1 genomes
+write_csv(gpa, paste0(folder_genomics, "pangenome/gene_content/gpa.csv"))
 
 # Gene presence-absence identical to roary output.  It has the fasta IDs instead of binary entries
-gpar <- clean_gpar(paste0(folder_data, "genomics/pangenome/gene_presence_absence_roary.csv"))
-write_csv(gpar, paste0(folder_data, "genomics_analysis/gene_content/gpar.csv"))
+gpar <- clean_gpar(paste0(folder_genomics, "pangenome/panaroo/gene_presence_absence_roary.csv"))
+write_csv(gpar, paste0(folder_genomics, "pangenome/gene_content/gpar.csv"))
 
 # Get the list of single-copy core genes
-list_sccg <- get_sccg(paste0(folder_data, "genomics/pangenome/gene_presence_absence.csv"))
-nrow(list_sccg)
-write_csv(list_sccg, paste0(folder_data, "genomics_analysis/gene_content/list_sccg.csv"), col_names = F)
+list_sccg <- get_sccg(paste0(folder_genomics, "pangenome/panaroo/gene_presence_absence.csv"))
+nrow(list_sccg) # 2929
+write_csv(list_sccg, paste0(folder_genomics, "pangenome/gene_content/list_sccg.csv"), col_names = F)
 
 # Compute the pairwise bray-curtis simularity based on gene presence absence
 sml <- compute_bc_dist(gpa)
-write_csv(sml, paste0(folder_data, "genomics_analysis/gene_content/sml.csv"))
+write_csv(sml, paste0(folder_genomics, "pangenome/gene_content/sml.csv"))
 
 # Structural variation
-spa <- clean_spa(paste0(folder_data, "genomics/pangenome/struct_presence_absence.Rtab"))
-dim(spa)
-write_csv(spa, paste0(folder_data, "genomics_analysis/gene_content/spa.csv"))
+spa <- clean_spa(paste0(folder_genomics, "pangenome/panaroo/struct_presence_absence.Rtab"))
+dim(spa) # 9771 x 36-1
+write_csv(spa, paste0(folder_genomics, "pangenome/gene_content/spa.csv"))
 
 # Make a longer list and Compute gene counts
 gpatl <- make_long_gpa(gpa)
 dim(gpatl)
-write_csv(gpatl, paste0(folder_data, "genomics_analysis/gene_content/gpatl.csv"))
+write_csv(gpatl, paste0(folder_genomics, "pangenome/gene_content/gpatl.csv"))
 
 # Genes and the contigs they are from
-gd <- clean_gd(paste0(folder_data, "genomics/pangenome/gene_data.csv"))
-dim(gd) # 258827 (gene x genome x contig) x 8 rows
-write_csv(gd, paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
+gd <- clean_gd(paste0(folder_genomics, "pangenome/panaroo/gene_data.csv"))
+dim(gd) # 252146 (gene x genome x contig) x 8 rows
+write_csv(gd, paste0(folder_genomics, "pangenome/gene_content/gd.csv"))
 
 # Full directory for each gene
-gpaf <- clean_gpaf(paste0(folder_data, "genomics/pangenome/gene_presence_absence.csv"))
-dim(gpaf) #  genes x 39-3 genomes. 1) gene name 2) non unique gene name 3) annotation
+gpaf <- clean_gpaf(paste0(folder_genomics, "pangenome/panaroo/gene_presence_absence.csv"))
+dim(gpaf) # 16135 genes x 38-3 genomes. 1) gene name 2) non unique gene name 3) annotation
 gpafl <- make_long_gpaf(gpaf)
 dim(gpafl$gpafl1) #
 dim(gpafl$gpafl2) #
 
 # Make longer format of gene with contig info
-gd <- read_csv(paste0(folder_data, "genomics_analysis/gene_content/gd.csv"))
-gpacl <- make_long_gpac(gpafl$gpafl1, contigs, gd)
-length(unique(gpacl$contig_id)) # 161 contigs
-write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/gpacl.csv"))
+# gd <- read_csv(paste0(folder_genomics, "pangenome/gene_content/gd.csv"))
+# gpacl <- make_long_gpac(gpafl$gpafl1, contigs, gd)
+# length(unique(gpacl$contig_id)) # 161 contigs
+# write_csv(gpacl, paste0(folder_data, "genomics_analysis/gene_content/gpacl.csv"))
 
-# Gene order
-gene_order <- gpacl %>%
-    group_by(replicon_type, gene) %>%
-    dplyr::count() %>%
-    arrange(desc(n))
-write_csv(gene_order, paste0(folder_data, "genomics_analysis/gene_content/gene_order.csv"))
+# # Gene order
+# gene_order <- gpacl %>%
+#     group_by(replicon_type, gene) %>%
+#     dplyr::count() %>%
+#     arrange(desc(n))
+# write_csv(gene_order, paste0(folder_data, "genomics_analysis/gene_content/gene_order.csv"))
 
 # Get the wide format of gene copy number. Use the gpar table
 gcn <- get_wide_gcn(gpar)
-write_csv(gcn, paste0(folder_data, "genomics_analysis/gene_content/gcn.csv"))
+write_csv(gcn, paste0(folder_genomics, "pangenome/gene_content/gcn.csv"))
 
 # Clean the gene names. Use only those with annotated gene names
 cleaned_gene_names <- clean_gene_names(gpar)
-write_csv(cleaned_gene_names, paste0(folder_data, "genomics_analysis/gene_content/cleaned_gene_names.csv"))
+write_csv(cleaned_gene_names, paste0(folder_genomics, "pangenome/gene_content/cleaned_gene_names.csv"))

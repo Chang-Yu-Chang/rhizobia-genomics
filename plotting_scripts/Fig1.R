@@ -19,18 +19,10 @@ source(here::here("metadata.R"))
 # Read data ----
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
 ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
-# isolates <- isolates %>% left_join(ani)
-# iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-#     mutate(contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens"))) %>%
-#     mutate(region = ifelse(region == "VA", "Virginia", "Pennsylvania"))
-sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>%
-    filter(site %in% isolates$site)
+sites  <- read_csv(paste0(folder_phenotypes, "sites/sites.csv")) %>% filter(site %in% isolates$site)
 # daily max t at sampling sites
 dml <- read_csv(paste0(folder_phenotypes, "sites/dml.csv")) %>%
-    mutate(
-        region = factor(region, c("Virginia", "Pennsylvania")),
-        site = factor(site, sites$site)
-    )
+    mutate(region = factor(region, c("Virginia", "Pennsylvania")), site = factor(site, sites$site))
 tb_month <- read_csv(paste0(folder_phenotypes, "sites/tb_month.csv")) # month by day
 us_states <- states() # us state map
 map_range <- read_csv(paste0(folder_phenotypes, "sites/map_range.csv")) %>%

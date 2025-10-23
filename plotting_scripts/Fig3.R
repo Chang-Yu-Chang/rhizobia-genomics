@@ -11,10 +11,8 @@ library(car)
 source(here::here("metadata.R"))
 
 load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
-isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv")) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
-iso <- read_csv(paste0(folder_data, "output/iso.csv")) %>%
-    mutate(population = ifelse(population == "VA", "Virginia", "Pennsylvania"))
+isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
 tt <- read_gpas()
 
 
