@@ -8,28 +8,30 @@ library(ggtree)
 source(here::here("metadata.R"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+ani <- read_csv(paste0(folder_genomics, "taxonomy/ani.csv"))
 load(paste0(folder_genomics, "pangenome/trees/trees.rdata"))
 tbb <- read_csv(paste0(folder_genomics, "pangenome/tree_distance/tbb.csv"))
 
 # Panel A. core gene ----
-#nodes_to_scale <- c(38, 40, 1, 2, 41, 42, 54)
+
 tr <- tbtr$tr[[1]]
-tr <- root(tr, outgroup = "g2")
-edges_to_scale <- which(tr$edge[,2] %in% nodes_to_scale)
-tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.01
+edges_to_scale <- which(tr$edge[,2] %in% 44)
+tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.1
 
 p1 <- tr %>%
     as_tibble() %>%
-    left_join(rename(isolates, label = genome_id)) %>%
+    left_join(rename(ani, label = genome_id)) %>%
     mutate(` ` = "") %>%
-    mutate(highlight = ifelse(node %in% nodes_to_scale, T, F)) %>%
+    mutate(highlight = ifelse(node %in% 44, T, F)) %>%
     as.treedata() %>%
     ggtree(layout = "ellipse") +
-    geom_tiplab(aes(label = label, color = contig_species), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
-    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
-    scale_color_manual(values = species_colors) +
-    scale_x_continuous(limits = c(0, 0.0075)) +
-    geom_treescale(x = .001, y = 15) +
+    geom_tiplab(aes(label = label, color = organism_name), hjust = -.1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = organism_name), shape = -1, size = -1) +
+    geom_nodepoint(aes(color = highlight, size = highlight)) +
+    scale_color_manual(values = c(species_colors, `TRUE` = "red")) +
+    scale_size_manual(values = c(`TRUE` = 3, `FALSE` = 0)) +
+    scale_x_continuous(limits = c(0, 0.045)) +
+    geom_treescale(x = .001, y = 20) +
     facet_grid2(~` `) +
     coord_cartesian(clip = "off") +
     theme_tree() +
@@ -44,18 +46,19 @@ p1 <- tr %>%
         axis.title.x = element_blank(),
         plot.margin = unit(c(0,-3,0,0), "mm")
     ) +
-    guides(color = "none") +
+    guides(color = "none", size = "none") +
     labs()
 
 p1_1 <- isolates %>%
-    left_join(select(isolates, genome_id, contig_species)) %>%
-    select(genome_id, population, contig_species) %>%
+    left_join(select(ani, genome_id, organism_name)) %>%
+    filter(genome_id %in% get_taxa_name(p1)) %>%
+    select(genome_id, region, organism_name) %>%
     mutate(genome_id = factor(genome_id, rev(get_taxa_name(p1)))) %>%
     ggplot() +
-    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    geom_tile(aes(x = region, y = genome_id, fill = organism_name), color = "black", linewidth = .5) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_manual(values = species_colors, breaks = c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")) +
+    scale_fill_manual(values = species_colors, breaks = c("Sinorhizobium meliloti", "Sinorhizobium medicae")) +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
@@ -71,6 +74,7 @@ p1_1 <- isolates %>%
         panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
         panel.background = element_rect(color = "black", fill = NA),
         axis.title = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 0),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         plot.margin = unit(c(0,0,0,-1), "mm")
@@ -82,15 +86,15 @@ p1_1 <- isolates %>%
 # Panel B. gene content ----
 p2 <- tbtr$tr[[2]] %>%
     as_tibble() %>%
-    left_join(rename(isolates, label = genome_id)) %>%
+    left_join(rename(ani, label = genome_id)) %>%
     mutate(` ` = "") %>%
     as.treedata() %>%
     ggtree(layout = "ellipse") +
-    geom_tiplab(aes(label = label, color = contig_species), hjust = 1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
-    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    geom_tiplab(aes(label = label, color = organism_name), hjust = 1, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = organism_name), shape = -1, size = -1) +
     scale_x_reverse() +
     scale_color_manual(values = species_colors) +
-    geom_treescale(x = -18, y = 22) +
+    geom_treescale(x = -18, y = 20) +
     coord_cartesian(clip = "off") +
     theme_tree() +
     theme(
@@ -105,11 +109,12 @@ p2 <- tbtr$tr[[2]] %>%
     labs()
 
 p2_1 <- isolates %>%
-    left_join(select(isolates, genome_id, contig_species)) %>%
-    select(genome_id, population, contig_species) %>%
+    left_join(select(ani, genome_id, organism_name)) %>%
+    filter(genome_id %in% get_taxa_name(p1)) %>%
+    select(genome_id, region, organism_name) %>%
     mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
     ggplot() +
-    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    geom_tile(aes(x = region, y = genome_id, fill = organism_name), color = "black", linewidth = .5) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
     scale_fill_manual(values = species_colors) +
@@ -125,6 +130,7 @@ p2_1 <- isolates %>%
         panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
         panel.background = element_rect(color = "black", fill = NA),
         axis.title = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 0),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         plot.margin = unit(c(0,0,0,-1), "mm")
@@ -133,8 +139,9 @@ p2_1 <- isolates %>%
     labs()
 
 p2_2 <- isolates %>%
-    left_join(select(isolates, genome_id, contig_species)) %>%
-    select(genome_id, site, contig_species) %>%
+    filter(genome_id %in% get_taxa_name(p1)) %>%
+    left_join(select(ani, genome_id, organism_name)) %>%
+    select(genome_id, site, organism_name) %>%
     mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
     ggplot() +
     geom_tile(aes(x = "Site", y = genome_id), color = "black", fill = NA, linewidth = .5) +
@@ -145,7 +152,7 @@ p2_2 <- isolates %>%
     theme_minimal() +
     theme(
         axis.title = element_blank(),
-        axis.text.x = element_text(size = 8),
+        axis.text.x = element_text(angle = 45, hjust = 0),
         axis.text.y = element_blank(),
         plot.margin = unit(c(0,0,0,0), "mm"),
         panel.grid = element_blank()
@@ -154,17 +161,16 @@ p2_2 <- isolates %>%
     labs()
 
 # Panel C. tree distance ----
-tb_obv <- tb2 %>%
+tb_obv <- tbb %>%
     select(-rfds) %>%
     distinct(tr_type1, tr_type2, .keep_all = T) %>%
     filter(tr_type1 == "gpa", tr_type2 == "core")
 
-p3 <- tb2 %>%
+p3 <- tbb %>%
     filter(tr_type1 == "gpa", tr_type2 == "core") %>%
     ggplot() +
     geom_histogram(aes(x = rfds), binwidth = .05, color = "black", fill = NA, boundary = 0) +
     geom_vline(data = tb_obv, aes(xintercept = rfd), color = "red", linetype = 2) +
-    #facet_grid2(tr_type1 ~ tr_type2, switch = "y", render_empty = F) +
     scale_x_continuous(breaks = seq(0,1,.2), limits = c(0,1)) +
     scale_y_continuous(position = "right") +
     coord_cartesian(clip = "off") +
@@ -182,8 +188,7 @@ p3 <- tb2 %>%
 # Connecting lines ----
 tips1 <- get_taxa_name(p1)
 tips2 <- get_taxa_name(p2)
-
-p4 <- tibble(genome_id = isolates$genome_id) %>%
+p4 <- tibble(genome_id = sort(get_taxa_name(p1))) %>%
     mutate(
         x1 = 1,
         x2 = 2,
@@ -192,7 +197,7 @@ p4 <- tibble(genome_id = isolates$genome_id) %>%
     ) %>%
     ggplot() +
     geom_segment(aes(x = x1, xend = x2, y = y1, yend = y2), linewidth = .2, color = "grey10") +
-    scale_y_continuous(expand = c(0,0), limits = c(0.5, 38.5)) +
+    scale_y_continuous(expand = c(0,0), limits = c(0.5, 35.5)) +
     coord_cartesian(clip = "off") +
     theme_void() +
     theme() +
@@ -218,23 +223,4 @@ p <- plot_grid(
     draw_plot(p3, width = .2, height = .35, x = .8, y = .6) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
-
 ggsave(here::here("plots/FigS3.png"), p, width = 10, height = 6)
-
-
-#
-tt <- read_gpas()
-nrow(tt$gpa) # 26544
-
-core <- tt$gpatl %>%
-    group_by(gene) %>%
-    filter(value == 1) %>%
-    count() %>%
-    ungroup() %>%
-    filter(n == max(n))
-nrow(core) / nrow(tt$gpa) *100
-
-tt$gpacl %>%
-    filter(str_detect(gene, "nod")) %>%
-    filter(genome_id %in% paste0("g", c(2,3,15)))
-
