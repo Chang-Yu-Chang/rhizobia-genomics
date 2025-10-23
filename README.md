@@ -2,7 +2,7 @@
 
 Scripts and minimal data for reproducing the anaylsis, tables, and figures presented in the manuscript
 
-"Biogeographic and genomic signatures of thermal adaptation in facultative rhizobia"
+"Biogeographic and genomic signatures of thermal adaptation in facultative symbionts"
 
 Chang, Chang-Yu, Terrence Topping-Brown, Jazmine L. Rud, Mccall B. Calvert, Gerardo Bencosme, and Corlett Wood. 
 
@@ -23,25 +23,24 @@ The Rscripts are executed under the following R environment
 ```
 > sessionInfo()
 R version 4.4.2 (2024-10-31)
-Platform: aarch64-apple-darwin20
+Platform: x86_64-apple-darwin20
 Running under: macOS Sequoia 15.6.1
 
 Matrix products: default
 BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/New_York
+time zone: Asia/Taipei
 tzcode source: internal
 
 attached base packages:
 [1] stats     graphics  grDevices datasets  utils     methods   base     
 
 loaded via a namespace (and not attached):
-[1] compiler_4.4.2      BiocManager_1.30.25 tools_4.4.2         rstudioapi_0.17.1  
-[5] renv_1.0.9    
+[1] compiler_4.4.2      BiocManager_1.30.25 tools_4.4.2    rstudioapi_0.17.1   renv_1.0.9   
 ```
 
 For first time `renv` user, install renv and restore the packages recorded in `renv.lock`
@@ -53,7 +52,7 @@ For first time `renv` user, install renv and restore the packages recorded in `r
 
 # Data folders and files
 
-There are 6 data folders. The data included in this repository should allow a user to reproduce all the figures and tables in both main text and supplements.
+There are data folders. The data included in this repository should allow a user to reproduce all the figures and tables in both main text and supplements.
 
 Some folders are labeled with (NOT IN THIS REPO) because it exceeds the github repo file limit. These files will be available in the final version.
 
@@ -62,10 +61,9 @@ Some folders are labeled with (NOT IN THIS REPO) because it exceeds the github r
     - `plants/`: sampling site coordinate and plant experiment data
     - `ensifer_ncbi.csv`: the list of Sinorhizobium/Ensifer reference genomes
     - (NOT IN THIS REPO) `plasmidsaurus/`: contains the raw ON long-read sequences from Plasmidsaurus
-2. `mapping/` has two mapping files used by all files
-    - `genomes.csv` is the mapping between sequencing batches and strain id
-    - `isolates.csv` is the list of isolates/strains and their ids
-3. (NOT IN THIS REPO) `genomics/` contains the intermediate files of genome assembly, annotation, and pangenomes
+2. `mapping/` has a mapping file
+    - `isolates.csv` is the list of isolates/strains and their sequencing batches and ids
+3. `genomics/` contains the intermediate files of genome assembly, annotation, and pangenomes
 4. `genomics_analysis/`
     - `contigs/contigs.csv`: contig data
     - `genomes/`
@@ -81,18 +79,16 @@ Some folders are labeled with (NOT IN THIS REPO) because it exceeds the github r
     - `fst/` and `gcv_fst/`: fst for SNPs and GCV (gene content variation)
     - `dxy/` and `gcv_dxy/`: dxy for SNPs and GCV
     - `go/` and `gcv_go`: GO enrichment analysis for SNPs and GCV
-5. `phylogenomics_analysis/`
     - `trees/trees.rdata`: R phylo objects of whole-genome tree
     - `replicon_trees/trees.rdata`: R phylo objects of replicon-level tree
 6. `phenotypes/` 
     - `sites/`: field sampling sites
     - `growth/`: growth traits
-    - `plants/`: symbiosis traits
-    
+
 
 # Workflow
 
-The shell scripts were executed on a 2021 iMac with Apple M1 chip 16GB memory and macOS version 14.7. 
+The shell scripts were executed on a 2021 iMac with Apple M1 chip 16GB memory.
 
 ## Reproducing figures and tables
 
@@ -116,8 +112,9 @@ cd genomics/assembly/
 zsh assess_reads.sh             # Filter and output the filtered read txt
 zsh denovo_assembly.sh          # Assembly
 zsh assess_assemblies.sh        # Quality control (quast and busco); the busco mamba env binary needs to be specified in zshrc
-zsh consolidate_genomes.sh      # Move genome fasta to one folder
 zsh manual_concat.sh            # Manually concatenate the two genomes g20 and g24
+cd ../../
+Rscript -e "renv::activate('.'); source('genomics/assembly/consolidate_qcs.R')" # Consolidates quality control metrics
 
 # Annotation
 cd genomics/annotation/
@@ -125,38 +122,27 @@ zsh annotate_genomes.sh
 zsh consolidate_annotations.sh 
 
 # Taxonomy
-cd genomics/misc 
-zsh download_ncbi_genomes.sh  # Download the Sinorhizobium/Ensifer genomes from NCBI. The list is stored in raw/ensifer_ncbi.csv
-
-cd genomics/taxonomy/
-zsh make_database.sh    # Render the genomes into a custom blast database
-zsh blast.sh            # Perform blast on rRNA and contigs
-
+cd genomics/taxonomy
+zsh download_ncbi_genomes.sh  # Download genomes from NCBI
+zsh ani.sh # Compare the pairwise distance between our assembled genomes and the reference genomes
 cd ../../
-Rscript -e "renv::activate('.'); 
-source('genomics_analysis/taxonomy/aggregate_results.R');    # Aggregate the blast results
-source('genomics_analysis/taxonomy/identify_taxa.R');        # Identify taxonomy
-"
+Rscript -e "renv::activate('.'); source('genomics/taxonomy/consolidate_ani.R')"
 
-# Genome-wide distance
-cd genomics/distances/
-zsh ani.sh
-zsh kmers.sh 
-
-cd ../../
-Rscript -e "renv::activate('.'); 
-source('genomics_analysis/distances/aggregate_distances.R') # Aggregate ANI and kmer results
-"
-
-# Pangenomics
+# Pangenome
 cd genomics/pangenome/
 zsh pangenome.sh 
-
+cd ../../
+Rscript -e "renv::activate('.'); source('genomics/pangenome/clean_gpa.R')"           # Clean up panaroo outputs, mostly gene presence/absence; output csv files are noted in the R script
+cd genomics/pangenome/
+zsh concatenate_alignment.sh # Concatenate the single-copy core genes
+zsh compute_trees1.sh # Use iqtree to compute single-copy core-gene trees
 cd ../../
 Rscript -e "renv::activate('.'); 
-source('genomics_analysis/gene_content/clean_gpa.R');           # Clean up panaroo outputs, mostly gene presence/absence; output csv files are noted in the R script
-source('genomics_analysis/gene_content/check_gene_names.R');    # Prepare the list of genes for Uniprot search
-"
+source('genomics/pangenome/compute_trees2.R')   # computes trees for gene content variation
+source('genomics/pangenome/curate_trees.R')     # combines the tree objects into a Rdata file `trees.rdata`
+source('genomics/pangenome/rf_tree.R')          # computes the RF distance between trees
+
+
 
 # Fst and dxy and go
 Rscript -e "renv::activate('.'); 
@@ -168,47 +154,9 @@ source('genomics_analysis/go/go.R');                    # Perform GO analysis fo
 source('genomics_analysis/gcv_go/gcv_go.R');            # Perform GO analysis for accessory genes
 "
 
-# Trees
-## Whole-genome trees
-cd phylogenomics_analysis/trees/
-zsh concatenate_alignment.sh
-zsh compute_trees1.sh # Compute single-copy core-gene trees
-cd ../../
-Rscript -e "renv::activate('.'); 
-source('phylogenomics_analysis/trees/compute_trees2.R'); # Compute trees based on GCV, ANI and kmers
-source('phylogenomics_analysis/trees/curate_trees.R');   # Curate and save the trees into one Rdata
-"
-
-## Replicon trees
-cd phylogenomics_analysis/replicon_trees/
-zsh concatenate_alignment.sh # Note this shell script is different from trees/concatenate_alignment.sh
-zsh compute_trees1.sh
-cd ../../
-Rscript -e "renv::activate('.'); 
-source('phylogenomics_analysis/replicon_trees/compute_trees2.R'); 
-source('phylogenomics_analysis/replicon_trees/curate_trees.R');
-source('phylogenomics_analysis/replicon_trees/count_snps.R');
-"
-
-## Tree distance
-Rscript -e "renv::activate('.'); 
-source('phylogenomics_analysis/tree_distance/rf_tree.R');
-"
-
 # Growth assay
-Rscript -e "renv::activate('.'); 
-source('phenotypes/growth/fit_gc.R');           # Smooth the raw growth curve and computes the growth traits 
-source('phenotypes/growth/stat_growth.R');      # Compare between populations for each temperature for each trait
-source('phenotypes/growth/stat_growth_rn.R')    # Compares between populations for each trait
-"
+Rscript -e "renv::activate('.'); source('phenotypes/growth/fit_gc.R')"  # Smooth the raw growth curve and computes the growth traits 
 
 # Map and climate
-Rscript -e "renv::activate('.'); 
-source('phenotypes/sites/extract_climate.R'); # Use DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
-"
-
-# Plant/symbiosis experiment
-Rscript -e "renv::activate('.'); 
-source('phenotypes/plants/clean_plants.R');             # Clean the variable names and binds the lupulina/sativa data tables into one `plants.csv`
-
+Rscript -e "renv::activate('.'); source('phenotypes/sites/extract_climate.R')" # Use DAYMET https://daymet.ornl.gov/ database to extract the climate data for our sampling sites given the coordinates
 ```

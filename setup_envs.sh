@@ -91,7 +91,7 @@ mamba install -y -c bioconda iqtree=2.3.0
 mamba create -n biopython
 mamba activate biopython
 mamba install -y -c conda-forge biopython=1.84
-mamba install -y -c conda-forge pandas
+mamba install -y -c conda-forge pandas=2.3.3
 mamba install -y matplotlib
 
 # Install gffread v0.12.7

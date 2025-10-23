@@ -11,9 +11,9 @@ source(here::here("metadata.R"))
 options(contrasts=c("contr.sum", "contr.poly"))
 
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
+ani <- read_csv(paste0(folder_data, "mapping/ani.csv"))
 isolates <- select(isolates, -exp_id, -genome_name)
 sites_dist <- read_csv(paste0(folder_data, "phenotypes/sites/sites_dist.csv"))
-iso <- read_csv(paste0(folder_data, "output/iso.csv"))
 
 # Figures ----
 # core ----

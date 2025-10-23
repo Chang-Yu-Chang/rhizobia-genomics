@@ -10,21 +10,22 @@ library(lme4)
 library(car)
 source(here::here("metadata.R"))
 
-load(paste0(folder_data, "phylogenomics_analysis/trees/trees.rdata"))
+load(paste0(folder_genomics, "pangenome/trees/trees.rdata"))
 isolates <- read_csv(paste0(folder_data, "mapping/isolates.csv"))
-ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
+ani <- read_csv(paste0(folder_genomics, "taxonomy/ani.csv"))
+isolates <- isolates %>% left_join(ani)
 tt <- read_gpas()
 
 
 # Panel A. core gene ----
 p1_1 <- tbtr$tr[[1]] %>%
     as_tibble() %>%
-    left_join(rename(iso, label = genome_id)) %>%
+    left_join(rename(isolates, label = genome_id)) %>%
     mutate(` ` = "") %>%
     as.treedata() %>%
     drop.tip("g2") %>%
-    ggtree(layout = "ellipse", aes(color = contig_species)) +
-    geom_tippoint(aes(fill = contig_species), shape = 21, size = 3) +
+    ggtree(layout = "ellipse", aes(color = organism_name)) +
+    geom_tippoint(aes(fill = organism_name), shape = 21, size = 3) +
     scale_fill_manual(values = species_colors) +
     scale_color_manual(values = species_colors) +
     theme(
@@ -32,21 +33,21 @@ p1_1 <- tbtr$tr[[1]] %>%
     ) +
     guides(fill = "none", color = "none")
 
-p1 <- p1_1 %>%
-    scaleClade(node = 53, scale = .2) %>%
-    scaleClade(node = 41, scale = .2) %>%
-    collapse('mixed', node = 53, fill=species_colors[4]) %>%
-    collapse('mixed', node = 41, fill=species_colors[3])
+p1 <- p1_1
+    # scaleClade(node = 53, scale = .2) %>%
+    # scaleClade(node = 41, scale = .2) %>%
+    # collapse('mixed', node = 53, fill=species_colors[4]) %>%
+    # collapse('mixed', node = 41, fill=species_colors[3])
 
 # Panel B. gcv  ----
 p2 <- tbtr$tr[[2]] %>%
     as_tibble() %>%
-    left_join(rename(iso, label = genome_id)) %>%
+    left_join(rename(isolates, label = genome_id)) %>%
     mutate(` ` = "") %>%
     as.treedata() %>%
     ggtree(layout = "ellipse") +
-    geom_tiplab(aes(label = label, color = contig_species), hjust = 0, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
-    geom_tippoint(aes(color = contig_species), shape = -1, size = -1) +
+    geom_tiplab(aes(label = label, color = organism_name), hjust = 0, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
+    geom_tippoint(aes(color = organism_name), shape = -1, size = -1) +
     scale_color_manual(values = species_colors) +
     geom_treescale(x = 4, y = 25) +
     coord_cartesian(clip = "off") +
@@ -64,14 +65,14 @@ p2 <- tbtr$tr[[2]] %>%
 
 
 p2_1 <- isolates %>%
-    left_join(select(iso, genome_id, contig_species)) %>%
-    select(genome_id, population, contig_species) %>%
+    filter(genome_id %in% get_taxa_name(p2)) %>%
+    select(genome_id, region, organism_name) %>%
     mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
     ggplot() +
-    geom_tile(aes(x = population, y = genome_id, fill = contig_species), color = "black", linewidth = .5) +
+    geom_tile(aes(x = region, y = genome_id, fill = organism_name), color = "black", linewidth = .5) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_manual(values = species_colors, breaks = c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens")) +
+    scale_fill_manual(values = species_colors, breaks = c("Sinorhizobium meliloti", "Sinorhizobium medicae")) +
     coord_cartesian(clip = "off") +
     theme_classic() +
     theme(
@@ -97,7 +98,7 @@ p2_1 <- isolates %>%
 # Panel B. symb genes ----
 tb <- tt$gpatl %>%
     filter(value == 1) %>%
-    left_join(select(iso, genome_id, contig_species))
+    left_join(select(isolates, genome_id, organism_name))
 
 genes_order <- tb %>%
     distinct(gene, genome_id) %>%
@@ -110,15 +111,15 @@ p3 <- tb %>%
     mutate(
         genome_id = factor(genome_id, rev(get_taxa_name(p2))),
         gene = factor(gene, genes_order),
-        contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
+        organism_name = factor(organism_name, c("Sinorhizobium meliloti", "Sinorhizobium medicae", "control"))
     ) %>%
-    distinct(gene, contig_species, genome_id) %>%
+    distinct(gene, organism_name, genome_id) %>%
     ggplot() +
     geom_tile(aes(x = gene, y = genome_id)) +
     scale_x_discrete(position = "top", expand = c(0,0)) +
     scale_y_discrete(expand = c(0,0)) +
     scale_fill_gradient(low = "grey80", high = "grey20") +
-    facet_grid2(contig_species ~., scales = "free", space = "free") +
+    facet_grid2(organism_name ~., scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
@@ -138,13 +139,13 @@ p3 <- tb %>%
 
 ## Stat: do s meliloti and s medicate differ in their genes?
 # mod <- tb %>%
-#     filter(contig_species %in% c("S. medicae", "S. meliloti")) %>%
-#     select(ge, genome_id, contig_species) %>%
-#     group_by(ge, genome_id, contig_species) %>%
+#     filter(organism_name %in% c("S. medicae", "S. meliloti")) %>%
+#     select(ge, genome_id, organism_name) %>%
+#     group_by(ge, genome_id, organism_name) %>%
 #     count() %>%
-#     lmer(n ~ ge + contig_species + (1|contig_species:genome_id), data = .)
+#     lmer(n ~ ge + organism_name + (1|organism_name:genome_id), data = .)
 #Anova(mod, type = 3)
-#emmeans(mod, ~contig_species)
+#emmeans(mod, ~organism_name)
 
 # Panel D. functional genes -----
 tb <- tt$gd %>%
@@ -152,31 +153,32 @@ tb <- tt$gd %>%
     mutate(ge = str_sub(gene, 1, 5) %>% str_remove("_\\d$|_$")) %>%
     mutate(g = str_sub(ge, 1, 3)) %>%
     select(g, ge, gene, genome_id) %>%
-    left_join(select(iso, genome_id, contig_species))
+    left_join(select(isolates, genome_id, organism_name))
 
 p4 <- tb %>%
     mutate(
         genome_id = factor(genome_id, rev(get_taxa_name(p2))),
-        contig_species = factor(contig_species, c("S. meliloti", "S. medicae", "S. canadensis", "S. adhaerens", "control"))
+        organism_name = factor(organism_name, c("Sinorhizobium meliloti", "Sinorhizobium medicae", "control"))
     ) %>%
-    group_by(g, contig_species, genome_id, ge) %>%
+    group_by(g, organism_name, genome_id, ge) %>%
     count() %>%
     ggplot() +
     geom_tile(aes(x = ge, y = genome_id, fill = n)) +
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
     scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10, name = "copy number") +
-    facet_grid(contig_species ~ g, scales = "free", space = "free") +
+    facet_grid(organism_name ~ g, scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
-        axis.text.x = element_text(angle = 45, hjust = 0, size = 8),
+        axis.text.x = element_text(angle = 45, hjust = 0, size = 8, face = "italic"),
         axis.title = element_blank(),
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
         legend.position = "bottom",
         strip.placement = "outside",
         strip.clip = "off",
+        strip.text.x = element_text(face = "italic"),
         strip.text.y = element_blank(),
         strip.background.x = element_rect(color = NA, fill = "gray90")
     ) +
@@ -202,9 +204,9 @@ ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 6)
 
 # PERMANOVA. Difference in heat relevant gene composition ?----
 tbm <- tb %>%
-    filter(contig_species %in% c("S. meliloti", "S. medicae")) %>%
-    group_by(contig_species, genome_id, ge) %>%
+    filter(organism_name %in% c("S. meliloti", "S. medicae")) %>%
+    group_by(organism_name, genome_id, ge) %>%
     count() %>%
     pivot_wider(names_from = ge, values_from = n, values_fill = 0)
 dm <- vegdist(tbm[,-c(1,2)], method = "bray")
-adonis2(dm ~ contig_species, data = tbm, permutations = 999)
+adonis2(dm ~ organism_name, data = tbm, permutations = 999)
