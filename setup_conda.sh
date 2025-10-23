@@ -47,11 +47,3 @@ mamba shell init
 mamba config --env --set subdir osx-64
 # Note that this command only modifies .bash_profile if you work in bash. For zsh environment, copy-paste the generated text from .bash_profile to .zshrc. Close and re-open a shell session. This step is essential for mamba activate to work
 mamba env list
-
-# 5. Install docker
-# brew install docker # use homebrew to install docker
-# cd ~/bioinformatics
-# wget https://desktop.docker.com/mac/main/arm64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-arm64 -O Docker.dmg
-# sudo hdiutil attach Docker.dmg
-# sudo /Volumes/Docker/Docker.app/Contents/MacOS/install
-# sudo hdiutil detach /Volumes/Docker

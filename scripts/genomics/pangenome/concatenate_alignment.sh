@@ -11,10 +11,7 @@ echo $genome_ids | tr ' ' '\n' > $folder_genomics/pangenome/trees/list_genomes.c
 
 # Concatenate
 python concatenate_alignment.py \
-    $folder_genomics/pangenome/gene_content/aligned_gene_sequences \
-    $folder_genomics/pangenome/gene_content/combined_sccg_alignment.fas \
+    $folder_genomics/pangenome/panaroo/aligned_gene_sequences \
+    $folder_genomics/pangenome/trees/combined_sccg_alignment.fas \
     $folder_genomics/pangenome/gene_content/list_sccg.csv \
-    $folder_genomics/pangenome/gene_content/list_genomes.csv
-
-# Copy this alignment for to the tree folders
-cp $folder_genomics/pangenome/panaroo/combined_sccg_alignment.fas $folder_genomics/trees/combined_sccg_alignment.fas
+    $folder_genomics/pangenome/trees/list_genomes.csv

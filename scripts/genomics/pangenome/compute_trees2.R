@@ -1,4 +1,4 @@
-#' Compute trees: gpa, ani, kmers
+#' Compute trees based on gene content variation
 
 library(tidyverse)
 library(ape)
