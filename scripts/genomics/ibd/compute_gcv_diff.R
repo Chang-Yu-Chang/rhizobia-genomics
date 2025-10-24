@@ -16,6 +16,7 @@ ani <- read_csv(paste0(folder_genomics, "taxonomy/ani.csv"), show_col_types = FA
 group_meliloti_PA <- isolates %>%
     left_join(ani) %>%
     filter(str_detect(organism_name, "meliloti"), str_detect(region, "Pennsylvania")) %>%
+    filter(genome_id != "g42") %>%
     pull(genome_id)
 
 group_medicae_VA <- isolates %>%
@@ -34,6 +35,12 @@ gpa_replicon <- gpacl %>%
 compute_gene_dxy <- function(df, genomes) {
     mat <- df %>% select(any_of(genomes)) %>% as.matrix()
     if (ncol(mat) < 2) return(NULL)
+
+    # drop genes that are invariant (all 0 or all 1)
+    variable_rows <- rowSums(mat) > 0 & rowSums(mat) < ncol(mat)
+    mat <- mat[variable_rows, , drop = FALSE]
+    if (nrow(mat) == 0) return(NULL)
+
     n_genes <- nrow(mat)
     combos <- combn(colnames(mat), 2, simplify = FALSE)
 
@@ -41,6 +48,7 @@ compute_gene_dxy <- function(df, genomes) {
         genome_id1 = map_chr(combos, 1),
         genome_id2 = map_chr(combos, 2),
         gene_diff = map_dbl(combos, ~sum(mat[, .x[1]] != mat[, .x[2]])),
+        total_genes = n_genes,
         Dxy_gene = gene_diff / n_genes
     )
 }
@@ -61,25 +69,5 @@ gcv_medicae_VA <- gpa_replicon %>%
 # combine results ----
 gcv <- bind_rows(gcv_meliloti_PA, gcv_medicae_VA)
 
-# count total genes per replicon ----
-gene_counts <- gpacl %>%
-    filter(!is.na(replicon)) %>%
-    distinct(gene, replicon) %>%
-    count(replicon, name = "n_genes")
-
-# summarise mean Dxy-like GCV ----
-gcv_summary <- gcv %>%
-    group_by(group, replicon) %>%
-    summarise(
-        mean_gene_diff = mean(gene_diff, na.rm = TRUE),
-        mean_Dxy_gene = mean(Dxy_gene, na.rm = TRUE),
-        sd_Dxy_gene = sd(Dxy_gene, na.rm = TRUE),
-        n_pairs = n(),
-        .groups = "drop"
-    ) %>%
-    left_join(gene_counts, by = "replicon") %>%
-    relocate(n_genes, .after = replicon)
-
 # output ----
 write_csv(gcv, file.path(folder_ibd, "gcv.csv"))
-write_csv(gcv_summary, file.path(folder_ibd, "gcv_summary.csv"))

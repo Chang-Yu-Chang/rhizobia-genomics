@@ -65,14 +65,14 @@ read_gpas <- function () {
 #         return(as.character(round(pv, 3)))
 #     }
 # }
-# detect_sig <- function (pv) {
-#     if (pv > 0.05) {
-#         return("n.s.")
-#     } else if (pv > 0.01) {
-#         return("*")
-#     } else if (pv > 0.001) {
-#         return("**")
-#     } else if (pv < 0.001) {
-#         return("***")
-#     }
-# }
+detect_sig <- function (pv) {
+    if (pv > 0.05) {
+        return("n.s.")
+    } else if (pv >= 0.01) {
+        return("*")
+    } else if (pv >= 0.001) {
+        return("**")
+    } else if (pv < 0.001) {
+        return("***")
+    }
+}
