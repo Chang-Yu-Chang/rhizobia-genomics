@@ -133,7 +133,7 @@ p2_3 <- tb %>%
     theme(
         axis.text.x = element_text(angle = 30, hjust = 0, color = "black"),
         axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
+        axis.title = element_blank(),
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
         legend.position = "bottom",

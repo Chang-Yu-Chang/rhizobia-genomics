@@ -12,7 +12,6 @@
 
 
 
-
 ### DEPRECATED
 1. `raw_reads`: examine raw reads
 4. `taxonomy`: aggregates the blast results

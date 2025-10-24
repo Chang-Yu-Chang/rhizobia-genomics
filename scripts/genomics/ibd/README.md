@@ -1,12 +1,5 @@
 Assign contigs to replicons and perform IBD
 
-1. `download_ref_genomes.sh`
-
-
-0. `genomics_cli`: command line tools that are executed
-1. `assembly`: de novo assemble rhizobia genomes from Nanopore long-read sequences
-2. `annotation`: genome annotation
-3. `taxonomy`: identify taxanomy using blast
-4. `pangenome`: pangenome analysis using paranoo. It requires prokka annotations. It also examines gene content on panaroo outputs
-
-`env_vars.sh` stores shell variables that specify directory.
+1. `blash.sh`
+2. `clean_blash.R`
+3. `make_gpa_by_replicon.R`
