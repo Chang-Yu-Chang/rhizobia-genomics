@@ -16,13 +16,13 @@ ani <- read_csv(paste0(folder_genomics, "taxonomy/ani.csv"))
 isolates <- isolates %>% left_join(ani)
 tt <- read_gpas()
 
-
 # Panel A. core gene ----
 tr <- tbtr$tr[[1]]
 edges_to_scale <- which(tr$edge[,2] %in% 44)
 tr$edge.length[edges_to_scale] <- tr$edge.length[edges_to_scale]*0.05
 
-p1_1 <- tr %>%
+## tree
+p1 <- tr %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
     mutate(highlight = ifelse(node == 44, T, F)) %>%
@@ -34,24 +34,28 @@ p1_1 <- tr %>%
     scale_color_manual(values = c(species_colors, `TRUE` = "red")) +
     scale_size_manual(values = c(`TRUE` = 3, `FALSE` = 0)) +
     scale_fill_manual(values = species_colors) +
+    geom_treescale(x = .02, y = 2) +
     theme(
         plot.background = element_rect(color = "black", fill = "white", linewidth = 1)
     ) +
     guides(fill = "none", color = "none", size = "none")
 
-p1 <- p1_1
-
 # Panel B. gcv  ----
-p2 <- tbtr$tr[[2]] %>%
+## Tree
+p2_1 <- tbtr$tr[[2]] %>%
     as_tibble() %>%
     left_join(rename(isolates, label = genome_id)) %>%
     mutate(` ` = "") %>%
     as.treedata() %>%
-    ggtree(layout = "ellipse") +
+    ggtree(layout = "slanted") +
     geom_tiplab(aes(label = label, color = organism_name), hjust = 0, align = T, offset = 1e-3, linetype = 3, linesize = .1) +
     geom_tippoint(aes(color = organism_name), shape = -1, size = -1) +
+    geom_highlight(node = 37, fill = species_colors[3], type = "encircle", alpha = .2) +
+    geom_highlight(node = 49, fill = species_colors[4], type = "encircle", alpha = .2) +
+    geom_text(x = 60, y = 4, label = "S. medicae\nclade", fontface = "italic") +
+    geom_text(x = 60, y = 22, label = "S. meliloti\nclade", fontface = "italic") +
     scale_color_manual(values = species_colors) +
-    geom_treescale(x = 4, y = 25) +
+    geom_treescale(x = 4, y = 2) +
     coord_cartesian(clip = "off") +
     theme_tree() +
     theme(
@@ -59,17 +63,16 @@ p2 <- tbtr$tr[[2]] %>%
         strip.background = element_blank(),
         strip.text = element_text(size = 10),
         axis.ticks.x = element_blank(),
-        axis.title.x = element_blank(),
-        plot.margin = unit(c(0,3,0,0), "mm")
+        axis.title.x = element_blank()
     ) +
     guides(fill = "none") +
     labs()
 
-
-p2_1 <- isolates %>%
-    filter(genome_id %in% get_taxa_name(p2)) %>%
+## heatmap
+p2_2 <- isolates %>%
+    filter(genome_id %in% get_taxa_name(p2_1)) %>%
     select(genome_id, region, organism_name) %>%
-    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2)))) %>%
+    mutate(genome_id = factor(genome_id, rev(get_taxa_name(p2_1)))) %>%
     ggplot() +
     geom_tile(aes(x = region, y = genome_id, fill = organism_name), color = "black", linewidth = .5) +
     scale_x_discrete(expand = c(0,0), position = "top") +
@@ -90,15 +93,15 @@ p2_1 <- isolates %>%
         panel.border = element_rect(color = "black", fill = NA, linewidth = .5),
         panel.background = element_rect(color = "black", fill = NA),
         axis.title = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 0, color = "black"),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 0),
         plot.background = element_blank()
     ) +
     guides(fill = guide_legend(override.aes = list(linewidth = .2), nrow = 1)) +
     labs()
 
-# Panel B. genes ----
+## genes presence absence heatmap
 tb <- tt$gpatl %>%
     filter(value == 1) %>%
     left_join(select(isolates, genome_id, organism_name))
@@ -108,59 +111,52 @@ genes_order <- tb %>%
     group_by(gene) %>%
     count() %>%
     arrange(desc(n)) %>%
-    pull(gene)
+    ungroup() %>%
+    mutate(x = row_number())
 
-p3 <- tb %>%
+p2_3 <- tb %>%
     mutate(
-        genome_id = factor(genome_id, rev(get_taxa_name(p2))),
-        gene = factor(gene, genes_order),
+        genome_id = factor(genome_id, rev(get_taxa_name(p2_1))),
+        gene = factor(gene, genes_order$gene),
         organism_name = factor(organism_name, c("Sinorhizobium meliloti", "Sinorhizobium medicae", "control"))
     ) %>%
     distinct(gene, organism_name, genome_id) %>%
+    left_join(genes_order) %>%
     ggplot() +
-    geom_tile(aes(x = gene, y = genome_id)) +
-    scale_x_discrete(position = "top", expand = c(0,0)) +
+    geom_tile(aes(x = x, y = genome_id, fill = "presence")) +
+    scale_x_continuous(expand = c(0,0), breaks = (1:18)*1000, labels = c(rep("",4), 5000, rep("",4),10000, rep("",4),15000,rep("",3)), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_gradient(low = "grey80", high = "grey20") +
+    scale_fill_manual(values = c(presence = "grey20", absence = "grey80"), breaks = c("absence", "presence")) +
     facet_grid2(organism_name ~., scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
     theme(
-        axis.text.x = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 0, color = "black"),
+        axis.text.y = element_blank(),
         axis.title.y = element_blank(),
-        axis.ticks.x = element_blank(),
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
-        legend.position = "right",
+        legend.position = "bottom",
+        legend.title = element_blank(),
         strip.placement = "outside",
         strip.text.y = element_blank(),
         strip.background.x = element_rect(color = NA, fill = "gray90"),
         plot.background = element_blank()
     ) +
     guides() +
-    labs(x = "gene family")
-
-## Stat: do s meliloti and s medicate differ in their genes?
-# mod <- tb %>%
-#     filter(organism_name %in% c("S. medicae", "S. meliloti")) %>%
-#     select(ge, genome_id, organism_name) %>%
-#     group_by(ge, genome_id, organism_name) %>%
-#     count() %>%
-#     lmer(n ~ ge + organism_name + (1|organism_name:genome_id), data = .)
-#Anova(mod, type = 3)
-#emmeans(mod, ~organism_name)
+    labs()
 
 # Panel C. functional genes -----
-tb <- tt$gd %>%
+tb2 <- tt$gd %>%
     filter(str_detect(gene, "dna|grp|gro|rpo|clp|rec|uvr")) %>%
     mutate(ge = str_sub(gene, 1, 5) %>% str_remove("_\\d$|_$")) %>%
     mutate(g = str_sub(ge, 1, 3)) %>%
     select(g, ge, gene, genome_id) %>%
     left_join(select(isolates, genome_id, organism_name))
 
-p4 <- tb %>%
+p3 <- tb2 %>%
     mutate(
-        genome_id = factor(genome_id, rev(get_taxa_name(p2))),
+        genome_id = factor(genome_id, rev(get_taxa_name(p2_1))),
         organism_name = factor(organism_name, c("Sinorhizobium meliloti", "Sinorhizobium medicae", "control"))
     ) %>%
     group_by(g, organism_name, genome_id, ge) %>%
@@ -171,7 +167,6 @@ p4 <- tb %>%
     scale_x_discrete(expand = c(0,0), position = "top") +
     scale_y_discrete(expand = c(0,0)) +
     scale_fill_manual(values = setNames(grey(0.1*(7:1)), 1:7), name = "copy number") +
-#    scale_fill_gradient(low = "grey80", high = "grey20", breaks = 1:10, name = "copy number") +
     facet_grid(organism_name ~ g, scales = "free", space = "free") +
     coord_cartesian(clip = "off") +
     theme_bw() +
@@ -181,28 +176,28 @@ p4 <- tb %>%
         panel.grid = element_blank(),
         panel.spacing.y = unit(0, "mm"),
         legend.position = "bottom",
-        #legend.direction = "horizontal",
         strip.placement = "outside",
         strip.clip = "off",
         strip.text.x = element_text(face = "italic"),
         strip.text.y = element_blank(),
-        strip.background.x = element_rect(color = NA, fill = "gray90")
+        strip.background.x = element_rect(color = NA, fill = "gray90"),
+        plot.margin = margin(0,3,1,1,"mm")
     ) +
     guides(fill = guide_legend(nrow = 1, label.position = "bottom")) +
     labs()
 
 # ----
 p <- plot_grid(
-    p2, p2_1 + guides(fill = "none"),
-    p3, p4, nrow = 1,
+    p2_1, p2_2 + guides(fill = "none"),
+    p2_3, p3, nrow = 1,
     align = "h", axis = "tb", rel_widths = c(1,.2,1,2),
     labels = c("", "", "", "C")
 ) +
     draw_plot(p1, x = .01, y = .7, width = .13, height = .28) +
-    draw_plot(get_legend(p2_1), x = -.35, y = -.42) +
     draw_text("A", x = .015, y = .96, size = 15, hjust = 0, fontface = "bold") +
     draw_text("B", x = .15, y = .96, size = 15, hjust = 0, fontface = "bold") +
-    draw_text("core", x = .05, y = .95, size = 10, hjust = 0) +
+    draw_text("Core gene", x = .035, y = .96, size = 10, hjust = 0) +
+    draw_text("Gene content", x = .17, y = .96, size = 10, hjust = 0) +
     theme(plot.background = element_rect(color = NA, fill = "white"))
 
 ggsave(here::here("plots/Fig3.png"), p, width = 12, height = 6)
