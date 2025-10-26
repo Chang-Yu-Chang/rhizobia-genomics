@@ -7,3 +7,5 @@
 - `compute_trees2.R` computes trees for gene content variation
 - `curate_trees.R` combines the tree objects into a Rdata file `trees.rdata`
 - `rf_tree.R` computes the RF distance between trees
+- `recA_dnaE2_analysis.sh`
+- `recA_dnaE2_analysis.R`

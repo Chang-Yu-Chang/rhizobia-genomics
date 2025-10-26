@@ -110,3 +110,18 @@ curl -o ~/.checkm/checkm_data_2015_01_16.tar.gz https://data.ace.uq.edu.au/publi
 cd ~/.checkm
 tar -xvzf checkm_data_2015_01_16.tar.gz
 checkm data setRoot ~/.checkm
+
+# Install bedtools v2.31.1
+mamba create -n bedtools
+mamba activate bedtools
+mamba install -y -c bioconda bedtool=2.31.1
+
+# Install mafft v7.525
+mamba create -n mafft
+mamba activate mafft
+mamba install y -c bioconda mafft=7.525
+
+# Install mafft v1.4.1
+mamba create -n trimal
+mamba activate trimal
+mamba install y -c bioconda trimal=1.4.1
