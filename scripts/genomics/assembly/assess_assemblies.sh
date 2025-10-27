@@ -44,17 +44,6 @@ do
     done
 done
 
-
-# Consolidates genome fasta files into one folder
-mamba activate seqkit
-for i in {1..38}
-do
-    dir=$folder_genomics/assembly/$genome_ids[$i]
-
-    # Remove contigs < 100k
-    seqkit seq -m 100000 -g $dir/medaka/consensus.fasta > $folder_genomics/fasta/genomes/$genome_ids[$i].fasta
-done
-
 # Calculate percentage removed
 mamba activate seqkit
 for i in {1..38}
@@ -62,7 +51,7 @@ do
     id=${genome_ids[$i]}
     dir=$folder_genomics/assembly/$id
     infile=$dir/medaka/consensus.fasta
-    outfile=$folder_genomics/fasta/genomes/$id.fasta
+    outfile=$folder_genomics/fasta/$id.fasta
 
     # Total genome length before filtering
     total_before=$(seqkit stats -T $infile | awk 'NR==2 {print $5}')
@@ -81,7 +70,7 @@ mamba activate checkm
 checkm lineage_wf \
     -t 8 \
     -x fasta \
-    $folder_genomics/fasta/genomes/ \
+    $folder_genomics/fasta/ \
     $folder_genomics/checkm
 
 # Extract summary table

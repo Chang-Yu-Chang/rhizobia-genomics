@@ -16,7 +16,7 @@ seqtk subseq $dir/medaka/consensus.fasta <(echo -e "contig_1\ncontig_2") >> $dir
 # ensure the output has the same line length
 awk '/^>/ {if (seqlen) {print seq; seqlen=0} print; seq=""; next} {seq = seq $0; seqlen += length($0)} END {while (length(seq) > 0) {print substr(seq, 1, 60); seq = substr(seq, 61)}}' $dir/final_genome.fasta > $dir/final_genome_fixed.fasta
 grep '^>' $dir/final_genome_fixed.fasta
-cp $dir/final_genome_fixed.fasta $folder_genomics/fasta/genomes/g20.fasta
+cp $dir/final_genome_fixed.fasta $folder_genomics/fasta/g20.fasta
 
 # g24
 dir=$folder_genomics/assembly/g24
@@ -26,4 +26,4 @@ seqtk subseq $dir/medaka/consensus.fasta <(echo -e "contig_1\ncontig_3") >> $dir
 awk '/^>/ {if (seqlen) {print seq; seqlen=0} print; seq=""; next} {seq = seq $0; seqlen += length($0)} END {while (length(seq) > 0) {print substr(seq, 1, 60); seq = substr(seq, 61)}}' $dir/final_genome.fasta > $dir/final_genome_fixed.fasta
 grep '^>' $dir/final_genome_fixed.fasta
 
-cp $dir/final_genome_fixed.fasta $folder_genomics/fasta/genomes/g24.fasta
+cp $dir/final_genome_fixed.fasta $folder_genomics/fasta/g24.fasta

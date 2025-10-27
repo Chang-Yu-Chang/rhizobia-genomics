@@ -15,17 +15,13 @@ do
     # Annotate genomes via prokka
     mkdir -p $folder_genomics/annotation/$genome_ids[$i]/
     zsh 03a-prokka.sh \
-        $folder_genomics/fasta/genomes/$genome_ids[$i].fasta \
+        $folder_genomics/fasta/$genome_ids[$i].fasta \
         $folder_genomics/annotation/$genome_ids[$i]/
 done
 
-## Reference genomes
-for ref in em1021 em1022 usda1106 wsm419 casidaa
-#for ref in em1021 wsm419 ngr234
-do
-    # Annotate genomes via prokka
-    mkdir -p $folder_genomics/annotation/$ref/
-    zsh 03a-prokka.sh \
-        $folder_genomics/fasta/ncbi/$ref.fasta \
-        $folder_genomics/annotation/$ref
+## gff
+mkdir -p $folder_genomics/gff
+
+for i in {1..38}; do
+    cp $folder_genomics/annotation/$genome_ids[$i]/annotated.gff $folder_genomics/gff/$genome_ids[$i].gff
 done

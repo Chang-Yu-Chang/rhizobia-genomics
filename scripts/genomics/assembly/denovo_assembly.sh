@@ -53,6 +53,16 @@ do
 done
 
 
+# Consolidates genome fasta files into one folder
+mamba activate seqkit
+for i in {1..38}
+do
+    dir=$folder_genomics/assembly/$genome_ids[$i]
+
+    # Remove contigs < 100k
+    seqkit seq -m 100000 -g $dir/medaka/consensus.fasta > $folder_genomics/fasta/$genome_ids[$i].fasta
+done
+
 
 
 

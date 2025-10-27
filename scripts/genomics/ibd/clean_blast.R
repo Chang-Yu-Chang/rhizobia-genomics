@@ -2,7 +2,6 @@
 library(tidyverse)
 source(here::here("metadata.R"))
 
-#blast <- read_tsv(paste0(folder_genomics, "ibd/blast_results/g10_vs_refs.tsv"), col_names = c("qseqid", "sseqid", "pident", "length", "evalue", "bitscore"))
 folder_genomics <- "~/Dropbox/lab/rhizobia-genomics/data/genomics"
 folder_ibd <- file.path(folder_genomics, "ibd/")
 folder_blast <- file.path(folder_ibd, "blast_results/")
