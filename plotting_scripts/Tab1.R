@@ -10,11 +10,14 @@ busco <- read_csv(paste0(folder_data, "genomics/qcs/busco.csv"))
 checkm <- read_csv(paste0(folder_data, "genomics/qcs/checkm.csv"))
 ani <- read_csv(paste0(folder_data, "genomics/taxonomy/ani.csv"))
 
-isolates <- select(isolates, genome_id, exp_id, population, site, growth_curve)
+isolates <- select(isolates, genome_id, exp_id, region, site, growth_curve)
 quast <- select(quast, genome_id, gc_percent, total_length_10000_bp, n50, l50)
 busco <- pivot_wider(busco, id_cols = genome_id, names_from = taxlevel, values_from = completeness, names_prefix = "busco_")
 checkm <- rename(checkm, genome_id = bin_id, checkm_completeness = completeness, checkm_contamination = contamination)
 ani <- select(ani, genome_id, organism_name, ani)
+
+# Replace the <95% ANI with sp.
+ani$organism_name[ani$ani<95] <- str_replace(ani$organism_name[ani$ani<95], " \\w+", " sp.")
 
 # Main table
 tb <- isolates %>%
@@ -23,7 +26,6 @@ tb <- isolates %>%
     left_join(busco) %>%
     left_join(ani) %>%
     mutate(
-        region = recode(population, "VA" = "Virginia", "PA" = "Pennsylvania"),
         region = factor(region, levels = c("Virginia", "Pennsylvania")),
         growth_curve = ifelse(growth_curve == 1, "+", ""),
         gc_percent = round(gc_percent, 1),
@@ -72,7 +74,7 @@ ft <- tb %>%
             "BUSCO",      # busco_* columns
             "Taxonomy"                  # organism + ani
         ),
-        colwidths = c(1, 3, 2, 4, 4, 2)   # total = 17
+        colwidths = c(1, 3, 2, 4, 4, 2)   # total = 16
     ) %>%
     # Header styling
     style(part = "header", pr_t = fp_text_default(bold = TRUE)) %>%
@@ -87,5 +89,5 @@ ft <- tb %>%
     bg(bg = "white", i = 2, j = 1:16, part = "header") %>%
     bg(bg = "grey95", i = seq(1, nrow_part(.), 2), j = 1:16)
 
-save_as_html(ft, path = here::here("plots/Tab1.html"))
+#save_as_html(ft, path = here::here("plots/Tab1.html"))
 save_as_image(ft, path = here::here("plots/Tab1.png"), res = 300)

@@ -1411,7 +1411,7 @@
     },
     "flextable": {
       "Package": "flextable",
-      "Version": "0.9.7",
+      "Version": "0.9.10",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1431,7 +1431,7 @@
         "uuid",
         "xml2"
       ],
-      "Hash": "e3201bd3a94311654ff35cf2ddc3343e"
+      "Hash": "a7cbadbf9c83806beff786c77c5f6970"
     },
     "fontBitstreamVera": {
       "Package": "fontBitstreamVera",
@@ -2736,23 +2736,25 @@
     },
     "officer": {
       "Package": "officer",
-      "Version": "0.6.8",
+      "Version": "0.7.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R6",
         "cli",
+        "dplyr",
         "grDevices",
         "graphics",
         "openssl",
         "ragg",
         "stats",
+        "tidyr",
         "utils",
         "uuid",
         "xml2",
         "zip"
       ],
-      "Hash": "f3c00dd7da020285bb78dc4e43893174"
+      "Hash": "246e418f758956a3d055e97c4b226729"
     },
     "openssl": {
       "Package": "openssl",
